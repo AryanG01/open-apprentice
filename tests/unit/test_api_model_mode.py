@@ -60,7 +60,7 @@ def test_model_mode_labels_meters_and_counts_spend(client):
         == pytest.approx(0.02 * m["session_calls"])
         == pytest.approx(m["session_usd"])
     )
-    assert m["server_cap_usd"] == 4.0
+    assert m["server_cap_usd"] == 2.0
     assert st["state"] == "AWAITING_USER" and len(st["question"]["options"]) >= 2
     ready = client.get("/health/ready").json()["model"]
     assert ready["available"] is True and ready["spend_usd"] == m["server_spend_usd"]

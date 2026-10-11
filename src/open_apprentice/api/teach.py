@@ -69,7 +69,7 @@ VISIBLE_DIFF_PX = 6  # the evaluation uses 1 px; a human looking at a picture ne
 DRIFT = {
     "move_origin": "center"
 }  # private tool change; only the Fabric backend supports it in this demo
-DEFAULT_MODEL_CAP_USD = 4.0  # global ceiling for model-mode spend on one server process
+DEFAULT_MODEL_CAP_USD = 2.0  # global ceiling for model-mode spend on one server process
 SESSION_TOKEN_LIMIT = 250_000
 SESSION_CALL_LIMIT = 40
 CONSERVATIVE_USD_PER_MILLION = 3.0  # used only if the provider reported no cost for a call

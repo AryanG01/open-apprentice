@@ -22,7 +22,7 @@ uv run uvicorn open_apprentice.api.app:app --port 8000
 Open <http://localhost:8000>. No account, no API key and no model call is needed for the interactive demo.
 
 **Optional: let NVIDIA Nemotron drive it.** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
-`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=4 uv run uvicorn open_apprentice.api.app:app --port 8000`. In *Try it live*, choose "NVIDIA Nemotron". It is
+`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=2 uv run uvicorn open_apprentice.api.app:app --port 8000`. In *Try it live*, choose "NVIDIA Nemotron". It is
 **off by default** so a public instance can never spend money by accident. Nemotron then proposes the candidate rules, writes the native procedure for each
 backend and writes the repair. Every output is checked on the real engine before it is accepted; if it fails, a scripted fixture is used instead and the
 interface says so. A live meter shows tokens, calls and estimated dollars, and the server refuses model sessions once the cap is reached.

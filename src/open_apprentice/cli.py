@@ -264,6 +264,16 @@ def learn(
     reps: int = typer.Option(
         1, "--reps", help="Repeat every trial this many times (fresh model samples)."
     ),
+    hybrid: bool = typer.Option(
+        False,
+        "--hybrid",
+        help="Union the model's rules with the bounded symbolic search over a declared grammar.",
+    ),
+    max_total_tokens: int = typer.Option(
+        600_000,
+        "--max-total-tokens",
+        help="GLOBAL model-token ceiling for the whole command; later trials are skipped and reported.",
+    ),
     output_dir: str = typer.Option("results/pilot", "--output-dir"),
 ) -> None:
     """Teaching-only trials with the live model on development episodes (spec 21.11 pilot question 1)."""
@@ -309,7 +319,13 @@ def learn(
 
     async def main() -> list[dict]:
         out = []
+        spent = 0
         for e, c in trials:
+            if spent >= max_total_tokens:
+                typer.echo(
+                    f"NOT RUN: global token ceiling {max_total_tokens} reached (episode {e}, {c})"
+                )
+                continue
             out.append(
                 await run_learn_trial(
                     provider,
@@ -321,8 +337,10 @@ def learn(
                     reasoning_effort=st.nebius_reasoning_effort,
                     completion_cap=completion_cap,
                     audit=audit,
+                    hybrid=hybrid,
                 )
             )
+            spent += out[-1]["tokens"]
         await provider.aclose()
         return out
 

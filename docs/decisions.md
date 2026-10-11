@@ -240,3 +240,9 @@ on the research claim." Entries are append-only; append, never rewrite history.
     Also: ~10-15% of model trials in BOTH arms end in `TruncatedOutput` even with a 32k completion floor (reasoning runaway): a reliability issue to report.
     Caveat to state with the non-model reference's 100%: its grammar was designed with the benchmark's rule families in mind (generic constants, but family-shaped), so
     it shows the tasks are solvable inside a declared grammar, not that the reference "understands" layout.
+45. **Hybrid candidate source (`concepts/hybrid.py`, `oa learn --hybrid`): model proposals UNIONED with the bounded symbolic search.** Motivation: decisions #44 (omission, not
+    under-asking, is the failure). The union keeps the teaching loop and the teacher as the only oracle; candidates are tagged [model]/[search]; a failing model call degrades
+    to search-only. Known limit, found while testing: the search keeps only the simplest few behaviours that fit the demonstration, so an in-grammar rule beyond that cut-off
+    (e.g. a clamped inset) can lose to a simpler rule that coincides on every asked scene. The benchmark's own templates sit inside the simple range, so on them hybrid
+    should approach the non-model reference; that shows search coverage, NOT model value. Model value would need rules outside the grammar (not yet built).
+    Cost lesson: output-heavy runs cost ~$3-4/M tokens (balance $19.95 -> $6.96 after the audit experiment + live sessions); `oa learn` now has `--max-total-tokens`.

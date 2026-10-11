@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from open_apprentice.agent.policies import CountingTeacher, drive_teaching
 from open_apprentice.budget import Ledger, Limits
 from open_apprentice.concepts.domain import DomainManifest
+from open_apprentice.concepts.hybrid import HybridSource
 from open_apprentice.concepts.schemas import sha
 from open_apprentice.concepts.teaching import State, TeachingSession
 from open_apprentice.concepts.witness import SolverPool
@@ -32,6 +33,7 @@ async def run_learn_trial(
     reasoning_effort: str | None,
     completion_cap: int = 6000,
     audit: bool = False,
+    hybrid: bool = False,
 ) -> dict:
     ep = make_manifest(split, 0, 12).episodes[episode]
     latent, demo, counts = (
@@ -54,6 +56,12 @@ async def run_learn_trial(
             completion_cap=completion_cap,
             audit=audit,
         )
+        source = None
+        if (
+            hybrid
+        ):  # model proposals UNIONED with the bounded symbolic search; the teaching loop is unchanged
+            source = HybridSource(provider, ledger, dom, counts, completion_cap=completion_cap)
+            sess.candidate_source = source
         err = None
         try:
             await sess.start(demo)
@@ -76,6 +84,13 @@ async def run_learn_trial(
         "episode": episode,
         "concept": concept,
         "audit": audit,
+        "hybrid": hybrid,
+        "hybrid_model_errors": list(source.model_errors) if source else None,
+        "final_rule_origin": (
+            source.origins.get(sess.candidates[0].hash)
+            if source and sess.state == State.INTENT_READY and sess.candidates
+            else None
+        ),
         "evaluator_template": ep.templates[concept],
         "template_note": "evaluator-only; never sent to the model",
         "error": err,
