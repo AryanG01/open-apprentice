@@ -126,17 +126,20 @@ def test_session_cap_evicts_the_oldest(client):
 def test_paid_mode_is_rate_limited_per_client_and_free_mode_is_not_starved(client):
     from open_apprentice.api import teach
     from open_apprentice.api.app import app
+    from open_apprentice.providers.base import TruncatedOutput
     from open_apprentice.providers.mock import MockProvider
 
-    app.state.provider = MockProvider(
-        {"hypotheses": [{"candidates": [{"summary": "x", "rule": []}]}] * 20}
-    )
+    class Failing(MockProvider):  # every paid attempt is counted even when the model call fails
+        async def _call(self, messages, *, max_tokens, ctx):
+            raise TruncatedOutput("x")
+
+    app.state.provider = Failing({})
     app.state.rate.clear()
+    limit = teach.RATE_LIMITS["nemotron"]
     codes = [
-        client.post("/api/teach", json={"mode": "nemotron"}).status_code
-        for _ in range(teach.RATE_LIMITS["nemotron"] + 2)
+        client.post("/api/teach", json={"mode": "nemotron"}).status_code for _ in range(limit + 2)
     ]
-    assert codes[: teach.RATE_LIMITS["nemotron"]] == [502] * teach.RATE_LIMITS["nemotron"]
+    assert codes[:limit] == [502] * limit
     assert codes[-1] == 429 and codes[-2] == 429
     assert client.post("/api/teach").status_code == 200
 
