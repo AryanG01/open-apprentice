@@ -21,9 +21,15 @@ uv run uvicorn open_apprentice.api.app:app --port 8000
 
 Open <http://localhost:8000>. No account, no API key and no model call is needed for the interactive demo.
 
+**Optional: let NVIDIA Nemotron drive it.** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
+`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=4 uv run uvicorn open_apprentice.api.app:app --port 8000`. In *Try it live*, choose "NVIDIA Nemotron". It is
+**off by default** so a public instance can never spend money by accident. Nemotron then proposes the candidate rules, writes the native procedure for each
+backend and writes the repair. Every output is checked on the real engine before it is accepted; if it fails, a scripted fixture is used instead and the
+interface says so. A live meter shows tokens, calls and estimated dollars, and the server refuses model sessions once the cap is reached.
+
 | Tab | What it is | Source of what you see |
 |---|---|---|
-| **Try it live** (`/#live`) | Teach the badge rule yourself, reuse it on Konva or Fabric, silently change the tool, reproduce the mismatch, repair, then download the result | Real engines and the independent verifier, run on your clicks. Candidate rules come from a non-model learner; native procedures are scripted fixtures. **No language model is involved.** |
+| **Try it live** (`/#live`) | Teach the badge rule yourself, reuse it on Konva or Fabric, silently change the tool, reproduce the mismatch, repair, then download the result | Real engines and the independent verifier, run on your clicks. Reference mode: non-model learner and scripted native procedures, **no language model**. Nemotron mode: live and metered (see above). Every response labels which produced what. |
 | **Learn / Reuse / Transfer / Challenge** | A recorded, annotated walkthrough of the same story | Recorded from a real offline run; labelled RECORDED |
 | **Compare** (`/#compare`) | Stored live-model pilot results against baselines | Rows from real Nemotron runs, development split, with their limits stated first |
 
@@ -48,7 +54,7 @@ non-model reference solves every task, while every model-based method, including
 was not the intended one**. We report this in the Compare tab and `docs/status.md` instead of hiding it. These are pilot numbers, not the locked study, and
 do not support any claim that our method beats the baselines.
 
-**Not built yet:** teaching with a language model from the web interface, your own scenes in Challenge mode, a skill inspector, SVG *import* of real documents.
+**Not built yet:** your own scenes in Challenge mode, a skill inspector, SVG *import* of real documents, entering a corrected example after "Neither".
 
 Every deviation from the specification is recorded in `docs/decisions.md`; the running log of what was tested is `docs/status.md`.
 
