@@ -1,0 +1,84 @@
+[project]
+name = "open-apprentice"
+version = "0.1.0"
+description = "Open Apprentice: demonstration-based learning of portable visual rules, with grounded counterexamples and checked native bindings."
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "MIT" }
+dependencies = [
+  "fastapi>=0.115,<0.116",
+  "uvicorn[standard]>=0.32,<0.33",
+  "pydantic>=2.9,<3",
+  "pydantic-settings>=2.5,<3",
+  "httpx>=0.27,<0.28",
+  "sqlalchemy>=2.0,<2.1",
+  "alembic>=1.13,<1.14",
+  "psycopg[binary]>=3.2,<3.3",
+  "z3-solver>=4.13,<4.14",
+  "typer>=0.12,<0.13",
+  "click>=8.1,<8.2",
+  "structlog>=24.4,<25",
+  "python-multipart>=0.0.12,<0.1",
+  "jinja2>=3.1,<3.2",
+  "pyyaml>=6.0,<7",
+]
+
+[project.scripts]
+oa = "open_apprentice.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/open_apprentice"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.24,<0.25",
+  "hypothesis>=6.112,<7",
+  "import-linter>=2.1,<3",
+  "ruff>=0.7,<0.8",
+  "black>=24.10,<25",
+  "mypy>=1.13,<2",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint.per-file-ignores]
+# Rule-AST builders and test helpers use terse one-line lambdas (B = lambda o, *a: ...) and `l` for ledgers on purpose.
+"tests/**" = ["E731", "E741", "F811"]
+"scripts/**" = ["E731"]
+"src/open_apprentice/concepts/**" = ["E731", "E741"]
+"src/open_apprentice/evaluation/episodes.py" = ["E731"]
+"src/open_apprentice/api/fixtures.py" = ["E731"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+
+[tool.importlinter]
+root_packages = ["open_apprentice"]
+
+[[tool.importlinter.contracts]]
+name = "Agent/skills/concepts/providers never import the evaluator"
+type = "forbidden"
+source_modules = [
+  "open_apprentice.agent",
+  "open_apprentice.concepts",
+  "open_apprentice.skills",
+  "open_apprentice.providers",
+  "open_apprentice.environments",
+]
+forbidden_modules = [
+  "open_apprentice.evaluation.verifier",
+  "open_apprentice.evaluation.episodes",
+]

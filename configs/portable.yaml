@@ -1,0 +1,48 @@
+# portable.yaml -- separately labelled v1.1 comparison; do not mix with counterexample results
+protocol: v1_1_portable
+status: unfrozen
+primary_comparison: full vs text_memory (v1.1 labelled comparison)
+model:
+  provider: nebius
+  id: nvidia/nemotron-3-super-120b-a12b   # unverified until `oa provider probe --live` passes
+  one_model_for_all_roles: true
+budgets:                     # spec 19.2 starting limits; shared ceilings for ALL methods
+  propose_execute_cycles_per_task: 3
+  primitive_actions_per_invocation: 100
+  repair_candidates: 3
+  interactive_task_seconds: 180
+  scored_tasks_per_episode: 8
+  episode_total_tokens: 300000
+  episode_provider_calls: 120
+  episode_primitive_actions: 800
+  episode_wall_clock_seconds: 900
+  parallel_provider_requests: 2
+  parallel_browser_contexts: 4
+  max_canvas: {width: 1600, height: 1200}
+  max_scene_objects: 100
+  initial_concept_candidates: 4
+  clarification_scenes: 8
+  user_questions_per_concept: 2
+  candidate_generation_rounds_per_concept: 2
+  native_candidates_per_transfer: 3
+  extra_native_actions_per_session: 48   # spec says 24; raised for all methods, decisions #35; inside the 800 total
+  solver_calls_per_session: 12
+  solver_ms_per_call: 500
+  solver_total_seconds: 6
+  composition_nodes_shipped: 2
+  composition_nodes_interpreter_max: 4
+  c_ref_token_units: 37500               # 300000 / 8 scored tasks (spec 21.10); caps raised in development, see decisions #33
+  action_equivalent_token_units: 10
+supported_domain:             # spec 8.9; tune on dev/validation only, then freeze
+  version: 1
+  object_count: {min: 2, max: 8}
+  card_size_px: {min: 24, max: 512}
+  canvas_width_px: {min: 64, max: 1600}
+  canvas_height_px: {min: 64, max: 1200}
+  rotation: unsupported
+  symbolic_subset: [add, sub, mul_by_const, div_by_const, compare, min, max, bounded_branch]
+  query_visible_difference_px: 1.0       # question selection only
+  verifier_tolerance_px: 0.5             # final verifier; separate from the above
+episodes: 12
+repetitions: 3
+methods: [fresh_full_context, flat_procedure_repair, text_memory, full_v1_1]

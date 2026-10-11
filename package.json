@@ -1,0 +1,12 @@
+{
+  "name": "open-apprentice-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "license": "MIT",
+  "workspaces": ["apps/web", "services/engine"],
+  "engines": { "node": ">=22.12 <23 || >=24" },
+  "scripts": {
+    "test": "npm test -w services/engine",
+    "build:web": "npm run build -w apps/web"
+  }
+}

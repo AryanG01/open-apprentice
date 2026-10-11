@@ -1,0 +1,50 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+*.local
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+apps/web/dist/
+apps/web/node_modules/
+services/engine/dist/
+services/engine/node_modules/
+.npm/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Artifacts, logs, local data volumes
+/data/
+*.log
+
+# Private evaluator manifests must never be tracked in application dirs
+benchmarks/final/**/answers/
+benchmarks/final/**/*.secret.json
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# uv
+.python-version.local
+
+# private evaluator manifests must never be committed (CLAUDE.md)
+benchmarks/final/

@@ -1,0 +1,57 @@
+# Local/deploy orchestration (spec 25.2). Only `web` publishes a port.
+# Node pinned to 22 to match spec 3.4 regardless of host Node.
+name: open-apprentice
+
+x-app-env: &app-env
+  env_file: .env
+
+services:
+  db:
+    image: postgres:16-bookworm
+    <<: *app-env
+    volumes: [dbdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: {context: ., dockerfile: docker/api.Dockerfile}
+    <<: *app-env
+    command: ["uvicorn", "open_apprentice.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    depends_on: {db: {condition: service_healthy}}
+    volumes: [artifacts:/data/artifacts]
+    user: "10001:10001"
+    read_only: true
+    tmpfs: [/tmp]
+    restart: unless-stopped
+
+  worker:
+    build: {context: ., dockerfile: docker/api.Dockerfile}
+    <<: *app-env
+    command: ["oa", "worker"]            # not implemented until M1; compose up will fail loudly until then
+    depends_on: {db: {condition: service_healthy}, engine: {condition: service_started}}
+    volumes: [artifacts:/data/artifacts]
+    user: "10001:10001"
+    restart: unless-stopped
+
+  engine:
+    build: {context: ., dockerfile: docker/engine.Dockerfile}
+    <<: *app-env
+    user: "10001:10001"
+    shm_size: 512m
+    mem_limit: 2g
+    restart: unless-stopped
+    # no published ports; reachable only on the compose network (spec 25.2)
+
+  web:
+    build: {context: ., dockerfile: docker/web.Dockerfile}
+    ports: ["8080:80"]
+    depends_on: [api]
+    restart: unless-stopped
+
+volumes:
+  dbdata:
+  artifacts:
