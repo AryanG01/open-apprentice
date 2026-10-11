@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import random
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -59,6 +60,7 @@ from open_apprentice.providers.base import Provider, ProviderError
 from open_apprentice.providers.mock import MockProvider
 
 router = APIRouter(prefix="/api/teach", tags=["teach"])
+replay_router = APIRouter(prefix="/api", tags=["replay"])
 
 MAX_SESSIONS = 20
 TTL_SECONDS = 30 * 60
@@ -107,6 +109,13 @@ class RunIn(BaseModel):
     tool_change: bool = False
 
 
+class BreakIn(BaseModel):
+    backend: str = Field(default="konva", pattern="^(konva|fabric)$")
+    tool_change: bool = False
+    samples: int = Field(default=40, ge=1, le=80)
+    seed: int = Field(default=0, ge=0, le=10_000)
+
+
 @dataclass
 class Live:
     id: str
@@ -119,6 +128,7 @@ class Live:
     registry: BindingRegistry = field(default_factory=BindingRegistry)
     concept: Optional[Concept] = None
     last_failure: Optional[dict] = None
+    last_break: Optional[dict] = None  # the latest stress test, included in the evidence package
     last_run: Optional[dict] = (
         None  # what the export endpoints serialise: the latest executed layout and its evidence
     )
@@ -524,6 +534,85 @@ async def run(request: Request, sid: str, body: RunIn) -> dict:
         return jsonable_encoder(out)
 
 
+def _break_cases(samples: int, seed: int) -> list[tuple[int, int, int, int]]:
+    """(width, height, x, y): the supported-domain boundaries first, then seeded random cases. Deterministic for a given seed."""
+    edges = [(w, h, 100, 100) for w in (60, 61, 150, 599, 600) for h in (40, 80, 200)]
+    edges += [(300, 80, 0, 0), (300, 80, 200, 200), (600, 200, 0, 0), (60, 40, 300, 300)]
+    rng = random.Random(seed)
+    cases = edges[:samples]
+    while len(cases) < samples:
+        cases.append(
+            (
+                rng.randrange(60, 601),
+                rng.randrange(40, 201),
+                rng.randrange(0, 301, 10),
+                rng.randrange(0, 201, 10),
+            )
+        )
+    return cases
+
+
+@router.post("/{sid}/break")
+async def break_it(request: Request, sid: str, body: BreakIn) -> dict:
+    """Stress test: run the active binding on many generated inputs on the REAL engine and judge each with the independent verifier.
+    Reports exactly what was tested. It is bounded sampling, not a proof; the response says so."""
+    live = _get(request, sid)
+    if live.concept is None:
+        raise HTTPException(409, "teach the rule first (answer the question)")
+    if body.tool_change and body.backend != "fabric":
+        raise HTTPException(
+            422, "the silent tool change is only available on the Fabric backend in this demo"
+        )
+    async with live.lock:
+        try:
+            await _ensure_binding(request, live, body.backend)
+        except ProviderError as e:
+            _account(request, live)
+            raise _provider_failure(e) from e
+        binding = live.registry.current(CONCEPT_ID, body.backend)
+        rule = live.concept.rule
+        harness, opener = _opener(request, body.backend, DRIFT if body.tool_change else None)
+        t0 = time.time()
+        failures: list[dict] = []
+        cases = _break_cases(body.samples, body.seed)
+        for w, h, x, y in cases:
+            sc = card_scene(w, h, x, y)
+            targets = targets_from_rule(rule, sc)
+            sess = opener(sc)
+            initial = opener.initials[-1]
+            try:
+                res = native_run(binding.prog, targets, sess, CANVAS, NativeBudget(60))
+                rep = harness.judge_expected(sess, initial, expected_state(rule, sc), ["card"])
+            finally:
+                sess.close()
+            if not rep.passed or not res["passed"]:
+                failures.append(
+                    {
+                        "width": w, "height": h, "x": x, "y": y, "native_passed": bool(res["passed"]),
+                        "failed_checks": [c.name for c in rep.checks if not c.passed], "native_diffs": res.get("diffs", [])[:2],
+                        "native_error": res.get("error"),
+                    }
+                )  # fmt: skip
+        out = {
+            "backend": body.backend,
+            "tool_change": body.tool_change,
+            "binding": {
+                "version": binding.version,
+                "origin": binding.origin,
+                "program_hash": binding.program_hash,
+            },
+            "tested": len(cases),
+            "passed": len(cases) - len(failures),
+            "failed": len(failures),
+            "failures": failures[:8],
+            "seed": body.seed,
+            "elapsed_s": round(time.time() - t0, 1),
+            "coverage": f"{len(cases)} inputs: the supported-domain boundaries first (widths 60-600, heights 40-200), then seeded random card sizes and positions. Bounded sampling on the real engine, not a proof for other inputs.",
+        }
+        live.last_break = out
+        return jsonable_encoder(out)
+
+
 @router.get("/{sid}/export.svg")
 async def export_svg(request: Request, sid: str) -> Response:
     live = _get(request, sid)
@@ -558,16 +647,35 @@ async def export_evidence(request: Request, sid: str) -> JSONResponse:
     if live.last_run is None or live.concept is None:
         raise HTTPException(409, "run the rule first; there is nothing to export yet")
     s = live.session
+    c = live.concept
+    cur = live.registry.current(CONCEPT_ID, live.last_run["request"]["backend"])
     pkg = {
         "label": _label(live.mode, live.model_id),
         "concept": {
-            "rule_text": live.concept.summary,
-            "sealed_hash": live.concept.sealed_hash(),
+            "rule_text": c.summary,
+            "rule": c.rule,
+            "input_schema": c.input_schema,
+            "preservation": list(c.preservation_constraints),
+            "domain_hash": c.domain_hash,
+            "sealed_hash": c.sealed_hash(),
             "intent_state": s.intent_state.value,
             "queries_asked": s.queries_asked,
         },
+        "domain": s.dom.canonical(),
+        "ledger": [
+            {
+                "seq": e.seq,
+                "kind": e.kind,
+                "payload": e.payload,
+                "source": e.source,
+                "prev_hash": e.prev_hash,
+                "hash": e.hash,
+            }
+            for e in s.ledger.entries
+        ],
         "teaching_ledger": [{"kind": e.kind, "source": e.source} for e in s.ledger.entries],
         "teaching_ledger_chain_verified": bool(s.ledger.verify_chain()),
+        "binding_program": cur.program_json if cur else None,
         "run": live.last_run["request"],
         "result": live.last_run["result"],
         "observed_geometry": live.last_run["boxes"],
@@ -581,6 +689,7 @@ async def export_evidence(request: Request, sid: str) -> JSONResponse:
             for _, v in live.registry.versions.items()
             for b in v
         ],
+        "stress_test": live.last_break,
         "model_meter": _meter(request, live),
         "fallbacks": list(live.fallbacks),
         "notes": [
@@ -690,3 +799,23 @@ async def repair(request: Request, sid: str) -> dict:
             and (new is None or new.concept_sealed_hash == sealed),
         }
         return jsonable_encoder(out)
+
+
+class ReplayIn(BaseModel):
+    package: dict
+
+
+@replay_router.post("/replay")
+async def replay_endpoint(body: ReplayIn) -> dict:
+    """Re-check an evidence package OFFLINE (no engine, no model). Accepts any package, so a reader can edit one and watch it fail."""
+    from open_apprentice.evaluation.replay import replay_package
+
+    raw = len(str(body.package))
+    if raw > 500_000:
+        raise HTTPException(413, "package too large")
+    try:
+        return replay_package(body.package)
+    except (KeyError, TypeError, ValueError, IndexError) as e:
+        raise HTTPException(
+            422, f"this does not look like an evidence package ({type(e).__name__})"
+        ) from e

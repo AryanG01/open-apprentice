@@ -44,7 +44,15 @@ def test_command_registered_with_help(cmd):
 UNBUILT = [
     c
     for c in SPEC_COMMANDS
-    if c not in (["doctor"], ["config", "init"], ["provider", "probe"], ["learn"], ["compare"])
+    if c
+    not in (
+        ["doctor"],
+        ["config", "init"],
+        ["provider", "probe"],
+        ["learn"],
+        ["compare"],
+        ["replay-evidence"],
+    )
 ]
 
 

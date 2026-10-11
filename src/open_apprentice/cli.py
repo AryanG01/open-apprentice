@@ -635,13 +635,38 @@ def export_svg(
 
 @app.command("replay-evidence")
 def replay_evidence(
-    dry_run: bool = DryRunOpt,
-    config: Optional[str] = ConfigOpt,
-    max_usd: Optional[float] = MaxUsdOpt,
-    live: bool = LiveOpt,
+    package: str = typer.Argument(
+        ..., help="an evidence package downloaded from the live demo (evidence.json)"
+    ),
 ) -> None:
-    """Offline evidence replay; spends no credits."""
-    _not_implemented("replay-evidence", "M5")
+    """Re-check an evidence package OFFLINE: hash chain, sealed concept hash, native-program hash, exact geometry, and the package's own claims.
+    Needs no engine, no model and no network; spends nothing."""
+    import json
+    import os
+
+    from open_apprentice.evaluation.replay import replay_package
+
+    if not os.path.exists(package):
+        typer.echo(f"oa replay-evidence: no such file: {package}", err=True)
+        raise typer.Exit(code=1)
+    try:
+        pkg = json.load(open(package))
+    except ValueError:
+        typer.echo("oa replay-evidence: not valid JSON", err=True)
+        raise typer.Exit(code=1)
+    res = replay_package(pkg)
+    for c in res["checks"]:
+        tag = "INFO" if c["passed"] is None else ("PASS" if c["passed"] else "FAIL")
+        typer.echo(f"{tag}  {c['name']}  ({c['detail']})")
+    typer.echo(
+        "RESULT: every offline check passed"
+        if res["passed"]
+        else "RESULT: at least one offline check FAILED"
+    )
+    typer.echo(
+        "Scope: this re-derives hashes and geometry from the package; it does not re-run the graphics engine."
+    )
+    raise typer.Exit(code=0 if res["passed"] else int(ExitState.VALIDATION_FAILED))
 
 
 @app.command("import-svg")

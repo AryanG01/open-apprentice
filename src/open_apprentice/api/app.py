@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from open_apprentice import __version__
-from open_apprentice.api.teach import router as teach_router
+from open_apprentice.api.teach import replay_router, router as teach_router
 from open_apprentice.config import load_settings
 from open_apprentice.providers.factory import MissingCredential, make_provider
 from open_apprentice.concepts.witness import SolverPool
@@ -51,6 +51,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Open Apprentice", version=__version__, lifespan=lifespan)
 app.include_router(teach_router)
+app.include_router(replay_router)
 
 
 @app.get("/health/live")

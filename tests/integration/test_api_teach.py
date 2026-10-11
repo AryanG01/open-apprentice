@@ -199,3 +199,42 @@ def test_model_mode_falls_back_to_a_labelled_fixture_when_the_model_procedure_is
         assert pkg["fallbacks"] == run["fallbacks"] and pkg["model_meter"]["session_calls"] >= 2
     finally:
         c.__exit__(None, None, None)
+
+
+def test_break_it_reports_what_was_tested_and_finds_the_unrepaired_tool_change(client):
+    sid, _ = _teach(client)
+    assert (
+        client.post(f"/api/teach/{sid}/break", json={"backend": "konva", "samples": 5}).status_code
+        == 200
+    )
+    ok = client.post(
+        f"/api/teach/{sid}/break", json={"backend": "fabric", "samples": 20, "seed": 3}
+    ).json()
+    assert (
+        ok["tested"] == 20
+        and ok["passed"] == 20
+        and ok["failed"] == 0
+        and "not a proof" in ok["coverage"]
+    )
+    again = client.post(
+        f"/api/teach/{sid}/break", json={"backend": "fabric", "samples": 20, "seed": 3}
+    ).json()
+    assert again["tested"] == 20 and again["failed"] == 0  # deterministic for a seed
+    bad = client.post(
+        f"/api/teach/{sid}/break", json={"backend": "fabric", "tool_change": True, "samples": 12}
+    ).json()
+    assert (
+        bad["failed"] == bad["tested"] > 0 and bad["failures"][0]["native_diffs"]
+    )  # the unrepaired scripted procedure fails everywhere
+    client.post(
+        f"/api/teach/{sid}/run", json={"width": 300, "backend": "fabric", "tool_change": True}
+    )
+    assert client.post(f"/api/teach/{sid}/repair").json()["status"] == "validated"
+    fixed = client.post(
+        f"/api/teach/{sid}/break",
+        json={"backend": "fabric", "tool_change": True, "samples": 20, "seed": 5},
+    ).json()
+    assert (
+        fixed["failed"] == 0 and fixed["passed"] == 20
+    )  # after the repair, the changed tool passes too
+    assert client.get(f"/api/teach/{sid}/evidence.json").json()["stress_test"]["tested"] == 20
