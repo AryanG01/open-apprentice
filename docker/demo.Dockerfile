@@ -27,7 +27,9 @@ COPY configs configs
 COPY docs/capabilities.json docs/capabilities.json
 
 RUN mkdir -p /tmp/home && chmod 1777 /tmp/home
-USER 10001:10001
+# UID 1000 is the `node` user in this base image; Hugging Face Spaces also runs containers as UID 1000.
+USER 1000:1000
+ENV PORT=8000
 EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s CMD node -e "fetch('http://127.0.0.1:8000/health/ready').then(r=>r.json()).then(j=>process.exit(j.engine?0:1)).catch(()=>process.exit(1))"
-CMD ["uvicorn", "open_apprentice.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||8000)+'/health/ready').then(r=>r.json()).then(j=>process.exit(j.engine?0:1)).catch(()=>process.exit(1))"
+CMD ["sh", "-c", "exec uvicorn open_apprentice.api.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
