@@ -290,3 +290,50 @@ export interface ReplayResult {
   passed: boolean;
   checks: ReplayCheck[];
 }
+
+export interface SvgRow {
+  id: string;
+  tag: string;
+  editable: boolean;
+  reason?: string;
+  world?: { x: number; y: number; width: number; height: number };
+}
+
+export interface SvgPair {
+  card: string;
+  badge: string;
+}
+
+export interface SvgSample {
+  id: string;
+  bytes: number;
+  coverage: { editable: number; listed: number };
+  suggested_pairs: SvgPair[];
+}
+
+export interface SvgInspect {
+  source: string;
+  inventory: { hash: string; elements: SvgRow[]; inert_vector_elements: number; coverage: { editable: number; listed: number } };
+  suggested_pairs: SvgPair[];
+}
+
+export interface SvgApply {
+  passed: boolean;
+  hash_before: string;
+  hash_after: string;
+  diff: { element: string; attribute: string; old: string | null; new: string }[];
+  unrelated_byte_changes: number;
+  scope: string;
+  rows: { badge: string; card: string; expected: { x: number; y: number; width: number; height: number }; measured: { x: number; y: number } | null; max_error_px: number | null; passed: boolean }[];
+  moved_elements: string[];
+  only_selected_badges_moved: boolean;
+  concept_hash: string;
+  original_svg: string;
+  modified_svg: string;
+  patch: unknown;
+}
+
+export interface SvgHarm {
+  all_rejected: boolean;
+  attempts: { attempt: string; rejected: boolean; reasons: string[] }[];
+}

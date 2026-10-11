@@ -84,6 +84,46 @@ export class Engine {
     return Promise.race([run, timeout]);
   }
 
+  // Measure rendered WORLD geometry of elements in an SVG document, using the browser's own transform matrices (local bboxes are not world coordinates).
+  // Evaluator route only. The document was validated by the API; this context is network-blocked, short-lived, and rejects obvious active content again.
+  async measureSvg(svg, ids) {
+    if (typeof svg !== "string" || svg.length > 200_000 || !Array.isArray(ids) || ids.length > 200 || !ids.every((i) => typeof i === "string" && i.length < 120)) {
+      throw Object.assign(new Error("invalid measure request"), { code: "INVALID_ARGUMENT" });
+    }
+    if (/<\s*(script|foreignObject|iframe|object|embed)\b|\son[a-z]+\s*=/i.test(svg)) {
+      throw Object.assign(new Error("active content is not allowed"), { code: "INVALID_ARGUMENT" });
+    }
+    const context = await this.#browser.newContext();
+    try {
+      await context.route("**/*", (route) => route.abort());
+      const page = await context.newPage();
+      await page.setContent(`<!doctype html><html><body style="margin:0">${svg.replace(/^\s*<\?xml[^>]*\?>/, "")}</body></html>`);
+      return await page.evaluate((wanted) => {
+        const root = document.querySelector("svg");
+        if (!root) return { error: "no <svg> root" };
+        const inv = root.getScreenCTM().inverse();
+        const pt = root.createSVGPoint();
+        return wanted.map((id) => {
+          const el = document.getElementById(id);
+          if (!el || typeof el.getBBox !== "function") return { id, missing: true };
+          const b = el.getBBox();
+          const m = el.getScreenCTM();
+          const xs = [];
+          const ys = [];
+          for (const [x, y] of [[b.x, b.y], [b.x + b.width, b.y], [b.x, b.y + b.height], [b.x + b.width, b.y + b.height]]) {
+            pt.x = x; pt.y = y;
+            const w = pt.matrixTransform(m).matrixTransform(inv);
+            xs.push(w.x); ys.push(w.y);
+          }
+          const x0 = Math.min(...xs), y0 = Math.min(...ys);
+          return { id, x: x0, y: y0, width: Math.max(...xs) - x0, height: Math.max(...ys) - y0 };
+        });
+      }, ids);
+    } finally {
+      await context.close();
+    }
+  }
+
   // Raw native attrs for the private verifier (evaluator route only).
   async nativeState(id, owner) {
     return this.#get(id, owner).page.evaluate(() => window.__engine.nativeState());

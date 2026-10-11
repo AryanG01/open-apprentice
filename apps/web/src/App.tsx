@@ -3,11 +3,12 @@ import { Compare } from "./Compare";
 import { Attempts, AxisChips, Checks, Facts, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
 import { Home } from "./Home";
+import { SvgLane } from "./SvgLane";
 import { TryIt } from "./TryIt";
 import type { Demo, Evidence, Step } from "./types";
 
-type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live";
-const MODES: Mode[] = ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live"];
+type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live" | "Real SVG";
+const MODES: Mode[] = ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live", "Real SVG"];
 
 const MODE_HELP: Record<Mode, string> = {
   Home: "What this is and what we measured.",
@@ -17,6 +18,7 @@ const MODE_HELP: Record<Mode, string> = {
   Challenge: "The tool changes under it. Only the native procedure may be repaired.",
   Compare: "Stored live runs against baselines, with their limits.",
   "Try it live": "Teach the rule yourself on the real engines.",
+  "Real SVG": "Apply your taught rule to a real SVG document (experimental).",
 };
 
 async function loadJson<T>(name: string): Promise<T> {
@@ -26,7 +28,7 @@ async function loadJson<T>(name: string): Promise<T> {
 }
 
 const HASH: Record<string, Mode> = {
-  home: "Home", learn: "Learn", reuse: "Reuse", transfer: "Transfer", challenge: "Challenge", compare: "Compare", live: "Try it live" };
+  home: "Home", learn: "Learn", reuse: "Reuse", transfer: "Transfer", challenge: "Challenge", compare: "Compare", live: "Try it live", svg: "Real SVG" };
 
 function modeFromHash(): Mode {
   return HASH[window.location.hash.replace("#", "")] ?? "Home";
@@ -178,7 +180,7 @@ export function App() {
   const pickMode = (m: Mode) => {
     setMode(m);
     window.location.hash = Object.keys(HASH).find((k) => HASH[k] === m) ?? "";
-    if (m !== "Compare" && m !== "Try it live" && m !== "Home") {
+    if (m !== "Compare" && m !== "Try it live" && m !== "Home" && m !== "Real SVG") {
       const first = steps.findIndex((s) => s.mode === m);
       if (first >= 0) setIndex(first);
     }
@@ -216,6 +218,11 @@ export function App() {
             <span className="pill live">STORED RESULTS</span>
             <span>Rows from real Nemotron runs on the development split. Not the locked study.</span>
           </div>
+        ) : mode === "Real SVG" ? (
+          <div className="banner" role="note">
+            <span className="pill recorded">EXPERIMENTAL</span>
+            <span>Applies the rule you taught to owner-authored SVG files. No language model is used; geometry is verified by measuring in the locked browser.</span>
+          </div>
         ) : mode === "Home" ? null : (
           <div className="banner" role="note">
             <span className="pill recorded">RECORDED</span>
@@ -238,7 +245,9 @@ export function App() {
         </nav>
       </header>
 
-      {mode === "Home" ? (
+      {mode === "Real SVG" ? (
+        <SvgLane go={goHash} />
+      ) : mode === "Home" ? (
         <Home data={evidence} go={goHash} />
       ) : mode === "Try it live" ? (
         <TryIt />
@@ -291,8 +300,8 @@ export function App() {
 
       <footer className="foot">
         <p>
-          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live" needs the local API; Nemotron mode additionally needs
-          DEMO_MODEL_ENABLED=1 and a Nebius key. Not built yet: your own scenes, a skill inspector, SVG import, and entering a corrected example after "Neither". Compare reads stored results only.
+          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live" and "Real SVG" need the local API; Nemotron mode additionally needs
+          DEMO_MODEL_ENABLED=1 and a Nebius key. Not built yet: a skill inspector, entering a corrected example after "Neither", and model-written SVG patches. Compare reads stored results only.
         </p>
       </footer>
     </div>

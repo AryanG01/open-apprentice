@@ -343,3 +343,21 @@ ul.replay { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 4px
 .demofields label { display: grid; gap: 4px; font-size: 0.9rem; }
 .demofields input { font: inherit; padding: 6px 8px; width: 9rem; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
 .demofields button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+/* ---- svg lane ---------------------------------------------------------------------- */
+.svglane { max-width: 1120px; }
+.svglane h3 { margin: 22px 0 8px; }
+.samples { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; }
+.samplebtn { display: grid; gap: 2px; text-align: left; border: 2px solid var(--line); background: var(--surface); color: var(--ink); padding: 10px 14px; border-radius: 10px; cursor: pointer; font: inherit; }
+.samplebtn.on { border-color: var(--accent); background: var(--accent-soft); }
+.svgpair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.svgpair.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.svgpair figure { margin: 0; }
+.svgpair img { width: 100%; height: auto; background: #fff; border: 1px solid var(--line); border-radius: 8px; display: block; }
+.svgpair figcaption { font-size: 0.85rem; color: var(--ink-2); margin-top: 4px; }
+ul.pairs { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 8px; }
+ul.pairs li { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; }
+ul.pairs label { display: grid; gap: 4px; font-size: 0.9rem; }
+ul.pairs select { font: inherit; padding: 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-width: 9rem; }
+ul.pairs button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
+@media (max-width: 760px) { .svgpair { grid-template-columns: minmax(0, 1fr); } }

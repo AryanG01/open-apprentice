@@ -256,6 +256,7 @@ RATE_WINDOW_S = 3600
 RATE_LIMITS = {
     "reference": 60,
     "nemotron": 8,
+    "svg": 120,
 }  # new sessions per client per hour; the paid mode is deliberately scarce
 
 

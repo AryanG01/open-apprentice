@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300">
+  <!-- Authored for Open Apprentice (MIT). Tiles live inside translated groups: world coordinates differ from local ones. -->
+  <title>Dashboard tiles</title>
+  <defs>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe5d6"/></linearGradient>
+  </defs>
+  <g id="tile-a" transform="translate(40 30)">
+    <rect id="a-card" x="0" y="0" width="200" height="110" fill="url(#sheen)" stroke="#8b987a"/>
+    <circle cx="40" cy="55" r="16" fill="#b9c7a3"/>
+    <rect id="a-badge" x="80" y="40" width="24" height="24" fill="#76b900"/>
+  </g>
+  <g id="tile-b" transform="translate(300 30)">
+    <rect id="b-card" x="0" y="0" width="220" height="110" fill="url(#sheen)" stroke="#8b987a"/>
+    <path d="M20 90 C60 40 120 120 200 50" fill="none" stroke="#6a7a5f" stroke-width="3"/>
+    <rect id="b-badge" x="10" y="10" width="24" height="24" fill="#76b900"/>
+  </g>
+  <g id="tile-c" transform="translate(40 170)">
+    <g transform="translate(10 0)">
+      <rect id="c-card" x="0" y="0" width="480" height="100" fill="url(#sheen)" stroke="#8b987a"/>
+      <rect id="c-badge" x="230" y="70" width="24" height="24" fill="#76b900"/>
+    </g>
+  </g>
+</svg>

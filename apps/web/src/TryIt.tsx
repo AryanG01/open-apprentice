@@ -202,6 +202,15 @@ export function TryIt() {
     );
   }
 
+  useEffect(() => {
+    if (!live?.concept) return;
+    try {
+      window.sessionStorage.setItem("oa.session", live.id);  // the SVG lane applies the rule from the latest sealed session
+    } catch {
+      /* storage unavailable: the lane will ask the visitor to teach a rule */
+    }
+  }, [live?.id, live?.concept]);
+
   const q = live?.question;
   const concept = live?.concept;
   const qViews = q ? [q.base, ...q.options.map((o) => ({ label: o.id, canvas: q.base.canvas, boxes: o.boxes, note: "" }))] : [];

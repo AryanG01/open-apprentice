@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Authored for Open Apprentice (MIT). Includes a rotated card on purpose: it is NOT editable (not a plain translate), so the lane must refuse it and say why. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="260">
+  <title>Pricing table</title>
+  <g id="plans" transform="translate(20 20)">
+    <rect id="plan-free" x="0" y="0" width="150" height="200" fill="#eef1e8" stroke="#8b987a"/>
+    <rect id="plan-free-tag" x="60" y="90" width="18" height="18" fill="#76b900"/>
+    <rect id="plan-pro" x="170" y="0" width="150" height="200" fill="#dfe5d6" stroke="#6a7a5f" stroke-width="2"/>
+    <rect id="plan-pro-tag" x="300" y="2" width="18" height="18" fill="#76b900"/>
+    <polygon points="190,150 230,120 270,150" fill="#b9c7a3"/>
+  </g>
+  <g id="promo" transform="translate(360 60) rotate(8)">
+    <rect id="plan-promo" x="0" y="0" width="150" height="150" fill="#fff3d6" stroke="#b8860b"/>
+    <rect id="plan-promo-tag" x="10" y="10" width="18" height="18" fill="#76b900"/>
+  </g>
+</svg>

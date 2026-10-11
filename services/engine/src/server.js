@@ -44,6 +44,11 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
     const { scene, owner, private_config, backend } = req.body ?? {};
     try { return await engine.create(scene, { owner, privateConfig: private_config, backend }); } catch (e) { return fail(reply, e); }
   });
+  app.post("/internal/svg/measure", async (req, reply) => {
+    if (!guard(req, reply)) return;
+    const { svg, ids } = req.body ?? {};
+    try { return { boxes: await engine.measureSvg(svg, ids) }; } catch (e) { return fail(reply, e); }
+  });
   app.get("/internal/sessions/:id/native", async (req, reply) => {
     if (!guard(req, reply)) return;
     try { return await engine.nativeState(req.params.id, req.query.owner); } catch (e) { return fail(reply, e); }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Authored for Open Apprentice (MIT). Three product cards, each with a status badge that is NOT yet where the rule wants it. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="220" viewBox="0 0 640 220">
+  <title>Product cards</title>
+  <rect id="canvas-bg" x="0" y="0" width="640" height="220" fill="#f4f6f1"/>
+  <rect id="card-1" x="20" y="30" width="180" height="120" fill="#dfe5d6" stroke="#8b987a"/>
+  <circle cx="60" cy="90" r="22" fill="#b9c7a3"/>
+  <path d="M40 130 L100 110 L160 130" fill="none" stroke="#6a7a5f" stroke-width="3"/>
+  <rect id="badge-1" x="90" y="75" width="20" height="20" fill="#76b900"/>
+  <rect id="card-2" x="230" y="30" width="180" height="120" fill="#dfe5d6" stroke="#8b987a"/>
+  <path d="M250 60 H390 M250 80 H370" stroke="#6a7a5f" stroke-width="4"/>
+  <rect id="badge-2" x="300" y="100" width="20" height="20" fill="#76b900"/>
+  <rect id="card-3" x="440" y="30" width="180" height="120" fill="#dfe5d6" stroke="#8b987a"/>
+  <text x="455" y="120" font-size="14" fill="#33402a">Starter plan</text>
+  <rect id="badge-3" x="441" y="31" width="20" height="20" fill="#76b900"/>
+</svg>

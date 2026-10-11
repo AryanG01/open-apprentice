@@ -30,6 +30,7 @@ interface says so. A live meter shows tokens, calls and estimated dollars, and t
 | Tab | What it is | Source of what you see |
 |---|---|---|
 | **Try it live** (`/#live`) | Teach the badge rule yourself, reuse it on Konva or Fabric, silently change the tool, reproduce the mismatch, repair, then download the result | Real engines and the independent verifier, run on your clicks. Reference mode: non-model learner and scripted native procedures, **no language model**. Nemotron mode: live and metered (see above). Every response labels which produced what. |
+| **Real SVG** (`/#svg`, experimental) | Apply the rule you taught to a real SVG: pick one of three owner-authored documents (or check your own), choose card/badge pairs, apply, and get the exact patch, before/after previews, and a browser measurement of every badge | Original bytes edited surgically through a typed, whitelisted patch; rendered world geometry measured in Chromium; **no model** |
 | **Learn / Reuse / Transfer / Challenge** | A recorded, annotated walkthrough of the same story | Recorded from a real offline run; labelled RECORDED |
 | **Compare** (`/#compare`) | Stored live-model pilot results against baselines | Rows from real Nemotron runs, development split, with their limits stated first |
 
@@ -64,7 +65,7 @@ non-model reference solves every task, while every model-based method, including
 was not the intended one**. We report this in the Compare tab and `docs/status.md` instead of hiding it. These are pilot numbers, not the locked study, and
 do not support any claim that our method beats the baselines.
 
-**Not built yet:** your own scenes in Challenge mode, a skill inspector, SVG *import* of real documents, entering a corrected example after "Neither".
+**Not built yet:** a skill inspector, entering a corrected example after "Neither", model-written SVG patches, and the spec's matched baseline pilot on real assets. The SVG lane edits rectangles by translate-only world geometry; paths, rotation/scale and shared styles are out of scope and reported as such.
 
 Every deviation from the specification is recorded in `docs/decisions.md`; the running log of what was tested is `docs/status.md`.
 

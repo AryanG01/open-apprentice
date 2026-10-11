@@ -179,3 +179,7 @@ experiment. The `oa learn` process stalled while the laptop slept (3 s CPU in 2.
 ## 2026-10-12: out-of-grammar RESULT (decisions #47) and teach-by-placing
 Search only 0/12 correct; model alone 5/12 (2 confident-wrong); hybrid 5/11 committed-all-correct. First evidence that the MODEL adds value (outside the search grammar). Small n; two reps; one rule family.
 Live demo now starts from the visitor's own badge placement (drag / number fields / arrow keys); an inexpressible placement ends unresolved in plain language. 334 tests pass.
+
+## 2026-10-12: Real-SVG lane (experimental, no model)
+Built and tested: validator (15 rejection cases), byte-exact editor (property-tested), typed patch with 7 harmful-patch rejections, rule applied to three authored SVGs with Chromium-measured verification (0.000 px on the samples),
+inventory and coverage (rotated element refused with a reason), UI tab. NOT done: matched baseline pilot, model-written patches, paths/rotation/styles. See decisions #48.
