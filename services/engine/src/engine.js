@@ -39,7 +39,7 @@ export class Engine {
   #sessions = new Map();
 
   async start() {
-    this.#browser = await chromium.launch({ headless: true });
+    this.#browser = await chromium.launch({ headless: true, args: process.env.OA_CHROMIUM_NO_SANDBOX === "1" ? ["--no-sandbox"] : [] });
   }
 
   async close() {

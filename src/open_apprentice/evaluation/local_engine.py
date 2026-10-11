@@ -22,7 +22,7 @@ def local_engine(root: str = ".") -> Iterator[tuple[str, str]]:
     port = s.getsockname()[1]
     s.close()
     token = secrets.token_urlsafe(24)
-    env = {k: os.environ[k] for k in ("PATH", "HOME", "TMPDIR", "LANG") if k in os.environ}
+    env = {k: os.environ[k] for k in ("PATH", "HOME", "TMPDIR", "LANG", "PLAYWRIGHT_BROWSERS_PATH", "OA_CHROMIUM_NO_SANDBOX") if k in os.environ}
     env.update(PORT=str(port), HOST="127.0.0.1", EVALUATOR_TOKEN=token)
     proc = subprocess.Popen(
         ["node", "services/engine/src/server.js"],

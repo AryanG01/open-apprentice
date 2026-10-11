@@ -165,3 +165,9 @@ candidate-generation wording before decision #39 and without the 32k floor chang
 Control: 34 committed (19 correct, 15 wrong = 44%), 9 abstained, 5 lost to truncation. Audit: 10 committed (6 correct, 4 wrong = 40%), 30 abstained, 8 lost. The audit trades
 correct answers for silence without improving precision. Spacing is the weak concept (control: 11 of 21 committed rules wrong; badge: 4 of 13). ~10-15% of model trials
 end in TruncatedOutput in both arms. This is shown in the Compare tab. The research claim "asking/auditing more reduces false success" is NOT supported.
+
+## 2026-10-11 night: deployable demo container VERIFIED
+`docker build -f docker/demo.Dockerfile -t open-apprentice-demo .` (2.47 GB) then `docker run -p 8000:8000 open-apprentice-demo`: engine ready as a non-root user (Chromium with
+`OA_CHROMIUM_NO_SANDBOX=1`, container is the sandbox), `scripts/live_flow_check.py --mode reference` passes end to end inside it (teach, run on both backends, tool change mismatch, repair with
+rule hash unchanged), static web + data served, CSP/frame/nosniff headers present. Model mode inside the container NOT tested (needs --env-file and spends credit).
+`docker compose` (db/worker/web) remains untested and is not the demo path (worker not implemented). Docs: docs/deploy.md, docs/demo_script.md.
