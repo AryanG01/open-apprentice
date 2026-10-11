@@ -1,0 +1,1185 @@
+{
+ "label": "RECORDED",
+ "origin": "offline deterministic story on the real Konva and Fabric engines and the independent verifier; no language model is used: candidate rules and binding programs are scripted fixtures; the teacher is scripted",
+ "generated_at": "2026-10-11T04:46:53+00:00",
+ "steps": [
+  {
+   "id": "demonstrate",
+   "mode": "Learn",
+   "title": "You demonstrate: badge in the card's top-right corner",
+   "summary": "One demonstration at card width 150. Three different rules produce exactly this result, so the demonstration alone cannot decide.",
+   "canvases": [
+    {
+     "label": "Before",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 150.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      }
+     ],
+     "note": ""
+    },
+    {
+     "label": "Your demonstration",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 150.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 218.0,
+       "y": 112.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "axes": {
+    "intent": "Not yet resolved",
+    "symbolic": "Not yet checked",
+    "native": "Not yet tested",
+    "held_out": "Not yet tested"
+   }
+  },
+  {
+   "id": "question",
+   "mode": "Learn",
+   "title": "It asks one question, on the input where its candidates disagree most",
+   "summary": "Each picture is what one rule would do at card width 400. Pick the one you meant, or say Neither.",
+   "query": {
+    "query_id": "e8ac3245875dbfee",
+    "candidate_set_hash": "cc044666ef1780d763a9febea6f7af4741efd6a7dbac176cc80ed013809fec85",
+    "source": "sampled",
+    "groups": [
+     [
+      "Fixed 12 px inset"
+     ],
+     [
+      "Inset is 8% of the card width"
+     ],
+     [
+      "8% of the card width, but never below 8 px or above 24 px"
+     ]
+    ],
+    "entropy": 1.584962500721156
+   },
+   "options": [
+    {
+     "id": "A",
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 400.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 468.0,
+       "y": 112.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "stands_for": [
+      "Fixed 12 px inset"
+     ]
+    },
+    {
+     "id": "B",
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 400.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 448.0,
+       "y": 132.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "stands_for": [
+      "Inset is 8% of the card width"
+     ]
+    },
+    {
+     "id": "C",
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 400.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 456.0,
+       "y": 124.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "stands_for": [
+      "8% of the card width, but never below 8 px or above 24 px"
+     ]
+    }
+   ],
+   "extra_options": [
+    "Neither / correct this example"
+   ],
+   "base": {
+    "label": "Question input (card width 400)",
+    "canvas": {
+     "w": 800,
+     "h": 600
+    },
+    "boxes": [
+     {
+      "id": "card",
+      "x": 100.0,
+      "y": 100.0,
+      "w": 400.0,
+      "h": 80.0,
+      "role": "card"
+     },
+     {
+      "id": "proto",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 20.0,
+      "h": 20.0,
+      "role": "prototype"
+     }
+    ],
+    "note": ""
+   },
+   "axes": {
+    "intent": "Ambiguous: 3 candidates",
+    "symbolic": "Disagreement found and re-executed concretely",
+    "native": "Not yet tested",
+    "held_out": "Not yet tested"
+   }
+  },
+  {
+   "id": "learned",
+   "mode": "Learn",
+   "title": "Answer C: the rule is sealed",
+   "summary": "The rule is fixed and hashed together with the domain and the teaching record. Every later native binding must carry this exact hash.",
+   "rule_text": "8% of the card width, but never below 8 px or above 24 px",
+   "sealed_hash": "3fd58d29436be908672f003d55375adbdcb1e876d1564f01a4fed3529cf02a3d",
+   "ledger_entries": 3,
+   "ledger_chain_verified": true,
+   "note": "answer source: scripted benchmark teacher, not a user study",
+   "axes": {
+    "intent": "Resolved within the candidate set",
+    "symbolic": "Disagreement removed",
+    "native": "Not yet tested",
+    "held_out": "Not yet tested"
+   }
+  },
+  {
+   "id": "reuse",
+   "mode": "Reuse",
+   "title": "Reuse on a new card (Konva)",
+   "summary": "The frozen rule is applied to a card of width 300 through a Konva binding. The independent verifier recomputes the result from raw engine state.",
+   "canvases": [
+    {
+     "label": "Expected (rule)",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 300.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 356.0,
+       "y": 124.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "note": ""
+    },
+    {
+     "label": "Konva result",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "badge",
+       "x": 356,
+       "y": 124,
+       "w": 20,
+       "h": 20,
+       "role": "badge"
+      },
+      {
+       "id": "card",
+       "x": 100,
+       "y": 100,
+       "w": 300,
+       "h": 80,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0,
+       "y": 0,
+       "w": 20,
+       "h": 20,
+       "role": "prototype"
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "checks": [
+    {
+     "name": "no_duplicate_ids",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "exactly_the_expected_new_objects",
+     "passed": true,
+     "detail": "created=['badge'] expected=['badge']"
+    },
+    {
+     "name": "original_objects_still_exist",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "geometry_matches_expected",
+     "passed": true,
+     "detail": "[]"
+    },
+    {
+     "name": "unselected_unchanged",
+     "passed": true,
+     "detail": "checked=0"
+    }
+   ],
+   "verifier_passed": true,
+   "axes": {
+    "intent": "Resolved",
+    "symbolic": "Not applicable here",
+    "native": "Checked on listed case",
+    "held_out": "Not yet tested on unseen sizes"
+   }
+  },
+  {
+   "id": "transfer",
+   "mode": "Transfer",
+   "title": "Transfer to a second backend (Fabric)",
+   "summary": "The rule did not change. Only the native procedure was written for Fabric, then checked against Fabric's own geometry on two listed cases.",
+   "canvases": [
+    {
+     "label": "Expected (rule)",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 300.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 356.0,
+       "y": 124.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "note": ""
+    },
+    {
+     "label": "Fabric result",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "badge",
+       "x": 356,
+       "y": 124,
+       "w": 20,
+       "h": 20,
+       "role": "badge"
+      },
+      {
+       "id": "card",
+       "x": 100,
+       "y": 100,
+       "w": 300,
+       "h": 80,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0,
+       "y": 0,
+       "w": 20,
+       "h": 20,
+       "role": "prototype"
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "binding": {
+    "version": 1,
+    "backend": "fabric",
+    "program_hash": "3d02d285f1aa6af5e038dd8514e4804f092d2f183e5b0c0501bf922e647c7bf1",
+    "concept_hash": "3fd58d29436be908672f003d55375adbdcb1e876d1564f01a4fed3529cf02a3d",
+    "origin": "fixture",
+    "scope": "listed cases only; not a proof for other inputs",
+    "native_actions": 6
+   },
+   "program": [
+    {
+     "body": [
+      {
+       "cond": {
+        "args": [
+         {
+          "ref": "locals.t.kind"
+         },
+         "clone_place"
+        ],
+        "op": "eq"
+       },
+       "else": [
+        {
+         "args": {
+          "node_id": {
+           "ref": "locals.t.id"
+          },
+          "x": {
+           "ref": "locals.t.x"
+          },
+          "y": {
+           "ref": "locals.t.y"
+          }
+         },
+         "op": "call",
+         "tool": "move_node"
+        }
+       ],
+       "op": "if",
+       "then": [
+        {
+         "args": {
+          "new_id": {
+           "ref": "locals.t.symbol"
+          },
+          "node_id": {
+           "ref": "locals.t.proto"
+          }
+         },
+         "op": "call",
+         "tool": "clone_node"
+        },
+        {
+         "args": {
+          "node_id": {
+           "ref": "locals.t.symbol"
+          },
+          "x": {
+           "ref": "locals.t.x"
+          },
+          "y": {
+           "ref": "locals.t.y"
+          }
+         },
+         "op": "call",
+         "tool": "move_node"
+        }
+       ]
+      }
+     ],
+     "op": "for_each",
+     "over": {
+      "ref": "inputs.targets"
+     },
+     "var": "t"
+    }
+   ],
+   "checks": [
+    {
+     "name": "no_duplicate_ids",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "exactly_the_expected_new_objects",
+     "passed": true,
+     "detail": "created=['badge'] expected=['badge']"
+    },
+    {
+     "name": "original_objects_still_exist",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "geometry_matches_expected",
+     "passed": true,
+     "detail": "[]"
+    },
+    {
+     "name": "unselected_unchanged",
+     "passed": true,
+     "detail": "checked=0"
+    }
+   ],
+   "verifier_passed": true,
+   "same_concept_hash": true,
+   "axes": {
+    "intent": "Unchanged",
+    "symbolic": "Not applicable here",
+    "native": "Checked on listed cases only",
+    "held_out": "Not yet tested"
+   }
+  },
+  {
+   "id": "mismatch",
+   "mode": "Challenge",
+   "title": "The tool changes underneath, with no announcement",
+   "summary": "Fabric now positions objects from their centre. The documentation and tool schema are unchanged, so the abstract model still says the program is fine, but the real result is off.",
+   "canvases": [
+    {
+     "label": "Expected (rule)",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 100.0,
+       "w": 300.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 356.0,
+       "y": 124.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "note": ""
+    },
+    {
+     "label": "Fabric after the change",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "badge",
+       "x": 346,
+       "y": 114,
+       "w": 20,
+       "h": 20,
+       "role": "badge"
+      },
+      {
+       "id": "card",
+       "x": 100,
+       "y": 100,
+       "w": 300,
+       "h": 80,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0,
+       "y": 0,
+       "w": 20,
+       "h": 20,
+       "role": "prototype"
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "mismatch": {
+    "status": "failed",
+    "native_status": "reproduced_mismatch",
+    "abstract_check_passed": true,
+    "semantic_model_trusted": false,
+    "diffs": [
+     {
+      "key": "badge",
+      "expected": [
+       356.0,
+       124.0,
+       20.0,
+       20.0
+      ],
+      "observed": [
+       346,
+       114,
+       20,
+       20
+      ]
+     }
+    ]
+   },
+   "checks": [
+    {
+     "name": "no_duplicate_ids",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "exactly_the_expected_new_objects",
+     "passed": true,
+     "detail": "created=['badge'] expected=['badge']"
+    },
+    {
+     "name": "original_objects_still_exist",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "geometry_matches_expected",
+     "passed": false,
+     "detail": "[('badge', (346.0, 114.0, 20.0, 20.0), (356.0, 124.0, 20.0, 20.0))]"
+    },
+    {
+     "name": "unselected_unchanged",
+     "passed": true,
+     "detail": "checked=0"
+    }
+   ],
+   "verifier_passed": false,
+   "axes": {
+    "intent": "Unchanged (the rule is not blamed)",
+    "symbolic": "Abstract model agrees (and is now untrusted)",
+    "native": "Reproduced mismatch",
+    "held_out": "Not applicable"
+   }
+  },
+  {
+   "id": "repair",
+   "mode": "Challenge",
+   "title": "Only the native procedure is repaired",
+   "summary": "Two patches were proposed. The first hard-codes an offset: it fixes the failing case but breaks an earlier one, so it is rejected. The second measures and corrects, passes every retained case, and is promoted as version 2.",
+   "attempts": [
+    {
+     "candidate": 0,
+     "diagnosis": "fixture 0",
+     "failed_stage": "retained_in_original_env",
+     "cases": [
+      {
+       "stage": "witness_in_current_env",
+       "passed": true,
+       "scene": "af8be1453afe",
+       "native_actions": 3
+      },
+      {
+       "stage": "retained_in_original_env",
+       "passed": false,
+       "scene": "ff6eaa591b5f",
+       "native_actions": 3
+      }
+     ]
+    },
+    {
+     "candidate": 1,
+     "diagnosis": "fixture 1",
+     "failed_stage": null,
+     "cases": [
+      {
+       "stage": "witness_in_current_env",
+       "passed": true,
+       "scene": "af8be1453afe",
+       "native_actions": 5
+      },
+      {
+       "stage": "retained_in_original_env",
+       "passed": true,
+       "scene": "ff6eaa591b5f",
+       "native_actions": 4
+      },
+      {
+       "stage": "fresh_in_current_env",
+       "passed": true,
+       "scene": "b49280524958",
+       "native_actions": 5
+      }
+     ]
+    }
+   ],
+   "old_program": [
+    {
+     "body": [
+      {
+       "cond": {
+        "args": [
+         {
+          "ref": "locals.t.kind"
+         },
+         "clone_place"
+        ],
+        "op": "eq"
+       },
+       "else": [
+        {
+         "args": {
+          "node_id": {
+           "ref": "locals.t.id"
+          },
+          "x": {
+           "ref": "locals.t.x"
+          },
+          "y": {
+           "ref": "locals.t.y"
+          }
+         },
+         "op": "call",
+         "tool": "move_node"
+        }
+       ],
+       "op": "if",
+       "then": [
+        {
+         "args": {
+          "new_id": {
+           "ref": "locals.t.symbol"
+          },
+          "node_id": {
+           "ref": "locals.t.proto"
+          }
+         },
+         "op": "call",
+         "tool": "clone_node"
+        },
+        {
+         "args": {
+          "node_id": {
+           "ref": "locals.t.symbol"
+          },
+          "x": {
+           "ref": "locals.t.x"
+          },
+          "y": {
+           "ref": "locals.t.y"
+          }
+         },
+         "op": "call",
+         "tool": "move_node"
+        }
+       ]
+      }
+     ],
+     "op": "for_each",
+     "over": {
+      "ref": "inputs.targets"
+     },
+     "var": "t"
+    }
+   ],
+   "new_program": [
+    {
+     "body": [
+      {
+       "cond": {
+        "args": [
+         {
+          "ref": "locals.t.kind"
+         },
+         "clone_place"
+        ],
+        "op": "eq"
+       },
+       "else": [
+        {
+         "name": "nid",
+         "op": "let",
+         "value": {
+          "ref": "locals.t.id"
+         }
+        }
+       ],
+       "op": "if",
+       "then": [
+        {
+         "args": {
+          "new_id": {
+           "ref": "locals.t.symbol"
+          },
+          "node_id": {
+           "ref": "locals.t.proto"
+          }
+         },
+         "op": "call",
+         "tool": "clone_node"
+        },
+        {
+         "name": "nid",
+         "op": "let",
+         "value": {
+          "ref": "locals.t.symbol"
+         }
+        }
+       ]
+      },
+      {
+       "args": {
+        "node_id": {
+         "ref": "locals.nid"
+        },
+        "x": {
+         "ref": "locals.t.x"
+        },
+        "y": {
+         "ref": "locals.t.y"
+        }
+       },
+       "op": "call",
+       "tool": "move_node"
+      },
+      {
+       "args": {
+        "node_ids": {
+         "args": [
+          {
+           "ref": "locals.nid"
+          }
+         ],
+         "op": "list"
+        }
+       },
+       "bind": "obs",
+       "op": "call",
+       "tool": "observe_geometry"
+      },
+      {
+       "name": "b",
+       "op": "let",
+       "value": {
+        "args": [
+         {
+          "args": [
+           {
+            "ref": "locals.obs"
+           },
+           "bounds"
+          ],
+          "op": "get"
+         },
+         0
+        ],
+        "op": "index"
+       }
+      },
+      {
+       "name": "dx",
+       "op": "let",
+       "value": {
+        "args": [
+         {
+          "ref": "locals.t.x"
+         },
+         {
+          "args": [
+           {
+            "ref": "locals.b"
+           },
+           "left"
+          ],
+          "op": "get"
+         }
+        ],
+        "op": "sub"
+       }
+      },
+      {
+       "name": "dy",
+       "op": "let",
+       "value": {
+        "args": [
+         {
+          "ref": "locals.t.y"
+         },
+         {
+          "args": [
+           {
+            "ref": "locals.b"
+           },
+           "top"
+          ],
+          "op": "get"
+         }
+        ],
+        "op": "sub"
+       }
+      },
+      {
+       "cond": {
+        "args": [
+         {
+          "args": [
+           {
+            "ref": "locals.dx"
+           },
+           0.25
+          ],
+          "op": "gt"
+         },
+         {
+          "args": [
+           {
+            "ref": "locals.dx"
+           },
+           -0.25
+          ],
+          "op": "lt"
+         },
+         {
+          "args": [
+           {
+            "ref": "locals.dy"
+           },
+           0.25
+          ],
+          "op": "gt"
+         },
+         {
+          "args": [
+           {
+            "ref": "locals.dy"
+           },
+           -0.25
+          ],
+          "op": "lt"
+         }
+        ],
+        "op": "or"
+       },
+       "op": "if",
+       "then": [
+        {
+         "args": {
+          "node_id": {
+           "ref": "locals.nid"
+          },
+          "x": {
+           "args": [
+            {
+             "ref": "locals.t.x"
+            },
+            {
+             "ref": "locals.dx"
+            }
+           ],
+           "op": "add"
+          },
+          "y": {
+           "args": [
+            {
+             "ref": "locals.t.y"
+            },
+            {
+             "ref": "locals.dy"
+            }
+           ],
+           "op": "add"
+          }
+         },
+         "op": "call",
+         "tool": "move_node"
+        }
+       ]
+      }
+     ],
+     "op": "for_each",
+     "over": {
+      "ref": "inputs.targets"
+     },
+     "var": "t"
+    }
+   ],
+   "versions": [
+    {
+     "version": 1,
+     "parent": null,
+     "program_hash": "3d02d285f1aa6af5e038dd8514e4804f092d2f183e5b0c0501bf922e647c7bf1",
+     "active": false
+    },
+    {
+     "version": 2,
+     "parent": 1,
+     "program_hash": "daef4377b3bc24057c01f7e1c55550d991e42945acc3a617764c4bed3340b653",
+     "active": true
+    }
+   ],
+   "concept_hash_before": "3fd58d29436be908672f003d55375adbdcb1e876d1564f01a4fed3529cf02a3d",
+   "concept_hash_after": "3fd58d29436be908672f003d55375adbdcb1e876d1564f01a4fed3529cf02a3d",
+   "binding_concept_hash": "3fd58d29436be908672f003d55375adbdcb1e876d1564f01a4fed3529cf02a3d",
+   "rule_unchanged": true,
+   "canvases": [
+    {
+     "label": "Expected (rule), unseen card width 220",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "card",
+       "x": 100.0,
+       "y": 150.0,
+       "w": 220.0,
+       "h": 80.0,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0.0,
+       "y": 0.0,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "prototype"
+      },
+      {
+       "id": "badge",
+       "x": 282.4,
+       "y": 167.6,
+       "w": 20.0,
+       "h": 20.0,
+       "role": "badge"
+      }
+     ],
+     "note": ""
+    },
+    {
+     "label": "Repaired binding, changed tool",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "badge",
+       "x": 282.4,
+       "y": 167.6,
+       "w": 20,
+       "h": 20,
+       "role": "badge"
+      },
+      {
+       "id": "card",
+       "x": 100,
+       "y": 150,
+       "w": 220,
+       "h": 80,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0,
+       "y": 0,
+       "w": 20,
+       "h": 20,
+       "role": "prototype"
+      }
+     ],
+     "note": ""
+    },
+    {
+     "label": "Repaired binding, original tool",
+     "canvas": {
+      "w": 800,
+      "h": 600
+     },
+     "boxes": [
+      {
+       "id": "badge",
+       "x": 282.4,
+       "y": 167.6,
+       "w": 20,
+       "h": 20,
+       "role": "badge"
+      },
+      {
+       "id": "card",
+       "x": 100,
+       "y": 150,
+       "w": 220,
+       "h": 80,
+       "role": "card"
+      },
+      {
+       "id": "proto",
+       "x": 0,
+       "y": 0,
+       "w": 20,
+       "h": 20,
+       "role": "prototype"
+      }
+     ],
+     "note": ""
+    }
+   ],
+   "checks": [
+    {
+     "name": "no_duplicate_ids",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "exactly_the_expected_new_objects",
+     "passed": true,
+     "detail": "created=['badge'] expected=['badge']"
+    },
+    {
+     "name": "original_objects_still_exist",
+     "passed": true,
+     "detail": ""
+    },
+    {
+     "name": "geometry_matches_expected",
+     "passed": true,
+     "detail": "[]"
+    },
+    {
+     "name": "unselected_unchanged",
+     "passed": true,
+     "detail": "checked=0"
+    }
+   ],
+   "verifier_passed": true,
+   "axes": {
+    "intent": "Unchanged: same sealed hash",
+    "symbolic": "Not applicable here",
+    "native": "Checked on listed cases in both environments",
+    "held_out": "Unseen card checked once; no held-out study here"
+   }
+  }
+ ],
+ "sealed_hash": "3fd58d29436be908672f003d55375adbdcb1e876d1564f01a4fed3529cf02a3d"
+}

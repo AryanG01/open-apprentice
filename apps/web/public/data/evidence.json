@@ -1,0 +1,207 @@
+{
+ "generated_at": "2026-10-11T04:46:53+00:00",
+ "runs": [
+  {
+   "run": "development-ep1-1-20261010T144833",
+   "label": "LIVE model rows + non-model reference (development split, not the locked study)",
+   "episodes": 1,
+   "methods": {
+    "full_v1_2": {
+     "scheduled": 8,
+     "correct": 2,
+     "committed_wrong": 0,
+     "abstained": 6,
+     "tokens": 115840,
+     "failures": {
+      "unresolved_teaching": 5,
+      "binding_unavailable": 1
+     }
+    }
+   },
+   "origins": [
+    "live"
+   ]
+  },
+  {
+   "run": "development-ep1-2-20261010T132248",
+   "label": "LIVE model rows + non-model reference (development split, not the locked study)",
+   "episodes": 2,
+   "methods": {
+    "enumerative_reference": {
+     "scheduled": 16,
+     "correct": 16,
+     "committed_wrong": 0,
+     "abstained": 0,
+     "tokens": 0,
+     "failures": {}
+    },
+    "fresh_full_context": {
+     "scheduled": 16,
+     "correct": 1,
+     "committed_wrong": 0,
+     "abstained": 11,
+     "tokens": 572289,
+     "failures": {
+      "public_check_failed": 7,
+      "model_truncated": 4,
+      "budget_exhausted": 4
+     }
+    },
+    "full_v1_2": {
+     "scheduled": 16,
+     "correct": 1,
+     "committed_wrong": 3,
+     "abstained": 12,
+     "tokens": 221197,
+     "failures": {
+      "binding_unavailable": 2,
+      "native_check_failed_unrepaired": 2,
+      "unresolved_teaching": 8
+     }
+    },
+    "structured_procedure": {
+     "scheduled": 16,
+     "correct": 2,
+     "committed_wrong": 0,
+     "abstained": 14,
+     "tokens": 496810,
+     "failures": {
+      "public_check_failed": 12,
+      "model_truncated": 2
+     }
+    },
+    "text_memory": {
+     "scheduled": 16,
+     "correct": 1,
+     "committed_wrong": 0,
+     "abstained": 14,
+     "tokens": 506982,
+     "failures": {
+      "public_check_failed": 13,
+      "model_truncated": 1,
+      "budget_exhausted": 1
+     }
+    }
+   },
+   "origins": [
+    "live",
+    "reference"
+   ]
+  },
+  {
+   "run": "development-ep3-3-20261010T160334",
+   "label": "LIVE model rows + non-model reference (development split, not the locked study)",
+   "episodes": 3,
+   "methods": {
+    "full_v1_2": {
+     "scheduled": 24,
+     "correct": 6,
+     "committed_wrong": 0,
+     "abstained": 18,
+     "tokens": 472766,
+     "failures": {
+      "unresolved_teaching": 10,
+      "binding_unavailable": 7,
+      "native_check_failed_unrepaired": 1
+     }
+    }
+   },
+   "origins": [
+    "live"
+   ]
+  },
+  {
+   "run": "development-ep3-3-20261011T020702",
+   "label": "LIVE model rows + non-model reference (development split, not the locked study)",
+   "episodes": 3,
+   "methods": {
+    "enumerative_reference": {
+     "scheduled": 24,
+     "correct": 24,
+     "committed_wrong": 0,
+     "abstained": 0,
+     "tokens": 0,
+     "failures": {}
+    },
+    "fresh_full_context": {
+     "scheduled": 24,
+     "correct": 7,
+     "committed_wrong": 7,
+     "abstained": 10,
+     "tokens": 710921,
+     "failures": {
+      "public_check_failed": 8,
+      "model_truncated": 2
+     }
+    },
+    "full_v1_2": {
+     "scheduled": 24,
+     "correct": 3,
+     "committed_wrong": 5,
+     "abstained": 16,
+     "tokens": 437167,
+     "failures": {
+      "binding_unavailable": 7,
+      "native_check_failed_unrepaired": 1,
+      "unresolved_teaching": 8
+     }
+    },
+    "structured_procedure": {
+     "scheduled": 16,
+     "correct": 1,
+     "committed_wrong": 10,
+     "abstained": 5,
+     "tokens": 404120,
+     "failures": {
+      "model_format_error": 1,
+      "public_check_failed": 2,
+      "model_truncated": 2
+     }
+    },
+    "text_memory": {
+     "scheduled": 16,
+     "correct": 3,
+     "committed_wrong": 2,
+     "abstained": 7,
+     "tokens": 547952,
+     "failures": {
+      "public_check_failed": 3,
+      "budget_exhausted": 4,
+      "model_truncated": 3,
+      "model_format_error": 1
+     }
+    }
+   },
+   "origins": [
+    "live",
+    "reference"
+   ]
+  }
+ ],
+ "teaching_trials": [
+  {
+   "concept": "badge",
+   "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "reasoning_effort": "low",
+   "trials": 12,
+   "recovered": 9,
+   "ready_but_wrong": 2,
+   "unresolved": 1
+  },
+  {
+   "concept": "spacing",
+   "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+   "reasoning_effort": "low",
+   "trials": 12,
+   "recovered": 6,
+   "ready_but_wrong": 3,
+   "unresolved": 3
+  }
+ ],
+ "caveats": [
+  "The teaching trials and the model runs used the candidate-generation prompt as it was before the wording change in decision #39 (live results after that change have not been collected yet).",
+  "Runs from before the live binding fixes (decisions #34-#37) and runs still in progress are excluded.",
+  "Development-split pilot runs; not the locked study and not evidence for the spec's quality gates.",
+  "Dollar cost is not shown: it depends on rates entered locally and is not verified against billing."
+ ]
+}
