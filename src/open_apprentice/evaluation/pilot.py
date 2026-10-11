@@ -22,11 +22,12 @@ from open_apprentice.evaluation.teacher import BenchmarkTeacher
 from open_apprentice.providers.base import Provider
 
 
-async def run_learn_trial(
-    provider: Provider,
-    split: str,
-    episode: int,
-    concept: str,
+async def _run_trial(
+    provider: Provider | None,
+    latent: list,
+    demo: dict,
+    counts: list[int],
+    meta: dict,
     *,
     max_tokens_total: int,
     max_calls: int,
@@ -35,12 +36,6 @@ async def run_learn_trial(
     audit: bool = False,
     hybrid: bool = False,
 ) -> dict:
-    ep = make_manifest(split, 0, 12).episodes[episode]
-    latent, demo, counts = (
-        (ep.badge, ep.demos["badge"], [2])
-        if concept == "badge"
-        else (ep.spacing, ep.demos["spacing"], [3, 4, 5])
-    )
     dom = DomainManifest()
     ledger = Ledger(Limits(tokens=max_tokens_total, calls=max_calls))
     teacher = CountingTeacher(BenchmarkTeacher(latent))
@@ -75,14 +70,14 @@ async def run_learn_trial(
     if sess.state == State.INTENT_READY:
         recovered = heldout_equal(sess.finalize().rule, latent, dom, counts)
     return {
-        "label": "LIVE" if provider.label == "LIVE" else provider.label,
+        "label": "NONE (search only)" if provider is None else provider.label,
         "ran_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "model": provider.requested_model,
+        "model": "none" if provider is None else provider.requested_model,
         "completion_cap": completion_cap,
         "reasoning_effort": reasoning_effort or "provider default",
-        "split": split,
-        "episode": episode,
-        "concept": concept,
+        "split": meta["split"],
+        "episode": meta["episode"],
+        "concept": meta["concept"],
         "audit": audit,
         "hybrid": hybrid,
         "hybrid_model_errors": list(source.model_errors) if source else None,
@@ -91,7 +86,7 @@ async def run_learn_trial(
             if source and sess.state == State.INTENT_READY and sess.candidates
             else None
         ),
-        "evaluator_template": ep.templates[concept],
+        "evaluator_template": meta["template"],
         "template_note": "evaluator-only; never sent to the model",
         "error": err,
         "final_state": sess.state.value,
@@ -117,6 +112,54 @@ async def run_learn_trial(
         "wall_s": round(time.perf_counter() - t0, 2),
         "prompt_hashes": {"hypotheses": sha(open("prompts/hypotheses.md").read())[:16]},
     }
+
+
+async def run_learn_trial(
+    provider: Provider,
+    split: str,
+    episode: int,
+    concept: str,
+    *,
+    max_tokens_total: int,
+    max_calls: int,
+    reasoning_effort: str | None,
+    completion_cap: int = 6000,
+    audit: bool = False,
+    hybrid: bool = False,
+) -> dict:
+    ep = make_manifest(split, 0, 12).episodes[episode]
+    latent, demo, counts = (
+        (ep.badge, ep.demos["badge"], [2])
+        if concept == "badge"
+        else (ep.spacing, ep.demos["spacing"], [3, 4, 5])
+    )
+    meta = {
+        "split": split,
+        "episode": episode,
+        "concept": concept,
+        "template": ep.templates[concept],
+    }
+    return await _run_trial(provider, latent, demo, counts, meta, max_tokens_total=max_tokens_total, max_calls=max_calls,
+                            reasoning_effort=reasoning_effort, completion_cap=completion_cap, audit=audit, hybrid=hybrid)  # fmt: skip
+
+
+async def run_oog_trial(
+    provider: Provider | None,
+    index: int,
+    *,
+    max_tokens_total: int,
+    max_calls: int,
+    reasoning_effort: str | None,
+    completion_cap: int = 6000,
+    hybrid: bool = False,
+) -> dict:
+    """One out-of-grammar rule (see oog.py). provider=None runs the free, non-model search-only arm."""
+    from open_apprentice.evaluation.oog import RULES, demonstration
+
+    name, latent = RULES[index]
+    meta = {"split": "oog-dev", "episode": index, "concept": "badge", "template": name}
+    return await _run_trial(provider, latent, demonstration(index), [2], meta, max_tokens_total=max_tokens_total, max_calls=max_calls,
+                            reasoning_effort=reasoning_effort, completion_cap=completion_cap, hybrid=hybrid)  # fmt: skip
 
 
 # ----------------------------------------------------------------------------- multi-method episode runs

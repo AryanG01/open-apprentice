@@ -1,0 +1,94 @@
+{
+  "label": "NONE (search only)",
+  "ran_at": "2026-10-11T11:40:08+00:00",
+  "model": "none",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 4,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": null,
+  "evaluator_template": "top-right inset 12, badge sized to a quarter of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[search] top-right inset 12",
+        "[search] top-right inset min(1/10*w,12)",
+        "[search] top-right inset min(1/4*w,12)",
+        "[search] top-right inset min(1/5*w,12)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 4,
+        "model_error": null,
+        "model_usage": {},
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1540,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1417,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 0
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "(enumeration)",
+          "reason": "no rule in the declared grammar fits all teaching evidence"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 0,
+        "model_error": null,
+        "model_usage": {},
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 8848,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.6598,
+          "expressible": false,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 0
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 0,
+  "calls": 0,
+  "unknown_cost_calls": 0,
+  "wall_s": 1.04,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "search",
+  "rep": 0
+}

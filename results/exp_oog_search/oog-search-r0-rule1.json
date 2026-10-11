@@ -1,0 +1,94 @@
+{
+  "label": "NONE (search only)",
+  "ran_at": "2026-10-11T11:40:05+00:00",
+  "model": "none",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 1,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": null,
+  "evaluator_template": "inset is 10% of the shorter side",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[search] top-right inset 8",
+        "[search] top-right inset 1/20*w",
+        "[search] top-right inset max(1/20*w,3)",
+        "[search] top-right inset max(1/20*w,4)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 4,
+        "model_error": null,
+        "model_usage": {},
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1307,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1258,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 0
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[search] top-right inset max(1/20*w,2)",
+        "[search] top-right inset min(1/10*w,8)",
+        "[search] top-right inset min(2/25*w,8)",
+        "[search] top-right inset clamp(3/50*w,2,8)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 4,
+        "model_error": null,
+        "model_usage": {},
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 8791,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.7169,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 0
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 0,
+  "calls": 0,
+  "unknown_cost_calls": 0,
+  "wall_s": 1.16,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "search",
+  "rep": 0
+}

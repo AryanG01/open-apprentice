@@ -237,6 +237,77 @@ def run(
     _not_implemented("run", "M1")
 
 
+@app.command("learn-oog")
+def learn_oog(
+    arm: str = typer.Option(
+        ..., "--arm", help="model | hybrid | search (search uses NO model and costs nothing)"
+    ),
+    reps: int = typer.Option(1, "--reps"),
+    live: bool = LiveOpt,
+    max_tokens: int = typer.Option(60000, "--max-tokens", help="Hard token ceiling PER TRIAL."),
+    max_calls: int = typer.Option(8, "--max-calls"),
+    completion_cap: int = typer.Option(32000, "--completion-cap"),
+    max_total_tokens: int = typer.Option(
+        300_000,
+        "--max-total-tokens",
+        help="GLOBAL model-token ceiling; later trials are skipped and reported.",
+    ),
+    output_dir: str = typer.Option("results/exp_oog", "--output-dir"),
+) -> None:
+    """Out-of-grammar battery (development only): rules the symbolic search cannot express. Saves every trial as it finishes."""
+    import asyncio
+    import json
+    import os
+
+    from open_apprentice.config import load_settings
+    from open_apprentice.evaluation.oog import RULES
+    from open_apprentice.evaluation.pilot import run_oog_trial
+    from open_apprentice.providers.factory import MissingCredential, make_provider
+
+    if arm not in ("model", "hybrid", "search"):
+        typer.echo("--arm must be model, hybrid or search", err=True)
+        raise typer.Exit(code=1)
+    st = load_settings()
+    trials = [i for _ in range(reps) for i in range(len(RULES))]
+    typer.echo(
+        f"oa learn-oog  arm={arm} trials={len(trials)} model={'none' if arm == 'search' else st.nebius_model}"
+    )
+    if arm != "search" and not live:
+        typer.echo(
+            "DRY RUN: add --live to spend model credit (global ceiling applies). The search arm needs no flag."
+        )
+        return
+    provider = None
+    if arm != "search":
+        try:
+            provider = make_provider(st)
+        except MissingCredential as e:
+            typer.echo(f"BLOCKED_NO_CREDENTIAL: {e}", err=True)
+            raise typer.Exit(code=int(ExitState.BLOCKED_NO_CREDENTIAL))
+
+    async def main() -> None:
+        spent = 0
+        os.makedirs(output_dir, exist_ok=True)
+        for k, i in enumerate(trials):
+            if spent >= max_total_tokens:
+                typer.echo(f"NOT RUN: global token ceiling {max_total_tokens} reached (rule {i})")
+                continue
+            r = await run_oog_trial(provider, i, max_tokens_total=max_tokens, max_calls=max_calls, reasoning_effort=st.nebius_reasoning_effort,
+                                    completion_cap=completion_cap, hybrid=(arm != "model"))  # fmt: skip
+            r["arm"], r["rep"] = arm, k // len(RULES)
+            spent += r["tokens"]
+            with open(os.path.join(output_dir, f"oog-{arm}-r{r['rep']}-rule{i}.json"), "w") as f:
+                json.dump(r, f, indent=2, default=str)
+            typer.echo(
+                f"saved rule{i} rep{r['rep']}: {r['final_state']} recovered={r['recovered_latent_on_heldout']} tokens={r['tokens']} (total {spent})"
+            )
+        if provider is not None:
+            await provider.aclose()
+
+    asyncio.run(main())
+    typer.echo(f"results in {output_dir}")
+
+
 @app.command("learn")
 def learn(
     dry_run: bool = DryRunOpt,
