@@ -12,6 +12,7 @@ function pct(n: number | null): string {
 export function Home({ data, go }: HomeProps) {
   const control = data.experiments?.find((e) => e.variant === "control");
   const audit = data.experiments?.find((e) => e.variant === "audit");
+  const hybrid = data.experiments?.find((e) => e.variant === "hybrid");
   return (
     <main className="page home" id="stage">
       <section className="hero">
@@ -53,6 +54,12 @@ export function Home({ data, go }: HomeProps) {
           <li>
             One extra model round to hunt for alternatives did <strong>not</strong> fix it: {audit ? `${audit.wrong} of ${audit.committed} committed rules were still wrong (${pct(audit.wrong_share_of_committed)}), and the system went silent on ${audit.abstained} of ${audit.trials} trials` : "see Compare"}.
           </li>
+          {hybrid ? (
+            <li>
+              Adding exhaustive symbolic search to the model's proposals, with the teacher still the only judge, cut it to <strong>{hybrid.wrong} of {hybrid.committed} wrong ({pct(hybrid.wrong_share_of_committed)})</strong>.
+              A non-model search alone does as well on these tasks, so this shows that closing the gap in the candidate set fixes the problem, not that the model adds value.
+            </li>
+          ) : null}
           <li>A non-model reference solves every development task, so the tasks and the independent verifier are sound. Its grammar was built knowing the rule families, so we do not call that “understanding”.</li>
         </ul>
         <p className="muted">Development-split pilots, small samples, stored rows. Nothing here is the locked study.</p>

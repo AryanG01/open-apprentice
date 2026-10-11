@@ -1,0 +1,106 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:46:18+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": null,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone the prototype as a badge positioned 2 pixels inside the top-right corner of the first object.",
+        "[model] Clone the prototype as a badge inset from the first object's top-right corner by 10% of the badge's width and height.",
+        "[model] Clone the prototype as a badge with horizontal inset 4% of the card width and vertical inset 10% of the badge height from the card's top-right corner.",
+        "[model] Clone the prototype as a badge with horizontal inset 10% of the badge width and a fixed 2-pixel vertical inset from the card's top-right corner.",
+        "[search] top-right inset 1/20*w",
+        "[search] top-right inset 1/25*w"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 981,
+          "completion_tokens": 7460,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 109,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0634,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[model] Clone the second object to the top-right of the first object, inset by 4% of the first object's width horizontally and vertically from the first object's top edge.",
+        "[model] Clone the second object to the top-right of the first object, inset by 4% of the first object's width, using the lower of the two objects' top edges as the vertical reference.",
+        "[model] Clone the second object to the top-right of the first object, inset by 4% of the first object's smaller dimension (width or height).",
+        "[model] Clone the second object to the top-right of the first object, inset by 4% of the first object's smaller dimension, using the lower of the two objects' top edges as the vertical reference.",
+        "[search] top-right inset 1/20*w-1",
+        "[search] top-right inset 3/100*w+1"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1730,
+          "completion_tokens": 25133,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 2758,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.2549,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 35304,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 104.1,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:42:51+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "search",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Align tops at fixed y=100, start at fixed x=80, then pack horizontally with fixed gap 20.",
+        "[model] Align tops at y=canvas.h/7, start at x=2*canvas.w/35, gap=canvas.w/70.",
+        "[model] Align tops at fixed y=100, start at second object's original x, gap=0.4*first object's width.",
+        "[model] Align tops at fixed y=100, start at first object's right edge plus 20, gap=20.",
+        "[search] equal edge gap 20"
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange objects in a horizontal row at fixed y=100 starting at x=80 with a fixed gap of 20.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = 100\nlet left = 80\nlet gap = 20\nfor V in objects with I {\n  if I == 0 {\n    move V to (left, top)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at y=canvas.h/7 starting at x=2*canvas.w/35 with gap=canvas.w/70.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = canvas.h / 7\nlet left = 2 * canvas.w / 35\nlet gap = canvas.w / 70\nfor V in objects with I {\n  if I == 0 {\n    move V to (left, top)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at fixed y=100 starting at x=80 with gap equal to 0.4 times the first object's width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = 100\nlet left = 80\nlet gap = 0.4 * objects[0].w\nfor V in objects with I {\n  if I == 0 {\n    move V to (left, top)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at fixed y=100 starting at the second object's original x with a fixed gap of 20.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = 100\nlet left = objects[1].x\nlet gap = 20\nfor V in objects with I {\n  if I == 0 {\n    move V to (left, top)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 1,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 3238,
+          "completion_tokens": 9161,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0014,
+          "expressible": true,
+          "pool_size": 1
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 12399,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 25.81,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

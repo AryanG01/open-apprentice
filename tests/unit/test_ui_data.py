@@ -13,10 +13,14 @@ DATA = "apps/web/public/data/evidence.json"
 @pytest.mark.skipif(not os.path.exists(DATA), reason="UI data not generated")
 def test_experiment_arms_are_labelled_by_variant_and_match_the_stored_trials():
     exps = {e["variant"]: e for e in json.load(open(DATA)).get("experiments", [])}
-    assert set(exps) <= {"control", "audit"} and len(exps) == len(
+    assert set(exps) <= {"control", "audit", "hybrid"} and len(exps) == len(
         json.load(open(DATA)).get("experiments", [])
     )
-    for variant, d in (("control", "results/exp_audit_control"), ("audit", "results/exp_audit_on")):
+    for variant, d in (
+        ("control", "results/exp_audit_control"),
+        ("audit", "results/exp_audit_on"),
+        ("hybrid", "results/exp_hybrid"),
+    ):
         if variant in exps and os.path.isdir(d):
             m = summarise(d)
             assert (

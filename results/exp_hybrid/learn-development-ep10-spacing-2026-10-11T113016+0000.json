@@ -1,0 +1,117 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:30:16+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "search",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[search] equal center pitch 71",
+        "[search] equal edge gap 16"
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange the objects in a horizontal row at fixed coordinates (80,120) with a fixed gap of 16.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 16\nlet start_x = 80\nlet baseline_y = 120\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange the objects in a horizontal row using the first object's width and height as grid units: start at (2*w, 3*h), gap 0.4*w.",
+          "reason": "invalid rule: line 9: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let u = objects[0].w\nlet v = objects[0].h\nlet gap = 0.4 * u\nlet start_x = 2 * u\nlet baseline_y = 3 * v\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange the objects in a horizontal row at canvas-proportional coordinates (\u22485.7% from left, \u224817.1% from top) with a canvas-proportional gap (\u22481.14%).",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 0.011428571428571428 * canvas.w\nlet start_x = 0.05714285714285714 * canvas.w\nlet baseline_y = 0.17142857142857143 * canvas.h\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange the objects in a horizontal row with x-position based on the first object's width (2*w) but fixed y=120 and fixed gap=16.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let u = objects[0].w\nlet gap = 16\nlet start_x = 2 * u\nlet baseline_y = 120\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange the three objects in a horizontal row at fixed coordinates (80,120) with a fixed gap of 16.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": \"locals.baseline_y\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange the three objects in a horizontal row using the first object's width and height as grid units: start at (2*w, 3*h), gap 0.4*w.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"u\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}}, {\"op\": \"let\", \"name\": \"v\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"ref\": \"locals.u\"}]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [2, {\"ref\": \"locals.u\"}]}}, {\"op\": \"let\", \"name\": \"basel",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange the three objects in a horizontal row at canvas-proportional coordinates (\u22485.7% from left, \u224817.1% from top) with a canvas-proportional gap (\u22481.14%).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2857142857142857/250000000000000000\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2857142857142857/50000000000000000\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"17142857142857143/100000000000000000\"}, {\"ref\": \"canv",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange the three objects in a horizontal row with x-position based on the first object's width (2*w) but fixed y=120 and fixed gap=16.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"u\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [2, {\"ref\": \"locals.u\"}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": ",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 3409,
+          "completion_tokens": 19421,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 2,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0027,
+          "expressible": true,
+          "pool_size": 2
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 22830,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 63.67,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

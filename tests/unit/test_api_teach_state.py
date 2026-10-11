@@ -139,7 +139,9 @@ def test_paid_mode_is_rate_limited_per_client_and_free_mode_is_not_starved(clien
     codes = [
         client.post("/api/teach", json={"mode": "nemotron"}).status_code for _ in range(limit + 2)
     ]
-    assert codes[:limit] == [502] * limit
+    assert (
+        codes[:limit] == [200] * limit
+    )  # a failing model degrades to search-only, but every paid attempt is still counted
     assert codes[-1] == 429 and codes[-2] == 429
     assert client.post("/api/teach").status_code == 200
 

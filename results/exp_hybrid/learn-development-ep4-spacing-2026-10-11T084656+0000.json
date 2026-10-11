@@ -1,0 +1,69 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:46:56+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Arrange objects in a horizontal row at fixed coordinates (80,120) with a fixed 12px gap between them.",
+        "[model] Arrange objects in a horizontal row at canvas-relative positions (6/35 of height, 2/35 of width) with a canvas-relative gap (3/350 of width).",
+        "[model] Arrange objects in a horizontal row positioned by object extents: top at second object's y minus twice first object's height, left at first object's x plus third object's height, gap proportional to first object's height (2/15).",
+        "[model] Arrange objects in a horizontal row at fixed position (80,120) with gap proportional to the first object's height (2/15)."
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 0,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1033,
+          "completion_tokens": 10682,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0013,
+          "expressible": true,
+          "pool_size": 1
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 11715,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 37.47,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

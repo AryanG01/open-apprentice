@@ -276,6 +276,12 @@ export function TryIt() {
         <p className="eyebrow" role="status" aria-live="polite">Live · {busy ? "working…" : live ? live.state.replace(/_/g, " ").toLowerCase() : "not started"}</p>
         <h2>{!live ? "Teach it a layout rule" : concept ? "The rule is sealed. Now use it." : "Which result did you mean?"}</h2>
         {error ? <p className="callout bad" role="alert">{error}</p> : null}
+        {live?.pool ? (
+          <p className="callout" role="note" aria-label="Candidate pool">
+            <strong>Candidate pool:</strong> {live.pool.from_model} rule{live.pool.from_model === 1 ? "" : "s"} from Nemotron, {live.pool.from_search} from the bounded symbolic search.
+            {live.pool.model_error ? ` Nemotron's call failed (${live.pool.model_error}), so only the search contributed.` : ""} The teacher's answers, not either source, decide which rule is kept.
+          </p>
+        ) : null}
         {live && live.fallbacks.length > 0 ? (
           <div className="callout" role="note"><strong>Scripted fallback used.</strong> {live.fallbacks.join(" ")}</div>
         ) : null}

@@ -1,0 +1,96 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:39:30+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "search",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Align tops to canvas height / 7, start first object at its x plus its height, then pack horizontally with gap equal to first object width / 10.",
+        "[model] Move all objects to fixed y=100, start first at x=80, pack with fixed gap 12.",
+        "[model] Align tops to canvas height / 7, start first at its x plus its height, set gap to original gap between first two objects plus 2.",
+        "[model] Align tops to canvas height / 7, start first horizontally at its y minus 4 times its height, pack with gap equal to first object width / 10.",
+        "[search] equal edge gap 12"
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to y = canvas height / 7, place first object at its original x plus its height, then pack subsequent objects horizontally with gap = first object width / 10.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let new_y = canvas.h / 7\nlet start_x = objects[0].x + objects[0].h\nlet gap = objects[0].w / 10\nmove objects[0] to (start_x, new_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, new_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move all objects to fixed position y=100, start first at x=80, pack with fixed gap 12.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let new_y = 100\nlet start_x = 80\nlet gap = 12\nmove objects[0] to (start_x, new_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, new_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to canvas height / 7, start first object at its original x plus its height, set horizontal gap to the original gap between first two objects plus 2.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let new_y = canvas.h / 7\nlet start_x = objects[0].x + objects[0].h\nlet first_gap = objects[1].x - (objects[0].x + objects[0].w)\nlet gap = first_gap + 2\nmove objects[0] to (start_x, new_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, new_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to canvas height / 7, start first object horizontally at its original y minus 4 times its height, pack with gap = first object width / 10.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let new_y = canvas.h / 7\nlet start_x = objects[0].y - 4 * objects[0].h\nlet gap = objects[0].w / 10\nmove objects[0] to (start_x, new_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, new_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 1,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 3359,
+          "completion_tokens": 14152,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0013,
+          "expressible": true,
+          "pool_size": 1
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 17511,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 39.51,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

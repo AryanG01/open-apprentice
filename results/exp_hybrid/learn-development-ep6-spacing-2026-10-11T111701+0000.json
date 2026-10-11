@@ -1,0 +1,95 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:17:01+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Arrange the first three objects in a horizontal row at fixed coordinates (80,120) with 20px spacing.",
+        "[model] Arrange the first three objects in a horizontal row with positions and spacing proportional to the canvas size.",
+        "[model] Position the first object at a fixed offset from its original location, then pack the next two objects to its right with 20px gaps.",
+        "[model] Shift each object horizontally by 70+10\u00d7index pixels and vertically to y=120."
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange the first three objects in a horizontal row at fixed coordinates (80,120) with 20px spacing.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "move objects[0] to (80, 120)\\nmove objects[1] to (80 + objects[0].w + 20, 120)\\nmove objects[2] to (80 + objects[0].w + 20 + objects[1].w + 20, 120)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange the first three objects in a horizontal row with positions and spacing proportional to the canvas size.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let left = (80.0/1400.0) * canvas.w\\nlet top = (120.0/700.0) * canvas.h\\nlet gap = (20.0/1400.0) * canvas.w\\nmove objects[0] to (left, top)\\nmove objects[1] to (left + objects[0].w + gap, top)\\nmove objects[2] to (left + objects[0].w + gap + objects[1].w + gap, top)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Position the first object at a fixed offset from its original location, then pack the next two objects to its right with 20px gaps.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let dx = 70\\nlet dy = -220\\nlet gap = 20\\nmove objects[0] to (objects[0].x + dx, objects[0].y + dy)\\nmove objects[1] to (objects[0].x + dx + objects[0].w + gap, objects[0].y + dy)\\nmove objects[2] to (objects[0].x + dx + objects[0].w + gap + objects[1].w + gap, objects[0].y + dy)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object horizontally by 70+10\u00d7index pixels and vertically to y=120.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "for V in objects with I {\\n  move V to (V.x + 70 + 10*I, 120)\\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 0,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 3169,
+          "completion_tokens": 18359,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0013,
+          "expressible": true,
+          "pool_size": 1
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 21528,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 53.32,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

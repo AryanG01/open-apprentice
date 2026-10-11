@@ -1,0 +1,71 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:29:12+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone proto as badge at card0's top-right inner corner with a fixed 2.4px margin.",
+        "[model] Clone proto as badge at card0's top-right inner corner with margin 12% of proto's width.",
+        "[model] Clone proto as badge at card0's top-right inner corner with margin 6% of card0's width.",
+        "[model] Clone proto as badge at card0's top-right inner corner with margin 12% of the width difference (card0 - proto).",
+        "[search] top-right inset 2",
+        "[search] top-right inset 1/20*w"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 988,
+          "completion_tokens": 14552,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1318,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1282,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 15540,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 40.03,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

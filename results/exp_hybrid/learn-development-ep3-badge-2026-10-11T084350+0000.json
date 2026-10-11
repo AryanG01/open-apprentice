@@ -1,0 +1,105 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:43:50+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone the prototype and place it at the reference object's top-left corner offset by half the prototype's width and height.",
+        "[model] Clone the prototype and place its left edge at the prototype's right edge, vertically centered on the reference object's top plus half prototype height.",
+        "[model] Clone the prototype and place it at twice the reference object's x-coordinate horizontally, and at the reference object's y plus its x-coordinate vertically.",
+        "[model] Clone the prototype and place it at an x-coordinate equal to the prototype's width, and y at the reference object's top plus half the prototype's height.",
+        "[search] top-right inset 10",
+        "[search] top-left inset 1/4*w"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 981,
+          "completion_tokens": 3927,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 105,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0637,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[model] Clone the second object as a badge aligned 10px inside the first object's right edge and 10px below its top edge.",
+        "[model] Clone the second object as a badge 10px right of the first object's left edge, clamped so its right edge never exceeds 10px inside the first object's right edge.",
+        "[model] If the second object is wider than the first, clone it as a badge with its right edge 10px inside the first's right edge; otherwise place it 10px right of the first's left edge; vertically always 10px below the first's top.",
+        "[search] top-right inset max(2/25*w,10)",
+        "[search] top-right inset clamp(2/25*w,10,12)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 3,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1725,
+          "completion_tokens": 16329,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 8848,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.7939,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 22962,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 59.14,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

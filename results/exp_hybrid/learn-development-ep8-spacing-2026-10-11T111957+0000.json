@@ -1,0 +1,71 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:19:57+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "search",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Move the first three objects to fixed absolute coordinates (40,120), (110,120), (190,120).",
+        "[model] Align all objects to y=120 and pack them horizontally starting at x=40 with a gap of 20.",
+        "[model] Align all objects to y=120 and space their centers equally starting at center 65 with spacing 75.",
+        "[model] Move all objects to a row 280 units above the first object's original y, and pack them horizontally starting 30 units right of the first object's original x with a gap of 20.",
+        "[search] equal center pitch 75",
+        "[search] equal edge gap 20"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1029,
+          "completion_tokens": 8508,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 2,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0027,
+          "expressible": true,
+          "pool_size": 2
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 9537,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 28.3,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

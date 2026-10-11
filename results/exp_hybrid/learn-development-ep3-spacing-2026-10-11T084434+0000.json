@@ -1,0 +1,116 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:44:34+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "search",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[search] equal edge gap 16"
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange objects in a horizontal row at fixed position (60,60) with fixed 16px spacing.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top_margin = 60\nlet left_margin = 60\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (left_margin, top_margin)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top_margin)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at y=60 with left margin and spacing proportional to the first object's width (1.5\u00d7 and 0.4\u00d7).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top_margin = 60\nlet left_margin = 1.5 * objects[0].w\nlet gap = 0.4 * objects[0].w\nfor V in objects with I {\n  if I == 0 {\n    move V to (left_margin, top_margin)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top_margin)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row with fixed left margin (60) and spacing (16), but vertical margin derived from first object's height (height\u221230).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top_margin = objects[0].h - 30\nlet left_margin = 60\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (left_margin, top_margin)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top_margin)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at y=60 with fixed spacing (16), but left margin derived from first object's width (width+20).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top_margin = 60\nlet left_margin = objects[0].w + 20\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (left_margin, top_margin)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top_margin)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at fixed position (60,60) with fixed 16px spacing.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"top\", \"value\": 60}, {\"op\": \"let\", \"name\": \"left\", \"value\": 60}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.left\"}, \"y\": {\"ref\": \"locals.top\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at y=60 with left margin and spacing proportional to the first object's width (1.5\u00d7 and 0.4\u00d7).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"top\", \"value\": 60}, {\"op\": \"let\", \"name\": \"left\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\":",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row with fixed left margin (60) and spacing (16), but vertical margin derived from first object's height (height\u221230).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"top\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 30]}}, {\"op\": \"let\", \"name\": \"left\", \"value\": 60}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.left\"}, \"y\": {\"ref\": \"locals.top\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row at y=60 with fixed spacing (16), but left margin derived from first object's width (width+20).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"top\", \"value\": 60}, {\"op\": \"let\", \"name\": \"left\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 20]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.left\"}, \"y\": {\"ref\": \"locals.top\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 1,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 3274,
+          "completion_tokens": 15067,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0014,
+          "expressible": true,
+          "pool_size": 1
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 18341,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 43.88,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

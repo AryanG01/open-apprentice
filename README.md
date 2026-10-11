@@ -23,8 +23,8 @@ Open <http://localhost:8000>. No account, no API key and no model call is needed
 
 **Optional: let NVIDIA Nemotron drive it.** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
 `DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=2 uv run uvicorn open_apprentice.api.app:app --port 8000`. In *Try it live*, choose "NVIDIA Nemotron". It is
-**off by default** so a public instance can never spend money by accident. Nemotron then proposes the candidate rules, writes the native procedure for each
-backend and writes the repair. Every output is checked on the real engine before it is accepted; if it fails, a scripted fixture is used instead and the
+**off by default** so a public instance can never spend money by accident. Nemotron then proposes candidate rules (unioned with a bounded symbolic search so a rule the model omits can still be found; the teacher alone decides), writes the native
+procedure for each backend and writes the repair. Every output is checked on the real engine before it is accepted; if it fails, a scripted fixture is used instead and the
 interface says so. A live meter shows tokens, calls and estimated dollars, and the server refuses model sessions once the cap is reached.
 
 | Tab | What it is | Source of what you see |
@@ -56,7 +56,10 @@ We hold ourselves to the claims we can back with a command.
 - Four evidence axes (intent, symbolic, native, held-out) are kept separate everywhere; there is no combined score and no single "Verified" badge.
 - 280+ tests, including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
 
-**Measured with a live NVIDIA model, and not flattering:** on development-split pilot runs (Nemotron-3-Ultra via Nebius, a handful of episodes), a
+**Measured with a live NVIDIA model (development split, small samples):** the model alone committed to a wrong rule 15 of 34 times (44%); an extra "audit" round did not help; unioning the model's proposals with a
+bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that shows closing the candidate-set gap works, not that the model adds value.
+
+**Earlier pilot, not flattering:** on development-split pilot runs (Nemotron-3-Ultra via Nebius, a handful of episodes), a
 non-model reference solves every task, while every model-based method, including ours, often **commits output from a rule that fit the examples but
 was not the intended one**. We report this in the Compare tab and `docs/status.md` instead of hiding it. These are pilot numbers, not the locked study, and
 do not support any claim that our method beats the baselines.

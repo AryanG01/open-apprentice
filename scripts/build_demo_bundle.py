@@ -505,14 +505,18 @@ def stored_evidence():
     from scripts.analyze_audit_experiment import summarise
 
     experiments = []
-    for arm, label in (("control", "Without the audit round"), ("on", "With the audit round")):
-        d = f"results/exp_audit_{arm}"
+    for arm, label in (
+        ("control", "Model alone (control)"),
+        ("on", "Model + audit round"),
+        ("hybrid", "Model + symbolic search (hybrid)"),
+    ):
+        d = "results/exp_hybrid" if arm == "hybrid" else f"results/exp_audit_{arm}"
         if glob.glob(f"{d}/learn-*.json"):
             m = summarise(d)
             experiments.append(
                 {
                     "name": "audit",
-                    "variant": "control" if arm == "control" else "audit",
+                    "variant": {"control": "control", "on": "audit", "hybrid": "hybrid"}[arm],
                     "arm": label,
                     **{k: v for k, v in m.items() if k != "by_concept"},
                 }

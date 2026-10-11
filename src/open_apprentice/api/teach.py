@@ -51,6 +51,7 @@ from open_apprentice.concepts.bindings import (
 )
 from open_apprentice.concepts.domain import DomainManifest
 from open_apprentice.concepts.enumerative import EnumerativeSource, _badge_rule, _lit
+from open_apprentice.concepts.hybrid import HybridSource
 from open_apprentice.concepts.rules import evaluate_rule
 from open_apprentice.concepts.schemas import Concept
 from open_apprentice.concepts.teaching import State, TeachingSession
@@ -80,7 +81,7 @@ def _label(mode: str, model_id: str = "") -> dict:
     if mode == "nemotron":
         return {
             "mode": "LIVE ENGINE + NVIDIA NEMOTRON",
-            "candidate_rules": f"{model_id or 'Nemotron'} via Nebius Token Factory, checked by the same teaching loop as the evaluation",
+            "candidate_rules": f"{model_id or 'Nemotron'} via Nebius Token Factory, unioned with a bounded symbolic search so a rule the model omits can still be found; the teacher decides",
             "native_procedures": "Nemotron-generated and accepted only after checks on the real backend; a scripted fixture is used instead, and labelled, if it fails",
             "verifier": "independent verifier, judging against the rule you taught",
         }
@@ -131,6 +132,9 @@ class Live:
     last_break: Optional[dict] = None  # the latest stress test, included in the evidence package
     last_run: Optional[dict] = (
         None  # what the export endpoints serialise: the latest executed layout and its evidence
+    )
+    hybrid: Optional[HybridSource] = (
+        None  # Nemotron mode: model proposals + bounded symbolic search
     )
     fallbacks: list[str] = field(
         default_factory=list
@@ -261,6 +265,20 @@ def _provider_failure(e: ProviderError) -> HTTPException:
     return HTTPException(502, f"the model call failed ({e.code}): {str(e)[:160]}")
 
 
+def _pool(live: Live) -> Optional[dict]:
+    """How many candidate rules came from the model and how many from the symbolic search in the latest round. Not the origin of the final
+    rule: behaviourally identical proposals keep the first origin, so that would overstate the model's role.
+    """
+    if live.hybrid is None or not live.session.reports:
+        return None
+    u = live.session.reports[-1].usage
+    return {
+        "from_model": u.get("from_model", 0),
+        "from_search": u.get("from_search", 0),
+        "model_error": u.get("model_error"),
+    }
+
+
 # ---------------------------------------------------------------------------------------------------- state view
 def _state(request: Request, live: Live) -> dict:
     s = live.session
@@ -270,6 +288,7 @@ def _state(request: Request, live: Live) -> dict:
         "label": _label(live.mode, live.model_id),
         "meter": _meter(request, live),
         "fallbacks": list(live.fallbacks),
+        "pool": _pool(live),
         "state": s.state.value,
         "intent_state": s.intent_state.value,
         "queries_asked": s.queries_asked,
@@ -336,11 +355,23 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
         else Ledger(Limits(tokens=10_000_000, calls=1000, actions=5000))
     )
     pool = getattr(request.app.state, "pool", None)
+    hybrid: Optional[HybridSource] = None
     if mode == "nemotron":
+        cap = int(os.environ.get("NEBIUS_COMPLETION_CAP", "32000") or 32000)
         sess = TeachingSession(
-            provider, ledger, dom, [2], pool=pool, teacher_source="user", prefer_readable_queries=True,
-            completion_cap=int(os.environ.get("NEBIUS_COMPLETION_CAP", "32000") or 32000),
-        )  # fmt: skip
+            provider,
+            ledger,
+            dom,
+            [2],
+            pool=pool,
+            teacher_source="user",
+            prefer_readable_queries=True,
+            completion_cap=cap,
+        )
+        hybrid = HybridSource(
+            provider, ledger, dom, [2], completion_cap=cap
+        )  # model proposals + bounded symbolic search (decisions #45, #46)
+        sess.candidate_source = hybrid
     else:
         sess = TeachingSession(
             None, ledger, dom, [2], pool=pool, teacher_source="user",
@@ -356,7 +387,7 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
             view("Your demonstration", boxes_of_outputs(before, after)),
         ]
     }
-    live = Live(uuid.uuid4().hex[:12], sess, jsonable_encoder(demo), ledger, mode=mode, provider=provider,
+    live = Live(uuid.uuid4().hex[:12], sess, jsonable_encoder(demo), ledger, mode=mode, provider=provider, hybrid=hybrid,
                 model_id=getattr(provider, "requested_model", "") if provider else "")  # fmt: skip
     store[live.id] = live
     try:

@@ -1,0 +1,132 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:16:08+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Place the badge at 60% across and 40% down the card from its top-left corner.",
+        "[model] Place the badge at a fixed offset of 54 pixels right and 16 pixels down from the card's top-left corner.",
+        "[model] Place the badge at the card's bottom-right corner, shifted left by 1.8 times the proto's width and up by 1.2 times the proto's height.",
+        "[model] Place the badge at the card's top-right corner, shifted left by 1.8 times the proto's width and down by 0.8 times the proto's height.",
+        "[search] top-right inset 16",
+        "[search] top-right inset max(3/20*w,16)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 981,
+          "completion_tokens": 8393,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1525,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1605,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[model] Place a clone of the second object 16 pixels inward from the top-right corner of the first object.",
+        "[model] Place a clone of the second object inset from the first object's top-right by 40% of the first object's dimensions, capped at 16 pixels.",
+        "[model] Place a clone of the second object inset from the first object's top-right by 2% of canvas width and 4% of canvas height, capped at 16 pixels.",
+        "[search] top-right inset min(1/4*w,16)",
+        "[search] top-right inset min(1/5*w,16)",
+        "[search] top-right inset clamp(1/4*w,12,16)"
+      ],
+      "rejected": [
+        {
+          "summary": "Place a clone of the second object 16 pixels inward from the top-right corner of the first object.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let pad = 16\\nclone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w - pad, objects[0].y + pad)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place a clone of the second object inset from the first object's top-right by 40% of the first object's dimensions, capped at 16 pixels.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let pad_x = min(0.4 * objects[0].w, 16)\\nlet pad_y = min(0.4 * objects[0].h, 16)\\nclone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w - pad_x, objects[0].y + pad_y)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place a clone of the second object inset from the first object's top-right by the clone's own width and height, capped at 16 pixels.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let pad_x = min(objects[1].w, 16)\\nlet pad_y = min(objects[1].h, 16)\\nclone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w - pad_x, objects[0].y + pad_y)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place a clone of the second object inset from the first object's top-right by 2% of canvas width and 4% of canvas height, capped at 16 pixels.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let pad_x = min(0.02 * canvas.w, 16)\\nlet pad_y = min(0.04 * canvas.h, 16)\\nclone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w - pad_x, objects[0].y + pad_y)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 3,
+        "from_search": 3,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 4377,
+          "completion_tokens": 24358,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 7926,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.6266,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 38109,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 107.63,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

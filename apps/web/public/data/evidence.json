@@ -3,7 +3,7 @@
   {
    "name": "audit",
    "variant": "control",
-   "arm": "Without the audit round",
+   "arm": "Model alone (control)",
    "trials": 48,
    "errors": 5,
    "committed": 34,
@@ -16,7 +16,7 @@
   {
    "name": "audit",
    "variant": "audit",
-   "arm": "With the audit round",
+   "arm": "Model + audit round",
    "trials": 48,
    "errors": 8,
    "committed": 10,
@@ -25,9 +25,22 @@
    "abstained": 30,
    "wrong_share_of_committed": 0.4,
    "tokens": 1824948
+  },
+  {
+   "name": "audit",
+   "variant": "hybrid",
+   "arm": "Model + symbolic search (hybrid)",
+   "trials": 24,
+   "errors": 1,
+   "committed": 20,
+   "correct": 19,
+   "wrong": 1,
+   "abstained": 3,
+   "wrong_share_of_committed": 0.05,
+   "tokens": 428463
   }
  ],
- "generated_at": "2026-10-11T08:39:57+00:00",
+ "generated_at": "2026-10-11T11:32:11+00:00",
  "runs": [
   {
    "run": "development-ep1-1-20261010T144833",

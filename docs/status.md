@@ -171,3 +171,7 @@ end in TruncatedOutput in both arms. This is shown in the Compare tab. The resea
 `OA_CHROMIUM_NO_SANDBOX=1`, container is the sandbox), `scripts/live_flow_check.py --mode reference` passes end to end inside it (teach, run on both backends, tool change mismatch, repair with
 rule hash unchanged), static web + data served, CSP/frame/nosniff headers present. Model mode inside the container NOT tested (needs --env-file and spends credit).
 `docker compose` (db/worker/web) remains untested and is not the demo path (worker not implemented). Docs: docs/deploy.md, docs/demo_script.md.
+
+## 2026-10-11 night: hybrid experiment RESULT (positive, limited) — decisions #46
+Hybrid: 24 trials, 20 committed, 19 correct, 1 wrong (5%), 3 abstained, 1 error; 428k tokens. Model alone: 44% wrong. The non-model reference also solves these tasks, and the model's role is NOT shown by this
+experiment. The `oa learn` process stalled while the laptop slept (3 s CPU in 2.5 h) but finished; results had been written only at the end, so per-trial saving was added (commit 3acc306).

@@ -1,0 +1,69 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:19:08+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Pack all objects in a horizontal row at fixed coordinates (40,100) with fixed 20px spacing.",
+        "[model] Pack all objects in a horizontal row at canvas-proportional coordinates (w/35, h/7) with canvas-proportional spacing (w/70).",
+        "[model] Pack all objects horizontally starting from the first object's right edge minus 20px, at fixed y=100, with 20px spacing.",
+        "[model] Pack all objects horizontally at fixed y=100 with canvas-relative left margin (w/35) and spacing (w/70)."
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 0,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1031,
+          "completion_tokens": 7703,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0015,
+          "expressible": true,
+          "pool_size": 1
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 8734,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 29.19,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

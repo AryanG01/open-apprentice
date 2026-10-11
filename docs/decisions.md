@@ -246,3 +246,9 @@ on the research claim." Entries are append-only; append, never rewrite history.
     (e.g. a clamped inset) can lose to a simpler rule that coincides on every asked scene. The benchmark's own templates sit inside the simple range, so on them hybrid
     should approach the non-model reference; that shows search coverage, NOT model value. Model value would need rules outside the grammar (not yet built).
     Cost lesson: output-heavy runs cost ~$3-4/M tokens (balance $19.95 -> $6.96 after the audit experiment + live sessions); `oa learn` now has `--max-total-tokens`.
+46. **RESULT (positive, with a stated limit): the hybrid source cuts wrong commits from 44% to 5%.** Hybrid (model proposals UNIONED with bounded symbolic search, #45), dev split, Nemotron-3-Ultra
+    low effort, 12 episodes x 2 concepts x 1 rep = 24 trials (results/exp_hybrid): committed 20 (19 correct, 1 wrong = 5%), abstained 3 (all badge `ambiguity_remains`), 1 trial lost to an
+    error, 428k tokens. Control (model alone, same dev episodes, 2 reps, #44): committed 34, 15 wrong = 44%. Different n (24 vs 48) and one repetition: treat as a strong signal, not a precise rate.
+    WHAT THIS DOES NOT SHOW: that the model adds value. The non-model reference also solves these tasks, and the origin tag overstates the model's role (behaviourally identical candidates keep the
+    FIRST origin, which is the model's: 14 of the 19 correct rules are tagged [model] although the search proposed the same behaviour). The supported claim: closing the omission gap with symbolic
+    coverage, while the teacher remains the only oracle, removes most confident-wrong commits. Model value needs rules outside the grammar (not yet built).

@@ -83,10 +83,11 @@ export function Compare({ data }: { data: Evidence }) {
 
       {data.experiments && data.experiments.length > 0 ? (
         <>
-          <h2>Does asking harder fix the wrong commits? A controlled test</h2>
+          <h2>What reduces the wrong commits? Three arms on the same development episodes</h2>
           <p className="muted">
-            Same 12 development episodes, both concepts, 2 repetitions, one extra model round that hunts for other rules fitting all the evidence (the "audit"). Result: <strong>it did not help.</strong>
-            It made the system silent, mostly on cases it would have got right.
+            Same 12 development episodes and both concepts. The audit arm adds one model round hunting for other rules: <strong>it did not help</strong>, it just made the system silent. The hybrid arm
+            unions the model's rules with a bounded symbolic search: <strong>wrong commits fell sharply</strong>. Caveats: the hybrid arm has one repetition (24 trials) against two (48) for the others, and a
+            non-model search alone also solves these tasks, so this does not show that the model adds value.
           </p>
           <div className="table-wrap">
             <table className="data">

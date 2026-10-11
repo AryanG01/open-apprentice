@@ -1,0 +1,112 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:42:25+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": null,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone the second object onto the first object's top-right with a fixed 1px margin on both axes.",
+        "[model] Clone the second object onto the first's top-right with margins equal to 5% of the clone's own width and height.",
+        "[model] Clone the second object onto the first's top-right with a horizontal margin of 2% of the first object's width and a fixed 1px vertical margin.",
+        "[model] Clone the second object onto the first's top-right with a fixed 1px horizontal margin and a vertical margin of 5% of the clone's height.",
+        "[search] top-right inset 1/100*w",
+        "[search] top-right inset 1/50*w"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 981,
+          "completion_tokens": 8663,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 109,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0473,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[model] Clone the second object and place it just inside the first object's top-right corner, inset by 2% of the first object's width.",
+        "[model] Clone the second object and place it just inside the first object's top-right corner, inset by 2% of the first object's smaller dimension.",
+        "[search] top-right inset 1/100*w+1",
+        "[search] top-right inset 3/100*w-1",
+        "[search] top-right inset max(1/50*w,1)"
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the first object, resize it to the second object's size, and place it just inside the first object's top-right corner, inset by 2% of the first object's width.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let margin = objects[0].w / 50\nclone objects[0] as badge at (objects[0].x + objects[0].w - objects[1].w - margin, objects[0].y + margin)\nresize badge to (objects[1].w, objects[1].h)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 2,
+        "from_search": 3,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1739,
+          "completion_tokens": 26314,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 2802,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.2574,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 37697,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 108.37,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

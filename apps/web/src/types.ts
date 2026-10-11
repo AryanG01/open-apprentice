@@ -128,7 +128,7 @@ export interface TeachingTrials {
 
 export interface ExperimentArm {
   name: string;
-  variant: "control" | "audit";
+  variant: "control" | "audit" | "hybrid";
   arm: string;
   trials: number;
   errors: number;
@@ -171,9 +171,16 @@ export interface LiveConcept {
   answer_source: string;
 }
 
+export interface CandidatePool {
+  from_model: number;
+  from_search: number;
+  model_error: string | null;
+}
+
 export interface LiveState {
   id: string;
   mode: string;
+  pool: CandidatePool | null;
   meter: Meter | null;
   fallbacks: string[];
   label: LiveLabel;

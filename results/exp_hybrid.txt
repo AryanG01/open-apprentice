@@ -1,1 +1,27 @@
 oa learn  split=development trials=24  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=low
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      INTENT_READY      1       2 2a/0c      True    7030  20.95  
+  0 spacing  edge       INTENT_READY      1       2 2a/0c      True   17511  39.51  
+  1 badge    prop       INTENT_READY      1       1 1a/0c      True   12475   30.5  
+  1 spacing  edge       INTENT_READY      1       1 1a/0c      True   13250  36.77  
+  2 badge    min        UNRESOLVED       2       2 2a/1c      None   37697 108.37  
+  2 spacing  edge       INTENT_READY      1       2 2a/0c      True   12399  25.81  
+  3 badge    const      INTENT_READY      2       2 2a/1c      True   22962  59.14  
+  3 spacing  edge       INTENT_READY      1       0 0a/0c      True   18341  43.88  
+  4 badge    prop       UNRESOLVED       2       2 2a/1c      None   35304  104.1  
+  4 spacing  edge       INTENT_READY      1       1 1a/0c      True   11715  37.47  
+  5 badge    min        UNRESOLVED       2       2 2a/1c      None   34843 407.57  
+  5 spacing  edge       INTENT_READY      1       1 1a/0c      True    9212  31.59  
+  6 badge    const      INTENT_READY      2       2 2a/1c      True   38109 107.63  
+  6 spacing  edge       INTENT_READY      1       1 1a/0c     False   21528  53.32  
+  7 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   31671  97.95  BudgetExhausted: BUDGET_EXHAUSTED[tokens] 31671+0+34634>60000
+  7 spacing  edge       INTENT_READY      1       1 1a/0c      True    8734  29.19  
+  8 badge    min        INTENT_READY      1       1 1a/0c      True    7750  20.58  
+  8 spacing  edge       INTENT_READY      1       2 2a/0c      True    9537   28.3  
+  9 badge    const      INTENT_READY      1       2 2a/0c      True    6519   14.0  
+  9 spacing  edge       INTENT_READY      1       1 1a/0c      True   10549  51.54  
+ 10 badge    prop       INTENT_READY      1       1 1a/0c      True   15540  40.03  
+ 10 spacing  edge       INTENT_READY      1       1 1a/0c      True   22830  63.67  
+ 11 badge    min        INTENT_READY      1       2 2a/0c      True    9298   24.1  
+ 11 spacing  edge       INTENT_READY      1       1 1a/0c      True   13659  37.74  
+recovered the hidden rule on held-out scenes: 19/24  |  total tokens 428463  |  results in results/exp_hybrid

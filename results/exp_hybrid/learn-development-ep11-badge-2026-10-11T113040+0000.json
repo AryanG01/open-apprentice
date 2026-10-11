@@ -1,0 +1,71 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:30:40+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone proto as badge at card0's top-right corner inset by 5% of card0's width horizontally and vertically.",
+        "[model] Clone proto as badge at card0's top-right corner inset by 15% of the badge's own width horizontally and vertically.",
+        "[model] Clone proto as badge at card0's top-right corner inset by a fixed 3 pixels horizontally and vertically.",
+        "[model] Clone proto as badge at card0's top-right corner inset by 7.5% of the width difference between card0 and the badge.",
+        "[search] top-right inset max(1/20*w,3)",
+        "[search] top-right inset max(1/25*w,3)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 981,
+          "completion_tokens": 8317,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1321,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1393,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 9298,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 24.1,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

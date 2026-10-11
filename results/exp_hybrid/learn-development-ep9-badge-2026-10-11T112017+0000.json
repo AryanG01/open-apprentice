@@ -1,0 +1,71 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:20:17+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone the second object inside the first with 10px padding from the top and right edges.",
+        "[model] Clone the second object at a fixed offset of (80, 10) from the first object's top-left.",
+        "[model] Clone the second object at proportional position (8/11 across, 1/9 down) within the first object.",
+        "[model] Clone the second object so its left edge sits 30px left of the first object's right edge, and its top edge sits 10px below the first object's top edge.",
+        "[search] top-right inset max(2/25*w,10)",
+        "[search] top-right inset min(1/10*w,10)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 983,
+          "completion_tokens": 5536,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1539,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1671,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 6519,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 14.0,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

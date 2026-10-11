@@ -62,6 +62,11 @@ def test_model_mode_labels_meters_and_counts_spend(client):
     )
     assert m["server_cap_usd"] == 2.0
     assert st["state"] == "AWAITING_USER" and len(st["question"]["options"]) >= 2
+    assert (
+        st["pool"]["from_model"] >= 1
+        and st["pool"]["from_search"] >= 1
+        and st["pool"]["model_error"] is None
+    )
     ready = client.get("/health/ready").json()["model"]
     assert ready["available"] is True and ready["spend_usd"] == m["server_spend_usd"]
 
@@ -77,7 +82,7 @@ def test_spend_cap_refuses_model_mode_instead_of_degrading(client, monkeypatch):
     assert client.post("/api/teach").status_code == 200  # the free mode keeps working
 
 
-def test_a_failing_model_call_is_reported_not_swallowed_and_leaves_no_zombie_session(client):
+def test_a_failing_model_call_degrades_to_search_only_and_says_so(client):
     from open_apprentice.api.app import app
 
     class Broken(MockProvider):
@@ -85,7 +90,14 @@ def test_a_failing_model_call_is_reported_not_swallowed_and_leaves_no_zombie_ses
             raise TruncatedOutput("hit the completion limit")
 
     app.state.provider = Broken({})
-    n = len(app.state.live)
-    r = client.post("/api/teach", json={"mode": "nemotron"})
-    assert r.status_code == 502 and "MODEL_TRUNCATED" in r.json()["detail"]
-    assert len(app.state.live) == n
+    st = client.post("/api/teach", json={"mode": "nemotron"})
+    assert st.status_code == 200
+    pool = st.json()["pool"]
+    assert (
+        pool["from_model"] == 0
+        and pool["from_search"] > 0
+        and pool["model_error"] == "MODEL_TRUNCATED"
+    )
+    assert (
+        st.json()["state"] == "AWAITING_USER"
+    )  # the symbolic search still produced a real question

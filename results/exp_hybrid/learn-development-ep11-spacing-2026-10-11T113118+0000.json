@@ -1,0 +1,69 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:31:18+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Align all objects to y=100 and pack horizontally from x=40 with 16px gap.",
+        "[model] Align all objects to y=canvas.h/7 and pack horizontally from x=canvas.w/35 with gap=canvas.w/87.5.",
+        "[model] Align all objects to y=canvas.h/7 and pack horizontally from x=40 with 16px gap.",
+        "[search] equal center pitch 91"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 3,
+        "from_search": 1,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1030,
+          "completion_tokens": 12629,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 2,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.0027,
+          "expressible": true,
+          "pool_size": 2
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 13659,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 37.74,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

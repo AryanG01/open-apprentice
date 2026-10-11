@@ -1,0 +1,71 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:40:00+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone the prototype as a badge just inside the top-right corner of the first card, inset horizontally by the prototype's width plus one twenty-fifth of the card's width and vertically by one twenty-fifth of the card's width.",
+        "[model] Clone the prototype as a badge just inside the top-right corner of the first card, with horizontal and vertical insets proportional to the card's height (61/125 and 11/125).",
+        "[model] Clone the prototype as a badge just inside the top-right corner of the first card, with horizontal and vertical insets proportional to the prototype's width (1.22x and 0.22x).",
+        "[model] Clone the prototype as a badge at a fixed offset of 24.4 pixels left and 4.4 pixels down from the first card's top-right corner.",
+        "[search] top-right inset 4",
+        "[search] top-right inset max(1/25*w,2)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 990,
+          "completion_tokens": 11485,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1321,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1277,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 12475,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 30.5,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}
