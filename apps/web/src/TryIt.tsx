@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Attempts, AxisChips, Checks, Hash, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
-import type { Axes, LiveRepair, LiveRun, LiveState } from "./types";
+import type { Axes, LiveRepair, LiveRun, LiveState, Meter, ReadyInfo } from "./types";
 
 class ApiError extends Error {
   constructor(
@@ -12,11 +12,12 @@ class ApiError extends Error {
   }
 }
 
-async function api<T>(path: string, method: "GET" | "POST" = "GET", body?: object): Promise<T> {
+async function api<T>(path: string, method: "GET" | "POST" = "GET", body?: object, signal?: AbortSignal): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(path, { method, headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined });
-  } catch {
+    res = await fetch(path, { method, headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined, signal });
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") throw new ApiError("Cancelled in the browser. The server may still finish that call; if it was a model call it is still billed.", 0);
     throw new ApiError("The live backend is not reachable.", 0);
   }
   if (!res.ok) {
@@ -57,6 +58,22 @@ function axesFor(s: LiveState | null, run: LiveRun | null, repair: LiveRepair | 
   };
 }
 
+function MeterPanel({ meter }: { meter: Meter | null }) {
+  if (!meter) return null;
+  return (
+    <section className="meter" aria-label="Model usage">
+      <h3>Model usage <span className="pill live">LIVE</span></h3>
+      <dl>
+        <dt>Model</dt><dd>{meter.model.split("/").pop()}</dd>
+        <dt>Calls / tokens</dt><dd>{meter.session_calls} / {meter.session_tokens.toLocaleString()}</dd>
+        <dt>This session</dt><dd>≈ ${meter.session_usd.toFixed(3)}</dd>
+        <dt>Server total</dt><dd>${meter.server_spend_usd.toFixed(2)} of ${meter.server_cap_usd.toFixed(2)}</dd>
+      </dl>
+      <p className="muted small">{meter.note}{meter.unknown_cost_calls > 0 ? ` ${meter.unknown_cost_calls} call(s) reported no cost and are charged at a conservative rate.` : ""}</p>
+    </section>
+  );
+}
+
 export function TryIt() {
   const [live, setLive] = useState<LiveState | null>(null);
   const [ready, setReady] = useState<"checking" | "yes" | "no">("checking");
@@ -69,12 +86,17 @@ export function TryIt() {
   const [toolChange, setToolChange] = useState(false);
   const [run, setRun] = useState<LiveRun | null>(null);
   const [repair, setRepair] = useState<LiveRepair | null>(null);
+  const [learner, setLearner] = useState<"reference" | "nemotron">("reference");
+  const [modelInfo, setModelInfo] = useState<ReadyInfo["model"] | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    api<{ engine: boolean; engine_error: string | null }>("/health/ready")
+    api<ReadyInfo>("/health/ready")
       .then((r) => {
         setReady(r.engine ? "yes" : "no");
         setReason(r.engine_error ?? "The graphics engine is not running on the server.");
+        setModelInfo(r.model);
       })
       .catch((e: Error) => {
         setReady("no");
@@ -82,45 +104,65 @@ export function TryIt() {
       });
   }, []);
 
-  const guarded = useCallback(async (fn: () => Promise<void>) => {
+  useEffect(() => {
+    if (!busy) return undefined;
+    const t0 = Date.now();
+    setElapsed(0);
+    const id = window.setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 1000);
+    return () => window.clearInterval(id);
+  }, [busy]);
+
+  const guarded = useCallback(async (fn: (signal: AbortSignal) => Promise<void>) => {
+    const ctl = new AbortController();
+    abortRef.current = ctl;
     setBusy(true);
     setError(null);
     try {
-      await fn();
+      await fn(ctl.signal);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
+      abortRef.current = null;
       setBusy(false);
     }
   }, []);
 
+  const refreshModel = () =>
+    api<ReadyInfo>("/health/ready")
+      .then((r) => setModelInfo(r.model))
+      .catch(() => undefined);
+
   const start = () =>
-    guarded(async () => {
+    guarded(async (signal) => {
       setRun(null);
       setRepair(null);
       setPicked(null);
-      setLive(await api<LiveState>("/api/teach", "POST"));
+      setLive(await api<LiveState>("/api/teach", "POST", { mode: learner }, signal));
+      void refreshModel();
     });
 
   const submit = () =>
-    guarded(async () => {
+    guarded(async (signal) => {
       if (!live?.question || !picked) return;
-      setLive(await api<LiveState>(`/api/teach/${live.id}/answer`, "POST", { query_id: live.question.query_id, answer: picked, candidate_set_hash: live.question.candidate_set_hash }));
+      setLive(await api<LiveState>(`/api/teach/${live.id}/answer`, "POST", { query_id: live.question.query_id, answer: picked, candidate_set_hash: live.question.candidate_set_hash }, signal));
       setPicked(null);
+      void refreshModel();
     });
 
   const doRun = () =>
-    guarded(async () => {
+    guarded(async (signal) => {
       if (!live) return;
       setRepair(null);
-      setRun(await api<LiveRun>(`/api/teach/${live.id}/run`, "POST", { width, backend, tool_change: toolChange && backend === "fabric" }));
+      setRun(await api<LiveRun>(`/api/teach/${live.id}/run`, "POST", { width, backend, tool_change: toolChange && backend === "fabric" }, signal));
+      void refreshModel();
     });
 
   const doRepair = () =>
-    guarded(async () => {
+    guarded(async (signal) => {
       if (!live) return;
-      setRepair(await api<LiveRepair>(`/api/teach/${live.id}/repair`, "POST"));
+      setRepair(await api<LiveRepair>(`/api/teach/${live.id}/repair`, "POST", undefined, signal));
       setRun(null);
+      void refreshModel();
     });
 
   if (ready === "checking") return <main className="page"><p role="status">Checking the live backend…</p></main>;
@@ -148,9 +190,31 @@ export function TryIt() {
     <div className="workspace try">
       <aside className="tasks" aria-label="Live controls">
         <p className="muted">Teach the badge rule yourself, then reuse it, change the tool underneath, and repair it.</p>
+        <fieldset className="runbox">
+          <legend>Who proposes the rules?</legend>
+          <label className="check">
+            <input type="radio" name="learner" checked={learner === "reference"} onChange={() => setLearner("reference")} disabled={busy} />
+            Reference learner (free, no model)
+          </label>
+          <label className="check">
+            <input type="radio" name="learner" checked={learner === "nemotron"} onChange={() => setLearner("nemotron")} disabled={busy || !modelInfo?.available} />
+            NVIDIA Nemotron (live, metered)
+          </label>
+          {!modelInfo?.available ? (
+            <span className="muted small">Not enabled on this server{modelInfo?.error ? `: ${modelInfo.error}` : " (start it with DEMO_MODEL_ENABLED=1 and a Nebius key)"}.</span>
+          ) : (
+            <span className="muted small">Model: {modelInfo.id.split("/").pop()}. Server spend ${modelInfo.spend_usd.toFixed(2)} of a ${modelInfo.cap_usd.toFixed(2)} cap.</span>
+          )}
+        </fieldset>
         <div className="controls">
           <button className="primary" onClick={start} disabled={busy}>{live ? "Start over" : "Start teaching"}</button>
+          {busy ? <button onClick={() => abortRef.current?.abort()}>Cancel</button> : null}
         </div>
+        {busy ? (
+          <p className="callout" role="status" aria-live="polite">
+            Working… {elapsed}s elapsed{learner === "nemotron" || live?.mode === "nemotron" ? ". Waiting for the model; one call can take a minute or two." : "."}
+          </p>
+        ) : null}
         {concept ? (
           <fieldset className="runbox">
             <legend>Reuse it</legend>
@@ -176,8 +240,10 @@ export function TryIt() {
           </fieldset>
         ) : null}
         <p className="muted small">
-          Nothing here calls a language model. Candidate rules come from a non-model learner using the same teaching loop as the evaluation, and the native
-          procedures are scripted fixtures. Every number on the canvas is read back from the real engine.
+          {live?.mode === "nemotron"
+            ? "Nemotron proposes the rules and writes the native procedure; every output is checked on the real engine before it is accepted, and any scripted fallback is labelled. "
+            : "In reference mode nothing calls a language model: rules come from a non-model learner and native procedures are scripted fixtures. "}
+          Every number on the canvas is read back from the real engine.
         </p>
       </aside>
 
@@ -185,6 +251,9 @@ export function TryIt() {
         <p className="eyebrow" role="status" aria-live="polite">Live · {busy ? "working…" : live ? live.state.replace(/_/g, " ").toLowerCase() : "not started"}</p>
         <h2>{!live ? "Teach it a layout rule" : concept ? "The rule is sealed. Now use it." : "Which result did you mean?"}</h2>
         {error ? <p className="callout bad" role="alert">{error}</p> : null}
+        {live && live.fallbacks.length > 0 ? (
+          <div className="callout" role="note"><strong>Scripted fallback used.</strong> {live.fallbacks.join(" ")}</div>
+        ) : null}
 
         {!live ? (
           <p className="lede">
@@ -251,6 +320,12 @@ export function TryIt() {
               ))}
             </div>
             {run.native_error ? <p className="callout bad" role="alert">The native procedure failed to run: {run.native_error}</p> : null}
+            {run.tool_change && run.native_passed && run.verifier_passed ? (
+              <p className="callout ok" role="note">
+                <strong>Survived the silent tool change.</strong> This native procedure measures what the tool actually did and corrects it, so Fabric's changed behaviour did not
+                break it and no repair was needed. Turn the tool change off or try again to see a procedure that does break.
+              </p>
+            ) : null}
             {run.tool_change && !run.native_passed ? (
               <div className="callout bad" role="note">
                 <strong>Reproduced native mismatch.</strong> Your rule is unchanged, but Fabric's real result is off by the amount shown.
@@ -276,11 +351,12 @@ export function TryIt() {
       </main>
 
       <aside className="evidence" aria-label="Evidence">
+        <MeterPanel meter={repair?.meter ?? run?.meter ?? live?.meter ?? null} />
         <AxisChips axes={axesFor(live, run, repair)} />
         {run ? <Checks checks={run.checks} passed={run.verifier_passed} /> : null}
         {concept ? <Hash label="Sealed concept hash" value={concept.sealed_hash} /> : null}
         {run ? <Hash label={`Binding v${run.binding.version} program`} value={run.binding.program_hash} /> : null}
-        {run ? <p className="muted small">Binding origin: {run.binding.origin} (scripted, not model-generated). The verifier judges against the rule you taught.</p> : null}
+        {run ? <p className="muted small">Binding origin: {run.binding.origin === "model" ? "model-generated, accepted only after passing the real-backend checks" : "scripted fixture, not model-generated"}. The verifier judges against the rule you taught.</p> : null}
       </aside>
     </div>
   );

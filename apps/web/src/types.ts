@@ -35,6 +35,7 @@ export interface OptionView {
 
 export interface Attempt {
   candidate: number;
+  source?: string;
   diagnosis: string;
   failed_stage: string | null;
   cases: { stage: string; passed: boolean; scene: string; native_actions: number }[];
@@ -42,6 +43,7 @@ export interface Attempt {
 
 export interface VersionRow {
   version: number;
+  origin?: string;
   parent: number | null;
   program_hash: string;
   active: boolean;
@@ -156,6 +158,9 @@ export interface LiveConcept {
 
 export interface LiveState {
   id: string;
+  mode: string;
+  meter: Meter | null;
+  fallbacks: string[];
   label: LiveLabel;
   state: string;
   intent_state: string;
@@ -169,6 +174,8 @@ export interface LiveState {
 }
 
 export interface LiveRun {
+  meter: Meter | null;
+  fallbacks: string[];
   backend: string;
   tool_change: boolean;
   width: number;
@@ -184,6 +191,8 @@ export interface LiveRun {
 }
 
 export interface LiveRepair {
+  meter: Meter | null;
+  fallbacks: string[];
   status: string;
   attempts: Attempt[];
   old_program: Program;
@@ -192,4 +201,22 @@ export interface LiveRepair {
   concept_hash_before: string;
   concept_hash_after: string;
   rule_unchanged: boolean;
+}
+
+export interface Meter {
+  model: string;
+  label: string;
+  session_tokens: number;
+  session_calls: number;
+  session_usd: number;
+  unknown_cost_calls: number;
+  server_spend_usd: number;
+  server_cap_usd: number;
+  note: string;
+}
+
+export interface ReadyInfo {
+  engine: boolean;
+  engine_error: string | null;
+  model: { available: boolean; id: string; spend_usd: number; cap_usd: number; error: string | null };
 }

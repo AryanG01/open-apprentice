@@ -167,7 +167,8 @@ export function Attempts({ attempts }: { attempts: Attempt[] }) {
       <ol>
         {attempts.map((a) => (
           <li key={a.candidate} className={a.failed_stage ? "fail-text" : "ok-text"}>
-            <strong>{a.failed_stage ? "Rejected" : "Promoted"}</strong>: {a.diagnosis || "scripted fixture patch"}
+            <strong>{a.failed_stage ? "Rejected" : "Promoted"}</strong>
+            {a.source ? <span className="muted"> ({a.source === "model" ? "model-generated" : "scripted fixture"})</span> : null}: {a.diagnosis || "scripted fixture patch"}
             {a.failed_stage ? <span> — failed at <code>{a.failed_stage.replace(/_/g, " ")}</code></span> : null}
             <ul className="cases">
               {a.cases.map((c, i) => (

@@ -199,8 +199,8 @@ export function App() {
         </div>
         {mode === "Try it live" ? (
           <div className="banner" role="note">
-            <span className="pill live">LIVE ENGINE · NO MODEL</span>
-            <span>You are driving the real Konva and Fabric engines and the independent verifier. No language model is called; native procedures are scripted fixtures.</span>
+            <span className="pill live">LIVE ENGINE</span>
+            <span>You are driving the real Konva and Fabric engines and the independent verifier. Choose who proposes the rules: the free reference learner (no model) or NVIDIA Nemotron (live and metered). Every response says which one produced what.</span>
           </div>
         ) : (
           <div className="banner" role="note">
@@ -272,8 +272,8 @@ export function App() {
 
       <footer className="foot">
         <p>
-          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live" runs the real engines through the local API (no model). Not built yet:
-          teaching with a language model from this interface, editable SVG export, your own scenes, and a skill inspector. Compare reads stored results only.
+          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live" needs the local API; Nemotron mode additionally needs
+          DEMO_MODEL_ENABLED=1 and a Nebius key. Not built yet: your own scenes, a skill inspector, SVG import, and entering a corrected example after "Neither". Compare reads stored results only.
         </p>
       </footer>
     </div>
