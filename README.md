@@ -57,7 +57,7 @@ We hold ourselves to the claims we can back with a command.
 - 280+ tests, including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
 
 **Measured with a live NVIDIA model (development split, small samples):** the model alone committed to a wrong rule 15 of 34 times (44%); an extra "audit" round did not help; unioning the model's proposals with a
-bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that shows closing the candidate-set gap works, not that the model adds value.
+bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that alone does not show the model adds value. On six rules *outside* the search's grammar it does: search alone got 0 of 12 right, the model alone 5 of 12 (with 2 confident-wrong commits), and the hybrid committed 5 rules, all correct. Tiny samples, development split.
 
 **Earlier pilot, not flattering:** on development-split pilot runs (Nemotron-3-Ultra via Nebius, a handful of episodes), a
 non-model reference solves every task, while every model-based method, including ours, often **commits output from a rule that fit the examples but

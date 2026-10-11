@@ -252,3 +252,9 @@ on the research claim." Entries are append-only; append, never rewrite history.
     WHAT THIS DOES NOT SHOW: that the model adds value. The non-model reference also solves these tasks, and the origin tag overstates the model's role (behaviourally identical candidates keep the
     FIRST origin, which is the model's: 14 of the 19 correct rules are tagged [model] although the search proposed the same behaviour). The supported claim: closing the omission gap with symbolic
     coverage, while the teacher remains the only oracle, removes most confident-wrong commits. Model value needs rules outside the grammar (not yet built).
+47. **RESULT: the model adds real value where the symbolic search cannot reach (out-of-grammar battery, development only).** Six badge rules the search provably cannot express (tests/unit/test_oog_battery.py):
+    height-based inset, shorter-side inset, centred on the top edge, bottom centre, resized badge, (w+h)/20 inset; 2 reps each; Nemotron-3-Ultra low effort; results/exp_oog_{search,model,hybrid}.
+    SEARCH ONLY (no model): 0 correct, 2 wrong (rule 5), 10 abstained. MODEL ALONE: 12 trials, 7 committed = 5 correct + 2 wrong (both rule 1), 2 abstained, 3 lost to errors.
+    HYBRID: 11 trials run (the 280k ceiling skipped the last), 5 committed = 5 correct + 0 wrong, 4 abstained, 2 lost to errors. Rules recovered by the model arms: height-based inset, centred
+    on the top edge, bottom centre; not recovered: shorter-side inset, resized badge, (w+h)/20. Hybrid vs model-alone (0 of 5 wrong vs 2 of 7) is a direction, not a significant difference.
+    Together with #46: search supplies coverage and safety inside its grammar, the model supplies reach outside it, and the teacher stays the only oracle. Tokens 216k + 315k (~$1.9).

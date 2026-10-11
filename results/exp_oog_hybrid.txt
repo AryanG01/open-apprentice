@@ -2,3 +2,13 @@ oa learn-oog  arm=hybrid trials=12 model=nvidia/Nemotron-3-Ultra-550b-a55b
 saved rule0 rep0: INTENT_READY recovered=True tokens=10886 (total 10886)
 saved rule1 rep0: UNRESOLVED recovered=None tokens=39191 (total 50077)
 saved rule2 rep0: INTENT_READY recovered=True tokens=9334 (total 59411)
+saved rule3 rep0: INTENT_READY recovered=True tokens=27127 (total 86538)
+saved rule4 rep0: HYPOTHESES_READY recovered=None tokens=54164 (total 140702)
+saved rule5 rep0: UNRESOLVED recovered=None tokens=39792 (total 180494)
+saved rule0 rep1: UNRESOLVED recovered=None tokens=37080 (total 217574)
+saved rule1 rep1: UNRESOLVED recovered=None tokens=30321 (total 247895)
+saved rule2 rep1: INTENT_READY recovered=True tokens=7315 (total 255210)
+saved rule3 rep1: INTENT_READY recovered=True tokens=22837 (total 278047)
+saved rule4 rep1: HYPOTHESES_READY recovered=None tokens=36778 (total 314825)
+NOT RUN: global token ceiling 280000 reached (rule 5)
+results in results/exp_oog_hybrid

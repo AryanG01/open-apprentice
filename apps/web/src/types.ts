@@ -140,7 +140,20 @@ export interface ExperimentArm {
   tokens: number;
 }
 
+export interface OogArm {
+  variant: "search" | "model" | "hybrid";
+  arm: string;
+  trials: number;
+  committed: number;
+  correct: number;
+  wrong: number;
+  abstained: number;
+  errors: number;
+  tokens: number;
+}
+
 export interface Evidence {
+  oog?: OogArm[];
   experiments?: ExperimentArm[];
   generated_at: string;
   runs: RunEvidence[];

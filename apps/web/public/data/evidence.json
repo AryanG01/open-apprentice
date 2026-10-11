@@ -40,7 +40,42 @@
    "tokens": 428463
   }
  ],
- "generated_at": "2026-10-11T11:32:11+00:00",
+ "oog": [
+  {
+   "variant": "search",
+   "arm": "Search only (no model)",
+   "trials": 12,
+   "committed": 2,
+   "correct": 0,
+   "wrong": 2,
+   "abstained": 10,
+   "errors": 0,
+   "tokens": 0
+  },
+  {
+   "variant": "model",
+   "arm": "Model alone",
+   "trials": 12,
+   "committed": 7,
+   "correct": 5,
+   "wrong": 2,
+   "abstained": 2,
+   "errors": 3,
+   "tokens": 216334
+  },
+  {
+   "variant": "hybrid",
+   "arm": "Model + symbolic search",
+   "trials": 11,
+   "committed": 5,
+   "correct": 5,
+   "wrong": 0,
+   "abstained": 4,
+   "errors": 2,
+   "tokens": 314825
+  }
+ ],
+ "generated_at": "2026-10-11T12:01:13+00:00",
  "runs": [
   {
    "run": "development-ep1-1-20261010T144833",

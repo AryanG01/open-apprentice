@@ -1,0 +1,102 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:52:43+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 5,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [
+    "MODEL_TRUNCATED"
+  ],
+  "final_rule_origin": null,
+  "evaluator_template": "inset is one twentieth of width plus height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Place badge at 80% of card0's width from its left edge and 15% of card0's height from its top edge.",
+        "[model] Place badge at card0's top-right corner, shifted left by 1.6 times proto's width and down by 0.6 times proto's height.",
+        "[model] Place badge at a fixed offset of (128, 12) from card0's top-left corner.",
+        "[model] Place badge at card0's top-right corner with a fixed offset of (-32, 12).",
+        "[search] top-right inset 12",
+        "[search] top-right inset min(1/10*w,12)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 985,
+          "completion_tokens": 5133,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1540,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.188,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[search] top-right inset min(1/10*w,12)",
+        "[search] top-right inset min(2/25*w,12)",
+        "[search] top-right inset min(3/25*w,12)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 0,
+        "from_search": 3,
+        "model_error": "MODEL_TRUNCATED",
+        "model_usage": {},
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 8848,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.6978,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 0
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 39792,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 170.15,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "hybrid",
+  "rep": 0
+}

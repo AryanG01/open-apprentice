@@ -13,6 +13,9 @@ export function Home({ data, go }: HomeProps) {
   const control = data.experiments?.find((e) => e.variant === "control");
   const audit = data.experiments?.find((e) => e.variant === "audit");
   const hybrid = data.experiments?.find((e) => e.variant === "hybrid");
+  const oogSearch = data.oog?.find((e) => e.variant === "search");
+  const oogModel = data.oog?.find((e) => e.variant === "model");
+  const oogHybrid = data.oog?.find((e) => e.variant === "hybrid");
   return (
     <main className="page home" id="stage">
       <section className="hero">
@@ -58,6 +61,12 @@ export function Home({ data, go }: HomeProps) {
             <li>
               Adding exhaustive symbolic search to the model's proposals, with the teacher still the only judge, cut it to <strong>{hybrid.wrong} of {hybrid.committed} wrong ({pct(hybrid.wrong_share_of_committed)})</strong>.
               A non-model search alone does as well on these tasks, so this shows that closing the gap in the candidate set fixes the problem, not that the model adds value.
+            </li>
+          ) : null}
+          {oogSearch && oogModel && oogHybrid ? (
+            <li>
+              Where the search cannot reach (six rules outside its grammar): search alone got <strong>{oogSearch.correct} of {oogSearch.trials}</strong> right; the model alone <strong>{oogModel.correct} of {oogModel.trials}</strong>,
+              but committed {oogModel.wrong} wrong rules; the hybrid committed {oogHybrid.committed} rules, <strong>{oogHybrid.wrong} wrong</strong>. That is the model's value: reach outside the search, kept safe by it. Tiny samples.
             </li>
           ) : null}
           <li>A non-model reference solves every development task, so the tasks and the independent verifier are sound. Its grammar was built knowing the rule families, so we do not call that “understanding”.</li>

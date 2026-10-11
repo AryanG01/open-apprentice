@@ -1,0 +1,98 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:52:10+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 4,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "top-right inset 12, badge sized to a quarter of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto at 80% of card0's width and 15% of card0's height from card0's top-left.",
+        "Clone proto at card0's right edge minus 1.6 times proto's width, and card0's top edge plus 0.6 times proto's height.",
+        "Clone proto at card0's right edge minus proto's width minus 0.6 times proto's width, and card0's top edge plus 0.6 times proto's height.",
+        "Clone proto at 80% of card0's width from card0's left, and 0.6 times proto's height from card0's top."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 4314,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object as a badge, size it to one quarter of the first object's height, and place it 12 pixels from the top and right edges of the first object.",
+        "Clone the first object as a badge, size it to a square of side one quarter of its height, and position it inset 12 pixels from the top-right corner of the first object.",
+        "Clone the second object as a badge, size it to one quarter of the smaller dimension of the first object, and place it 12 pixels from the top and right edges of the first object.",
+        "Clone the first object as a badge, size it to a square of side one quarter of the smaller dimension of the first object, and position it inset 12 pixels from the top-right corner of the first object."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object, resize it to one quarter of the first object's height, and place it 12 pixels from the top and right edges of the first object.",
+          "reason": "invalid rule: line 5: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_size = objects[0].h / 4\nlet badge_x = objects[0].x + objects[0].w - badge_size - 12\nlet badge_y = objects[0].y + 12\nclone objects[1] as badge at (badge_x, badge_y)\nresize badge to (badge_size, badge_size)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the first object, resize it to a square of side one quarter of its height, and position it inset 12 pixels from the top-right corner of the first object.",
+          "reason": "invalid rule: line 5: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_size = objects[0].h / 4\nlet badge_x = objects[0].x + objects[0].w - badge_size - 12\nlet badge_y = objects[0].y + 12\nclone objects[0] as badge at (badge_x, badge_y)\nresize badge to (badge_size, badge_size)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object, resize it to one quarter of the smaller dimension of the first object, and place it 12 pixels from the top and right edges of the first object.",
+          "reason": "invalid rule: line 5: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_size = min(objects[0].w, objects[0].h) / 4\nlet badge_x = objects[0].x + objects[0].w - badge_size - 12\nlet badge_y = objects[0].y + 12\nclone objects[1] as badge at (badge_x, badge_y)\nresize badge to (badge_size, badge_size)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the first object, resize it to a square of side one quarter of the smaller dimension of the first object, and position it inset 12 pixels from the top-right corner of the first object.",
+          "reason": "invalid rule: line 5: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_size = min(objects[0].w, objects[0].h) / 4\nlet badge_x = objects[0].x + objects[0].w - badge_size - 12\nlet badge_y = objects[0].y + 12\nclone objects[0] as badge at (badge_x, badge_y)\nresize badge to (badge_size, badge_size)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4328,
+        "completion_tokens": 29776,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 39403,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 163.23,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 1
+}

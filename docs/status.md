@@ -175,3 +175,7 @@ rule hash unchanged), static web + data served, CSP/frame/nosniff headers presen
 ## 2026-10-11 night: hybrid experiment RESULT (positive, limited) — decisions #46
 Hybrid: 24 trials, 20 committed, 19 correct, 1 wrong (5%), 3 abstained, 1 error; 428k tokens. Model alone: 44% wrong. The non-model reference also solves these tasks, and the model's role is NOT shown by this
 experiment. The `oa learn` process stalled while the laptop slept (3 s CPU in 2.5 h) but finished; results had been written only at the end, so per-trial saving was added (commit 3acc306).
+
+## 2026-10-12: out-of-grammar RESULT (decisions #47) and teach-by-placing
+Search only 0/12 correct; model alone 5/12 (2 confident-wrong); hybrid 5/11 committed-all-correct. First evidence that the MODEL adds value (outside the search grammar). Small n; two reps; one rule family.
+Live demo now starts from the visitor's own badge placement (drag / number fields / arrow keys); an inexpressible placement ends unresolved in plain language. 334 tests pass.

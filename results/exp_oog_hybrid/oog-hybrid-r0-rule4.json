@@ -1,0 +1,99 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:49:53+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 4,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": null,
+  "evaluator_template": "top-right inset 12, badge sized to a quarter of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "BudgetExhausted: BUDGET_EXHAUSTED[tokens] 54164+0+35082>60000",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Place the badge at 80% across and 15% down the card from its top-left corner.",
+        "[model] Place the badge at the card's top-right, then shift left by 1.6 badge widths and down by 0.6 badge heights.",
+        "[model] Place the badge at a fixed offset of 32 pixels left and 12 pixels down from the card's top-right corner.",
+        "[model] Place the badge at a fixed offset of 48 pixels right and 28 pixels up from the card's center.",
+        "[search] top-right inset 12",
+        "[search] top-right inset min(1/10*w,12)"
+      ],
+      "rejected": [
+        {
+          "summary": "Place the badge at 80% across and 15% down the card from its top-left corner.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let bx = objects[0].x + 0.8 * objects[0].w\\nlet by = objects[0].y + 0.15 * objects[0].h\\nclone objects[1] as badge at (bx, by)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge at the card's top-right, then shift left by 1.6 badge widths and down by 0.6 badge heights.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let bx = objects[0].x + objects[0].w - 1.6 * objects[1].w\\nlet by = objects[0].y + 0.6 * objects[1].h\\nclone objects[1] as badge at (bx, by)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge at a fixed offset of 32 pixels left and 12 pixels down from the card's top-right corner.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let bx = objects[0].x + objects[0].w - 32\\nlet by = objects[0].y + 12\\nclone objects[1] as badge at (bx, by)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge at a fixed offset of 48 pixels right and 28 pixels up from the card's center.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let cx = objects[0].x + objects[0].w / 2\\nlet cy = objects[0].y + objects[0].h / 2\\nlet bx = cx + 48\\nlet by = cy - 28\\nclone objects[1] as badge at (bx, by)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 2854,
+          "completion_tokens": 21955,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1540,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1586,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 54164,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 246.07,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "hybrid",
+  "rep": 0
+}

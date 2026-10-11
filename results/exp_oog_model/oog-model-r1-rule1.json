@@ -1,0 +1,55 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:47:06+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 1,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "inset is 10% of the shorter side",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object 8 pixels inward from the top-right corner of the first object.",
+        "Clone the second object inset from the top-right of the first by 5% of the first's width horizontally and 10% of the first's height vertically.",
+        "Clone the second object inset from the top-right of the first by a margin equal to 40% of the second object's width.",
+        "Clone the second object inset from the top-right of the first by a margin equal to 10% of the first object's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 2822,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 3807,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 13.42,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 1
+}

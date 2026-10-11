@@ -112,6 +112,35 @@ export function Compare({ data }: { data: Evidence }) {
         </>
       ) : null}
 
+      {data.oog && data.oog.length > 0 ? (
+        <>
+          <h2>Where the model matters: rules the symbolic search cannot express</h2>
+          <p className="muted">
+            Six badge rules outside the search's grammar (height-based inset, centred on the top edge, bottom centre, a resized badge, and others), two repetitions each. Any success here is the model's.
+            Tiny samples; the difference between the model-only and hybrid rows is a direction, not a significant result.
+          </p>
+          <div className="table-wrap">
+            <table className="data">
+              <thead><tr><th>Arm</th><th>Trials</th><th>Committed</th><th>Correct</th><th>Wrong</th><th>Abstained</th><th>Lost to errors</th><th>Tokens</th></tr></thead>
+              <tbody>
+                {data.oog.map((e) => (
+                  <tr key={e.variant}>
+                    <th scope="row">{e.arm}</th>
+                    <td>{e.trials}</td>
+                    <td>{e.committed}</td>
+                    <td>{e.correct}</td>
+                    <td className={e.wrong > 0 ? "fail-text" : ""}>{e.wrong}</td>
+                    <td>{e.abstained}</td>
+                    <td>{e.errors}</td>
+                    <td>{e.tokens.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : null}
+
       <h2>Limits of this evidence</h2>
       <ul className="caveats">
         {data.caveats.map((c) => (

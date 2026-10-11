@@ -1,0 +1,113 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:58:09+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 3,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "bottom centre, 8 px above the edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone proto as badge at a fixed offset (70, 52) from card0's top-left corner.",
+        "[model] Clone proto as badge at a fixed offset (-90, -28) from card0's bottom-right corner.",
+        "[model] Clone proto as badge at a fixed offset (-10, 12) from card0's center.",
+        "[model] Clone proto as badge at a fixed canvas position (170, 152) regardless of card0."
+      ],
+      "rejected": [
+        {
+          "summary": "(enumeration)",
+          "reason": "no rule in the declared grammar fits all teaching evidence"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 0,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 985,
+          "completion_tokens": 5308,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 7408,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.5507,
+          "expressible": false,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[model] Clone the second object as a badge centered horizontally on the first object and placed 8 pixels above the first object's bottom.",
+        "[model] Clone the second object as a badge centered horizontally on the first object with a vertical offset from the bottom capped at 8 pixels and 5% of the first object's width.",
+        "[model] Clone the second object as a badge centered horizontally on the first object with a vertical offset from the bottom at least 8 pixels and 30% of the second object's width."
+      ],
+      "rejected": [
+        {
+          "summary": "(enumeration)",
+          "reason": "no rule in the declared grammar fits all teaching evidence"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 3,
+        "from_search": 0,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 1701,
+          "completion_tokens": 14843,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 8848,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.6561,
+          "expressible": false,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 22837,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 63.83,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "hybrid",
+  "rep": 1
+}

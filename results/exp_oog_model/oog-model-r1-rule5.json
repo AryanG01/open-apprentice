@@ -1,0 +1,72 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:54:47+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 5,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "inset is one twentieth of width plus height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge at a fixed offset of 32px left and 12px down from card0's top-right corner.",
+        "Clone proto as badge at card0's top-right with a margin of 0.6 times proto's width horizontally and 0.6 times proto's height vertically.",
+        "Clone proto as badge at 80% of card0's width from its left and 15% of card0's height from its top.",
+        "Clone proto as badge at card0's top-right with a margin of 4% of canvas width horizontally and 2% of canvas height vertically."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 12452,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Badge positioned at first object's left plus half width plus full height minus 1.6 times second object's width, vertically at first object's top plus 5% of width plus 5% of height.",
+        "Badge positioned at first object's left plus 80% width plus 30% height minus 1.2 times second object's width, vertically at first object's top plus 5% of width plus 5% of height.",
+        "Badge positioned at first object's left plus 65% of (width plus height) minus 1.4 times second object's width, vertically at first object's top plus 5% of width plus 5% of height.",
+        "Badge positioned at first object's left plus half width plus full height minus 1.6 times second object's height, vertically at first object's top plus 5% of width plus 5% of height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1680,
+        "completion_tokens": 21000,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 36117,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 156.53,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 1
+}

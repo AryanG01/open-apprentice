@@ -1,0 +1,134 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:55:10+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 0,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": null,
+  "evaluator_template": "inset is 10% of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Place a clone of the second object at a fixed offset left and down from the first object's top-right corner.",
+        "[model] Place a clone of the second object at a fixed offset right and down from the first object's top-left corner.",
+        "[model] Place a clone of the second object at a fixed fraction of the first object's width and height from its top-left corner.",
+        "[model] Place a clone of the second object at a fixed fraction of the canvas width and height.",
+        "[search] top-right inset 8",
+        "[search] top-right inset 1/20*w"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 4,
+        "from_search": 2,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 985,
+          "completion_tokens": 6480,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1307,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1472,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "[model] Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the first object's height, and down by 10% of the first object's height.",
+        "[model] Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the taller object's height, and down by 10% of that taller height.",
+        "[model] Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the first object's smaller dimension, and down by 10% of that smaller dimension.",
+        "[search] top-right inset max(1/20*w,2)",
+        "[search] top-right inset min(1/10*w,8)",
+        "[search] top-right inset min(2/25*w,8)"
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the first object's height, and down by 10% of the first object's height.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let margin = 0.1 * objects[0].h\\nlet dx = objects[1].w + margin\\nclone objects[1] as badge at (objects[0].x + objects[0].w - dx, objects[0].y + margin)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the taller object's height, and down by 10% of that taller height.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let margin = 0.1 * max(objects[0].h, objects[1].h)\\nlet dx = objects[1].w + margin\\nclone objects[1] as badge at (objects[0].x + objects[0].w - dx, objects[0].y + margin)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the first object's smaller dimension, and down by 10% of that smaller dimension.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let margin = 0.1 * min(objects[0].w, objects[0].h)\\nlet dx = objects[1].w + margin\\nclone objects[1] as badge at (objects[0].x + objects[0].w - dx, objects[0].y + margin)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object to the left of the first object's right edge by the second object's width plus 10% of the smaller of the first object's height and the canvas height, and down by 10% of that value.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let margin = 0.1 * min(objects[0].h, canvas.h)\\nlet dx = objects[1].w + margin\\nclone objects[1] as badge at (objects[0].x + objects[0].w - dx, objects[0].y + margin)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 3,
+        "from_search": 3,
+        "model_error": null,
+        "model_usage": {
+          "correction_turn": true,
+          "prompt_tokens": 4332,
+          "completion_tokens": 25283,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 2,
+          "enumerated": 3072,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.2789,
+          "expressible": true,
+          "pool_size": 8848
+        }
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 37080,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 146.54,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "hybrid",
+  "rep": 1
+}

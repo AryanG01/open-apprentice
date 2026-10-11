@@ -521,8 +521,33 @@ def stored_evidence():
                     **{k: v for k, v in m.items() if k != "by_concept"},
                 }
             )
+    oog = []
+    for arm, label in (
+        ("search", "Search only (no model)"),
+        ("model", "Model alone"),
+        ("hybrid", "Model + symbolic search"),
+    ):
+        ts = [json.load(open(f)) for f in sorted(glob.glob(f"results/exp_oog_{arm}/oog-*.json"))]
+        if ts:
+            ready = [t for t in ts if t["final_state"] == "INTENT_READY"]
+            oog.append(
+                {
+                    "variant": arm,
+                    "arm": label,
+                    "trials": len(ts),
+                    "committed": len(ready),
+                    "correct": sum(1 for t in ready if t["recovered_latent_on_heldout"]),
+                    "wrong": sum(1 for t in ready if t["recovered_latent_on_heldout"] is False),
+                    "abstained": sum(1 for t in ts if t["final_state"] == "UNRESOLVED"),
+                    "errors": sum(
+                        1 for t in ts if t["final_state"] not in ("INTENT_READY", "UNRESOLVED")
+                    ),
+                    "tokens": sum(t["tokens"] for t in ts),
+                }
+            )
     return {
         "experiments": experiments,
+        "oog": oog,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "runs": runs,
         "teaching_trials": trials,

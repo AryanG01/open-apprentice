@@ -1,0 +1,55 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:49:27+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 3,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "bottom centre, 8 px above the edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "BudgetExhausted: BUDGET_EXHAUSTED[tokens] 25659+0+34627>60000",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset of (70, 52) from the top-left of the first object.",
+        "Place the badge at a proportional position (43.75% from left, 65% from top) of the first object's bounding box.",
+        "Place the badge by offsetting from the bottom-right of the first object by multiples (4.5x, 1.4x) of the second object's size.",
+        "Center the badge horizontally on the first object, and place it 22 pixels below the vertical center of the first object."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 5842,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 25659,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 104.54,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 1
+}
