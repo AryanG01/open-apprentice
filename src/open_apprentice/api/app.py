@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from open_apprentice import __version__
 from open_apprentice.api.teach import router as teach_router
 from open_apprentice.config import load_settings
+from open_apprentice.providers.factory import MissingCredential, make_provider
 from open_apprentice.concepts.witness import SolverPool
 from open_apprentice.evaluation.local_engine import local_engine
 
@@ -25,7 +26,17 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.live = {}
     app.state.engine = None
     app.state.engine_error = None
+    app.state.spend = {"usd": 0.0, "tokens": 0}
+    app.state.provider = None
+    app.state.model_error = None
     async with AsyncExitStack() as stack:
+        # Model mode costs real money, so it is OFF unless the operator opts in with DEMO_MODEL_ENABLED=1 (and has credentials).
+        if os.environ.get("DEMO_MODEL_ENABLED") == "1":
+            try:
+                app.state.provider = make_provider(load_settings())
+                stack.push_async_callback(app.state.provider.aclose)
+            except MissingCredential as e:
+                app.state.model_error = str(e)[:160]
         app.state.pool = stack.enter_context(SolverPool())
         url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
         if url and token:
@@ -51,10 +62,20 @@ def live() -> dict[str, str]:
 @app.get("/health/ready")
 def ready() -> dict:
     """Readiness: can this server actually run the interactive demo?"""
+    from open_apprentice.api.teach import _cap_usd
+
+    p = app.state.provider
     return {
         "engine": app.state.engine is not None,
         "engine_error": app.state.engine_error,
         "live_sessions": len(app.state.live),
+        "model": {
+            "available": p is not None,
+            "id": getattr(p, "requested_model", "") if p else "",
+            "spend_usd": round(app.state.spend["usd"], 4),
+            "cap_usd": _cap_usd(),
+            "error": app.state.model_error,
+        },
     }
 
 
