@@ -151,3 +151,12 @@ candidate-generation wording before decision #39 and without the 32k floor chang
 - Cleanup: black + ruff clean, 292 tests pass (incl. engine-backed), import-boundary contract kept. mypy debt noted (decisions #43).
 - Audit-vs-control experiment (decisions #40) launched on Nemotron-3-Ultra: 48 trials per arm, 12 dev episodes x 2 concepts x 2 reps. RESULT PENDING.
 - Not yet verified: `docker compose up`, clean-checkout reproduction, phone-width layout, public-deployment hardening (no rate limiting; engine calls block the event loop; unauthenticated session creation is capped at 20).
+
+## 2026-10-11 evening: Nemotron live mode, Break it, offline replay (all tested)
+- Nemotron live mode (opt-in `DEMO_MODEL_ENABLED=1`, global cap `DEMO_MODEL_MAX_USD`, default $4): the model proposes candidate rules and writes/repairs the native
+  procedure; outputs are accepted only after the real-engine checks, and a scripted fixture replaces a failed model output WITH a visible, reasoned notice. Measured on
+  Nemotron-3-Ultra: start ~24 s, whole session about $0.09-$0.28. Two real runs of the same flow differed: Fabric native procedure failed once (labelled fallback) and passed
+  once; under the silent tool change the passing model procedure survived without repair (it measures and corrects). Single runs, not rates.
+- Break it: `/api/teach/{id}/break` (bounded sampling, deterministic per seed). Offline replay: `oa replay-evidence`, `/api/replay`; 8 tamper cases are detected.
+- 309 tests pass (incl. engine-backed); fresh `git clone` + README steps verified (uv sync, npm ci, playwright, build:web, tests, lint-imports).
+- Open: Vercel CLI is logged out (public deployment waits for `vercel login`); audit-vs-control experiment still running.

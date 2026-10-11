@@ -33,6 +33,13 @@ interface says so. A live meter shows tokens, calls and estimated dollars, and t
 | **Learn / Reuse / Transfer / Challenge** | A recorded, annotated walkthrough of the same story | Recorded from a real offline run; labelled RECORDED |
 | **Compare** (`/#compare`) | Stored live-model pilot results against baselines | Rows from real Nemotron runs, development split, with their limits stated first |
 
+**Break it:** *Try to break it* runs 40 generated inputs (domain boundaries first, then seeded random sizes and positions) on the real engine, judges each with the
+independent verifier, and reports exactly how many passed and the first failures with their numbers. It is bounded sampling, and says so.
+
+**Verify it yourself:** the evidence package is self-contained (rule, domain, hash-chained teaching ledger, native program, observed geometry). *Re-check this package
+offline* (or `uv run python -m open_apprentice.cli replay-evidence evidence.json`) recomputes the ledger chain, the sealed concept hash, the program hash and
+the rule's exact result with no engine and no model, and checks that the package's own pass/fail claim agrees. Edit one byte of the file and it fails.
+
 **Export:** after a run, *Download editable SVG* gives script-free SVG 1.1 with every object id preserved and the rule hash, backend and
 verifier result embedded as metadata. *Evidence package (JSON)* contains the teaching ledger, hashes and observed geometry so a layout can be re-checked
 without trusting the interface.
