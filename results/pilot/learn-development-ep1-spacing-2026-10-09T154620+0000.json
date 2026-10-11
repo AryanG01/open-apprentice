@@ -1,0 +1,79 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:46:20+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move every card to y=100 and shift its x right by 2% of the canvas width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/50\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every card to y=100 and shift its x right by 2% of the canvas width plus 1% of its own width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/50\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/100\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}]}, \"y\": 100}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 892,
+        "completion_tokens": 899,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place all cards at y=100 and arrange them in a row with equal horizontal spacing based on canvas width."
+      ],
+      "rejected": [
+        {
+          "summary": "Shift each card to y=100 and increase its x by a fixed proportion of its own width plus a constant offset.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset\", \"value\": 8}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}]}, {\"ref\": \"locals.offset\"}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every card to y=100 and set its x to the original x plus 2% of canvas width plus 1% of the card's width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/50\"}, {\"ref\": \"canvas.w\"}]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/100\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}]}, \"y\": 100}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 982,
+        "completion_tokens": 1504,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 4277,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 13.6,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

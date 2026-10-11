@@ -1,0 +1,98 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:57:20+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move each card to y=100 and shift its x right by a base offset plus 6 times its index in the list."
+      ],
+      "rejected": [
+        {
+          "summary": "Move each card to y=100 and set its x to the previous card's right edge plus a fixed gap, starting from an initial x of 40.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=160, y=100, w=70, h=90) but the evidence shows (x=166, y=100, w=70, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": 10}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.cur_x\"}, \"y\": 100}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"op\": \"add\", ",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 610,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Move each card to y=100 and shift its x right by a base offset plus 6 times its index in the list."
+      ],
+      "rejected": [
+        {
+          "summary": "Place cards at y=100 with left edges spaced by a fixed gap after each card's width.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'cur_x')",
+          "rule_excerpt": "let gap = 10\nlet cur_x = 40\nfor V in objects {\n    move V to (cur_x, 100)\n    cur_x = cur_x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Center each card horizontally within equal columns dividing the canvas width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=178.3, y=100, w=110, h=90) but the evidence shows (x=40, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"n\", \"value\": 3}, {\"op\": \"let\", \"name\": \"col_w\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, {\"ref\": \"locals.n\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"locals.col_w\"}, {\"ref\": \"locals.I\"}]}, {\"op\": \"div\", \"args\": [{\"ref\": \"locals.col_w\"}, 2]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align cards to y=100 and set x based on cumulative width plus a margin that scales with canvas width.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let margin = canvas.w * 0.02\nlet acc = margin\nfor V in objects {\n    move V to (acc, 100)\n    acc = acc + V.w + margin\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place each card at y=100; the first card at x=40, each subsequent card at the previous card's right edge plus a fixed 16 units. ",
+          "reason": "invalid rule: line 5: object index must be a whole number (near 'I')",
+          "rule_excerpt": "for V in objects with I {\n    if I == 0 {\n        move V to (40, 100)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + 16, 100)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place cards at y=100 with left edges determined by a running total that starts at 40 and adds each card's width plus a fixed 16. ",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let acc = 40\nfor V in objects {\n    move V to (acc, 100)\n    acc = acc + V.w + 16\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3266,
+        "completion_tokens": 1564,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 6481,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 12.87,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

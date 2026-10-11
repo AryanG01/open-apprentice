@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:43:18+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype as a badge at the card's top-left plus half the prototype's width and height.",
+        "Clone the prototype as a badge at the prototype's right edge horizontally and the card's y plus half prototype height vertically.",
+        "Clone the prototype as a badge at twice the card's x coordinate and the card's y plus the card's x coordinate.",
+        "Clone the prototype as a badge at the prototype's width as absolute x and the card's y plus half the prototype's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 5135,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 19769,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 49.86,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,15 @@
+oa learn  split=development trials=12  model=nvidia/nemotron-3-super-120b-a12b  reasoning_effort=medium
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      INTENT_READY      1       1 1a/0c      True    6093  24.41  
+  1 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   23306 102.32  TruncatedOutput: output hit the completion limit; not executing partial output
+  2 badge    min        INTENT_READY      2       1 1a/1c     False   28972 110.57  
+  3 badge    const      INTENT_READY      2       2 2a/1c      True   16872  67.49  
+  4 badge    prop       UNRESOLVED       2       2 2a/1c      None   11222  39.07  
+  5 badge    min        UNRESOLVED       2       2 2a/1c      None   30190 109.73  
+  6 badge    const      UNRESOLVED       2       2 2a/1c      None   15544   57.7  
+  7 badge    prop       UNRESOLVED       2       2 2a/1c      None   16682  61.45  
+  8 badge    min        UNRESOLVED       2       2 2a/1c      None   11400  40.77  
+  9 badge    const      INTENT_READY      1       1 1a/0c      True    4295  15.15  
+ 10 badge    prop       UNRESOLVED       2       1 1a/1c      None   22463  74.08  
+ 11 badge    min        INTENT_READY      1       1 1a/0c     False    3839  12.82  
+recovered the hidden rule on held-out scenes: 3/12  |  total tokens 190878  |  results in results/pilot_v7_medium

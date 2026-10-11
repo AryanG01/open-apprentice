@@ -1,0 +1,84 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:57:45+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "All cards are shifted vertically to a fixed y\u2011coordinate while preserving their original horizontal offsets.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Each card moves right by an amount that decreases with its index, then all are lifted to y=100.",
+          "reason": "invalid rule: line 6: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "let dx0 = 30\nlet dx1 = 20\nlet dx2 = 10\nfor V in objects with I {\n    if I == 0 { move V to (V.x + dx0, V.y) }\n    else if I == 1 { move V to (V.x + dx1, V.y) }\n    else if I == 2 { move V to (V.x + dx2, V.y) }\n}\nfor V in objects {\n    move V to (V.x, 100)\n}"
+        },
+        {
+          "summary": "Cards are re\u2011aligned to a vertical column whose left edge is at x = 40, keeping original widths and heights.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near '/')",
+          "rule_excerpt": "let column_x = 40\nfor V in objects with I {\n    move V to (column_x + I * 0, V.y)  // same x for all\n}\nfor V in objects {\n    move V to (V.x, 100)\n}"
+        },
+        {
+          "summary": "Each card\u2019s new x equals its old x plus (30 - 10*index), then its y is set to 100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"sub\", \"args\": [30, {\"op\": \"mul\", \"args\": [10, {\"ref\": \"locals.I\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"y\"]}}], \"index_var\": \"I\"}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"ob"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 889,
+        "completion_tokens": 561,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Each card keeps its width and height, its y becomes 100, and its x increases by 30 minus ten times its index in the list."
+      ],
+      "rejected": [
+        {
+          "summary": "All cards are moved to the same y = 100; their x positions are shifted so that the leftmost card ends at x = 40 and each subsequent card is placed directly to the right of the previous one with a fixed 10\u2011unit gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let first_x = 40\nlet gap = 10\nmove objects[0] to (first_x, 100)\nfor V in objects with I {\n  if I == 0 { }\n  else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, 100)\n  }\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1087,
+        "completion_tokens": 969,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 3506,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 8.62,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

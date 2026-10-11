@@ -1,0 +1,113 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:56:39+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each object right by 30 if its width is 50, otherwise by 20, and align its top at y = 120."
+      ],
+      "rejected": [
+        {
+          "summary": "Shift every object right by 30 pixels and align its top edge at y = 120.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 30]}, \"y\": {\"ref\": \"locals.y_target\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects on a horizontal line at y = 120 while preserving their original horizontal spacing.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=120, w=50, h=80) but the evidence shows (x=40, y=120, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"let\", \"name\": \"first_x\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.first_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, 70]}]}, \"y",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each object to y = 120 and increase its x by a fraction of its width (0.6 for the first and third, 0.33 for the second).",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'dx')",
+          "rule_excerpt": "let y_target = 120\nfor V in objects {\n  let dx = 0.0\n  if V.w == 50 { dx = 0.6 * V.w }\n  else { dx = 0.333 * V.w }\n  move V to (V.x + dx, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at x = 40, y = 120 with a fixed gap of 70 pixels between them.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=180, y=120, w=50, h=50) but the evidence shows (x=190, y=120, w=50, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object right by (30 minus ten times its index parity) and align its top at y = 120.",
+          "reason": "invalid rule: line 3: unexpected character ' '",
+          "rule_excerpt": "let y_target = 120\nfor V in objects with I {\n  let delta = 30 - (I % 2) * 10\n  move V to (V.x + delta, y_target)\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row starting at x = 40, y = 120 with a gap of 70 between the first two and 80 between the second and third.",
+          "reason": "invalid rule: line 6: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "let y_target = 120\nlet start_x = 40\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else if I == 1 {\n    move V to (start_x + 70, y_target)\n  } else {\n    move V to (start_x + 70 + 80, y_target)\n  }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3070,
+        "completion_tokens": 1859,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each object right by 30 if its width is 50, otherwise by 20, and align its top at y = 120.",
+        "Shift each object right by 30 if its original y is greater than 330, otherwise by 20, and align its top at y = 120.",
+        "Shift each object right by 30 if its index in the list is 0 or 2, otherwise by 20, and align its top at y = 120."
+      ],
+      "rejected": [
+        {
+          "summary": "Shift each object right by 30 if its index in the list is even, otherwise by 20, and align its top at y = 120.",
+          "reason": "invalid rule: line 3: unexpected character ' '",
+          "rule_excerpt": "let y_target = 120\nfor V in objects with I {\n  if I % 2 == 0 {\n    let dx = 30\n  } else {\n    let dx = 20\n  }\n  move V to (V.x + dx, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object right by 30 if its id is card0 or card2, otherwise by 20, and align its top at y = 120.",
+          "reason": "invalid rule: line 3: unexpected character ' '",
+          "rule_excerpt": "let y_target = 120\nfor V in objects {\n  if V.id == \"card0\" or V.id == \"card2\" {\n    let dx = 30\n  } else {\n    let dx = 20\n  }\n  move V to (V.x + dx, y_target)\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3842,
+        "completion_tokens": 2063,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 10834,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 21.24,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

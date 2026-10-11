@@ -1,0 +1,81 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:53:37+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge placed 10 pixels right and 10 pixels down from card0's top\u2011left."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge placed at a quarter of card0's width to the right and a tenth of its height down from card0's top\u2011left.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=20, y=329, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/10\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\",",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge placed at a fixed 1% of canvas width right and 0.5% of canvas height down from card0's top\u2011left.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=24, y=323.5, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/100\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/200\"}, {\"ref\": \"canvas.h\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge placed so its left edge aligns with card0's left edge plus proto's width, and its top edge aligns with card0's top edge plus proto's height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=340, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 787,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone proto as badge placed 10 pixels right and 10 pixels down from card0's top\u2011left.",
+        "Clone proto as badge placed at one\u2011quarter of card0\u2019s width to the right and one\u2011ninth of card0\u2019s height down from card0\u2019s top\u2011left.",
+        "Clone proto as badge placed at proto\u2019s position plus card0\u2019s top\u2011left offset plus (10,10).",
+        "Clone proto as badge placed at a fixed fraction of the canvas: x = canvas width / 70, y = canvas height * 33 / 70."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1391,
+        "completion_tokens": 819,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3985,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 7.94,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

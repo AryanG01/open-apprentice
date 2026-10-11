@@ -1,0 +1,144 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:44:38+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row starting at (60,60) with a fixed 16\u2011pixel gap between them.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 60\nlet base_y = 60\nlet spacing = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, base_y)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + spacing, base_y)\n    }}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to a row whose origin is offset from the canvas bottom\u2011right edges (60\u202fpx from left, 60\u202fpx from top) and keep a fixed 16\u2011pixel gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = canvas.w - 1340\nlet base_y = canvas.h - 640\nlet spacing = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, base_y)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + spacing, base_y)\n    }}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at (60,60) where the gap equals 40% of the first object\u2019s width (16\u202fpx in the example).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 60\nlet base_y = 60\nlet spacing = 0.4 * objects[0].w\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, base_y)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + spacing, base_y)\n    }}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (60,60) with a fixed 16\u2011pixel gap between them.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 60, \"y\": 60}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 16]}, \"y\": 60}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"t",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row starting at (60,60) where the gap equals 40% of the first object\u2019s width (16\u202fpx in the example).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 60, \"y\": 60}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"r",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects to a row whose origin is offset from the canvas edges (60\u202fpx from left, 60\u202fpx from top) and keep a fixed 16\u2011pixel gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=60, w=100, h=40) but the evidence shows (x=116, y=60, w=100, h=40)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.w\"}, 1340]}, \"y\": {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.h\"}, 640]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2992,
+        "completion_tokens": 5896,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row starting at (60,60) with a gap equal to the previous object's width plus 16 pixels.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let startX = 60\\nlet yConst = 60\\nmove objects[0] to (startX, yConst)\\nfor V in objects with I {\\n    if I > 0 {\\n        let prev = objects[I-1]\\n        let gap = prev.w + 16\\n        move V to (prev.x + gap, yConst)\\n    }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (60,60) with a gap equal to the previous object's width plus 40% of the first object's width.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let startX = 60\\nlet yConst = 60\\nmove objects[0] to (startX, yConst)\\nfor V in objects with I {\\n    if I > 0 {\\n        let prev = objects[I-1]\\n        let gap = prev.w + 0.4 * objects[0].w\\n        move V to (prev.x + gap, yConst)\\n    }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row whose origin is 60px from the left and top edges, computed as fractions of the canvas size, with a gap of previous width plus 16px derived from canvas height.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let startX = canvas.w * 0.04285714285714286\\nlet yConst = canvas.h * 0.08571428571428571\\nmove objects[0] to (startX, yConst)\\nfor V in objects with I {\\n    if I > 0 {\\n        let prev = objects[I-1]\\n        let gap = prev.w + canvas.h * 0.022857142857142856\\n        move V to (prev.x + gap, yConst)\\n    }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row whose origin is set by canvas proportions (60px left/top) and whose gap is previous width plus 40% of the first object's width.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let startX = canvas.w * 0.04285714285714286\\nlet yConst = canvas.h * 0.08571428571428571\\nmove objects[0] to (startX, yConst)\\nfor V in objects with I {\\n    if I > 0 {\\n        let prev = objects[I-1]\\n        let gap = prev.w + 0.4 * objects[0].w\\n        move V to (prev.x + gap, yConst)\\n    }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (60,60) with a fixed 16\u2011pixel gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 60\nlet startY = 60\nlet gap = 16\nmove objects[0] to (startX, startY)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, startY)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row whose origin is 60px from the left and top edges (canvas\u2011proportional) with a fixed 16\u2011pixel gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = canvas.w * 60 / 1400\nlet startY = canvas.h * 60 / 700\nlet gap = 16\nmove objects[0] to (startX, startY)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, startY)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (60,60) with a gap equal to 40% of the first object's width.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 60\nlet startY = 60\nlet gap = 0.4 * objects[0].w\nmove objects[0] to (startX, startY)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, startY)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row whose origin is 60px from the left and top edges (canvas\u2011proportional) with a gap equal to 40% of the first object's width.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = canvas.w * 60 / 1400\nlet startY = canvas.h * 60 / 700\nlet gap = 0.4 * objects[0].w\nmove objects[0] to (startX, startY)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, startY)\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4356,
+        "completion_tokens": 8918,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 22162,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 67.16,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

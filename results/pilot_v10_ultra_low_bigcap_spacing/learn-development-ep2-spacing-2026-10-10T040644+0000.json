@@ -1,0 +1,72 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:06:44+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to a horizontal row at one-seventh canvas height, spaced by one-twentieth canvas width starting from the first object's original x plus one step.",
+        "Align all objects to a horizontal row at one-seventh canvas height, spaced by the first object's width plus 20 pixels, starting from the first object's original x plus that spacing.",
+        "Arrange objects in a canvas-anchored grid: top row at canvas_height/7, left column at row_y minus 20, column step canvas_width/20."
+      ],
+      "rejected": [
+        {
+          "summary": "Move the first object to (first_object.x + canvas_width/20, canvas_height/7), then pack subsequent objects to the right with a 20-pixel gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let row_y = canvas.h / 7\nlet unit = canvas.w / 20\nlet gap = 20\nlet first_x = objects[0].x + unit\nmove objects[0] to (first_x, row_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, row_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 14203,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Arrange the three objects in a horizontal row at fixed y=100 starting from x=80 with a constant 20px gap.",
+        "Arrange the three objects in a horizontal row at y=max(100, canvas_height/7) with gap = y/5 and start_x = y - gap.",
+        "Loop through all objects placing them on a fixed baseline y=100 starting at x=80 with a constant 20px gap.",
+        "Loop through all objects placing them on a baseline y=max(100, canvas_height/7) with gap = baseline/5 and start_x = baseline - gap."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1782,
+        "completion_tokens": 14694,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 31710,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 86.1,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

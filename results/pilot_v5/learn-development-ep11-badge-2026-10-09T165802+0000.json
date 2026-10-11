@@ -1,0 +1,110 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:58:02+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge with a fixed offset from card0\u2019s top\u2011left.",
+        "Clone proto as badge positioned horizontally at card0\u2019s center plus a constant, vertically with a fixed offset.",
+        "Clone proto as badge placed a constant distance from card0\u2019s right edge, vertically with a fixed offset.",
+        "Clone proto as badge using a fixed fraction of the canvas width and height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 862,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Badge is a clone of the second object placed at the bottom\u2011right corner of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=440, w=20, h=20) but the evidence shows (x=47, y=373, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at the top\u2011left corner of the first object shifted by the second object\u2019s size.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=390, w=20, h=20) but the evidence shows (x=47, y=373, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at the centre of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=405, w=20, h=20) but the evidence shows (x=47, y=373, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"a",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at the same position as the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=10, y=370, w=20, h=20) but the evidence shows (x=47, y=373, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, \"y\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at an offset equal to the first object's width minus the second object's width minus 3 pixels horizontally, and the second object's height minus 17 pixels vertically.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=36, y=7, w=24, h=24) but the evidence shows (x=35.85, y=3.15, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 3]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at an offset of 37 pixels right and 3 pixels down from the first object's top\u2011left corner.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 37]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 3]}}]",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed so that its right side aligns with the first object's right side minus 13 pixels, and its top aligns with the first object's top plus 3 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=37, y=373, w=20, h=20) but the evidence shows (x=47, y=373, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 13]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"obje",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at the same horizontal position as the first object's left edge plus half the first object's width plus 7 pixels, and vertically at the first object's top edge plus 3 pixels.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}, 7]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 3]}}]",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4334,
+        "completion_tokens": 2343,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8527,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 15.73,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

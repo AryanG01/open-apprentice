@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:44:22+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset of 28 pixels right and 2 pixels down from the card's top-left corner.",
+        "Place the badge flush against the card's top-right corner with 2 pixels of padding, using the badge's own width.",
+        "Place the badge 22 pixels left of the card's right edge and 2 pixels down from its top edge.",
+        "Place the badge horizontally at 60% of the card's width minus 2 pixels from the left edge, and 2 pixels down from the top."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 8037,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 22676,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 64.67,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

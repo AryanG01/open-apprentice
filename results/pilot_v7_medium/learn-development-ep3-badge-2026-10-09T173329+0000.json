@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:33:29+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place a clone of proto at a position offset by one\u2011fourth of card0\u2019s width and one\u2011ninth of card0\u2019s height.",
+        "Place a clone of proto horizontally centered inside card0 and vertically offset by one\u2011ninth of card0\u2019s height.",
+        "Place a clone of proto fixed 10 units to the right and 10 units down from card0\u2019s top\u2011left corner.",
+        "Place a clone of proto shifted by half of proto\u2019s width and half of proto\u2019s height from card0\u2019s top\u2011left corner."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 2930,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place a clone of the second object at an offset equal to the first object's width minus the second object's width minus 10 pixels horizontally, and 10 pixels vertically from the first object's top\u2011left.",
+        "Place a clone of the second object horizontally at three times its width minus 50 pixels from the first object's left edge, and vertically 10 pixels below the first object's top edge.",
+        "Place a clone of the second object horizontally at half the first object's width plus the second object's width minus 30 pixels from the first object's left edge, and vertically 10 pixels below the first object's top edge.",
+        "Place a clone of the second object horizontally at twice the first object's width minus five times the second object's width plus 30 pixels from the first object's left edge, and vertically 10 pixels below the first object's top edge."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1659,
+        "completion_tokens": 11302,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 16872,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 67.49,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

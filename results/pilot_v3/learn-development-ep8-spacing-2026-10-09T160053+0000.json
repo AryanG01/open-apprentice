@@ -1,0 +1,94 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:00:53+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move all objects to y = 120 and shift each object's x by a fixed amount that depends on its original x modulo 100.",
+          "reason": "invalid rule: line 2: unexpected character ' '",
+          "rule_excerpt": "for V in objects {\n  if (V.x % 100) < 50 {\n    move V to (V.x + 30, 120)\n  } else {\n    move V to (V.x + 20, 120)\n  }\n}"
+        },
+        {
+          "summary": "Set every object's y to 120 and increase its x by one tenth of the canvas width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 10]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": 120}]}]"
+        },
+        {
+          "summary": "Align all objects along the horizontal line y = 120 while preserving their original x offset from the leftmost object.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"min_x\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.min_x\"}]}, 40]}, \"y\": 120}]}]"
+        },
+        {
+          "summary": "Place each object at y = 120 and give it an x equal to its original x plus its own height divided by 2.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"h\"]}, 2]}]}, \"y\": 120}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1036,
+        "completion_tokens": 1215,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Set each object's y to 120 and adjust its x by adding (80 minus its width)."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects at y=120 and place them horizontally with equal spacing of 70 starting at x=40.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start\", \"value\": 40}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.spacing\"}]}]}, \"y\": 120}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Align objects at y=120, positioning each at a base x of canvas.w * 2/70 plus its index times 70.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, 2]}, 70]}}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.spacing\"}]}]}, \"y\": 120}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Place every object on the line y=120 and shift its x right by a fixed amount of 30 pixels, except subtract its width when the width is 60.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'delta')",
+          "rule_excerpt": "for V in objects {\n  let delta = 30\n  if V.w == 60 {\n    delta = 20\n  }\n  move V to (V.x + delta, 120)\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1201,
+        "completion_tokens": 1564,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 5016,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 13.61,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:45:34+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "TEACHING",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [],
+  "recovered_latent_on_heldout": null,
+  "tokens": 12981,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 35.63,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

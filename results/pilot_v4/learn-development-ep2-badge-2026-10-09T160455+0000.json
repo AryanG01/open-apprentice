@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:04:55+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge aligned to the canvas: x is a fixed fraction of canvas width, y is a fixed fraction of canvas height.",
+        "Clone proto as badge placed at card0\u2019s top\u2011left plus a constant offset (29,1)."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge placed just inside the bottom\u2011right corner of card0, offset by 1 pixel up and left.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=39, y=419, w=20, h=20) but the evidence shows (x=39, y=361, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 1]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge positioned at a fixed fraction of card0\u2019s width and height from its top\u2011left corner.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=39, y=360.2, w=20, h=20) but the evidence shows (x=39, y=361, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"29/50\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/400\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"ge",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 561,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge placed a fixed horizontal offset from card0\u2019s left edge and one pixel below its top edge.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": 29}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 1}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.off",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge positioned so its right side aligns with card0\u2019s right side minus one pixel, and its top is one pixel below card0\u2019s top.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=-1, y=1, w=24, h=24) but the evidence shows (x=-0.48, y=0.48, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 1]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objec",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge placed to the right of card0\u2019s left edge by the width of proto plus nine pixels, and one pixel below card0\u2019s top.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=33, y=1, w=24, h=24) but the evidence shows (x=-0.48, y=0.48, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 9]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 1]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge placed at a fraction of card0\u2019s width from its left edge (approximately 58%) and one pixel below card0\u2019s top.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=13.92, y=1, w=24, h=24) but the evidence shows (x=-0.48, y=0.48, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"frac\", \"value\": {\"rat\": \"29/50\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.frac\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"obj",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4211,
+        "completion_tokens": 1450,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 7210,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 11.29,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

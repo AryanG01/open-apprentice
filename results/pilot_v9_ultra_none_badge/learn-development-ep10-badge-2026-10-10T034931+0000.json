@@ -1,0 +1,113 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:49:31+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "none",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place its top-left at a fixed fraction of the first object's width and height from the first object's top-left."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place its top-left at the bottom-right corner of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=420, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the bottom-right corner of the canvas.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=1380, y=680, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.h\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the bottom-right corner of the first object, but only if the first object is in the bottom-left quadrant of the canvas.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=420, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"if\", \"cond\": {\"op\": \"and\", \"args\": [{\"op\": \"lt\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 2]}]}, {\"op\": \"gt\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 2]}]}]}, \"then\": [{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\",",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at a fixed offset from the bottom-right corner of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=420, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": 0}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 0}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"arg",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its center at the center of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=20, y=390, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"a",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place its top-left relative to the first object's top-left using the first object's dimensions and the second object's dimensions.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=20, y=382, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 10]}, {\"op\": \"div\", \"args\": [",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at a position derived from the canvas center and the first object's position.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=355, y=365, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"center_x\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 2]}}, {\"op\": \"let\", \"name\": \"center_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 2]}}, {\"op\": \"let\", \"name\": \"rel_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.center_x\"}]}}, {\"op\": \"let\", \"name\": \"rel_y\", \"value\": {\"op\": \"sub\", \"args\": [{\"op",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2914,
+        "completion_tokens": 744,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object and place its top-left at a fixed fraction of the first object's width and height from the first object's top-left.",
+        "Clone the second object and place its center at a fixed fraction of the first object's width and height measured from the first object's top-left corner.",
+        "Clone the second object and place its top-left at a fixed fraction of the canvas width and height."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place its top-left at a fixed fraction of the first object's width and height measured from the first object's bottom-right corner.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=36.4, y=417.6, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"frac_x\", \"value\": {\"rat\": \"17/50\"}}, {\"op\": \"let\", \"name\": \"frac_y\", \"value\": {\"rat\": \"3/50\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"ref",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1772,
+        "completion_tokens": 366,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 5796,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 4.9,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:41:36+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row starting at fixed left and top margins with a fixed horizontal gap between them.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let marginX = 80\nlet marginY = 100\nlet spacing = 12\nlet acc = 0\nfor V in objects with I {\n    move V to (marginX + acc, marginY)\n    acc = acc + V.w + spacing\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects using margins and spacing defined as fractions of the canvas size.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let marginX = canvas.w * 0.05714285714285714\nlet marginY = canvas.h / 7\nlet spacing = canvas.w * 0.00857142857142857\nlet acc = 0\nfor V in objects with I {\n    move V to (marginX + acc, marginY)\n    acc = acc + V.w + spacing\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Compute left margin from a combination of canvas width and the first object's width, with top margin as a canvas fraction and spacing as a canvas fraction.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let marginX = canvas.w * 0.05 + objects[0].w * 0.08333333333333333\nlet marginY = canvas.h / 7\nlet spacing = canvas.w * 0.00857142857142857\nlet acc = 0\nfor V in objects with I {\n    move V to (marginX + acc, marginY)\n    acc = acc + V.w + spacing\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Use fixed left margin and spacing, but derive the top margin as a fraction of the canvas height.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let marginX = 80\nlet marginY = canvas.h * 0.14285714285714286\nlet spacing = 12\nlet acc = 0\nfor V in objects with I {\n    move V to (marginX + acc, marginY)\n    acc = acc + V.w + spacing\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at fixed left and top margins with a fixed horizontal gap between them.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"marginX\", \"value\": 80}, {\"op\": \"let\", \"name\": \"marginY\", \"value\": 100}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": 12}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.marginX\"}, \"y\": {\"ref\": \"locals.marginY\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\":",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects using margins and spacing defined as fractions of the canvas size.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"marginX\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/20\"}]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"rat\": \"8333333333333333/100000000000000000\"}]}]}}, {\"op\": \"let\", \"name\": \"marginY\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": {\"op\": \"m",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Compute left margin from a combination of canvas width and a constant offset, with top margin as a canvas fraction and fixed spacing.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"marginX\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/20\"}]}, 10]}}, {\"op\": \"let\", \"name\": \"marginY\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"7142857142857143/50000000000000000\"}]}}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": 12}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Use fixed left margin and spacing, but derive the top margin as a fraction of the canvas height.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"marginX\", \"value\": 80}, {\"op\": \"let\", \"name\": \"marginY\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"7142857142857143/50000000000000000\"}]}}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"857142857142857/100000000000000000\"}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3234,
+        "completion_tokens": 6385,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place objects in a row with a fixed left margin of 80, top margin at canvas height divided by 7, and a fixed horizontal spacing of 12.",
+        "Place objects in a row with left margin set to 5% of canvas width plus 10, top margin at canvas height divided by 7, and fixed horizontal spacing of 12.",
+        "Place objects in a row with fixed left margin of 80, top margin set to 10% of canvas height plus 30, and fixed horizontal spacing of 12.",
+        "Place objects in a row with fixed left margin of 80, top margin at canvas height divided by 7, and horizontal spacing equal to 10% of the first object's width."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with a fixed left margin of 80, top margin at canvas height divided by 7, and a fixed horizontal spacing of 12.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let leftMargin = 80\nlet top = canvas.h / 7\nlet spacing = 12\nfor V in objects with I {\n    if I == 0 {\n        move V to (leftMargin, top)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + spacing, top)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row where left margin is 5% of canvas width plus 10, top margin is canvas height divided by 7, and spacing is 0.5% of canvas width plus 5.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let leftMargin = 0.05 * canvas.w + 10\nlet top = canvas.h / 7\nlet spacing = 0.005 * canvas.w + 5\nfor V in objects with I {\n    if I == 0 {\n        move V to (leftMargin, top)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + spacing, top)\n    }}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row with left margin as 5% of canvas width plus 10, top margin as 10% of canvas height plus 30, and fixed spacing of 12.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let leftMargin = 0.05 * canvas.w + 10\nlet top = 0.1 * canvas.h + 30\nlet spacing = 12\nfor V in objects with I {\n    if I == 0 {\n        move V to (leftMargin, top)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + spacing, top)\n    }}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row with fixed left margin of 80, top margin at canvas height divided by 7, and spacing equal to 10% of the first object's width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let leftMargin = 80\nlet top = canvas.h / 7\nlet spacing = 0.1 * objects[0].w\nfor V in objects with I {\n    if I == 0 {\n        move V to (leftMargin, top)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + spacing, top)\n    }}\n",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4452,
+        "completion_tokens": 6438,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 20509,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 58.32,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

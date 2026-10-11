@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:13:27+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to a fixed top margin (100), left margin (40), and fixed inter-object gap (16) in a horizontal row.",
+        "Set all objects' y to 100, then shift each object right by 30 + 6*index pixels from its original x.",
+        "Align tops to 1/7 of canvas height, left margin to 1/35 of canvas width, and use a fixed gap of 16.",
+        "Align tops to 100, place first object 30px right of its original x, then flow subsequent objects with a gap of 16."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 15626,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 16660,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 58.17,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

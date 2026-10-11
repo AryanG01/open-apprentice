@@ -1,0 +1,141 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:05:10+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place cards in a row with a fixed horizontal step of 70 pixels, starting at x=80 and y=100.",
+        "Step equals the width of the first card plus 20 pixels; start at x=80, y=100.",
+        "Step is canvas width divided by 20; start at x=80, y=100."
+      ],
+      "rejected": [
+        {
+          "summary": "Place each card side\u2011by\u2011side starting at a fixed left margin, keeping original vertical position.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=230, y=100, w=120, h=40) but the evidence shows (x=220, y=100, w=120, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}]}, {\"op\": \"get\", \"args\": [{\"r",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange cards in a row with a uniform gap equal to the width of the first card.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=180, y=100, w=50, h=60) but the evidence shows (x=150, y=100, w=50, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}}, {\"op\": \"let\", \"name\": \"base_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"base_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base_x\"}, {\"op\": \"mul\", \"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each card so its left edge aligns with a grid of 80\u2011pixel columns, preserving its original y offset from the top.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=0, y=100, w=50, h=80) but the evidence shows (x=80, y=100, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"column_width\", \"value\": 80}, {\"op\": \"let\", \"name\": \"y_offset\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 360]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.column_wid",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each card to a position where its x equals its original x plus a constant offset, and set y to a fixed value.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=230, y=100, w=120, h=40) but the evidence shows (x=220, y=100, w=120, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 70}, {\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"ref\": \"locals.y_fixed\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place each card after the previous one with a fixed spacing of 20 pixels, starting at x=80, y=100.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let spacing = 20\nlet acc = 0\nfor V in objects with I {\n    move V to (80 + acc, 100)\n    acc = acc + V.w + spacing\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3060,
+        "completion_tokens": 1263,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "First card moved to (80,100); each next card placed 20px to the right of the previous card, same y.",
+          "reason": "invalid rule: line 5: object index must be a whole number (near 'I')",
+          "rule_excerpt": "move objects[0] to (80, 100)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + 20, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "All cards moved to y=100 and arranged left\u2011to\u2011right with a fixed 20\u2011pixel gap, starting at x=80.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=360, y=100, w=120, h=40) but the evidence shows (x=220, y=100, w=120, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 20}, {\"op\": \"let\", \"name\": \"y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Each card\u2019s y set to 100; x set to previous card\u2019s x plus its width plus 20, except the first which gets x=80.",
+          "reason": "invalid rule: line 4: object index must be a whole number (near 'I')",
+          "rule_excerpt": "move objects[0] to (80, 100)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + 20, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Cards are stacked horizontally with a constant 20\u2011pixel spacing, aligned to a baseline y=100, with the first card\u2019s left edge at x=80.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y = 100\nlet spacing = 20\nmove objects[0] to (80, y)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + spacing, y)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards in a row with a fixed horizontal gap of 70 pixels, starting at x=80 and y=100.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 70}, {\"op\": \"let\", \"name\": \"y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.gap\"}]",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place cards in a row with a gap equal to the first card's width plus 20 pixels, starting at x=80 and y=100.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 20]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place cards in a row with a gap equal to one twentieth of the canvas width, starting at x=80 and y=100.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 20]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place cards in a row with a gap equal to the second card's width plus 20 pixels, starting at x=80 and y=100.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[1] your rule gives (x=124, y=100, w=24, h=24) but the evidence shows (x=152, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 20]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5416,
+        "completion_tokens": 1806,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11545,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 15.65,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

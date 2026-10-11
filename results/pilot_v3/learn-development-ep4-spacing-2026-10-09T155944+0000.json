@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:59:44+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move all objects to y=120 and lay them out left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 12\nlet cursor_x = start_x\nfor V in objects {\n  move V to (cursor_x, 120)\n  cursor_x = cursor_x + V.w + gap\n}"
+        },
+        {
+          "summary": "Shift every object upward by 290 pixels and then shift its x right by an amount that decreases by 9 pixels for each subsequent object, beginning with +70 for the first.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [0, 290]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"sub\", \"args\": [70, {\"op\": \"mul\", \"args\": [9, {\"ref\": \"locals.I\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"loc"
+        },
+        {
+          "summary": "Place each object so its top aligns with y=120 and its left aligns with the canvas left edge plus a margin that grows by the object's width plus 12 pixels, starting from a margin of 80.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = 80\nlet gap = 12\nfor V in objects with I {\n  if I == 0 {\n    move V to (margin, 120)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, 120)\n  }\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1040,
+        "completion_tokens": 884,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Set all objects to y=120, then place them left\u2011to\u2011right starting at x=80 with a fixed 12\u2011pixel gap.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let y_target = 120\nlet start_x = 80\nlet gap = 12\nlet cursor_x = start_x\nfor V in objects {\n    move V to (cursor_x, y_target)\n    cursor_x = cursor_x + V.w + gap\n}"
+        },
+        {
+          "summary": "Set all objects to y=120, start at the first object's original x plus 70, then layout left\u2011to\u2011right with a fixed 12\u2011pixel gap.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let y_target = 120\nlet start_x = objects[0].x + 70\nlet gap = 12\nlet cursor_x = start_x\nfor V in objects {\n    move V to (cursor_x, y_target)\n    cursor_x = cursor_x + V.w + gap\n}"
+        },
+        {
+          "summary": "Set all objects to y=120, start at canvas width times 0.05 plus 10, then layout left\u2011to\u2011right with a fixed 12\u2011pixel gap.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let y_target = 120\nlet start_x = canvas.w * 0.05 + 10\nlet gap = 12\nlet cursor_x = start_x\nfor V in objects {\n    move V to (cursor_x, y_target)\n    cursor_x = cursor_x + V.w + gap\n}"
+        },
+        {
+          "summary": "Set all objects to y=120, start at x=80, then layout left\u2011to\u2011right with a gap equal to 24% of the first object's width.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let y_target = 120\nlet start_x = 80\nlet gap = objects[0].w * 0.24\nlet cursor_x = start_x\nfor V in objects {\n    move V to (cursor_x, y_target)\n    cursor_x = cursor_x + V.w + gap\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1204,
+        "completion_tokens": 1375,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4503,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 11.84,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

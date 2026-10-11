@@ -1,0 +1,116 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:10:43+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Create a badge positioned 80px right and 10px down from the top\u2011left of the first object, keeping its size equal to the second object.",
+        "Create a badge placed at a fixed offset (90,330) from the canvas origin, using the size of the second object."
+      ],
+      "rejected": [
+        {
+          "summary": "Create a badge whose left edge aligns with the first object's left edge plus 80% of its width, and whose top edge aligns with the first object's top edge plus 10% of its height, copying the size of the second object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=98, y=329, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"4/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/10\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\",",
+          "stage": "initial"
+        },
+        {
+          "summary": "Create a badge positioned relative to the first object such that its left edge is 80px from the object's left edge and its top edge is 10px from the object's top edge, while its width and height match the second object's dimensions.",
+          "reason": "duplicate",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1315,
+        "completion_tokens": 377,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "If the first object is wide (>100), place badge 80px right and 10px down from it; otherwise place it 10px left and 10px down."
+      ],
+      "rejected": [
+        {
+          "summary": "Create a badge by copying the proto object and placing it 80px right and 10px down from the first object.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 80]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 10]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Create a badge by scaling the first object to 2/11 of its width and 2/9 of its height, then placing it 80px right and 10px down from the first object.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = 2/11 * objects[0].w\nlet h = 2/9 * objects[0].h\nclone objects[0] as badge at (objects[0].x + 80, objects[0].y + 10) resize badge to (w, h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Create a badge by copying the proto object and placing it 90px right and 330px down from the proto object itself.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, 90]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"y\"]}, 330]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Create a badge by copying the proto object and placing it 80px right and 10px down from the first object, but constraining its y\u2011position to never exceed the canvas height minus its height.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near '.')",
+          "rule_excerpt": "clone proto as badge at (objects[0].x + 80, objects[0].y + 10)\nif badge.y > canvas.h - badge.h { move badge to (badge.x, canvas.h - badge.h) }",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at proto\u2019s position plus an offset that equals the first object\u2019s x plus 80 when its width exceeds 100, else minus 10.",
+          "reason": "invalid rule: give the rule as rule_text (a string in the rule language)",
+          "rule_excerpt": "",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone proto and shift it right by 80 and down by 10, but only when the first object\u2019s width is at least 100; otherwise shift left by 10 and down by 10.",
+          "reason": "invalid rule: give the rule as rule_text (a string in the rule language)",
+          "rule_excerpt": "",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Create a badge by copying proto; its x is proto.x plus 80 if the first object\u2019s width is greater than 100, otherwise proto.x minus 10; its y is proto.y plus 10.",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near 'if')",
+          "rule_excerpt": "let dx = if objects[0].w > 100 then 80 else -10\nclone proto as badge at (proto.x + dx, proto.y + 10)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5025,
+        "completion_tokens": 2710,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 9427,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 15.69,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

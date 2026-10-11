@@ -1,0 +1,47 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:53:45+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in order at y=60, with x starting at 60 and increasing by each object's width plus a fixed horizontal gap of 16.",
+        "Place objects in order at y proportional to canvas height, with x starting at a proportional left margin and increasing by each object's width plus a proportional horizontal gap.",
+        "Place objects in order at y=60, with x starting at a fixed 60 and increasing by each object's width plus a gap that scales with canvas width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1035,
+        "completion_tokens": 1833,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 2868,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 8.77,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

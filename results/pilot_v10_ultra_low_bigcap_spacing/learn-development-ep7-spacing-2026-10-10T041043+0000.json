@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:10:43+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed y=100 starting from x=40 with 20px gaps between objects.",
+        "Arrange all objects in a horizontal row at canvas-relative y=canvas.h/7 starting from x=canvas.w/35 with gaps of canvas.w/70.",
+        "Move all objects to fixed y=100 and shift each rightward by a decreasing offset (30, 20, 10, ...) based on its index.",
+        "Move all objects to canvas-relative y=canvas.h/7 and shift each rightward by a decreasing offset (30, 20, 10, ...) based on its index."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 13685,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 14716,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 47.85,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

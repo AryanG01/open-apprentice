@@ -1,0 +1,101 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:46:34+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each object right by an amount that grows with its index (70 + index*10) and align all tops to y=120."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with a fixed left margin of 80, fixed top of 120, and a fixed horizontal gap of 20.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor')",
+          "rule_excerpt": "let margin = 80\nlet y_fixed = 120\nlet gap = 20\nlet cursor = margin\nfor V in objects with I {\n    move V to (cursor, y_fixed)\n    cursor = cursor + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a row using the first object's width: left margin = 8/9 of that width, gap = width/4.5, and fixed top y=120.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor')",
+          "rule_excerpt": "let margin = objects[0].w * 8 / 9\nlet gap = objects[0].w / 4.5\nlet y_fixed = 120\nlet cursor = margin\nfor V in objects with I {\n    move V to (cursor, y_fixed)\n    cursor = cursor + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Position objects in a row based on canvas proportions: left margin = 2/35 of canvas width, gap = 1/70 of canvas width, and top = 6/35 of canvas height.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor')",
+          "rule_excerpt": "let margin = canvas.w * 2 / 35\nlet gap = canvas.w / 70\nlet y_fixed = canvas.h * 6 / 35\nlet cursor = margin\nfor V in objects with I {\n    move V to (cursor, y_fixed)\n    cursor = cursor + V.w + gap\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 2759,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each object right by an amount that grows with its index (70 + index*10) and align all tops to y=120.",
+        "Place objects in a row with a fixed left margin of 80 and a fixed gap of 20, aligning all tops to y=120.",
+        "Place objects in a row using canvas proportions: left margin = 4/70 of canvas width, gap = 1/70 of canvas width, and top = 12/70 of canvas height."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with a fixed left margin of 80 and a fixed gap of 20, aligning all tops to y=120.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y_fixed = 120\nlet left_margin = 80\nlet gap = 20\nlet x = left_margin\nfor V in objects {\n    move V to (x, y_fixed)\n    x = x + V.w + gap\n}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row using canvas proportions: left margin = 4/70 of canvas width, gap = 1/70 of canvas width, and top = 12/70 of canvas height.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y_fixed = canvas.h * 12 / 70\nlet left_margin = canvas.w * 4 / 70\nlet gap = canvas.w * 1 / 70\nlet x = left_margin\nfor V in objects {\n    move V to (x, y_fixed)\n    x = x + V.w + gap\n}\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row with left margin 80 and gap 20 only for objects of width 90, 120, or 50 (otherwise gap 0), aligning tops to y=120.",
+          "reason": "invalid rule: nesting too deep",
+          "rule_excerpt": "let y_fixed = 120\nlet left_margin = 80\nlet x = left_margin\nfor V in objects {\n    move V to (x, y_fixed)\n    if V.w == 90 {\n        let gap = 20\n    } else {\n        if V.w == 120 {\n            let gap = 20\n        } else {\n            if V.w == 50 {\n                let gap = 20\n            } else {\n                let gap = 0\n            }\n        }\n    }\n    let x = x + V.w + gap\n}\n",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3307,
+        "completion_tokens": 8027,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 15125,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 49.92,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

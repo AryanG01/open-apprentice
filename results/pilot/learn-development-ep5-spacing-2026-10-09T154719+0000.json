@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:47:19+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move every object to the fixed y\u2011coordinate 100 while preserving its original x\u2011position.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every object to y=100 and shift its x to the right by half its own width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every object to y=100 and set its x to the original x plus a constant offset of 50 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 50]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every object to y=100 and arrange them horizontally with equal spacing starting at x=60.",
+          "reason": "invalid rule: line 1: unknown name 'length'; define it with let or a for loop first (near '(')",
+          "rule_excerpt": "let n = length(objects)\nlet total_width = 0\nfor V in objects { total_width = total_width + V.w }\nlet space = (canvas.w - total_width) / (n + 1)\nlet x = space\nfor V in objects {\n  move V to (x, 100)\n  x = x + V.w + space\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 890,
+        "completion_tokens": 650,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move every object to y=100 and place them side\u2011by\u2011side starting at x=60 with a gap equal to the average width of the objects.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let avg_w = (objects[0].w + objects[1].w + objects[2].w) / 3\nlet x = 60\nfor V in objects {\n  move V to (x, 100)\n  x = x + V.w + avg_w\n}"
+        },
+        {
+          "summary": "Move every object to y=100 and shift its x to the right by a quarter of its original y coordinate.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"y\"]}]}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every object to y=100 and set its x to the original x plus half of its width, then subtract a fixed offset of 5 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}]}, 5]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move every object to y=100 and distribute them horizontally so that the left edge of the first object is at 60 and the spacing between objects equals the difference between canvas width and total width divided by (n+1).",
+          "reason": "invalid rule: line 2: expected '[' after 'objects' (write objects[0], objects[1], ...) (near '.')",
+          "rule_excerpt": "let total_w = objects[0].w + objects[1].w + objects[2].w\nlet gap = (canvas.w - total_w) / (objects.length + 1)\nlet x = 60\nfor V in objects {\n  move V to (x, 100)\n  x = x + V.w + gap\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1074,
+        "completion_tokens": 1036,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3650,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 9.44,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

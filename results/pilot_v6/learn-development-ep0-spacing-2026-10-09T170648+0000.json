@@ -1,0 +1,154 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:06:48+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the first card at its original x plus a fixed offset, then stack subsequent cards with a fixed horizontal gap, all aligned to y=100.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let offset = 70\nlet gap = 12\nmove objects[0] to (objects[0].x + offset, 100)\nfor V in objects with I {\n    if I > 0 {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to y=100 and distribute them evenly starting from a fixed left margin of 80 pixels.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 12\nmove objects[0] to (start_x, 100)\nfor V in objects with I {\n    if I > 0 {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set each card's y to 100 and position each card's left edge at the previous card's right edge plus a gap that scales with the previous card's width.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 100\nlet gap_ratio = 0.1\nmove objects[0] to (objects[0].x + 70, y_target)\nfor V in objects with I {\n    if I > 0 {\n        let gap = gap_ratio * objects[I-1].w\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the first card at a fixed fraction of the canvas width, then lay out remaining cards with a fixed edge gap, all at y=100.",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let first_frac = 0.05714  // 80/1400\nlet gap = 12\nmove objects[0] to (canvas.w * first_frac, 100)\nfor V in objects with I {\n    if I > 0 {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift first card right by 70, then place each next card 12px to the right of the previous card's right edge, all at y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 70]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set first card's left to 80, top to 100; each following card sits 12px right of the prior card's right edge, top 100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 12]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all cards to y=100; first card's x is its original x plus 70; each next card's x is previous card's x plus its width plus 12.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place first card at x = canvas.w * 0.05714, y=100; each subsequent card placed 12px right of the previous card's right edge, y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"2857/50000\"}]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]},",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4008,
+        "completion_tokens": 1957,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Set all cards to y=100, keep sizes, place first card at x=80 then each next card 12px to the right of the previous card\u2019s right edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 80\nlet gap = 12\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, 100)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to y=100, keep sizes, position each card\u2019s left edge at a fixed left margin plus the sum of all preceding cards\u2019 widths plus a fixed gap.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'accumulated')",
+          "rule_excerpt": "let margin = 80\nlet gap = 12\nlet accumulated = 0\nfor V in objects with I {\n  move V to (margin + accumulated, 100)\n  accumulated = accumulated + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to y=100, keep sizes, place the first card at a fixed fraction of the canvas width (0.05714) then each subsequent card at the previous card\u2019s right edge plus a fixed gap of 12px.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let frac = 0.05714285714285714\nlet gap = 12\nfor V in objects with I {\n  if I == 0 {\n    move V to (frac * canvas.w, 100)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to y=100, keep sizes, place each card\u2019s left edge at its original x plus a fixed offset of 70px, then adjust overlapping by shifting each card right by the excess width of the previous card beyond a 12px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let offset = 70\nlet gap = 12\nfor V in objects with I {\n  let tentative = V.x + offset\n  if I == 0 {\n    move V to (tentative, 100)\n  } else {\n    let prev = objects[I-1]\n    let excess = max(0, (prev.x + prev.w) - (tentative - gap))\n    move V to (tentative + excess, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set all cards to y=100, keep sizes, place first card at x=80 then each next card 12px to the right of the previous card\u2019s right edge.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'curX')",
+          "rule_excerpt": "let curX = 80\nlet gap = 12\nfor V in objects {\n  move V to (curX, 100)\n  curX = curX + V.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all cards to y=100, keep sizes, position each card\u2019s left edge at a fixed left margin plus the sum of all preceding cards\u2019 widths plus a fixed gap.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'accumulated')",
+          "rule_excerpt": "let margin = 80\nlet gap = 12\nlet accumulated = 0\nfor V in objects {\n  move V to (margin + accumulated, 100)\n  accumulated = accumulated + V.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all cards to y=100, keep sizes, place the first card at a fixed fraction of the canvas width then each subsequent card at the previous card\u2019s right edge plus a fixed gap of 12px.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'curX')",
+          "rule_excerpt": "let frac = 0.05714285714285714\nlet gap = 12\nlet curX = frac * canvas.w\nfor V in objects {\n  move V to (curX, 100)\n  curX = curX + V.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all cards to y=100, keep sizes, place each card\u2019s left edge at its original x plus a fixed offset of 70px, then resolve overlaps by shifting each card right so that the gap between cards is at least 12px.",
+          "reason": "invalid rule: line 3: unknown name 'null'; define it with let or a for loop first (near '\\n')",
+          "rule_excerpt": "let offset = 70\nlet minGap = 12\nlet prevRight = null\nfor V in objects {\n  let tentative = V.x + offset\n  if prevRight == null {\n    move V to (tentative, 100)\n    prevRight = tentative + V.w\n  } else {\n    let needed = max(tentative, prevRight + minGap)\n    move V to (needed, 100)\n    prevRight = needed + V.w\n  }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5131,
+        "completion_tokens": 2271,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 13367,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 21.22,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:57:47+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects left-to-right starting at X=80 with a fixed gap of 16 and a fixed Y=120, using an accumulating X position.",
+        "Position objects using canvas-relative start X, gap and Y, accumulating X across the list.",
+        "Align all objects to a fixed Y computed from canvas height minus 580, then lay them out left-to-right with start X = canvas.w *0.05714 and gap = canvas.w *0.01143."
+      ],
+      "rejected": [
+        {
+          "summary": "Place all objects at a fixed vertical position and lay them out left\u2011to\u2011right with a constant start X and equal spacing.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=166, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"FIXED_Y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"START_X\", \"value\": 80}, {\"op\": \"let\", \"name\": \"GAP\", \"value\": 16}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.START_X\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"a",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object vertically to a fixed fraction of the canvas height and horizontally by a constant plus half its own width.",
+          "reason": "invalid rule: line 1: unexpected character ' '",
+          "rule_excerpt": "let FIXED_Y = canvas.h * 0.17142857142857142  // \u2248120 when canvas.h=700\nfor V in objects {\n    move V to (V.x + 50 + 0.5 * V.w, FIXED_Y)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects vertically to the canvas height minus a constant offset, then shift each right by a fixed amount that depends on the canvas width.",
+          "reason": "invalid rule: line 2: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let FIXED_Y = canvas.h - 580\nlet SHIFT = canvas.w * 0.05  // 70 when canvas.w=1400\nfor V in objects {\n    move V to (V.x + SHIFT, FIXED_Y)\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2848,
+        "completion_tokens": 2468,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5316,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 12.73,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

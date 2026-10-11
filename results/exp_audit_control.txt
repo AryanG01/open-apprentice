@@ -1,0 +1,1 @@
+oa learn  split=development trials=48  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=low

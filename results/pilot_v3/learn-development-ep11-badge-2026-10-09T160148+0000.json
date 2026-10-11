@@ -1,0 +1,78 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:01:48+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset from card0\u2019s top\u2011left.",
+        "Place the badge horizontally at card0\u2019s midline plus a constant, vertically with a fixed offset.",
+        "Place the badge horizontally at card0\u2019s right edge minus a constant, vertically with a fixed offset.",
+        "Place the badge horizontally at the smaller of card0\u2019s right edge and a fixed x, vertically with a fixed offset."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 1201,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place the badge to the right of the first object, offset by a fixed 3\u202fpx vertically and a fixed horizontal gap equal to the first object\u2019s width minus the badge\u2019s width minus 3\u202fpx."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the badge at a fraction of the first object\u2019s width and height, using the same fractions for all cases.",
+          "reason": "contradicts teaching evidence - corrected_example: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"fx\", \"value\": {\"rat\": \"617/1000\"}}, {\"op\": \"let\", \"name\": \"fy\", \"value\": {\"rat\": \"33/1000\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.fx\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"r"
+        },
+        {
+          "summary": "Center the badge horizontally relative to the first object\u2019s width, then shift it right by a fixed 7\u202fpx, and keep a fixed 3\u202fpx vertical offset.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"hcenter\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}}, {\"op\": \"let\", \"name\": \"hoffset\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"sub\", \"args\": [{\"ref\": \"locals.hcenter\"}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}]}, 7]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}"
+        },
+        {
+          "summary": "Scale the horizontal offset proportionally to the badge\u2019s width relative to the first object\u2019s width, keeping a fixed 3\u202fpx vertical offset.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"ratio\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.ratio\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": "
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1668,
+        "completion_tokens": 1039,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 4896,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 12.6,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:05:45+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset from card0's left and top edges.",
+        "Place the badge at a fixed absolute position on the canvas."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the badge to the right of card0, aligned with its right edge minus the badge width, and slightly below card0.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=40, y=412, w=20, h=20) but the evidence shows (x=38, y=412, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge using the proto's original position plus a constant offset.",
+          "reason": "invalid rule: line 1: unexpected closing brace or trailing text (near '}')",
+          "rule_excerpt": "clone proto as badge at (proto.x + 38, proto.y + 412)}]}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 837,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the badge a fixed offset (28,2) to the right\u2011down from card0\u2019s top\u2011left, copying proto\u2019s size.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 28}, {\"op\": \"let\", \"name\": \"dy\", \"value\": 2}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.dy\"}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge horizontally at card0\u2019s midline plus 3 pixels, vertically 2 pixels down, copying proto\u2019s size.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=15, y=2, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}, 3]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": 2}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge horizontally such that its left edge is 22 pixels left of card0\u2019s right edge, vertically 2 pixels down, copying proto\u2019s size.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=2, y=2, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 22]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": 2}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge horizontally at 56% of card0\u2019s width from its left edge, vertically 2 pixels down, copying proto\u2019s size.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=13.44, y=2, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"rat\": \"14/25\"}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": 2}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\":",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the reference object (proto if present, otherwise the first object) and place it at (reference.x + reference.w * 0.56, reference.y + 2).",
+          "reason": "invalid rule: line 1: expected '{' to open a block (near 'exists')",
+          "rule_excerpt": "if proto exists {\n  let ref = proto\n} else {\n  let ref = objects[0]\n}\nlet dx = ref.w * 0.56\nlet dy = 2\nclone ref as badge at (ref.x + dx, ref.y + dy)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4106,
+        "completion_tokens": 1724,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 7655,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 12.7,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:49:11+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "none",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place its top-left at the first object's top-left plus a fixed offset of 54 right and 16 down."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place its top-left at the center of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=55, y=360, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"e",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its center at the center of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=45, y=350, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"l",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's top-left plus half the second object's size.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=20, y=350, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"ox\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}}, {\"op\": \"let\", \"name\": \"oy\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}, 2]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 363,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object and place its top-left at the first object's top-left plus a fixed offset of 54 right and 16 down.",
+        "Clone the second object and place its top-left at a fixed fraction of the first object's width and height from its top-left."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place its top-left at the first object's top-right minus a fixed horizontal offset and plus a fixed vertical offset.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=74, y=356, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 26]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 16]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's center plus a fixed offset.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=74, y=356, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"e",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1369,
+        "completion_tokens": 245,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 2958,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 3.85,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

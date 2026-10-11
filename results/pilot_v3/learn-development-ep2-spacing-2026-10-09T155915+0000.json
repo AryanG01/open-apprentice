@@ -1,0 +1,61 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:59:15+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a horizontal row starting at x=80 with 70\u2011pixel spacing, all at y=100."
+      ],
+      "rejected": [
+        {
+          "summary": "Shift every object right by 70 pixels and set its top to y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 70]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Align objects to a grid whose left margin is 80 and vertical offset is 100, preserving each object's width and height.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [80, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}]}, 10]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move each object so its left edge equals the previous object's right edge plus 20, starting at x=80, and set y=100.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'cur_x')",
+          "rule_excerpt": "let cur_x = 80\nfor V in objects {\n  move V to (cur_x, 100)\n  cur_x = cur_x + V.w + 20\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1038,
+        "completion_tokens": 511,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 1549,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 3.31,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

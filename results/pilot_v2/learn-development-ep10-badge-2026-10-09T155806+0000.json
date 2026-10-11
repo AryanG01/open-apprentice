@@ -1,0 +1,90 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:58:06+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Create a badge by cloning the proto object and placing it near the bottom\u2011right of card0.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"rat\": \"23/50\"}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, {\"rat\": \"3/50\"}]}]}}]"
+        },
+        {
+          "summary": "Create a badge by cloning the proto object and positioning it at a fixed fraction of the canvas width and height.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"493/5000\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"5463/10000\"}]}}]"
+        },
+        {
+          "summary": "Create a badge by cloning the proto object and aligning its left edge with card0\u2019s right edge minus a constant offset.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset\", \"value\": {\"rat\": \"62/5\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.offset\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"rat\": \"12/5\"}]}}]"
+        },
+        {
+          "summary": "Create a badge by cloning the proto object and placing it where the x coordinate equals the proto\u2019s original x plus a scaled canvas width, and y equals card0\u2019s y plus a small offset.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"493/5000\"}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"rat\": \"12/5\"}]}}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 846,
+        "completion_tokens": 503,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone proto and place it relative to card0 using a fixed fraction of card0's width and height.",
+        "Clone proto and position it at a fixed absolute coordinate within the canvas."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto and align its center with the center of card0, then shift it right by a quarter of its own width.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"a"
+        },
+        {
+          "summary": "Clone proto and place it so that its top\u2011left corner is at the point where a diagonal from the canvas top\u2011left to card0 bottom\u2011right intersects a grid spaced by one fifth of the canvas width.",
+          "reason": "invalid rule: line 3: unknown name 'floor'; define it with let or a for loop first (near '(')",
+          "rule_excerpt": "let stepX = canvas.w / 5\nlet stepY = canvas.h / 5\nlet kx = floor((card0.x + card0.w) / stepX)\nlet ky = floor((card0.y + card0.h) / stepY)\nclone proto as badge at (kx * stepX, ky * stepY)"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 989,
+        "completion_tokens": 692,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3030,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 6.63,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

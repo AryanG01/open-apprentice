@@ -1,0 +1,63 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:41:06+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "template_class": "PRIVATE (not shown to the model)",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "TEACHING",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Copy the second object and place it at a fixed offset (92,8) relative to the first object's top\u2011left corner.",
+          "reason": "invalid rule: bad expression",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 92}, {\"op\": \"let\", \"name\": \"dy\", \"value\": 8}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"target\": {\"ref\": \"objects.1\"}, \"symbol\": \"s1\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.dy\"}]}}]"
+        },
+        {
+          "summary": "Copy the second object and place it at a fraction of the first object's width and height (23/30 of width, 4/35 of height) from its top\u2011left corner.",
+          "reason": "invalid rule: bad expression",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"fx\", \"value\": {\"rat\": \"23/30\"}}, {\"op\": \"let\", \"name\": \"fy\", \"value\": {\"rat\": \"4/35\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"target\": {\"ref\": \"objects.1\"}, \"symbol\": \"s1\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"ref\": \"locals.fx\"}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get"
+        },
+        {
+          "summary": "Copy the second object and position it so its bottom\u2011right corner is inset by (8,42) pixels from the bottom\u2011right corner of the first object.",
+          "reason": "invalid rule: bad expression",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"right\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"bottom\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"name\": \"targetY\", \"value\": {\"op\": \"sub\", \"args\": [{\"ref\": \"locals.bottom\"}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"obje"
+        },
+        {
+          "summary": "Copy the second object and place it at the same relative position as the first object's top\u2011left corner shifted by half the first object's width and height minus half the second object's width and height (i.e., align centers with an offset of half the size difference).",
+          "reason": "invalid rule: bad expression",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [{\"ref\": \"locals.cy0\"}, {\"ref\": \"locals.cy1\"}]}, \"kind\": \"clone_place\", \"target\": {\"ref\": \"objects.1\"}, \"symbol\": \"s1\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.dy\"}]}}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 984,
+        "completion_tokens": 3845,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11996,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 45.66,
+  "prompt_hashes": {
+    "hypotheses": "1c023912861644f2"
+  }
+}

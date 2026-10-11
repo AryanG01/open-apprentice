@@ -1,0 +1,51 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:58:00+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each card right by an amount that grows with its index and align all cards to a fixed vertical position."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first card at a fixed left margin, then lay out the rest in a row with a constant horizontal gap, all aligned to a fixed vertical position.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 40\nlet gap = 16\nlet row_y = canvas.h / 7\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, row_y)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, row_y)\n  }\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 892,
+        "completion_tokens": 891,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 1783,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 4.9,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

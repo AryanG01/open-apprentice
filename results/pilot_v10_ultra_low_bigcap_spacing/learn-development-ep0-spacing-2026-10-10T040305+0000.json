@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:03:05+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects' top edges to one-seventh of the canvas height; position the first object at its original x plus its own height; then place each subsequent object with a horizontal gap equal to one-tenth of the first object's width.",
+        "Align all objects' top edges to one-seventh of the canvas height; position the first object at two-thirds of its own width; then place each subsequent object with a horizontal gap equal to one-tenth of the first object's width.",
+        "Align all objects' top edges to a fixed y-coordinate of 100; position the first object at its original x plus its own height; then place each subsequent object with a horizontal gap equal to one-tenth of the first object's width.",
+        "Align all objects' top edges to one-seventh of the canvas height; position the first object at its original x plus its own height; then place each subsequent object with a horizontal gap equal to one-fifth of the last object's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 9095,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Anchor the first object at fixed coordinates (80,100) and pack the rest to the right with a constant 12px gap.",
+        "Anchor at (80,100) but never left of the first object's original right (x+h) nor below its original y minus 260; gap at least 12 or one-tenth of the first object's width.",
+        "Anchor at (80,100) but never left of 1/20 canvas width nor below 1/7 canvas height; gap at least 12 or 1/60 canvas height.",
+        "Explicitly position each of the three objects using the first two objects' widths and a fixed 12px gap."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1852,
+        "completion_tokens": 20858,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 32839,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 94.44,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

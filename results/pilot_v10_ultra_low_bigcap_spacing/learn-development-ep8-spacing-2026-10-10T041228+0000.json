@@ -1,0 +1,103 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:12:28+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=witness_found; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Equalize center-to-center spacing to the average original center spacing, shift the group right by the first gap, and align all tops to y=120.",
+        "Shift each object horizontally by the difference between the first object's height and its own width, and align all tops to y=120."
+      ],
+      "rejected": [
+        {
+          "summary": "Equalize the horizontal gaps between objects to their average, shift the group right by the first gap, and align all tops to y=120.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap0\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}}, {\"op\": \"let\", \"name\": \"gap1\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, \"x\"]}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"a",
+          "stage": "initial"
+        },
+        {
+          "summary": "Equalize horizontal gaps to their average, shift the group right by the first gap, and align tops to the minimum original y minus the total arranged width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap0\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}}, {\"op\": \"let\", \"name\": \"gap1\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, \"x\"]}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"a",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1029,
+        "completion_tokens": 15677,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Fixed absolute positions: first object at (40,120), 20px gaps.",
+        "Canvas-relative with floors: start at max(40, canvas.w/50) and max(120, canvas.h*0.15), fixed 20px gap.",
+        "First-object-relative with floors: start at max(40, 0.8*first.w) and max(120, 1.5*first.h), gap max(20, first.h/4).",
+        "Grid-based: 20px grid, first object at cell (2,6), gap equals grid unit."
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange objects in a horizontal row with fixed 20px gaps starting at absolute position (40, 120).",
+          "reason": "invalid rule: line 5: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 20\nmove objects[0] to (40, 120)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, 120)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Anchor the row using the first object's size (80% width, 150% height) with floors at (40, 120), and gap as 25% of first object's height floored at 20.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = max(40, objects[0].w * 0.8)\nlet start_y = max(120, objects[0].h * 1.5)\nlet gap = max(20, objects[0].h / 4)\nmove objects[0] to (start_x, start_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Anchor the row using canvas size (2% width, 15% height) with floors at (40, 120), with a fixed 20px gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = max(40, canvas.w / 50)\nlet start_y = max(120, canvas.h * 0.15)\nlet gap = 20\nmove objects[0] to (start_x, start_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects on a 20px grid: first object at grid cell (2,6) i.e. (40,120), subsequent objects spaced by one grid unit (20px) edge-to-edge.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let grid = 20\nlet start_x = 2 * grid\nlet start_y = 6 * grid\nlet gap = grid\nmove objects[0] to (start_x, start_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4864,
+        "completion_tokens": 16843,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 38413,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 105.79,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

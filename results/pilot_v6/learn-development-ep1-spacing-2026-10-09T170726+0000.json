@@ -1,0 +1,136 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:07:26+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place all objects at y=100, start at x=40, and lay them out left\u2011to\u2011right with a fixed horizontal gap of 16 pixels.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 16\nlet startX = 40\nlet y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=100, start at the original first object\u2019s x plus 30, and lay them out with a fixed gap of 16.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 16\nlet startX = objects[0].x + 30\nlet y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=100, start at x=40, and lay them out with a gap that is 0.145 times the width of the first object (\u224816 px).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 0.145 * objects[0].w\nlet startX = 40\nlet y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=100, start at the original first object\u2019s x plus 30, and lay them out with a gap that is 0.145 times the width of the first object.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 0.145 * objects[0].w\nlet startX = objects[0].x + 30\nlet y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=100, start at x=40, and lay them out left-to-right with a fixed horizontal gap of 16 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 40, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 16]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at y=100, start at the original first object\u2019s x plus 30, and lay them out with a fixed gap of 16.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 30]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at y=100, start at x=40, and lay them out with a gap that is 0.145 times the width of the first object (~16 px).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=135.9, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"29/200\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 40, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"obj",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at y=100, start at the original first object\u2019s x plus 30, and lay them out with a gap that is 0.145 times the width of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=135.9, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"29/200\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 30]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4090,
+        "completion_tokens": 2039,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Set y=100, start x at original first object's x plus 30, then place objects left-to-right with a fixed gap of 16.",
+        "Set y=100, start x at a fixed 40, then place objects left-to-right with a fixed gap of 16.",
+        "Set y to one seventh of canvas height, start x at original first object's x plus 30, then place objects left-to-right with a fixed gap of 16.",
+        "Set y to one seventh of canvas height, start x at a fixed 40, then place objects left-to-right with a fixed gap of 16."
+      ],
+      "rejected": [
+        {
+          "summary": "Set y=100 for all objects, start x at original first object's x plus 30, then place objects left\u2011to\u2011right with a fixed horizontal gap of 16.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = objects[0].x + 30\nlet gap = 16\nlet y_target = 100\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set y=100 for all objects, start x at a fixed 40, then place objects left\u2011to\u2011right with a fixed horizontal gap of 16.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 40\nlet gap = 16\nlet y_target = 100\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set y to one seventh of the canvas height, start x at original first object's x plus 3/11 of its width, then place objects left\u2011to\u2011right with a gap of 8/55 of the first object's width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = canvas.h * (1/7)\nlet start_x = objects[0].x + (3/11) * objects[0].w\nlet gap = (8/55) * objects[0].w\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set y to one seventh of the canvas height, start x at original first object's x plus 30, then place objects left\u2011to\u2011right with a fixed horizontal gap of 16.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = canvas.h * (1/7)\nlet start_x = objects[0].x + 30\nlet gap = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5398,
+        "completion_tokens": 2266,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 13793,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 19.83,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

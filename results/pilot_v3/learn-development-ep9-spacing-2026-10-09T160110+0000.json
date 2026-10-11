@@ -1,0 +1,90 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:01:10+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move every card to y=100 and shift its x right by 30 plus 6 times its index.",
+        "Set each card\u2019s y to a fixed fraction of the canvas height (100/700) and increase its x by its original x plus an index\u2011based offset."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all cards to y=100, then lay them out left\u2011to\u2011right with a fixed 6\u2011unit gap, starting at x=40.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 6}, {\"op\": \"let\", \"name\": \"cursor_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.cursor_x\"}, \"y\": 100}, {\"op\": \"let\", \"name\": \"cursor_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"ref\": \"locals.cursor_x\"}, {\"op\": \"get\", \"args\": [{\"ref\": \""
+        },
+        {
+          "summary": "Place cards on a horizontal line at y=100, preserving original order and adding a uniform 6\u2011unit space between them, while shifting the whole row right by 30 units.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc_x')",
+          "rule_excerpt": "let base_x = 30\nlet space = 6\nlet acc_x = base_x\nfor V in objects {\n  move V to (acc_x, 100)\n  acc_x = acc_x + V.w + space\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 968,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Keep each card\u2019s width/height, move it to y=100 and shift its x right by 30 plus 6 times its index.",
+          "reason": "contradicts teaching evidence - neither: reproduces an output the user rejected",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"add\", \"args\": [30, {\"op\": \"mul\", \"args\": [6, {\"ref\": \"locals.I\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": 100}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Align all cards to y=100, then place them left\u2011to\u2011right preserving order with a fixed 6\u2011unit gap after each card\u2019s width, starting at x=40.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"acc_x\", \"value\": 40}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.acc_x\"}, \"y\": 100}, {\"op\": \"let\", \"name\": \"acc_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"ref\": \"locals.acc_x\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}, 6]}}]}]"
+        },
+        {
+          "summary": "Set y=100 for every card and compute its x as 40 plus the sum of all previous cards\u2019 widths plus 6 times the number of previous cards.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"prefix_sum\", \"value\": 0}, {\"op\": \"let\", \"name\": \"prev_count\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [40, {\"ref\": \"locals.prefix_sum\"}]}, {\"op\": \"mul\", \"args\": [6, {\"ref\": \"locals.prev_count\"}]}]}, \"y\": 100}, {\"op\": \"let\", \"name\": \"prefix_sum\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.prefix_sum\"},"
+        },
+        {
+          "summary": "Move each card to y=100 and shift its x right by half the canvas width divided by 10 plus 6 times its index.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_shift\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 20]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base_shift\"}, {\"op\": \"mul\", \"args\": [6, {\"ref\": \"locals.I\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": 1"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1836,
+        "completion_tokens": 997,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4842,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 10.9,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:54:13+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each object right by an amount that decreases linearly with its index, and set its y to a fixed value."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row at a fixed y, with a fixed gap between them, starting from a fixed x.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let startX = 80\nlet gap = 12\nlet yTarget = 120\nlet acc = startX\nfor V in objects {\n  move V to (acc, yTarget)\n  acc = acc + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to a vertical line at x = 80, then cascade them right by their own width plus a fixed gap, keeping y constant.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let yTarget = 120\nlet gap = 12\nlet acc = 80\nfor V in objects {\n  move V to (acc, yTarget)\n  acc = acc + V.w + gap\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1040,
+        "completion_tokens": 856,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each object right by an amount that decreases linearly with its index, and set its y to a fixed value.",
+        "Place objects in a horizontal row at y=120, each after the previous plus a fixed 12-unit gap, starting at x=80.",
+        "Place objects in a horizontal row at y = canvas height minus 580, each after the previous plus a fixed 12-unit gap, starting at x=80.",
+        "Place objects in a horizontal row at y = first object's original y minus 290, each after the previous plus a fixed 12-unit gap, starting at x=80."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row at y=120, each object positioned after the previous one plus a fixed 12\u2011unit gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let yTarget = 120\nfor V in objects with I {\n  if I == 0 {\n    move V to (80, yTarget)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + 12, yTarget)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row at y = canvas height minus 580, each after the previous plus a fixed 12\u2011unit gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let yTarget = canvas.h - 580\nfor V in objects with I {\n  if I == 0 {\n    move V to (80, yTarget)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + 12, yTarget)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row at y = first object's original y minus 290, each after the previous plus a fixed 12\u2011unit gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let yTarget = objects[0].y - 290\nfor V in objects with I {\n  if I == 0 {\n    move V to (80, yTarget)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + 12, yTarget)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3431,
+        "completion_tokens": 1509,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 6836,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 12.27,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

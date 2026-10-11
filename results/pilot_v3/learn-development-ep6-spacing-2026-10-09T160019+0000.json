@@ -1,0 +1,57 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:00:19+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align objects vertically to a fixed y\u2011coordinate and space them horizontally by a fixed gap plus each object's width.",
+        "Shift each object right by an amount that grows linearly with its index in the list."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row starting at a fixed left margin, keeping their original heights and widths.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"row_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"acc\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"ref\": \"locals.acc\"}]}, \"y\": {\"ref\": \"locals.row_y\"}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.acc\"}, {\"op\": \"get\", \"args"
+        },
+        {
+          "summary": "Move all objects to a common y\u2011coordinate and set their x\u2011coordinate to a fixed offset plus the cumulative width of all preceding objects.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"offset\", \"value\": 80}, {\"op\": \"let\", \"name\": \"cum\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.offset\"}, {\"ref\": \"locals.cum\"}]}, \"y\": {\"ref\": \"locals.target_y\"}}, {\"op\": \"let\", \"name\": \"cum\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.cum\"}, {\"op\": \"get\", \""
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1039,
+        "completion_tokens": 900,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 1939,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 5.21,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

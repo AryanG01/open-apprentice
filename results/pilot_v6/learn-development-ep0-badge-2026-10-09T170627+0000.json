@@ -1,0 +1,105 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:06:27+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Badge placed 92px right and 8px down from card0, same size as proto."
+      ],
+      "rejected": [
+        {
+          "summary": "Create badge positioned 92px right and 8px down from card0, sized equal to proto.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + 92, objects[0].y + 8)\nresize badge to (objects[1].w, objects[1].h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge placed at card0's left edge plus 92% of card0 width, vertically aligned with card0 top plus 8px, same size as proto.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let offset_x = 0.92 * objects[0].w\nlet offset_y = 8\nclone objects[1] as badge at (objects[0].x + offset_x, objects[0].y + offset_y)\nresize badge to (objects[1].w, objects[1].h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge positioned such that its left edge is 92px from card0 left and its top edge is 8px from card0 top; size matches proto.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + 92, objects[0].y + 8)\nresize badge to (objects[1].w, objects[1].h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge anchored to card0's bottom-left corner shifted up 42px and right 92px, size equal to proto.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + 92, objects[0].y + objects[0].h - 42)\nresize badge to (objects[1].w, objects[1].h)}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge positioned at card0 left plus 92% of card0 width, top plus 8px, same size as proto.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=120.4, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"23/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 8}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"o",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge aligned so its left edge is 92px from card0 left and top edge 8px from card0 top, size proto.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge anchored to card0 bottom-left shifted up 42px and right 92px, size proto.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=102, y=388, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 92]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}, 42]}}]",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3538,
+        "completion_tokens": 1005,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Badge placed 92px right and 8px down from card0, same size as proto.",
+        "Badge placed at card0 left plus 23/30 of its width, 8px down, same size as proto.",
+        "Badge placed at card0 right minus 28px, 8px down, same size as proto.",
+        "Badge placed at card0 left plus half its width plus 32px, 8px down (proto height * 2/5), same size as proto."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1888,
+        "completion_tokens": 787,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 7218,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 10.64,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

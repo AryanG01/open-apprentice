@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:54:31+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto at a fixed position computed from the first object's coordinates.",
+        "Clone proto offset from the first object by a fixed fraction of its width and a fixed fraction of its height.",
+        "Clone proto offset from the first object using the second object's width for the horizontal offset and a fraction of the first object's height for the vertical offset.",
+        "Clone proto at a position that is a fixed fraction of the canvas width and height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 995,
+        "completion_tokens": 1924,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the badge to the right of the first object, aligned with its bottom edge, using a fixed horizontal offset.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + objects[0].w + 10, objects[0].y + objects[0].h - 20)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge at a position that is a fixed fraction of the canvas width and height, independent of objects.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let fx = 382/5 / 1400\nlet fy = 1518/5 / 700\nclone objects[1] as badge at (fx * canvas.w, fy * canvas.h)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge relative to the second object (proto) using a fixed offset from its top\u2011left corner.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[1].x + 382/5, objects[1].y + 1518/5)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge so that its center aligns with the center of the first object, then shift it by a fixed amount.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let cx = objects[0].x + objects[0].w / 2\nlet cy = objects[0].y + objects[0].h / 2\nclone objects[0] as badge at (cx - 10, cy - 10)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge so that its center aligns with the center of the first object, then shift it by a fixed amount.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let cx = objects[0].x + objects[0].w / 2\nlet cy = objects[0].y + objects[0].h / 2\nlet _bx = cx - 10\nlet _by = cy - 10\nclone objects[0] as badge at (_bx, _by)\nresize badge to (20, 20)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4337,
+        "completion_tokens": 1691,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8947,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 17.9,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

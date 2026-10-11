@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:38:58+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a row with fixed y=120, starting at x=80 and a constant horizontal gap of 16.",
+        "Align objects using the first object's original position: y shifted up by 260, x shifted right by 70, then lay them out with a fixed gap of 16.",
+        "Position objects based on canvas fractions: y = canvas height/7 + 20, start x = canvas width/20 + 10, with a fixed gap of 16.",
+        "Keep y fixed at 120, start x relative to the first object's original x (+70), and set the gap to 40% of the first object's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1029,
+        "completion_tokens": 3651,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 4680,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 17.5,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

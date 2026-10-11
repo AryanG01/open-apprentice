@@ -1,0 +1,100 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:58:22+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Set all cards to y=100 and shift each card's x by an amount that decreases linearly with its index in the list. "
+      ],
+      "rejected": [
+        {
+          "summary": "Set each card's y to a fixed vertical margin from the top, preserving its width and height while shifting its x by a fixed offset.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=130, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, 30]}, \"y\": {\"ref\": \"locals.margin_y\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to a common baseline determined by a proportion of the canvas height, keeping their original horizontal spacing.",
+          "reason": "invalid rule: line 1: unexpected character ' '",
+          "rule_excerpt": "let base_y = 0.142857 * canvas.h  // \u2248100 when canvas.h=700\nlet dx0 = 30\nlet dx1 = 16\nlet dx2 = 2\nmove objects[0] to (objects[0].x + dx0, base_y)\nmove objects[1] to (objects[1].x + dx1, base_y)\nmove objects[2] to (objects[2].x + dx2, base_y)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each card upward so its top aligns with a fixed y, and adjust its x by a fraction of its own width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=145, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"local",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards in a horizontal row starting at a left inset, with equal vertical placement, preserving each card's size.",
+          "reason": "invalid rule: line 2: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let start_x = 40\nlet spacing = 76  // difference between card0.x and card1.x after move\nlet y = 100\nlet x = start_x\nfor obj in objects {\n  move obj to (x, y)\n  x = x + obj.w + spacing\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place each card at a specific fixed coordinate based on its identity, keeping its size unchanged.",
+          "reason": "invalid rule: line 2: unexpected character ' '",
+          "rule_excerpt": "for V in objects {\n  if V.id == \"card0\" { move V to (40, 100) }\n  else if V.id == \"card1\" { move V to (116, 100) }\n  else { move V to (222, 100) }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all cards to a common y\u2011coordinate of 100 and shift each card's x by a fixed amount that depends on its original x coordinate via a linear formula. ",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=39, y=100, w=60, h=90) but the evidence shows (x=40, y=100, w=60, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"sub\", \"args\": [30, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/10\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\",",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3103,
+        "completion_tokens": 2356,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Set all cards to y=100 and shift each card's x by an amount that decreases linearly with its index in the list. ",
+        "Set all cards to y=100 and shift each card's x by an amount that is zero after the third card",
+        "Set all cards to y=100 and shift each card's x by 30 minus (index times canvas width divided by 100)",
+        "Set all cards to y=100 and shift each card's x by 30 minus (index times 14) but only if the card's width is less than 100"
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1594,
+        "completion_tokens": 1596,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8649,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 19.52,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

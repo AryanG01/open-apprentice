@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:55:21+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Set all objects to a common y\u2011coordinate and shift each object right by a base offset plus an index\u2011dependent increment."
+      ],
+      "rejected": [
+        {
+          "summary": "Align objects to a horizontal line at y = 120 and space them evenly starting from x = 80 with a gap of 110 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=300, y=120, w=50, h=90) but the evidence shows (x=330, y=120, w=50, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 110}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.i\"}, {\"ref\": \"locals.gap\"}]}]}, \"y\": 120}], \"index_var\": \"i\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each object to a y\u2011coordinate that is the canvas height minus a fixed margin, and shift its x by the width of the preceding object plus a constant.",
+          "reason": "invalid rule: line 3: unexpected character ' '",
+          "rule_excerpt": "let y_target = canvas.h - 580\nfor obj in objects with i {\n  let prev_w = (i == 0) ? 0 : objects[i-1].w\n  move obj to (obj.x + prev_w + 30, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row whose left edge aligns with a vertical guide at x = 80, preserving original ordering and adding a uniform horizontal padding of 20 pixels between them.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let guide_x = 80\nlet padding = 20\nlet cursor_x = guide_x\nfor obj in objects {\n  move obj to (cursor_x, 120)\n  cursor_x = cursor_x + obj.w + padding\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1039,
+        "completion_tokens": 675,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Set all objects to a common y\u2011coordinate and shift each object right by a base offset plus an index\u2011dependent increment.",
+        "Set a common y\u2011coordinate based on a constant offset from the top, then lay out objects left\u2011to\u2011right starting from a fixed x and adding each object's width plus a fixed padding."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with a fixed left start, equal spacing, and align them to a y\u2011coordinate derived from the canvas height.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'y_target')",
+          "rule_excerpt": "let start_x = 80\nlet spacing = 20\ny_target = canvas.h - 580\nlet cursor_x = start_x\nfor obj in objects with i {\n  move obj to (cursor_x, y_target)\n  let cursor_x = cursor_x + obj.w + spacing\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to a horizontal line whose y is a fixed distance from the canvas bottom, and position each object immediately after the previous one using its original width plus a fixed gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'i')",
+          "rule_excerpt": "let y_line = canvas.h - 580\nlet gap = 20\nfor obj in objects with i {\n  if i == 0 {\n    move obj to (80, y_line)\n  } else {\n    let prev = objects[i-1]\n    move obj to (prev.x + prev.w + gap, y_line)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1390,
+        "completion_tokens": 1084,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 4188,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 9.67,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

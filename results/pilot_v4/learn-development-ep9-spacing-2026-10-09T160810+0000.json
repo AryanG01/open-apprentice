@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:08:10+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move every card to y=100 and shift its x right by 30 plus 6 times its index.",
+        "Set each card\u2019s y to a fixed fraction of the canvas height (100/700) and increase its x by its original x plus an index\u2011based offset."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all cards to y=100, then lay them out left\u2011to\u2011right with a fixed 6\u2011unit gap, starting at x=40.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=156, y=100, w=70, h=90) but the evidence shows (x=166, y=100, w=70, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 6}, {\"op\": \"let\", \"name\": \"cursor_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.cursor_x\"}, \"y\": 100}, {\"op\": \"let\", \"name\": \"cursor_x\", \"value\": {\"op\":",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards on a horizontal line at y=100, preserving original order and adding a uniform 6\u2011unit space between them, while shifting the whole row right by 30 units.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc_x')",
+          "rule_excerpt": "let base_x = 30\nlet space = 6\nlet acc_x = base_x\nfor V in objects {\n  move V to (acc_x, 100)\n  acc_x = acc_x + V.w + space\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 968,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place cards in a row at y=100, beginning at x=40, and accumulate each card\u2019s position by adding its width plus a 16\u2011unit spacing."
+      ],
+      "rejected": [
+        {
+          "summary": "Set all cards to y=100, place the first at x=40, then each next card sits 16 units to the right of the previous card\u2019s right edge.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 100\nmove objects[0] to (40, y_target)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + 16, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift every card vertically to y = canvas height minus 600, and shift it right by 30 plus 6 times its index.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=30, y=108, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.h\"}, 600]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"add\", \"args\": [30, {\"op\": \"mul\", \"args\": [6, {\"ref\": \"locals.I\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align cards on a horizontal line at y=100, start at x=40, and lay them out left\u2011to\u2011right with a fixed 16\u2011unit gap between cards.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 100\nlet base_x = 40\nlet gap = 16\nmove objects[0] to (base_x, y_target)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1886,
+        "completion_tokens": 1519,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5414,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 12.54,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

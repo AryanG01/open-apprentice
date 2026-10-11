@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:37:57+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 7,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place it inside the first object's top\u2011right corner with a 2\u2011pixel margin.",
+        "Clone the second object and position it at 56% of the first object's width and 2.5% of its height from the first object's top\u2011left.",
+        "Clone the second object and place it horizontally at the first object's centre plus 3 pixels, vertically 2 pixels below the first object's top.",
+        "Clone the second object and place it a fixed 28 pixels right and 2 pixels down from the first object's top\u2011left corner."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 2290,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "If the first object is wider than the second, use a fixed offset of 2; otherwise use the second object's width divided by 25.",
+        "When the widths of the two objects differ, apply a fixed offset of 2; when they are equal, apply the second object's width divided by 25.",
+        "On a wide canvas (width > 1000) use a fixed offset of 2; on a narrower canvas use the second object's width divided by 25.",
+        "On a tall canvas (height > 200) use a fixed offset of 2; on a shorter canvas use the second object's width divided by 25."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1676,
+        "completion_tokens": 11735,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 16682,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 61.45,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

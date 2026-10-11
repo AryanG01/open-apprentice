@@ -1,0 +1,88 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:06:18+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a row starting at x=60 with a fixed gap of 12 pixels between them, all at y=100. Widths are preserved."
+      ],
+      "rejected": [
+        {
+          "summary": "Move every object to a fixed vertical position y=100 while preserving its width and height.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=100, w=90, h=60) but the evidence shows (x=60, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": 100}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object upward so its top aligns with a fixed margin of 100 pixels from the canvas top, keeping horizontal position unchanged.",
+          "reason": "duplicate",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at x=60 with equal horizontal spacing of 42 pixels, all at y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=102, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 60}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": 42}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.spacing\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align the bottom of each object to y=160 (so top varies by height) while keeping original x.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=100, w=90, h=60) but the evidence shows (x=60, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"op\": \"sub\", \"args\": [160, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"h\"]}]}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align the left edge of each object to a column whose x-coordinate is 60 plus the sum of widths of all previous objects, keeping y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=150, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"sum\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"U\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"if\", \"cond\": {\"op\": \"lt\", \"args\": [{\"ref\": \"locals.J\"}, {\"ref\": \"locals.I\"}]}, \"then\": [{\"op\": \"let\", \"name\": \"sum\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.sum\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.U\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Shift each object rightward by 50 pixels plus 42 times its index, then set y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=212, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 50]}, {\"op\": \"mul\", \"args\": [42, {\"ref\": \"locals.I\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Move each object so its left side aligns with a grid of spacing 42 pixels starting at x=60, preserving vertical position y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=102, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [60, {\"op\": \"mul\", \"args\": [42, {\"ref\": \"locals.I\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2778,
+        "completion_tokens": 1837,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 4615,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 11.0,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

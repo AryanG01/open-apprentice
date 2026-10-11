@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:08:43+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "All objects are moved to a fixed horizontal line at y=120, starting at x=80 with 12px gaps.",
+        "Objects are arranged horizontally at a canvas-relative height (120/700 of canvas.h), with left margin (80/1400 of canvas.w) and gap (12/1400 of canvas.w).",
+        "The topmost object defines a baseline: baseline_y = topmost.y - 2*topmost.h; baseline_x = 2/3*baseline_y; gap = 0.1*baseline_y; objects flow right from there.",
+        "The first object anchors the layout: y=120 fixed, start_x = first.x + 1.4*first.w, gap=12 fixed."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1033,
+        "completion_tokens": 11635,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 12668,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 37.16,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

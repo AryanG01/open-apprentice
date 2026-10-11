@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:00:26+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object at a fixed offset (80, 10) from the top-left of the first object.",
+        "Clone the second object 30 pixels left of the first object's right edge and 10 pixels below its top edge.",
+        "Clone the second object with 10px padding from the first object's right and top edges (accounting for clone width horizontally).",
+        "Clone the second object at an offset scaled by its own size (4x width, 0.5x height) from the first object's top-left."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 983,
+        "completion_tokens": 3112,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 4095,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 8.97,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

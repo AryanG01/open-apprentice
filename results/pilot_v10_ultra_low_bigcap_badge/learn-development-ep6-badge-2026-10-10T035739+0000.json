@@ -1,0 +1,65 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:57:39+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at 60% horizontally and 40% vertically across the first object.",
+        "Place the badge at the first object's bottom-right corner, inset by 1.8\u00d7 the prototype's width and 1.2\u00d7 its height.",
+        "Place the badge at the first object's top-left offset by 2.7\u00d7 the prototype's width and 0.8\u00d7 its height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 12476,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Fixed 16-pixel margins from the first object's top and right edges.",
+        "Margins capped at 16 pixels, otherwise 80% of the badge height.",
+        "Margins capped at 16 pixels, otherwise 40% of the first object's height.",
+        "Margins capped at 16 pixels, otherwise one quarter of the canvas height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1591,
+        "completion_tokens": 14429,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 29477,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 74.68,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

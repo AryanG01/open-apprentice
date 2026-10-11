@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:01:35+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with fixed vertical coordinate 120, fixed horizontal spacing 16, and start the first object at x=80.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 80\nlet spacing = 16\nlet y_target = 120\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + spacing, y_target)\n  }\n}"
+        },
+        {
+          "summary": "Align objects horizontally at y = 120, with spacing equal to 40% of the first object's width, and start the first object at its original x plus 1.75 times its width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 0.4 * objects[0].w\nlet start_x = objects[0].x + 1.75 * objects[0].w\nlet y_target = 120\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, y_target)\n  }\n}"
+        },
+        {
+          "summary": "Position objects in a row at y = 120, beginning at a left margin of 5% of the canvas width, using a fixed spacing of 16 pixels.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 0.05 * canvas.w\nlet spacing = 16\nlet y_target = 120\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + spacing, y_target)\n  }\n}"
+        },
+        {
+          "summary": "Stack objects vertically aligned at x = 80, preserving their original order, with each object placed 10 pixels below the previous one.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"x_target\", \"value\": 80}, {\"op\": \"let\", \"name\": \"y_start\", \"value\": 120}, {\"op\": \"let\", \"name\": \"v_spacing\", \"value\": 10}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.x_target\"}, \"y\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.y_start\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.v_spacing\"}]}]}}], \"index_var\": \"I\"}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1036,
+        "completion_tokens": 1457,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Arrange objects in a horizontal row starting at x=80, y=120, with gaps equal to the previous object's width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"start_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.cur_x\"}, \"y\": {\"ref\": \"locals.start_y\"}}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.cur_x\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals."
+        },
+        {
+          "summary": "Place objects in a row at y=120, beginning at 5% of canvas width, spaced by 40 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/20\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"start_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"spacing\", \"value\": 40}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.cur_x\"}, \"y\": {\"ref\": \"locals.start_y\"}}, {\"op\": \"let\", \"name\":"
+        },
+        {
+          "summary": "Align objects horizontally at y=120, with left edge of first object at x=80 and each subsequent object placed immediately after the previous one.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"base_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"offset\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base_x\"}, {\"ref\": \"locals.offset\"}]}, \"y\": {\"ref\": \"locals.base_y\"}}, {\"op\": \"let\", \"name\": \"offset\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.offset\"}, {\"op\": \"get"
+        },
+        {
+          "summary": "Position objects in a row at y=120, starting at x = 80, with each object's x increased by the sum of widths of all prior objects.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"base_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"prior_sum\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base_x\"}, {\"ref\": \"locals.prior_sum\"}]}, \"y\": {\"ref\": \"locals.base_y\"}}, {\"op\": \"let\", \"name\": \"prior_sum\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.prior_sum\"},"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1216,
+        "completion_tokens": 430,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4139,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 10.84,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

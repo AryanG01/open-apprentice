@@ -1,0 +1,27 @@
+oa learn  split=development trials=24  model=nvidia/nemotron-3-super-120b-a12b  reasoning_effort=low
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      INTENT_READY      1       0 0a/0c     False    1614    4.1  
+  0 spacing  edge       UNRESOLVED       2       0 0a/0c      None    3733   9.34  
+  1 badge    prop       INTENT_READY      1       0 0a/0c     False    1721   4.27  
+  1 spacing  edge       UNRESOLVED       2       0 0a/0c      None    3377   6.83  
+  2 badge    min        UNRESOLVED       2       1 1a/1c      None    4062   8.11  
+  2 spacing  edge       INTENT_READY      1       0 0a/0c     False    1549   3.31  
+  3 badge    const      INTENT_READY      1       0 0a/0c     False    1452   2.97  
+  3 spacing  edge       INTENT_READY      1       0 0a/0c      True    1664   4.12  
+  4 badge    prop       UNRESOLVED       2       1 1a/1c      None    4226  10.02  
+  4 spacing  edge       UNRESOLVED       2       0 0a/0c      None    4503  11.84  
+  5 badge    min        UNRESOLVED       2       1 1a/1c      None    4273   8.81  
+  5 spacing  edge       UNRESOLVED       2       0 0a/0c      None    5031  13.78  
+  6 badge    const      UNRESOLVED       2       1 1a/1c      None    4035   7.68  
+  6 spacing  edge       INTENT_READY      1       1 1a/0c      True    1939   5.21  
+  7 badge    prop       UNRESOLVED       2       1 1a/1c      None    3928   7.76  
+  7 spacing  edge       INTENT_READY      1       0 0a/0c     False    1785   3.99  
+  8 badge    min        UNRESOLVED       2       1 1a/1c      None    4117   8.22  
+  8 spacing  edge       INTENT_READY      2       0 0a/0c     False    5016  13.61  
+  9 badge    const      INTENT_READY      1       0 0a/0c     False    2258   5.83  
+  9 spacing  edge       UNRESOLVED       2       1 1a/1c      None    4842   10.9  
+ 10 badge    prop       UNRESOLVED       2       1 1a/1c      None    5311  15.03  
+ 10 spacing  edge       UNRESOLVED       2       0 0a/0c      None    4139  10.84  
+ 11 badge    min        INTENT_READY      2       1 1a/1c     False    4896   12.6  
+ 11 spacing  edge       UNRESOLVED       2       0 0a/0c      None    2966   4.98  
+recovered the hidden rule on held-out scenes: 2/24  |  total tokens 82437  |  results in results/pilot_v3

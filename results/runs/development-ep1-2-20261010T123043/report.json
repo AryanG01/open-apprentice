@@ -1,0 +1,376 @@
+{
+  "config": "development-pilot",
+  "origins": [
+    "reference"
+  ],
+  "label": "MEASURED (live model rows + non-model reference rows; split and n stated below)",
+  "episodes": [
+    "ep-f42cd7ac01",
+    "ep-f96ca92599"
+  ],
+  "n_rows": 18,
+  "methods_all_stages": {
+    "enumerative_reference": {
+      "method": "enumerative_reference",
+      "success": {
+        "correct": 15,
+        "scheduled": 16,
+        "rate": 0.9375
+      },
+      "conditional": {
+        "correct": 15,
+        "committed": 15,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 15,
+        "rate": 0.0
+      },
+      "failures": {
+        "abstained": 1
+      },
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 336,
+        "solver_s": 0.27371666696853936,
+        "teacher_interactions": 2,
+        "wall_s": 5.046973834047094,
+        "usd_known_total": 0.0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "fresh_full_context": {
+      "method": "fresh_full_context",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "text_memory": {
+      "method": "text_memory",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "structured_procedure": {
+      "method": "structured_procedure",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    }
+  },
+  "methods_transfer_and_composition": {
+    "enumerative_reference": {
+      "method": "enumerative_reference",
+      "success": {
+        "correct": 8,
+        "scheduled": 8,
+        "rate": 1.0
+      },
+      "conditional": {
+        "correct": 8,
+        "committed": 8,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 8,
+        "rate": 0.0
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 336,
+        "solver_s": 0.27371666696853936,
+        "teacher_interactions": 2,
+        "wall_s": 5.046973834047094,
+        "usd_known_total": 0.0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "fresh_full_context": {
+      "method": "fresh_full_context",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "text_memory": {
+      "method": "text_memory",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "structured_procedure": {
+      "method": "structured_procedure",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    }
+  },
+  "primary_comparison": {
+    "a": "full_v1_2",
+    "b": "structured_procedure",
+    "n_episodes": 0,
+    "diff": null,
+    "ci95": null,
+    "note": "fewer than 2 paired episodes: no uncertainty can be estimated"
+  },
+  "primary_vs_strongest_baseline": {
+    "a": "full_v1_2",
+    "b": "enumerative_reference",
+    "n_episodes": 0,
+    "diff": null,
+    "ci95": null,
+    "note": "fewer than 2 paired episodes: no uncertainty can be estimated"
+  },
+  "gates_27_5": {
+    "status": "evaluated",
+    "caveat": "prospective goals from spec 27.5; passing them would support considering an exceptional score, not guarantee one",
+    "transfer_composition_success": {
+      "observed": null,
+      "goal": 0.9,
+      "met": false
+    }
+  },
+  "split_note": "DEVELOPMENT data, episodes 1..2; development tuning/diagnostics, NOT the locked study",
+  "infra_errors": [
+    {
+      "episode": "ep-f96ca92599",
+      "method": "full_v1_2",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f96ca92599",
+      "method": "fresh_full_context",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f96ca92599",
+      "method": "text_memory",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f96ca92599",
+      "method": "structured_procedure",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f42cd7ac01",
+      "method": "full_v1_2",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f42cd7ac01",
+      "method": "fresh_full_context",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f42cd7ac01",
+      "method": "text_memory",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    },
+    {
+      "episode": "ep-f42cd7ac01",
+      "method": "structured_procedure",
+      "error": "TruncatedOutput: output hit the completion limit; not executing partial output"
+    }
+  ]
+}

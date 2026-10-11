@@ -1,0 +1,100 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:04:10+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto and place it at a fixed offset (92,8) from card0's top\u2011left.",
+        "Clone proto and place it so its left edge aligns with card0's right edge minus a fixed gap of 28 pixels, and its top edge is 8 pixels below card0's top."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto and position it at a point that is 75% of card0's width from its left edge, plus its own left edge, and 8 pixels below card0's top.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"o",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it inside card0's area, inset by 10 pixels from the left and 8 pixels from the top, then shift right by half of card0's width.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=80, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"inset_x\", \"value\": 10}, {\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.inse",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 991,
+        "completion_tokens": 573,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone proto and place it 8 pixels below the first object, with horizontal offset equal to 102 minus half the width of the second object.",
+        "Clone proto and place it 8 pixels below the first object, with horizontal offset equal to the first object's width minus the second object's width minus 8 pixels."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto and place it 8 pixels below the reference object, with horizontal offset equal to the reference object's width minus a fixed 28 pixels.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 28]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 8]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it 8 pixels below the reference object, with horizontal offset equal to 75% of the reference object's width plus 2 pixels.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"rat\": \"3/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 2]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it 8 pixels below the reference object, with horizontal offset equal to the reference object's width minus the width of the second object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=110, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 8]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it 8 pixels below the reference object, with horizontal offset equal to the reference object's width minus half the width of the second object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=120, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4150,
+        "completion_tokens": 2580,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 8294,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 15.75,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

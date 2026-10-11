@@ -1,0 +1,153 @@
+# Status
+
+Living log: what works, what was tested, what is limited, next action. Updated at each gate (spec 23).
+A blocked live check is reported blocked, never passed.
+
+## 2026-10-09 — M0 (Python side) done; M0 gate not yet fully met
+
+### Toolchain (real output)
+git 2.52.0 · system Python 3.13.5 · uv 0.7.13 · Node 25.6.0 · npm 11.8.0 · Docker 28.3.2 · Compose v2.39.1 · arm64.
+
+### What works (each verified by running it)
+- `uv sync` resolved and installed the locked set; `uv.lock` written. Venv is Python 3.13.5 (decisions #10).
+- `oa --help` lists the full spec 24.5 surface plus v1.3 additions; `oa <group> <sub>` forms work.
+- `oa doctor` (offline) reads `.env`, never prints secrets, exits 0 or 5. Verified against a real generated `.env`.
+- `oa config init` generated SESSION_SECRET + POSTGRES_PASSWORD, kept DATABASE_URL consistent, wrote `.env` mode 600, idempotent, preserves user values.
+- Unbuilt commands exit code 2 `NOT_IMPLEMENTED`; none fakes success.
+- `pytest`: **216 passed (incl. engine-backed integration tests, opt-in via OA_ENGINE_TESTS=1; stable across PYTHONHASHSEED values) + 18 node tests** (CLI contract, config/bootstrap secrecy, protocol config invariants).
+- `lint-imports`: trust-boundary contract kept. Vacuous until those packages contain code.
+- `docker compose config -q`: compose.yaml valid.
+- 5 protocol configs (dev, pilot, counterexample, portable, final) with spec 19.2 budgets and 8.9 domain; `final` explicitly unfrozen.
+
+- M1 started: restricted JSON-AST interpreter (`skills/interpreter.py`) with spec 7.2 limits; 13 tests cover allowlist, refs, proto keys, div-by-zero, non-finite, statement/depth/loop/action/expression budgets, assert.
+- Independent verifier (`evaluation/verifier.py`): own affine composition from raw native state; gap_row checks (existence, sizes, order, gaps, left/top, unselected unmoved, styles, canvas, no-op). Golden flat + nested-scaled scenes pass; all six spec 12.4 faults rejected; rotation rejected, not approximated. 11 tests.
+- Konva engine (`services/engine`): real Konva in headless Chromium, network blocked, static allowlisted dispatcher with the 12 spec 6.4 tools, monotonic revisions + stale-write conflicts, idempotent `action_id`, owner-scoped sessions, 4-session cap, per-action deadline, evaluator-only drift config (`move_frame: world`), constant public schema hash. 8 `node --test` tests pass.
+- Cross-check (`tests/integration/test_konva_fixtures.py`): the same procedure run on real Konva passes the Python verifier without drift and FAILS under the private world-frame drift. This is the reproducible semantic-change failure; fixtures come from `services/engine/scripts/gen_fixtures.js` (fixture origin, not a learned skill).
+- Provider layer: `Provider` interface (strict pydantic validation, extra fields forbidden, ONE charged schema-correction, distinct truncation/refusal/auth/rate-limit/timeout/wrong-model outcomes), deterministic scripted `MockProvider` (labelled MOCK, never improvises), `NebiusProvider` (httpx; backoff + Retry-After; timeouts not auto-retried and leave an *unresolved* reservation; unknown cost stays None, never 0; error bodies redacted). Tested against an in-process fake HTTP server (16 tests). **The Nebius adapter has never touched the real endpoint** (JSON mode and `max_tokens` vs `max_completion_tokens` are unconfirmed assumptions for `oa provider probe`).
+- Budget ledger: reserve/reconcile/release, held capacity counts, USD ceiling requires a cost estimate, unknown-cost counter, per-category totals.
+- Engine HTTP: agent surface cannot set private config (403); `/internal/*` needs `EVALUATOR_TOKEN` and is disabled without one; native state unreachable from the agent surface. 11 engine tests pass.
+- Fresh agent (`agent/fresh.py`) + public operational checker + canonical task generator + evaluator harness. **Offline M1 e2e (opt-in `OA_ENGINE_TESTS=1`, real Konva + MOCK provider + independent verifier): 3 pass** - flat task solved cycle 1 and independently verified; naive program fails on a nested scene, agent corrects from feedback in cycle 2 and verifier agrees; a previously-correct program fails all cycles under the private world-frame drift. Mock replies are scripted *fixtures*, not learned behaviour and not evidence about Nemotron.
+- M2 core (offline, MOCK provider + deterministic benchmark teacher; 53 new tests):
+  - Pure rule language + concrete evaluator (exact rationals; no tools; floats rejected). Independent AST->Z3 compiler for the declared subset; variable*variable and variable divisors raise `Unsupported`. **Hypothesis property tests (550 generated rule/input pairs incl. tie-biased inputs) show concrete == symbolic**, and the first tie-biased run found and I fixed a real translator bug (clone-symbol size when created on only some paths). Mutation checks (min/max swap, branch-merge swap, lt->le, ge->gt, eq->ne, dropped clone size) are each caught.
+  - Witness service: typed statuses (witness_found / no_witness_in_model / incomplete / timeout / unsupported), solver in a killable spawned process (z3 memory cap, 500 ms/call, 12 calls, 6 s total), unsupported rules spend no solver call, every SAT model is re-executed concretely before use (divergence raises `GroundingError`), SMT-LIB + solver version + domain/candidate hashes exported for UNSAT. Readability rounding is labelled "simple, not minimal". Killed-solver recovery tested.
+  - Sealed concept hash (rule + schema + preservation + domain + ledger head; excludes summary/version), hash-chained append-only teaching ledger (tamper-evident; `source` records benchmark_teacher), four separate evidence enums, test that no aggregate confidence/verified field exists.
+  - Query selection (entropy / effort, <=8 scenes, <=4 options + Neither, stale-answer rejection by candidate-set hash). Teaching session: <=2 queries, <=2 generation rounds, Neither never forces a pick, every candidate must satisfy the WHOLE ledger (incl. 'neither' exclusions), honest UNRESOLVED outcomes. Scenarios pass: ambiguity resolved by one question; omitted hypothesis recovered via Neither + counted corrected example without the formula appearing in any prompt; a candidate fitting only the newest correction is rejected; no-fit -> unresolved.
+- M3 (offline; real Konva AND real Fabric 6.9.1 in the locked page; MOCK provider scripts the binding programs):
+  - Fabric backend: same tool names, genuinely native behaviour (left/top, async clone, groups = explicit `UNSUPPORTED_CAPABILITY`), private `move_origin: center` drift; backend identity differs in the public schema hash but not across drift. 6 node tests.
+  - Bindings: concept -> targets (pure) -> restricted-AST native program; metered 24-action native allowance; abstract documented-contract model; native check vs observe_geometry; immutable versions + active pointer + history; promotion verifies the sealed concept hash, validation + regression, and parent-unchanged (race => retained unpromoted); rollback = pointer move.
+  - Verified on real engines: transfer validates on listed cases for both Konva and Fabric (<=24 native actions); under the private Fabric drift the SAME binding passes the abstract check but fails natively (reproduced mismatch, center offset exactly 10 px for a 20 px proto, abstract model marked untrusted); a hard-coded "fix" passes the drifted witness but is rejected by retained-case replay in the original environment; a probing repair is promoted as v2 with the **sealed concept hash and teaching ledger unchanged**, v1 retained, and the repaired binding is intent-correct on an unseen scene in BOTH environments per the independent verifier; failed repair quarantines and keeps history; a correct execution of a WRONG inferred rule fails the independent intent check; promotion rejects an edited rule, narrowed domain, changed ledger, failed validation.
+- M4 core (offline; real Konva+Fabric; MOCK model replies where a model would be used):
+  - Non-LLM enumerative reference learner (declared grammar, published constants pool, search limit, CPU time, coverage; deeper grammar only after a Neither). It runs through the SAME TeachingSession/question/ledger machinery. Observed on the clamped-badge latent: it hits a Neither, takes a counted correction, and still ends UNRESOLVED within 2 queries (identifiability limit, at candidate caps 4 and 64); on a proportional latent it learns the rule; on a target outside its grammar it reports not-expressible. Reproducibility bugs found and fixed on the way (set-order in the Z3 encoding; Z3 global-context history changing models).
+  - Fixed two-concept composition on real Konva: correct order passes the independent verifier; reversed order passes every node-local check yet fails globally; out-of-scope node rejected; one shared native budget; cycles/recursion/unresolved refs/>4 nodes rejected; missing binding is an explicit error.
+  - Episode manifests: template-disjoint dev/val/final splits, held-out size ranges, opaque ids, 4 no-change + 8 drift episodes balanced by backend direction, private latents/drift, freeze + tamper detection, deterministic across processes/hash seeds. Konva got an equivalent private drift (`move_anchor: center`).
+  - Metrics/report: episode-clustered paired bootstrap (clustering widens intervals when episodes differ), abstentions/failures count in denominators, false-success rate, separate cost dimensions, learning-cost rows excluded from success denominators, report refuses empty/mock rows unless stamped MOCK and never evaluates the 27.5 gates on non-live rows.
+  - Runner + policies: ReferencePolicy (no model), FullV12Policy (model proposes candidates and bindings; same flow), FreshFullContext / TextMemory / StructuredProcedure (shared synthesis loop, differ only in what persists; structured has a replay gate and program reuse). Verified on real engines: all methods get byte-identical task views, no prompt contains evaluator-only strings, reference gets no provider and reports $0, mock costs are UNKNOWN not zero, intent-agnostic baselines pass the public check yet are rejected by the private evaluator (false success is counted).
+  - Batteries (disposable scenes, labelled): grounding ablation and target-omission (Neither + counted correction recovers an omitted affine rule; no correction needed when the fixture contains the truth).
+  - **Measured so far (all NON-LLM, DEVELOPMENT split, harness checks, not a study):** reference on 2 dev episodes: 15/16 correct, 1 abstention, 0 false successes, 3 teacher interactions, 336 native actions. Grounding ablation on 1 dev drift episode, recovery tasks: grounded 1/2 correct, 0 false successes (other task abstained on the action-allowance finding); ungrounded 0/2 correct, 2/2 false successes.
+- **LIVE (real Nemotron via Nebius), 2026-10-09 - first real evidence, DEVELOPMENT split only:**
+  - `oa provider probe --live` PASSED: auth, model id returned as requested, `max_tokens`, `json_object` and strict `json_schema` (once the token budget was realistic; my first run misread a truncation as "unsupported"), `seed`, usage incl. `reasoning_tokens`, `reasoning_effort` (none/low honoured). Report: `docs/capabilities.json`; notes: `docs/provider_feedback.md`. Total probe spend < 2k tokens.
+  - Teaching-only pilot question ("does the model propose useful candidate rules, and does a revealed disagreement lead to the hidden rule on held-out scenes?"), 12 trials = 6 dev episodes x {badge, spacing}, one run each:
+    * reasoning_effort=low: **2/12 recovered**, 38.5k tokens, ~9 s/trial; 5 trials ended "INTENT_READY" on a WRONG rule (false resolution caught only by the held-out check).
+    * provider-default effort: **3/12 recovered**, 98.5k tokens, ~35 s/trial, but **6/12 hit the 6,000-token cap** (hidden reasoning ate the budget) so the default is confounded by truncation.
+    * Spacing (edge-gap) looks easier than badge margins in both runs (badge 0/6 recovered in both). n=12 single draws: this is a first signal and a debugging aid, NOT an estimate of ability or a comparison of effort levels.
+  - **Prompt/loop tuning on dev (24 trials each, reasoning_effort=low) - decisions 27/28:** recovered 2 -> 2 -> 6 -> 6 (v2 -> v3 diversity wording -> v4 numeric correction turn -> v5 alternatives round) while confident-wrong ("ready" on a wrong rule) went 11 -> 8 -> 9 -> **2** and honest UNRESOLVED 11 -> 14 -> 9 -> 16. Spacing 6/12 recovered, badge 0/12 in v5. Frozen as the shared configuration; single draws, wide uncertainty, development data only.
+  - v6 (computed geometric relations in the evidence) is a recorded NEGATIVE result: 6/24 recovered, badge still 0/12, +22% tokens -> disabled (decisions #29). Live smoke of 1 drift episode with all 5 methods: reference 7/8 correct; full_v1_2 0/8 (teaching never resolved both concepts, so it abstained); fresh/structured 0/8 (hit the 80k token cap); text_memory crashed on one malformed candidate (fixed: per-candidate leniency). Takeaway: model-based methods cannot act until teaching resolves BOTH concepts, and badge is the blocker.
+  - **Model result (development, one draw per trial): Nemotron-3-Ultra-550B at low effort recovers 15/24 hidden rules (badge 9/12, spacing 6/12) vs 6/24 for Nemotron-3-Super with the same loop** (decisions #32). Prompt-only levers did not come close. `.env` now selects Ultra/low. Teaching costs ~20k tokens and up to ~2 min per concept; the spec's 80k-token episode cap no longer fits (decision #33, open). Ready-but-wrong outcomes: 5 of 24 (the failure the held-out check exists to expose).
+  - What live failures forced me to fix (all recorded in decisions 22-26): nested-JSON structural slips -> text rule front-end; ids -> positional aliases; retry feedback now carries rejection reasons; a probe crash on error responses; a misleading "bad expression" message for a wrong `clone_place` key.
+  - Spend so far: roughly 140k tokens total across probes and trials; dollars unknown (no rates configured), well inside the $5 ceiling by any plausible price.
+- API `GET /health/live` exists (import verified; not served).
+
+### Environment notes
+- Chromium cannot launch inside the Bash sandbox (Mach port denied); engine tests/fixture generation were run with the sandbox disabled for those commands only.
+- The e2e tests spawn the Node engine and need Chromium, so they run unsandboxed and are skipped by default.
+
+### Not done / limitations
+- `docker compose build`: **succeeded** (api, web, engine, worker images built; engine image installs Chromium via Playwright). Images were built but NOT run: `docker compose up`, health endpoints, and the `oa worker` command (not yet implemented, so the worker container will exit) are untested. `docker images` inspection was denied by the sandbox (daemon socket), unrelated to the build.
+- npm workspaces installed (konva 9.3.22, fabric 6.9.1, playwright 1.64.0, fastify 5.12.5, react 18.3.1, vite 5.4.21, ts 5.9.3); Chromium headless shell downloaded; `npm run build:web` succeeds. Engine is a health-only placeholder; web is a MOCK-banner placeholder.
+- `schemas/` empty. No DB, migrations, provider code, verifier, or any M1 content.
+- No git repository (sandbox denies creating `.git`; user must run `! git init`). Run records cannot yet carry a commit hash.
+- No live Nebius check of any kind (no credential). All live gates BLOCKED.
+- Clean-checkout reproduction not yet performed.
+
+### Gate status
+- M1 offline gate (mock-driven run -> verifier-checked artifact; verifier rejects all six faults): **met in tests**. `oa run --mode mock` CLI is NOT wired yet.
+- M1 live gate (real Nemotron task -> checked artifact): **BLOCKED** (no credential; adapter unverified).
+
+### M2 limitations (read before trusting any claim)
+- All of the above uses scripted MOCK candidate sets. It demonstrates the machinery, not that Nemotron proposes useful candidates; that is exactly what the 72-hour pilot must measure and is BLOCKED on a credential.
+- The enumerative symbolic reference learner (spec 21.11) is not built. Without it, no claim that the LLM is necessary can be made.
+- Symbolic results cover only the declared rectangle/linear subset; they say nothing about native Konva/Fabric behaviour (M3) or user intent.
+- Teaching sessions are in-memory objects; no durable persistence/resume, HTTP routes, or UI yet.
+- The syntactic duplicate check does not merge behaviourally identical candidates; entropy weights are per candidate (uniform), as the spec's heuristic states.
+
+### M3 limitations
+- The repair that succeeds is a scripted FIXTURE (a probing program). Whether Nemotron writes such a repair is unmeasured and BLOCKED on a credential. The drift is one artificial family; no claim about real Konva/Fabric releases.
+- Only flat scenes and the badge rule are exercised end to end on the native backends; gap_row bindings, resize targets, and multi-concept composition are not yet run natively.
+- The mock-provider flow is not yet wired to `oa transfer`, durable jobs, or the UI.
+- Native allowance accounting is per-search (24 actions) and not yet merged into a single episode ledger across teaching + binding + repair.
+
+### M4 limitations
+- Of the model-based methods only the SHARED candidate-generation step has run live (teaching-only, dev). Binding generation, the synthesis baselines and full episodes have NOT run live. Previously: NO LLM method had been run on anything real: FullV12 and the three baselines were exercised only with scripted MOCK replies (plumbing, fairness, accounting). Their prompts for hypotheses/binding/synthesis are untested against Nemotron; baseline competence is therefore UNKNOWN and must be tuned on dev/validation (equal effort for every method) before any comparison means anything.
+- Dev tasks are in the reference's grammar by construction, so its 15/16 says the harness works and that easy dev tasks are easy; it says nothing about the final split (not run; do not peek before the freeze).
+- The 24-action native allowance fails row-task repairs (decisions #18) - unresolved protocol decision.
+- Structured baseline's replay gate and the reference's template library are my implementations of the spec's descriptions, not reproductions of ContractSkill or any paper.
+- Nesting is not held out (Fabric subset has no groups); one drift family only; composition plan is host-fixed (spec allows the model to propose it; not built).
+- Not wired: `oa compare/benchmark/report` CLI, durable jobs, UI, v1.3 SVG lane, offline evidence replay export. git init and clean-checkout reproduction still open.
+
+### Next
+Obtain a Nebius credential and run `oa provider probe --live`, then the 72-hour pilot (4 dev episodes, all methods); wire the CLI (`oa run/compare/report`); resolve the native-allowance decision on dev data; M5 (UI, editable SVG, evidence replay, v1.3 spike).
+
+## Live pilot on Nemotron-3-Ultra (low effort), development episodes 1-2, 2026-10-10 — NOT a result, a debugging record
+Run `results/runs/development-ep1-2-20261010T132248` (all fixes of decisions #34-#37; dev split; single run, no repetitions):
+reference 16/16; full_v1_2 1/16 (3 of 4 commits wrong); fresh_full_context 1/16; text_memory 1/16; structured_procedure 2/16;
+~1.8M model tokens; dollar cost unknown (rates unset). Most failures are `unresolved_teaching` (the model never resolves the concept, so
+the method abstains) and token-budget exhaustion for the baselines. These numbers must not be quoted as method comparisons.
+- Open: full_v1_2 committed 4 times, 3 wrong. A re-run of episode 1 alone did NOT reproduce it (2/8 correct, 0 wrong; teaching is stochastic),
+  so the cause (wrong learned rule vs. binding vs. verifier) is UNKNOWN. Rows now carry an evaluator-private `verdict` (failed checks) so the
+  next occurrence is explained. A false-success rate is a headline metric; until explained, treat it as a possible defect.
+- Earlier same-day run `development-ep1-2-20261010T123444`: full_v1_2 rows INVALID (pre-fix); marked in-place.
+- 2026-10-10 later: full_v1_2 alone on dev episodes 3-5 (`results/runs/development-ep3-3-20261010T160334`): 6/24 correct, 0 wrong commits;
+  failures = unresolved_teaching and binding_unavailable (+1 provider timeout during learning). Across both full_v1_2 re-runs 0/8 commits were wrong,
+  so the earlier 3-of-4 wrong commits remain UNEXPLAINED (not reproduced). Binding fixes (decision #38) not yet re-measured end to end.
+
+## UI (2026-10-11): recorded walkthrough + Compare view (apps/web) — first usable interface
+Built: canvas-first workspace (task stepper | scene panels | evidence), Learn/Reuse/Transfer/Challenge/Compare modes, the real competing-outcome
+question with a Neither option, four separate evidence chips (no combined score, no "Verified" badge), independent-verifier check list,
+old/new native-procedure diff, binding version table, sealed-hash display, text equivalents for every canvas, keyboard-operable controls,
+light/dark, reduced-motion respected. Data: `scripts/build_demo_bundle.py` (needs Chromium) writes `apps/web/public/data/{demo,evidence}.json`:
+- demo.json is RECORDED: a deterministic offline story run on the real Konva+Fabric engines and the independent verifier. NO model is used;
+  the candidate rules, teacher answers and the two native procedures are scripted fixtures, and the UI says so on every screen.
+- evidence.json is rebuilt from stored live-pilot rows (development split), excluding runs that predate the binding fixes or are unfinished.
+Run: `PYTHONPATH=src:. python scripts/build_demo_bundle.py && cd apps/web && npx vite build && npx vite preview`.
+Checked: `tsc --noEmit` clean; viewed in Chrome at desktop width (steps 1, 2, 6, 7 and Compare). NOT checked: phone width (the browser tool
+could not resize the viewport), screen-reader behaviour, Firefox/Safari.
+NOT built: live teaching from the UI, HTTP API for runs, challenge mode with the user's own inputs, skill inspector, editable SVG export,
+evidence-replay command. These are listed in the page footer.
+Also found while building it: the engine-backed integration tests (OA_ENGINE_TESTS=1) had gone stale after #32-#38 and one research-integrity
+test caught my own prompt wording (decision #39). All 274 tests (including engine-backed) pass.
+
+## Five-method live pilot, dev episodes 3-5, Nemotron-3-Ultra low effort (run development-ep3-3-20261011T020702) — 2026-10-11
+Single run, development split, n = 3 episodes; the 2M-token global ceiling stopped text_memory and structured_procedure on episode 5 (reported as NOT RUN).
+NOT a method comparison and NOT evidence for the §27.5 gates. Model tokens ~2.1M. Dollar cost not computed (rates are user-entered, unverified).
+| method | correct / scheduled | committed but wrong |
+|---|---|---|
+| non-model reference | 24 / 24 | 0 |
+| full_v1_2 | 3 / 24 | 5 of 8 committed |
+| fresh_full_context | 7 / 24 | 7 of 14 |
+| text_memory | 3 / 16 | 2 of 5 |
+| structured_procedure | 1 / 16 | 10 of 11 |
+Reading (honest): (1) tasks and verifier are sound (reference 24/24). (2) EVERY model method commits wrong output at a high rate; full_v1_2 is
+not better at avoiding it. The private verdicts show geometry mismatches against the evaluator's rule, i.e. the system committed from a rule that fit
+the demonstrations but was not the intended one (the "ready on a wrong rule" mode seen in the teaching trials, now visible end to end). The earlier
+"3 of 4 wrong" observation was therefore real, not noise. (3) Under spec 21.11's stopping rule this is the case "no separation": the claim to
+test next must be narrowed (e.g. does asking about disagreements reduce wrong commits), not rescued with extra agent roles. (4) All of this used the
+candidate-generation wording before decision #39 and without the 32k floor changes beyond #34-#38.
+
+## 2026-10-11 later: export, one-process demo, audit experiment, cleanup
+- Editable SVG + evidence-package export from the live demo (`/api/teach/{id}/export.svg`, `/evidence.json`). Tested: SVG parsed by an independent XML
+  parser equals the engine's observed geometry; ids sanitised; no active content; provenance (rule hash, backend, binding hash, verifier result, model_used=none) embedded.
+- The API serves the built web app at `/`: `uv run uvicorn open_apprentice.api.app:app --port 8000` is the whole product. README rewritten with verified commands.
+- Measured cost: five-method pilot ~2.1M tokens = $1.19 (balance 21.14 -> 19.95), i.e. ~$0.57/M tokens (memory note live-run-cost).
+- Cleanup: black + ruff clean, 292 tests pass (incl. engine-backed), import-boundary contract kept. mypy debt noted (decisions #43).
+- Audit-vs-control experiment (decisions #40) launched on Nemotron-3-Ultra: 48 trials per arm, 12 dev episodes x 2 concepts x 2 reps. RESULT PENDING.
+- Not yet verified: `docker compose up`, clean-checkout reproduction, phone-width layout, public-deployment hardening (no rate limiting; engine calls block the event loop; unauthenticated session creation is capped at 20).

@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:00:06+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row at y=100, starting at x=60 and spacing each by the prior object's width plus a fixed 12\u2011pixel gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 12\nmove objects[0] to (60, 100)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, 100)\n    }\n}"
+        },
+        {
+          "summary": "Align all objects to y=100 and lay them out left\u2011to\u2011right with a gap equal to 1% of the canvas width, beginning at a fixed left offset of 60.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 0.01 * canvas.w\nlet start = 60\nmove objects[0] to (start, 100)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, 100)\n    }\n}"
+        },
+        {
+          "summary": "Shift each object so its top aligns at y=100 and its left edge equals the previous object's right edge plus a margin that is the smaller of 12 pixels or 2% of the canvas width.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = min(12, 0.02 * canvas.w)\nmove objects[0] to (60, 100)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + margin, 100)\n    }\n}"
+        },
+        {
+          "summary": "Arrange objects in a row at y=100, starting at x = canvas.w * 0.0429 (\u224860) and spacing each by the prior width plus a fixed 12\u2011pixel gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start = canvas.w * 0.042857142857142855\nlet gap = 12\nmove objects[0] to (start, 100)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, 100)\n    }\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1039,
+        "completion_tokens": 1017,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row at y=100, starting at a fixed fraction of canvas width and spacing them by a constant gap.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"42857/1000000\"}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 12}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"ref\": \"locals.gap\"}]}]}"
+        },
+        {
+          "summary": "Place objects in a row at y=100, starting at a fixed fraction of canvas width and spacing them by a fraction of canvas width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"42857/1000000\"}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"8571/1000000\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"args\": [{\"op\": \"ge"
+        },
+        {
+          "summary": "Place objects in a row at y=100, starting at a fixed x offset and spacing them by a constant gap.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start\", \"value\": 60}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 12}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"ref\": \"locals.gap\"}]}]}]}, \"y\": 100}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Place objects in a row at y=100, starting at a fixed fraction of canvas width and spacing them by a fraction of the first object's width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"42857/1000000\"}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"rat\": \"133333/1000000\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, "
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1259,
+        "completion_tokens": 1716,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 5031,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 13.78,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

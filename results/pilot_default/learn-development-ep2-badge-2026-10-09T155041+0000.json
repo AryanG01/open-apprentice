@@ -1,0 +1,48 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:50:41+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place it offset left by the width difference minus one pixel, and down by one pixel.",
+        "Clone the second object and place it at a fixed fraction of the first object's width and height added to its origin.",
+        "Clone the second object and place it offset right by its own width plus nine pixels, and up by its height minus nineteen pixels.",
+        "Clone the second object and place it at a fixed pixel offset of (29, 1) from the first object's top\u2011left corner."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 832,
+        "completion_tokens": 3307,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11666,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 43.16,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

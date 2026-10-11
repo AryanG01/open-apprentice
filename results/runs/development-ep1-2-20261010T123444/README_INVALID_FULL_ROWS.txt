@@ -1,0 +1,1 @@
+NOTE: this run was STOPPED mid-way and its full_v1_2 rows are INVALID (built before the live binding fixes: nesting depth 8, tool return shapes, correction batch). Baseline rows for the first episode are valid. See docs/decisions.md #34-#35.

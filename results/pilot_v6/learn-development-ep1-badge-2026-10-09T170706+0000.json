@@ -1,0 +1,155 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:07:06+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Create a badge sized proportionally to card0, placed to the right of card0 with a fixed horizontal gap and vertical alignment to card0's top.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_w = 0.1818 * objects[0].w\nlet badge_h = 0.4 * objects[0].h\nclone objects[0] as badge at (objects[0].x + objects[0].w + 8, objects[0].y)\nresize badge to (badge_w, badge_h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a copy of proto scaled to match card0's width ratio and positioned using a fraction of canvas width and height.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let scale_x = objects[0].w / 20\nlet scale_y = objects[0].h / 20\nclone proto as badge at (scale_x * 239, scale_y * 443)\nresize badge to (objects[0].w * 2/11, objects[0].h * 2/5)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge appears at a fixed offset from the canvas origin, independent of objects.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone proto as badge at (95.6, 354.4)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is placed at the same relative position as proto but scaled to card0 dimensions.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let rx = objects[0].x + (objects[0].w * 0.1)\nlet ry = objects[0].y + (objects[0].h * 0.05)\nclone proto as badge at (rx, ry)\nresize badge to (objects[0].w * 0.1818, objects[0].h * 0.4)}]}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Create a badge sized proportionally to card0, placed to the right of card0 with a fixed horizontal gap and vertical alignment to card0's top.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_w = 0.1818 * objects[0].w\nlet badge_h = 0.4 * objects[0].h\nclone objects[0] as badge at (objects[0].x + objects[0].w + 8, objects[0].y)\nresize badge to (badge_w, badge_h)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a copy of proto scaled to match card0's width ratio and positioned using a fraction of canvas width and height.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let scale_x = objects[0].w / 20\nlet scale_y = objects[0].h / 20\nclone proto as badge at (scale_x * 239, scale_y * 443)\nresize badge to (objects[0].w * 2/11, objects[0].h * 2/5)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge appears at a fixed offset from the canvas origin, independent of objects.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone proto as badge at (95.6, 354.4)\nresize badge to (20, 20)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is placed at the same relative position as proto but scaled to card0 dimensions.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let rx = objects[0].x + (objects[0].w * 0.1)\nlet ry = objects[0].y + (objects[0].h * 0.05)\nclone proto as badge at (rx, ry)\nresize badge to (objects[0].w * 0.1818, objects[0].h * 0.4)}]}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3662,
+        "completion_tokens": 1203,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Badge is a clone of proto, resized to card0's width*2/11 and height*2/5, placed at card0's top\u2011left plus fixed offsets 85.6 right and 4.4 down.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 2/11\nlet h = objects[0].h * 2/5\nclone objects[1] as badge at (objects[0].x + 428/5, objects[0].y + 22/5)\nresize badge to (w, h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of proto, sized to match card0's width ratio 2/11 and height ratio 2/5, positioned at the same relative spot inside card0 (85.6 right, 4.4 down).",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let wx = objects[0].w * 2/11\nlet hy = objects[0].h * 2/5\nlet dx = objects[0].w * 0.7781818181818182\nlet dy = objects[0].h * 0.088\nclone objects[1] as badge at (objects[0].x + dx, objects[0].y + dy)\nresize badge to (wx, hy)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of proto, sized to card0's width*2/11 and height*2/5, placed at a fixed fraction of the canvas width and height (\u22480.0683,0.5063).",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 2/11\nlet h = objects[0].h * 2/5\nclone objects[1] as badge at (canvas.w * 0.06828571428571429, canvas.h * 0.5062857142857143)\nresize badge to (w, h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of proto, resized to card0's width*2/11 and height*2/5, positioned at card0's left edge plus 85.6 pixels and top edge plus 4.4 pixels.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 2/11\nlet h = objects[0].h * 2/5\nclone objects[1] as badge at (objects[0].x + 85.6, objects[0].y + 4.4)\nresize badge to (w, h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of proto, sized to card0\u2019s width*2/11 and height*2/5, placed at card0\u2019s top\u2011left plus fixed offsets 85.6 right and 4.4 down.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 2/11\nlet h = objects[0].h * 2/5\nclone objects[1] as badge at (objects[0].x + 428/5, objects[0].y + 22/5)\nresize badge to (w, h)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a clone of proto, sized to card0\u2019s width*2/11 and height*2/5, placed at a fixed fraction of the canvas width and height (~0.0683,0.5063).",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 2/11\nlet h = objects[0].h * 2/5\nclone objects[1] as badge at (canvas.w * 0.06828571428571429, canvas.h * 0.5062857142857143)\nresize badge to (w, h)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a clone of proto, sized to card0\u2019s width*2/11 and height*2/5, placed at card0\u2019s left edge plus 85.6\u202fpx and top edge plus 4.4\u202fpx.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 2/11\nlet h = objects[0].h * 2/5\nclone objects[1] as badge at (objects[0].x + 85.6, objects[0].y + 4.4)\nresize badge to (w, h)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a clone of proto, sized to match proto\u2019s own size (no scaling) and placed at the same relative position inside card0 as proto is in the evidence scene.",
+          "reason": "invalid rule: line 2: unexpected character '\u00d7'",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + 428/5, objects[0].y + 22/5)\n/* size remains 20\u00d720 */",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4769,
+        "completion_tokens": 2240,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11874,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 18.3,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

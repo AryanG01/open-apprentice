@@ -1,0 +1,155 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:54:55+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Set each card's y to canvas height divided by 7, keep original x.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=100, w=90, h=60) but the evidence shows (x=60, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"ref\": \"locals.y_target\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set each card's y to canvas height divided by 7, and shift x right by canvas width divided by 28.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=170, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"x_shift\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 28]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set each card's y to canvas height divided by 7, and set x to a left margin plus index times average card width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=146.7, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"margin\", \"value\": 60}, {\"op\": \"let\", \"name\": \"avg_w\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set each card's y to canvas height divided by 7, and keep original horizontal ordering but compress widths proportionally to fit canvas width.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'total_w')",
+          "rule_excerpt": "let y_target = canvas.h / 7\nlet total_w = 0\nfor V in objects { total_w = total_w + W.w }\nlet scale = canvas.w / total_w\nfor V in objects {\n  resize V to (V.w * scale, V.h)\n  move V to (V.x, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set y to canvas.h/7, adjust x by a base shift of 50 minus index\u2011dependent offsets. ",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'shift')",
+          "rule_excerpt": "let y_target = canvas.h / 7\nfor V in objects with I {\n  let shift = 50\n  if I == 1 { shift = shift - 8 }\n  else if I == 2 { shift = shift - 6 }\n  move V to (V.x + shift, y_target)\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y to canvas.h/7, and set x to a fixed left margin plus index times a varying step. ",
+          "reason": "invalid rule: line 8: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "let y_target = canvas.h / 7\nlet margin = 10\nlet step0 = 50\nlet step1 = 42\nlet step2 = 44\nfor V in objects with I {\n  if I == 0 { move V to (margin + step0, y_target) }\n  else if I == 1 { move V to (margin + step0 + step1, y_target) }\n  else if I == 2 { move V to (margin + step0 + step1 + step2, y_target) }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y to canvas.h/7, and shift x right by half the object's width plus a constant. ",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=180, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"add\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}, {\"rat\": \"1/2\"}]}, 5]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y to canvas.h/7, and set x to the original x plus a fraction of the canvas width that depends on the object's index. ",
+          "reason": "invalid rule: line 3: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let y_target = canvas.h / 7\nfor V in objects with I {\n  let frac = 0.0357142857 - I * 0.0047619048  // 1/28 - I*(1/210)\n  let shift = canvas.w * frac\n  move V to (V.x + shift, y_target)\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3076,
+        "completion_tokens": 2001,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place cards in a row starting at x=60, each spaced by its width plus a fixed 12\u2011pixel gap, all at y = canvas height/7.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'sum')",
+          "rule_excerpt": "let sum = 0\nfor V in objects with I {\n  move V to (60 + sum + I * 12, canvas.h / 7)\n  sum = sum + V.w\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each card's y to canvas height/7 and set its x to its original x plus a width\u2011dependent offset that grows with index.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=55, y=100, w=90, h=60) but the evidence shows (x=60, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"offset\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, 2]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"ar",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align cards to a horizontal grid whose left margin is 60 and column width is the average card width plus 12, keeping y at canvas height/7.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=158.7, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"avg\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, \"w\"]}]}, 3]}}, {\"op\": \"let\", \"name\": \"col\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.avg\"}, 12]}}, {\"op\": \"for_each\", \"var\": \"V\", \"ove",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each card to y = canvas height/7 and set x to the previous card's right edge plus a constant 12\u2011pixel gap, starting from x=60 for the first card.",
+          "reason": "invalid rule: line 4: object index must be a whole number (near 'I')",
+          "rule_excerpt": "move objects[0] to (60, canvas.h / 7)\nfor V in objects with I {\n  if I > 0 {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + 12, canvas.h / 7)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards in a row starting at x=60, each card placed after the previous card's width plus a fixed 12\u2011pixel gap, all at y = canvas height/7.",
+          "reason": "invalid rule: line 8: expected a statement (let / move / resize / clone / for / if) (near 'sum')",
+          "rule_excerpt": "let sum = 0\nfor V in objects with I {\n  if I == 0 {\n    move V to (60, canvas.h / 7)\n  } else {\n    move V to (sum + 60, canvas.h / 7)\n  }\n  sum = sum + V.w + 12\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set the first card's x to 60 and y to canvas.h/7; each subsequent card's x is the previous card's right edge plus a 12\u2011pixel gap, y stays at canvas.h/7.",
+          "reason": "invalid rule: line 4: object index must be a whole number (near 'I')",
+          "rule_excerpt": "move objects[0] to (60, canvas.h / 7)\nfor V in objects with I {\n  if I > 0 {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + 12, canvas.h / 7)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Position each card at x = 60 + (index * 12) + cumulative width of all prior cards, with y = canvas height/7.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'sum')",
+          "rule_excerpt": "let sum = 0\nfor V in objects with I {\n  move V to (60 + I * 12 + sum, canvas.h / 7)\n  sum = sum + V.w\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Use a left margin of canvas.h * 0.08571428571428572 and a gap of canvas.h * 0.017142857142857142; lay out cards sequentially with those values, keeping y at canvas.h/7.",
+          "reason": "invalid rule: line 10: expected a statement (let / move / resize / clone / for / if) (near 'sum')",
+          "rule_excerpt": "let margin = canvas.h * 0.08571428571428572\nlet gap = canvas.h * 0.017142857142857142\nlet sum = 0\nfor V in objects with I {\n  if I == 0 {\n    move V to (margin, canvas.h / 7)\n  } else {\n    move V to (sum + margin, canvas.h / 7)\n  }\n  sum = sum + V.w + gap\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4290,
+        "completion_tokens": 3110,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 12477,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 24.25,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

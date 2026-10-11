@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:48:20+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object as a badge positioned with a fixed 3-pixel inset from the first object's right and top edges.",
+        "Clone the second object as a badge inset from the first object's top-right corner by 5% of the first object's width in both directions.",
+        "Clone the second object as a badge inset from the first object's top-right corner by 15% of the badge's own width horizontally and 15% of its height vertically.",
+        "Clone the second object as a badge with horizontal inset of 5% of the first object's width from the right edge and a fixed 3-pixel vertical inset from the top edge."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 4796,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5777,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 13.43,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

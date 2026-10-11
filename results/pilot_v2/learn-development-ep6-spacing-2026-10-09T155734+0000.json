@@ -1,0 +1,90 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:57:34+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move each card to a common y\u2011position while keeping its original horizontal offset.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"857142857/5000000000\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"ref\": \"locals.target_y\"}}]}]"
+        },
+        {
+          "summary": "Shift each card right by an amount equal to its index times ten pixels, then align them to a fixed y.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"857142857/5000000000\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, 10]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": {\"ref\": \"locals.target_y\"}}]"
+        },
+        {
+          "summary": "Place the cards in a horizontal row starting at a left margin of 80 pixels, spaced by their original widths, all at the same y.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"target_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"cursor_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.cursor_x\"}, \"y\": {\"ref\": \"locals.target_y\"}}, {\"op\": \"let\", \"name\": \"cursor_x\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.cursor_x\"}, {\"op\": \"get\", \"args\": [{\""
+        },
+        {
+          "summary": "Align the bottom edges of all cards to a fixed y\u2011position plus their heights, preserving horizontal order.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"op\": \"sub\", \"args\": [{\"ref\": \"locals.target_y\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"h\"]}]}}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 890,
+        "completion_tokens": 590,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Move each card right by 70\u202fpx plus 10\u202fpx times its index, and set its y to 120.",
+        "Shift each card right by one twentieth of the canvas width plus 10\u202fpx times its index, and align y to canvas height minus 580."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the cards in a horizontal row starting at x=80 with 110\u202fpx spacing, all at y=120.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [80, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, 110]}]}, \"y\": 120}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Set each card\u2019s y to a fixed value of 120 and increase its x by the cumulative width of preceding cards plus a 10\u202fpx gap.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let acc = 0\nfor V in objects with I {\n    move V to (80 + acc, 120)\n    acc = acc + V.w + 10\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1051,
+        "completion_tokens": 848,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3379,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 8.55,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

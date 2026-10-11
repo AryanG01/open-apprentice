@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:34:09+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge 28 pixels right and 2 pixels down from the top\u2011left corner of card0.",
+        "Place the badge at 56% of card0\u2019s width and about 2.22% of its height from its top\u2011left corner.",
+        "Place the badge 28 pixels right from card0\u2019s left edge and 88 pixels above its bottom edge.",
+        "For the first object in the list, clone proto 28 pixels right and 2 pixels down from its top\u2011left corner to create badge."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 2548,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object and place it so its vertical offset is 4% of the first object's width, and its horizontal offset is the remaining width after accounting for the second object's width and that same vertical offset.",
+        "Same as the first rule, but only apply the offset when the first object is wider than the second; otherwise place the badge directly to the right of the first object with no vertical offset.",
+        "Clone the second object and position it by measuring the horizontal offset from the right edge of the first object, subtracting the second object's width plus a vertical offset that is 4% of the first object's width.",
+        "Clone the second object using an offset that is 4% of the smaller of the first object's width and the canvas width, ensuring the rule adapts when the canvas is narrower than the first object."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1588,
+        "completion_tokens": 6105,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11222,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 39.07,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

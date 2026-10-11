@@ -1,0 +1,106 @@
+{
+  "config": "development-pilot",
+  "origins": [
+    "live"
+  ],
+  "label": "MEASURED (live model rows + non-model reference rows; split and n stated below)",
+  "episodes": [
+    "ep-f42cd7ac01",
+    "ep-f96ca92599"
+  ],
+  "n_rows": 18,
+  "methods_all_stages": {
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 3,
+        "scheduled": 16,
+        "rate": 0.1875
+      },
+      "conditional": {
+        "correct": 3,
+        "committed": 3,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 3,
+        "rate": 0.0
+      },
+      "failures": {
+        "abstained": 13
+      },
+      "costs": {
+        "tokens": 187680,
+        "calls": 14,
+        "actions": 117,
+        "solver_s": 0.4554939988302067,
+        "teacher_interactions": 9,
+        "wall_s": 557.8200142487185,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 18
+      }
+    }
+  },
+  "methods_transfer_and_composition": {
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 1,
+        "scheduled": 8,
+        "rate": 0.125
+      },
+      "conditional": {
+        "correct": 1,
+        "committed": 1,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 1,
+        "rate": 0.0
+      },
+      "failures": {
+        "abstained": 7
+      },
+      "costs": {
+        "tokens": 187680,
+        "calls": 14,
+        "actions": 117,
+        "solver_s": 0.4554939988302067,
+        "teacher_interactions": 9,
+        "wall_s": 557.8200142487185,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 18
+      }
+    }
+  },
+  "primary_comparison": {
+    "a": "full_v1_2",
+    "b": "full_v1_2",
+    "n_episodes": 2,
+    "diff": 0.0,
+    "ci95": [
+      0.0,
+      0.0
+    ],
+    "draws": 5000,
+    "per_episode_diff": {
+      "ep-f42cd7ac01": 0,
+      "ep-f96ca92599": 0.0
+    },
+    "note": "episode-clustered percentile bootstrap; with few episodes uncertainty is substantial"
+  },
+  "primary_vs_strongest_baseline": null,
+  "gates_27_5": {
+    "status": "evaluated",
+    "caveat": "prospective goals from spec 27.5; passing them would support considering an exceptional score, not guarantee one",
+    "transfer_composition_success": {
+      "observed": 0.125,
+      "goal": 0.9,
+      "met": false
+    }
+  },
+  "split_note": "DEVELOPMENT data, episodes 1..2; development tuning/diagnostics, NOT the locked study",
+  "infra_errors": []
+}

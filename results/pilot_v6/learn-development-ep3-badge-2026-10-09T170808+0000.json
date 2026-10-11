@@ -1,0 +1,86 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:08:08+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the proto object and place it 10px right and 10px down from card0."
+      ],
+      "rejected": [
+        {
+          "summary": "Create a badge by scaling card0 to half width and 2/9 height, then offset it 10px right and 10px down.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w * 0.5\nlet h = objects[0].h * (2/9)\nclone objects[0] as badge at (objects[0].x + 10, objects[0].y + 10) resize badge to (w, h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Make a badge with width half of card0 and height 2/9 of card0, positioned 10px right and 10px down from card0.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let w = objects[0].w / 2\nlet h = objects[0].h * 2 / 9\nclone proto as badge at (objects[0].x + 10, objects[0].y + 10) resize badge to (w, h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge copies proto\u2019s size and is placed 10px right and 10px down from card0\u2019s top\u2011left corner.",
+          "reason": "duplicate",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1312,
+        "completion_tokens": 735,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the proto object and place it 10px right and 10px down from card0.",
+        "Badge is proto-sized, placed at card0's left plus a quarter of its width and top plus one\u2011ninth of its height.",
+        "Badge is proto-sized, placed at a fixed absolute position (20,330) regardless of other objects."
+      ],
+      "rejected": [
+        {
+          "summary": "Badge is proto-sized, placed at card0's left plus proto's width and top plus proto's height plus 10px.",
+          "reason": "invalid rule: line 1: unexpected closing brace or trailing text (near '}')",
+          "rule_excerpt": "clone proto as badge at (objects[0].x + objects[1].w, objects[0].y + objects[1].h + 10)}]}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1600,
+        "completion_tokens": 882,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4529,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 8.57,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

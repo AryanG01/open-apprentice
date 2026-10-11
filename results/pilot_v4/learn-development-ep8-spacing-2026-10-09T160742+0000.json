@@ -1,0 +1,133 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:07:42+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move all objects to y = 120 and shift each object's x by a fixed amount that depends on its original x modulo 100.",
+          "reason": "invalid rule: line 2: unexpected character ' '",
+          "rule_excerpt": "for V in objects {\n  if (V.x % 100) < 50 {\n    move V to (V.x + 30, 120)\n  } else {\n    move V to (V.x + 20, 120)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set every object's y to 120 and increase its x by one tenth of the canvas width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=150, y=120, w=50, h=80) but the evidence shows (x=40, y=120, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 10]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": 120}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects along the horizontal line y = 120 while preserving their original x offset from the leftmost object.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"min_x\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.min_x\"}]}, 40]}, \"y\": 120}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place each object at y = 120 and give it an x equal to its original x plus its own height divided by 2.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=50, y=120, w=50, h=80) but the evidence shows (x=40, y=120, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"h\"]}, 2]}]}, \"y\": 120}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set y to 120 and add 30 to x for objects with original x < 100, add 20 for 100 \u2264 x < 150, otherwise add 30.",
+          "reason": "invalid rule: line 4: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "for V in objects {\n  if (V.x < 100) {\n    move V to (V.x + 30, 120)\n  } else if (V.x < 150) {\n    move V to (V.x + 20, 120)\n  } else {\n    move V to (V.x + 30, 120)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y to 120 and increase x by half the difference between the object's original x and the nearest multiple of 100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=120, w=50, h=80) but the evidence shows (x=40, y=120, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"nearest\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 100]}, 100]}}, {\"op\": \"let\", \"name\": \"diff\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.nearest\"}]}}, {\"op\": \"emit_target\", \"kind\": \"mov",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y to 120 and set x to 40 plus the sum of widths of all preceding objects plus 20 times the number of preceding objects.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let acc = 0\nlet count = 0\nfor V in objects {\n  move V to (40 + acc + 20 * count, 120)\n  acc = acc + V.w\n  count = count + 1\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y to 120 and set x to the original x plus the object's width minus 20.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=130, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}, 20]}, \"y\": 120}]}]",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2966,
+        "completion_tokens": 2140,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "All objects move to y=120; shift is 30 except for the second object which shifts by 20."
+      ],
+      "rejected": [
+        {
+          "summary": "All objects are moved to y=120 and shifted horizontally by an amount that decreases by 10 for each subsequent object.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=170, y=120, w=50, h=50) but the evidence shows (x=190, y=120, w=50, h=50)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"sub\", \"args\": [30, {\"op\": \"mul\", \"args\": [10, {\"ref\": \"locals.I\"}]}]}]}, \"y\": 120}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Objects align at y=120 with x set to 40 plus the cumulative width of all preceding objects.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=90, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"acc\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [40, {\"ref\": \"locals.acc\"}]}, \"y\": 120}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.acc\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Each object is moved to y=120 and its x is increased by a fixed fraction of the canvas width (3/140).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [3, 140]}, {\"ref\": \"canvas.w\"}]}]}, \"y\": 120}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Even-indexed objects shift right by 30, odd-indexed by 20, all moved to y=120.",
+          "reason": "invalid rule: line 2: unexpected character ' '",
+          "rule_excerpt": "for V in objects with I {\n  if I % 2 == 0 {\n    move V to (V.x + 30, 120)\n  } else {\n    move V to (V.x + 20, 120)\n  }\n}\n",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4389,
+        "completion_tokens": 1955,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 3
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 13397,
+  "calls": 5,
+  "unknown_cost_calls": 5,
+  "wall_s": 23.15,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

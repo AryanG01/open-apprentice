@@ -1,0 +1,81 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:08:42+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset from card0\u2019s top\u2011left.",
+        "Place the badge horizontally centered on card0 with a small rightward shift.",
+        "Place the badge near card0\u2019s right edge, leaving a fixed gap.",
+        "Place the badge at a fixed fraction of the canvas width and height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 984,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Badge is a clone of proto positioned at card0's top\u2011left plus proto's width minus 3 horizontally and plus 3 vertically."
+      ],
+      "rejected": [
+        {
+          "summary": "Badge is a clone of proto placed to the right of card0 by a fixed offset of 37px horizontally and 3px vertically.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 37]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 3]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of proto placed at a point that is 37% of the canvas width from the left and 53% of the canvas height from the top.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=518, y=371, w=20, h=20) but the evidence shows (x=47, y=373, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"rat\": \"37/100\"}, {\"ref\": \"canvas.w\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"rat\": \"53/100\"}, {\"ref\": \"canvas.h\"}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of proto placed at the same y as card0 plus 3, and x equal to proto's x plus card0's x plus proto's width times 1.85.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=44.4, y=3, w=24, h=24) but the evidence shows (x=35.85, y=3.15, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"37/20\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": ",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1730,
+        "completion_tokens": 731,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 4433,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 9.54,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

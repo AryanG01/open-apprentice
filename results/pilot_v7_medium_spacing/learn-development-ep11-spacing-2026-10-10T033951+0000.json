@@ -1,0 +1,116 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:39:51+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects vertically to canvas height divided by 7, then shift each object right by an amount that decreases by 14 pixels for each subsequent object in order.",
+        "Align objects vertically to canvas.h/7 and shift each horizontally by a fraction of the canvas width that decreases by canvas.width/100 per object in order.",
+        "Align objects vertically to canvas.h/7 and shift each horizontally by a combination of canvas width and height: add canvas.width*3/140 then subtract canvas.height/50 times the object's index."
+      ],
+      "rejected": [
+        {
+          "summary": "Align objects vertically to canvas.h/7 and shift each horizontally by a fixed amount of 30 pixels minus 14 times the object's index, keeping width and height unchanged.",
+          "reason": "duplicate",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1030,
+        "completion_tokens": 5290,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Align objects in a row at y = canvas.h/7 with a fixed left margin of 40px and a fixed gap of 16px between objects.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = 40\nlet gap = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, canvas.h/7)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, canvas.h/7)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects in a row at y = canvas.h/7 with left margin and gap set as fractions of canvas width (1/35 and 1/87.5).",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = canvas.w * (1/35)\nlet gap = canvas.w * (1/87.5)\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, canvas.h/7)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, canvas.h/7)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects in a row at y = canvas.h/7 with left margin as a fraction of canvas width (1/35) and fixed gap of 16px.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = canvas.w * (1/35)\nlet gap = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, canvas.h/7)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, canvas.h/7)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects in a row at y = canvas.h/7 with fixed left margin of 40px and gap as a fraction of canvas width (1/87.5).",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = 40\nlet gap = canvas.w * (1/87.5)\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, canvas.h/7)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, canvas.h/7)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row at y = canvas.h/7, starting with a fixed left margin of 40px and a fixed gap of 16px between objects.}",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=40, y=9.143, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.margin\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row at y = canvas.h/7, with left margin as 1/35 of canvas width and a fixed gap of 16px.}",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=1.829, y=9.143, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"div\", \"args\": [1, 35]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.margin\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_targ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row at y = canvas.h/7, with a fixed left margin of 40px and gap as 1/87.5 of canvas width.}",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=40, y=9.143, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"div\", \"args\": [1, {\"rat\": \"175/2\"}]}]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.margin\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"o",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row at y = canvas.h/7, with left margin as 1/35 of canvas width and gap as 1/87.5 of canvas width.}",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=1.829, y=9.143, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"div\", \"args\": [1, 35]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"div\", \"args\": [1, {\"rat\": \"175/2\"}]}]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.margin\"}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4734,
+        "completion_tokens": 5534,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 16588,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 52.96,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

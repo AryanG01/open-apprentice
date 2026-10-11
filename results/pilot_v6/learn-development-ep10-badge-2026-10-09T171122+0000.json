@@ -1,0 +1,116 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:11:22+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge inside the first object, aligned to its top\u2011right corner with a fixed 12\u202f% inset of the size difference.",
+        "Create the badge by copying the proto and positioning it at a fixed offset from the top\u2011left of the first object.",
+        "Position the badge relative to the first object using a constant fraction of the object\u2019s width and height for horizontal and vertical offsets."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the badge at a location that is a fixed fraction of the canvas width and height, independent of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=138, y=382.4, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"rat\": \"9857142857142857/100000000000000000\"}, {\"ref\": \"canvas.w\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"rat\": \"5462857142857143/10000000000000000\"}, {\"ref\": \"canvas.h\"}]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1339,
+        "completion_tokens": 1301,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Badge is half the size of card0 and placed with fixed pixel gaps from card0's right and bottom edges.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = objects[0].w * 0.5\nlet bh = objects[0].h * 0.5\nclone objects[0] as badge at (objects[0].x + objects[0].w - bw - 2.4, objects[0].y + objects[0].h - bh - 17.6)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is half the size of card0 and placed using proportional offsets from card0's left and top edges (44% width, 6% height).",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = objects[0].w * 0.5\nlet bh = objects[0].h * 0.5\nclone objects[0] as badge at (objects[0].x + 0.44 * objects[0].w, objects[0].y + 0.06 * objects[0].h)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge copies the proto object's size (20\u00d720) and is positioned relative to card0 using the same proportional offsets (44% of card0 width, 6% of card0 height).",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 20\nlet bh = 20\nclone objects[1] as badge at (objects[0].x + 0.44 * objects[0].w, objects[0].y + 0.06 * objects[0].h)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is half the size of card0 and positioned so that its horizontal gap from card0's left equals its vertical gap from card0's bottom, and its vertical gap from card0's top equals its horizontal gap from card0's right.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = objects[0].w * 0.5\nlet bh = objects[0].h * 0.5\nlet hgap = objects[0].w - bw\nlet vgap = objects[0].h - bh\nclone objects[0] as badge at (objects[0].x + hgap * 0.44, objects[0].y + vgap * 0.06)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is half the size of card0 and placed with fixed pixel gaps from card0's right and bottom edges.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = objects[0].w * 1/2\nlet bh = objects[0].h * 1/2\nclone objects[0] as badge at (objects[0].x + objects[0].w - bw - 12/5, objects[0].y + objects[0].h - bh - 88/5)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is half the size of card0 and placed using proportional offsets from card0's left and top edges (44% width, 6% height).",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = objects[0].w * 1/2\nlet bh = objects[0].h * 1/2\nclone objects[0] as badge at (objects[0].x + 11/25 * objects[0].w, objects[0].y + 3/50 * objects[0].h)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge copies the proto object's size (20\u00d720) and is positioned relative to card0 using the same proportional offsets (44% of card0 width, 6% of card0 height).",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 20\nlet bh = 20\nclone objects[1] as badge at (objects[0].x + 11/25 * objects[0].w, objects[0].y + 3/50 * objects[0].h)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is half the size of card0 and positioned so that its horizontal gap from card0's left equals its vertical gap from card0's bottom, and its vertical gap from card0's top equals its horizontal gap from card0's right.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = objects[0].w * 1/2\nlet bh = objects[0].h * 1/2\nlet hgap = objects[0].w - bw\nlet vgap = objects[0].h - bh\nclone objects[0] as badge at (objects[0].x + hgap * 11/25, objects[0].y + vgap * 3/50)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5663,
+        "completion_tokens": 2851,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11154,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 19.87,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:59:22+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a horizontal row at y=60, starting at x=60 with a fixed 16\u2011unit gap between them."
+      ],
+      "rejected": [
+        {
+          "summary": "Align objects to the top edge at y=60 and shift each right by half the canvas width minus its original x.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 60}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/2\"}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": {\"ref\": \"locals"
+        },
+        {
+          "summary": "Move each object so its left edge aligns with a grid of 80\u2011unit columns, keeping its original y shifted to 60.",
+          "reason": "invalid rule: line 4: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let y_target = 60\nlet column_width = 80\nfor V in objects {\n  let target_x = ((V.x // column_width) + 1) * column_width\n  move V to (target_x, y_target)\n}"
+        },
+        {
+          "summary": "Resize nothing; just set y to 60 and add an offset equal to the object's index times 20 plus its width.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 60}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"offset\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, 20]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}, {\"ref\": \"locals.offset\"}]}, \"y\": {\"ref\": \"locals.y_target\""
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1035,
+        "completion_tokens": 629,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 1664,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 4.12,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

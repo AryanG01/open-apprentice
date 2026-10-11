@@ -1,0 +1,111 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:40:07+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Create a badge the same size as proto, positioned horizontally based on the canvas width minus proto width, and vertically just below the card\u2019s top edge with an offset proportional to the card\u2019s width.",
+        "Create a badge the same size as proto, placed horizontally using the canvas and proto widths, and vertically shifted down from the card\u2019s top by a fixed fraction of the proto\u2019s width.",
+        "Create a badge the same size as proto, positioned horizontally from the canvas and proto widths, and vertically placed using the card\u2019s top plus a fraction of the remaining canvas height below the card.",
+        "Create a badge the same size as proto, placed horizontally using the canvas and proto widths, and vertically offset from the card\u2019s top by a fraction of the canvas height minus proto height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 5316,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place it offset from the first object by 44% of the first object's width to the right and 6% of the first object's height down.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=10.56, y=1.44, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"11/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it offset from the first object by 88% of the second object's width to the right and 12% of the second object's height down.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=21.12, y=2.88, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"22/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it offset from the first object by 44% of the first object's width to the right and 12% of the second object's height down.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=10.56, y=2.88, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"11/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it offset from the first object by 88% of the second object's width to the right and 6% of the first object's height down.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=21.12, y=1.44, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"22/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at a point that is 44% of the first object's width to the right of its left edge and 6% of its height down from its top edge.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=10.56, y=1.44, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"11/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"3/50\"}, {\"op\": ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place it offset from the first object by 44% of the first object's width and 6% of its height, with a small correction based on how the canvas size differs from 1400\u00d7700.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=9.224, y=1.69, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"11/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/1000\"}, {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.w\"}, 1400]}]}]}, \"y\": {",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place it at 44% of the first object's width and 6% of its height only when the first object is larger than the second; otherwise place it at the first object's origin.",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near 'if')",
+          "rule_excerpt": "let wx = if objects[0].w > objects[1].w then 0.44 else 0.0\nlet hy = if objects[0].h > objects[1].h then 0.06 else 0.0\nclone objects[1] as badge at (objects[0].x + wx * objects[0].w, objects[0].y + hy * objects[0].h)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place it scaled by the canvas size: offset = 44% of the first object's width times (canvas width / 1400) and similarly for height.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"mul\", \"args\": [{\"rat\": \"11/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 1400]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": ",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4497,
+        "completion_tokens": 11662,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 22463,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 74.08,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

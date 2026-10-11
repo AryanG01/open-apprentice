@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:48:06+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype at a fixed offset of (17.6, 2.4) from the first object's top-left corner.",
+        "Clone the prototype at 44% of the first object's width and 6% of its height from its top-left corner.",
+        "Clone the prototype at 88% of the prototype's width and 12% of its height from the first object's top-left corner.",
+        "Clone the prototype with a 6% top margin and a 6% right margin (minus badge width) relative to the first object."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 11779,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 26465,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 66.91,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

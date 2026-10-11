@@ -1,0 +1,355 @@
+{
+  "config": "development-pilot",
+  "origins": [
+    "live",
+    "reference"
+  ],
+  "label": "MEASURED (live model rows + non-model reference rows; split and n stated below)",
+  "episodes": [
+    "ep-f42cd7ac01"
+  ],
+  "n_rows": 36,
+  "methods_all_stages": {
+    "enumerative_reference": {
+      "method": "enumerative_reference",
+      "success": {
+        "correct": 7,
+        "scheduled": 8,
+        "rate": 0.875
+      },
+      "conditional": {
+        "correct": 7,
+        "committed": 7,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 7,
+        "rate": 0.0
+      },
+      "failures": {
+        "abstained": 1
+      },
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 201,
+        "solver_s": 0.23318604286760092,
+        "teacher_interactions": 1,
+        "wall_s": 3.1724192071706057,
+        "usd_known_total": 0.0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 0,
+        "scheduled": 8,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 8
+      },
+      "costs": {
+        "tokens": 21306,
+        "calls": 7,
+        "actions": 0,
+        "solver_s": 0.08405241812579334,
+        "teacher_interactions": 4,
+        "wall_s": 36.57082520786207,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    },
+    "fresh_full_context": {
+      "method": "fresh_full_context",
+      "success": {
+        "correct": 0,
+        "scheduled": 8,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 6,
+        "budget_exhausted:tokens": 2
+      },
+      "costs": {
+        "tokens": 75497,
+        "calls": 24,
+        "actions": 16,
+        "solver_s": 0.07362645794637501,
+        "teacher_interactions": 4,
+        "wall_s": 106.50689375109505,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    },
+    "text_memory": {
+      "method": "text_memory",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "structured_procedure": {
+      "method": "structured_procedure",
+      "success": {
+        "correct": 0,
+        "scheduled": 8,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 6,
+        "budget_exhausted:tokens": 2
+      },
+      "costs": {
+        "tokens": 77316,
+        "calls": 25,
+        "actions": 16,
+        "solver_s": 0.07731770921964198,
+        "teacher_interactions": 3,
+        "wall_s": 107.38340691581834,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    }
+  },
+  "methods_transfer_and_composition": {
+    "enumerative_reference": {
+      "method": "enumerative_reference",
+      "success": {
+        "correct": 4,
+        "scheduled": 4,
+        "rate": 1.0
+      },
+      "conditional": {
+        "correct": 4,
+        "committed": 4,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 4,
+        "rate": 0.0
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 201,
+        "solver_s": 0.23318604286760092,
+        "teacher_interactions": 1,
+        "wall_s": 3.1724192071706057,
+        "usd_known_total": 0.0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 0,
+        "scheduled": 4,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 4
+      },
+      "costs": {
+        "tokens": 21306,
+        "calls": 7,
+        "actions": 0,
+        "solver_s": 0.08405241812579334,
+        "teacher_interactions": 4,
+        "wall_s": 36.57082520786207,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    },
+    "fresh_full_context": {
+      "method": "fresh_full_context",
+      "success": {
+        "correct": 0,
+        "scheduled": 4,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 4
+      },
+      "costs": {
+        "tokens": 75497,
+        "calls": 24,
+        "actions": 16,
+        "solver_s": 0.07362645794637501,
+        "teacher_interactions": 4,
+        "wall_s": 106.50689375109505,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    },
+    "text_memory": {
+      "method": "text_memory",
+      "success": {
+        "correct": 0,
+        "scheduled": 0,
+        "rate": null
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {},
+      "costs": {
+        "tokens": 0,
+        "calls": 0,
+        "actions": 0,
+        "solver_s": 0,
+        "teacher_interactions": 0,
+        "wall_s": 0,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 0
+      }
+    },
+    "structured_procedure": {
+      "method": "structured_procedure",
+      "success": {
+        "correct": 0,
+        "scheduled": 4,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 4
+      },
+      "costs": {
+        "tokens": 77316,
+        "calls": 25,
+        "actions": 16,
+        "solver_s": 0.07731770921964198,
+        "teacher_interactions": 3,
+        "wall_s": 107.38340691581834,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    }
+  },
+  "primary_comparison": {
+    "a": "full_v1_2",
+    "b": "structured_procedure",
+    "n_episodes": 1,
+    "diff": null,
+    "ci95": null,
+    "note": "fewer than 2 paired episodes: no uncertainty can be estimated"
+  },
+  "primary_vs_strongest_baseline": {
+    "a": "full_v1_2",
+    "b": "enumerative_reference",
+    "n_episodes": 1,
+    "diff": null,
+    "ci95": null,
+    "note": "fewer than 2 paired episodes: no uncertainty can be estimated"
+  },
+  "gates_27_5": {
+    "status": "evaluated",
+    "caveat": "prospective goals from spec 27.5; passing them would support considering an exceptional score, not guarantee one",
+    "transfer_composition_success": {
+      "observed": 0.0,
+      "goal": 0.9,
+      "met": false
+    }
+  },
+  "split_note": "DEVELOPMENT data, episodes 2..2; development tuning/diagnostics, NOT the locked study",
+  "infra_errors": [
+    {
+      "episode": "ep-f42cd7ac01",
+      "method": "text_memory",
+      "error": "ModelFormatError: invalid after one correction: 4 validation errors for HypothesisSet\ncandidates.0\n  Value error, give exactly one of rule_text or rule [type=value_error, input_value={'summary': \"Place object...t index"
+    }
+  ]
+}

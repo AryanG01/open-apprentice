@@ -1,0 +1,30 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:51:08+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "TEACHING",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [],
+  "recovered_latent_on_heldout": null,
+  "tokens": 6882,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 27.08,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

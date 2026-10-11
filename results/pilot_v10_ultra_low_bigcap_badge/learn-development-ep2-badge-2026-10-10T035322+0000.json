@@ -1,0 +1,64 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:53:22+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object as a badge at the top-right of the first object with a fixed 1px inset from the right and top edges.",
+        "Clone the second object as a badge at the top-right of the first object with an inset of 5% of the badge's width and height.",
+        "Clone the second object as a badge at the top-right of the first object with a horizontal inset of 2% of the first object's width and a fixed 1px vertical inset.",
+        "Clone the second object as a badge at the top-right of the first object with a fixed 1px horizontal inset and a vertical inset of 5% of the badge's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 9762,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object as a badge just inside the first object's top-right corner, inset by 2% of the first object's width.",
+        "Clone the second object as a badge just inside the first object's top-right corner, inset by 2% of the first object's smaller dimension."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1739,
+        "completion_tokens": 28500,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 40982,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 118.83,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:48:34+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset of (92,8) pixels from the top\u2011left of card0.",
+        "Position the badge using half of card0\u2019s width plus 1.6 times proto\u2019s width for x, and 40% of proto\u2019s height for y, added to card0\u2019s origin.",
+        "Place the badge at card0\u2019s right edge minus 1.4 times proto\u2019s width for x, and 40% of proto\u2019s height for y, added to card0\u2019s origin.",
+        "Put the badge at a fixed canvas location (51/700 of canvas width, 368/700 of canvas height), independent of card0."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 835,
+        "completion_tokens": 5688,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 14064,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 58.18,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

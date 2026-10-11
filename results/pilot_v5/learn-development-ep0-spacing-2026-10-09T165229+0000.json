@@ -1,0 +1,110 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:52:29+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 1/2)",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row with a fixed left margin of 80 and a fixed gap of 12 between them, keeping their original sizes.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, 100)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects horizontally starting at a margin equal to 5% of the canvas width, with a fixed 12\u2011pixel gap between them, and set their y to 100.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 12\nlet margin = 0.05 * canvas.w\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, 100)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Center the group of objects vertically at y=100 and distribute them evenly across the canvas width, preserving each object's width and adding equal spacing.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near 'total_w')",
+          "rule_excerpt": "let total_w = 0\nfor V in objects { total_w = total_w + V.w }\nlet free_space = canvas.w - total_w\nlet gap = free_space / (len(objects) + 1)\nlet x = gap\nfor V in objects {\n    move V to (x, 100)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object so its left edge aligns with a vertical grid spaced 40 pixels apart, starting at grid line 2, and set its y to 100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"grid\", \"value\": 40}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"mul\", \"args\": [{\"op\": \"add\", \"args\": [2, {\"ref\": \"locals.I\"}]}, {\"ref\": \"locals.grid\"}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row with a fixed left margin of 80 and a fixed gap of 12 between them, keeping their original sizes.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nlet acc = 0\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, 100)\n        acc = V.w + gap\n    } else {\n        move V to (start_x + acc, 100)\n        acc = acc + V.w + gap\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects horizontally starting at a margin equal to 5% of the canvas width, with a fixed 12\u2011pixel gap between them, and set their y to 100.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 12\nlet margin = 0.05 * canvas.w\nlet acc = 0\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, 100)\n        acc = V.w + gap\n    } else {\n        move V to (margin + acc, 100)\n        acc = acc + V.w + gap\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Stack objects vertically with a fixed top margin of 100 and a fixed gap of 20 between them, preserving widths and heights.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 20\nlet start_y = 100\nlet acc = 0\nfor V in objects with I {\n    if I == 0 {\n        move V to (80, start_y)\n        acc = V.h + gap\n    } else {\n        move V to (80, start_y + acc)\n        acc = acc + V.h + gap\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row where each object's left edge is placed at 80 plus the cumulative width of all previous objects plus 12 times the number of previous objects.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nlet acc = 0\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, 100)\n        acc = V.w + gap\n    } else {\n        move V to (start_x + acc, 100)\n        acc = acc + V.w + gap\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3173,
+        "completion_tokens": 1909,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place objects in a horizontal row with left margin 80, constant gap 12, and top aligned at y=100.",
+        "Place objects in a horizontal row with left margin 80, gap increasing by 12 per index, and top aligned at y=100.",
+        "Place objects in a horizontal row with left margin 80, constant gap 12, and vertical position based on canvas height (y = canvas.h - 600).",
+        "Place objects in a horizontal row with left margin as 5.714% of canvas width, constant gap 12, and top aligned at y=100."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1490,
+        "completion_tokens": 1851,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8423,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 17.8,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

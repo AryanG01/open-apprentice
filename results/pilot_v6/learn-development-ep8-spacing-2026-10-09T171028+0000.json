@@ -1,0 +1,136 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:10:28+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move all objects to a fixed y=120 and shift each horizontally by a constant that depends on its parity (even index +30, odd index +20).",
+          "reason": "invalid rule: line 3: unexpected character ' '",
+          "rule_excerpt": "let y_target = 120\nfor V in objects with I {\n    let dx = 30 if (I % 2 == 0) else 20\n    move V to (V.x + dx, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed y=120 and distribute them evenly starting at x=40 with a horizontal pitch of 70.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=180, y=120, w=50, h=50) but the evidence shows (x=190, y=120, w=50, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"pitch\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"loca",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep each object's original width and height, move its top to y=120, and shift its left edge so that the gap between consecutive objects equals 20.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nlet cumulative_x = 0\nfor V in objects with I {\n    if I == 0 {\n        move V to (40, y_target)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects on a horizontal line at y=120, preserving their original ordering and aligning their left edges to a grid where each cell width is the maximum object width plus a fixed margin.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"let\", \"name\": \"max_w\", \"value\": {\"op\": \"max\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"cell\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.max_w\"}, 20]}}, {\"op\": \"for_each\", \"var\": \"V\", \"ov",
+          "stage": "initial"
+        },
+        {
+          "summary": "Fix y=120, place first object at x=40, then each subsequent object 20 pixels to the right of the previous object's right edge.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nlet cum_x = 0\nfor V in objects with I {\n    if I == 0 {\n        move V to (40, y_target)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Fix y=120 and position each object at x = 40 + 20*index + sum of widths of all preceding objects.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'sum_w')",
+          "rule_excerpt": "let y_target = 120\nlet base = 40\nlet step = 20\nlet sum_w = 0\nfor V in objects with I {\n    move V to (base + step * I + sum_w, y_target)\n    sum_w = sum_w + V.w\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Fix y=120, start at x=40, then lay out objects left-to-right with a constant 20\u2011pixel gap between them, preserving each object's original size.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nlet x = 40\nfor V in objects {\n    move V to (x, y_target)\n    x = x + V.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Fix y=120, place the first object at x=40, and for each object set its x to the previous object's x plus its width plus a fixed 20\u2011pixel separator.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet sep = 20\nfor V in objects with I {\n    if I == 0 {\n        move V to (40, y_target)\n    } else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + sep, y_target)\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3868,
+        "completion_tokens": 1934,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align objects to y=120, start at x=40, then place each object so its left edge equals the previous object's left edge plus its width plus a fixed 20\u2011pixel gap.",
+        "Align objects to y=120, start at x=40, then place each object so its left edge equals the previous object's left edge plus its width plus a gap equal to 0.4 times the width of the first object.",
+        "Align objects to y=120, start at x=40, then place each object so its left edge equals the previous object's left edge plus its width plus a gap equal to the width of the second object divided by three.",
+        "Align objects to y=120, start at x=40, then place each object so its left edge equals the previous object's left edge plus its width plus a gap equal to the smaller of 20 pixels and half the width of the first object."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to y=120, place the first at x=40, then lay them left\u2011to\u2011right with a fixed 20\u2011pixel edge gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nmove objects[0] to (40, y_target)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=120, start at x=40, then place each object so its left edge equals the previous object's right edge plus a constant 20\u2011pixel gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nmove objects[0] to (40, y_target)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Fix y=120, set the first object's left to 40, then for each subsequent object set its left to the previous object's left plus its width plus 20.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nmove objects[0] to (40, y_target)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects on a horizontal line at y=120 beginning at x=40, keeping original widths and heights, with a uniform 20\u2011pixel spacing between adjacent objects.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 20\nmove objects[0] to (40, y_target)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4934,
+        "completion_tokens": 2612,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 13348,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 23.01,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

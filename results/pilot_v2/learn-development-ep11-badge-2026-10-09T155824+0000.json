@@ -1,0 +1,86 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:58:24+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Create a badge by cloning the proto and placing it to the right of card0 at about 5/8 of its width, slightly lower.",
+        "Clone proto and position it so its left edge aligns with card0's right edge minus a fixed 23\u2011pixel gap, vertically aligned with card0's top plus 3 pixels.",
+        "Place the cloned proto at a point that is 37 pixels to the right and 3 pixels down from card0's origin."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto and situate it at a location that is 60% of card0's width to the right and 3 pixels below card0's top.",
+          "reason": "invalid rule: line 3: unexpected closing brace or trailing text (near '}')",
+          "rule_excerpt": "let offset_x = 0.6 * card0.w\nlet offset_y = 3\nclone proto as badge at (card0.x + offset_x, card0.y + offset_y)}]}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 839,
+        "completion_tokens": 670,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the badge to the right of the first object, offset by about 60% of its width and 3 pixels down.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 3}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.offset_y\"}]}}]"
+        },
+        {
+          "summary": "Center the badge horizontally on the first object and align its top with the first object's top plus a quarter of its height.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": "
+        },
+        {
+          "summary": "Position the badge using the second object's size: shift right by twice its width and down by its height from the first object's origin.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [2, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [1, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"arg"
+        },
+        {
+          "summary": "Put the badge at a fixed fraction (5/8) of the first object's width to the right and a fixed fraction (1/30) of its height down.",
+          "reason": "contradicts teaching evidence - corrected_example: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [5, 8]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [1, 30]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.off"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1475,
+        "completion_tokens": 807,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3791,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 7.45,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

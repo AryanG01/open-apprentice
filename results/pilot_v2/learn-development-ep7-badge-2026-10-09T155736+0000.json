@@ -1,0 +1,60 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:57:36+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype and place it 28 pixels right and 2 pixels down from the first card."
+      ],
+      "rejected": [
+        {
+          "summary": "Create a badge sized like the prototype positioned at the bottom\u2011right corner of the first card, inset by 2 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"inset_x\", \"value\": 2}, {\"op\": \"let\", \"name\": \"inset_y\", \"value\": 2}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, {\"ref\": \"locals.inset_x\"}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\":"
+        },
+        {
+          "summary": "Place a copy of the prototype directly above the first card\u2019s top\u2011left corner, shifted right by half the card\u2019s width.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}]"
+        },
+        {
+          "summary": "Generate a badge aligned with the card\u2019s baseline, using the card\u2019s y plus a fixed offset and the proto\u2019s x plus a fixed offset.",
+          "reason": "duplicate"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 839,
+        "completion_tokens": 440,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 1279,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 2.65,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

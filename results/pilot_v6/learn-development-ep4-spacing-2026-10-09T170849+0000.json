@@ -1,0 +1,140 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:08:49+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place all objects at y=120, then lay them out left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let GAP = 12\nlet START_X = 80\nlet y_target = 120\nmove objects[0] to (START_X, y_target)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + GAP, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at the original x of the first object plus 70.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let GAP = 12\nlet y_target = 120\nlet start_offset = 70\nmove objects[0] to (objects[0].x + start_offset, y_target)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + GAP, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at a fraction of the canvas width (80/1400 \u2248 0.05714).",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let GAP = 12\nlet y_target = 120\nlet START_FRAC = 80 / 1400\nlet START_X = START_FRAC * canvas.w\nmove objects[0] to (START_X, y_target)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + GAP, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at the left margin that keeps the block centered horizontally.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'total_width')",
+          "rule_excerpt": "let GAP = 12\nlet y_target = 120\nlet total_width = 0\nlet n = 0\nfor V in objects {\n    total_width = total_width + V.w\n    n = n + 1\n}\nlet total_gap = GAP * (n - 1)\nlet block_width = total_width + total_gap\nlet START_X = (canvas.w - block_width) / 2\nmove objects[0] to (START_X, y_target)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w +",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left-to-right with a fixed 12-pixel gap, starting at x=80.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let GAP = 12\nlet START_X = 80\nlet y_target = 120\nmove objects[0] to (START_X, y_target)\nfor V in objects with I {\n    if I != 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + GAP, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left-to-right with a fixed 12-pixel gap, starting at the original x of the first object plus 70.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let GAP = 12\nlet y_target = 120\nlet start_offset = 70\nmove objects[0] to (objects[0].x + start_offset, y_target)\nfor V in objects with I {\n    if I != 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + GAP, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left-to-right with a fixed 12-pixel gap, starting at a fraction of the canvas width (80/1400).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let GAP = 12\nlet y_target = 120\nlet START_FRAC = 80 / 1400\nlet START_X = START_FRAC * canvas.w\nmove objects[0] to (START_X, y_target)\nfor V in objects with I {\n    if I != 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + GAP, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at y=120, then lay them out left-to-right with a fixed 12-pixel gap, starting at the left margin that centers the block horizontally.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'total_width')",
+          "rule_excerpt": "let GAP = 12\nlet y_target = 120\nlet total_width = 0\nlet n = 0\nfor V in objects {\n    total_width = total_width + V.w\n    n = n + 1\n}\nlet total_gap = GAP * (n - 1)\nlet block_width = total_width + total_gap\nlet START_X = (canvas.w - block_width) / 2\nmove objects[0] to (START_X, y_target)\nfor V in objects with I {\n    if I != 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + GA",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4258,
+        "completion_tokens": 2075,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to y=120 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80.",
+        "Align all objects to y=120 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at the original x of the first object plus 70 pixels.",
+        "Align all objects to y = canvas.height - 580 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to y=120 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nlet acc = 0\nfor V in objects with I {\n  move V to (start_x + acc, 120)\n  acc = acc + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=120 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at the original x of the first object plus 70 pixels.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 12\nlet start_x = objects[0].x + 70\nlet acc = 0\nfor V in objects with I {\n  move V to (start_x + acc, 120)\n  acc = acc + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y = canvas.height - 580 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nlet acc = 0\nfor V in objects with I {\n  move V to (start_x + acc, canvas.h - 580)\n  acc = acc + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=120 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80; keep widths and heights unchanged.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near '/')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nlet acc = 0\nfor V in objects with I {\n  move V to (start_x + acc, 120)\n  /* sizes stay as they are */\n  acc = acc + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=120 and place them left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80; keep widths and heights unchanged.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4907,
+        "completion_tokens": 2394,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 13634,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 20.49,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

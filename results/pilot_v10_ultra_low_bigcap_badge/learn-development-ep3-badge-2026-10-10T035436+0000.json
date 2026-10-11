@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:54:36+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype and place it at the reference object's top-left corner offset by half the prototype's width and height.",
+        "Clone the prototype and place its left edge at the prototype's right edge, vertically centered on the reference object's top plus half prototype height.",
+        "Clone the prototype and place it at twice the reference object's x-coordinate horizontally, and at the reference object's y plus its x-coordinate vertically.",
+        "Clone the prototype and place it at an x-coordinate equal to the prototype's width, and y at the reference object's top plus half the prototype's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 3927,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object as a badge positioned half its width to the right of the first object, unless the first object sits at the canvas left edge, in which case place it half its width to the left of the second object.",
+        "Clone the second object as a badge positioned half its width to the right of the first object, unless the second object sits at the canvas left edge, in which case place it half its width to the left of the second object.",
+        "Clone the second object as a badge positioned half its width to the right of the first object if the first object is wider, otherwise half its width to the left of the second object.",
+        "Clone the second object as a badge positioned half its width to the right of the first object if the first object is taller, otherwise half its width to the left of the second object."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1653,
+        "completion_tokens": 22091,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 28652,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 73.47,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

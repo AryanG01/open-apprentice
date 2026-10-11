@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:55:57+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype as a badge positioned 2 pixels inside the top-right corner of the first object.",
+        "Clone the prototype as a badge inset from the first object's top-right corner by 10% of the badge's width and height.",
+        "Clone the prototype as a badge with horizontal inset 4% of the card width and vertical inset 10% of the badge height from the card's top-right corner.",
+        "Clone the prototype as a badge with horizontal inset 10% of the badge width and a fixed 2-pixel vertical inset from the card's top-right corner."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 7460,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Inset from the first object's top and right edges is 1/25 of its width.",
+        "Inset from the first object's top and right edges is 1/25 of its smaller dimension (width or height).",
+        "Horizontal inset uses 1/25 of the first object's width; vertical inset uses 1/25 of its smaller dimension.",
+        "Horizontal inset uses 1/25 of the first object's smaller dimension; vertical inset uses 1/25 of its width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1680,
+        "completion_tokens": 20644,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 30765,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 80.97,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

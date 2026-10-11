@@ -1,0 +1,68 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:45:57+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place all objects in a horizontal row at y=100, starting at x=80 with a fixed 12\u2011unit gap between consecutive objects.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 12}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}, {\"ref\": \"locals.gap\"}]}]}]}, \"y\": {\"ref\":"
+        },
+        {
+          "summary": "Shift every object so its top aligns with y=100 and preserve its original horizontal ordering by adding the same offset (70) to each object's x coordinate.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 100}, {\"op\": \"let\", \"name\": \"dx\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"ref\": \"locals.y_target\"}}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 892,
+        "completion_tokens": 925,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place the objects in a horizontal row at y=100, starting at x=80 with a fixed gap of 12 between consecutive objects."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 979,
+        "completion_tokens": 1305,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 4101,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 13.08,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

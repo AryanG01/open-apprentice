@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:07:03+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype and place it 28 pixels to the right and 2 pixels down from the first object.",
+        "Clone the prototype and place it at the horizontal midpoint of the first object plus 3 pixels, vertically aligned with its top plus 2 pixels."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the prototype and place it so its left edge aligns with the right edge of the first object minus 12 pixels, and its top edge is 2 pixels below the first object's top.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=48, y=392, w=20, h=20) but the evidence shows (x=38, y=392, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 12]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the prototype and place it inside the first object's bounding box, inset by 12 pixels from the left and 2 pixels from the top.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=22, y=392, w=20, h=20) but the evidence shows (x=38, y=392, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 12]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 438,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place the badge 2 pixels down from the top of the first object and 2 pixels left of its right edge."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the badge horizontally centered in the first object, then shift it right by half the prototype width, and vertically 2 pixels from the top.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=0, y=0, w=20, h=20) but the evidence shows (x=38, y=392, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"center_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 2]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"local",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge at the same y as the first object's top plus 2, and at x equal to the first object's left plus the prototype's width times 1.4.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=33.6, y=2, w=24, h=24) but the evidence shows (x=26.88, y=2.12, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"x_offset\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"7/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.x_offset\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge so its left edge aligns with the first object's left edge plus the prototype's width plus 8, and its top edge aligns with the first object's top plus 2.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=32, y=2, w=24, h=24) but the evidence shows (x=26.88, y=2.12, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 8]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1658,
+        "completion_tokens": 802,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 3886,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 8.13,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

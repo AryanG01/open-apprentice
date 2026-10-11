@@ -1,0 +1,53 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:46:55+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 0/2)",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a horizontal row with a fixed 16\u2011unit gap, starting at x=60 and y=60.",
+        "Position each object at y=60, with its x equal to the previous object's x plus its width plus a fixed gap of 16, first object at x=60.",
+        "Arrange objects left\u2011to\u2011right at y=60 with a constant 16\u2011unit spacing, computing each x as the start plus the sum of prior widths and gaps."
+      ],
+      "rejected": [
+        {
+          "summary": "Center the row of objects vertically at y=60, keeping a fixed 16\u2011unit gap between them.",
+          "reason": "invalid rule: line 6: unknown name 'length'; define it with let or a for loop first (near '(')",
+          "rule_excerpt": "let GAP = 16\nlet TOTAL_W = 0\nfor V in objects {\n    let TOTAL_W = TOTAL_W + V.w\n}\nlet LEFT_X = (canvas.w - TOTAL_W - GAP * (length(objects)-1)) / 2\nlet CURRENT_X = LEFT_X\nfor V in objects {\n    move V to (CURRENT_X, 60)\n    let CURRENT_X = CURRENT_X + V.w + GAP\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 886,
+        "completion_tokens": 1109,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 1995,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 6.24,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

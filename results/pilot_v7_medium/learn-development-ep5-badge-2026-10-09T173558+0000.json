@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:35:58+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 5,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge by cloning proto, setting its X to a twentieth of the canvas width plus 8/25 of proto's width, and its Y to card0's Y plus 9/50 of proto's width.",
+        "Place the badge by cloning proto, setting its X to card0's X plus 166/225 of card0's width, and its Y to card0's Y plus 3/50 of card0's height.",
+        "Place the badge by cloning proto, setting its X to a twentieth of the canvas width plus 16/225 of card0's width, and its Y to card0's Y plus 9/50 of proto's width.",
+        "Place the badge by cloning proto, setting its X to a twentieth of the canvas width plus 8/75 of card0's height, and its Y to card0's Y plus 9/50 of proto's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 5233,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place badge using linear combination of first object's dimensions and canvas size.",
+        "Place badge using linear combination of second object's dimensions and canvas size.",
+        "Place badge using a conditional: for wide canvases use first+second objects, otherwise use first object+canvas."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the badge by scaling the first object's width and height with fixed fractions and adding to its position.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"kx\", \"value\": {\"op\": \"div\", \"args\": [166, 225]}}, {\"op\": \"let\", \"name\": \"ky\", \"value\": {\"op\": \"div\", \"args\": [3, 50]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.kx\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"obje",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge by scaling the cloned object's own dimensions with fixed fractions and adding to its original position.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=91.68, y=364.3, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"kx\", \"value\": {\"op\": \"div\", \"args\": [191, 50]}}, {\"op\": \"let\", \"name\": \"ky\", \"value\": {\"op\": \"div\", \"args\": [759, 50]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.kx\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"obj",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge by scaling the canvas width and height with fixed fractions.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=3.493, y=45.54, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"kx\", \"value\": {\"op\": \"div\", \"args\": [191, 3500]}}, {\"op\": \"let\", \"name\": \"ky\", \"value\": {\"op\": \"div\", \"args\": [759, 1750]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.kx\"}, {\"ref\": \"canvas.w\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.ky\"}, {\"ref\": \"canvas.h\"}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the badge relative to the first object's top\u2011right corner by subtracting scaled dimensions of the cloned object.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=-4.32, y=37.32, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"kx\", \"value\": {\"op\": \"div\", \"args\": [59, 50]}}, {\"op\": \"let\", \"name\": \"ky\", \"value\": {\"op\": \"div\", \"args\": [141, 50]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge using linear combination of first and second objects' dimensions.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near 'dx')",
+          "rule_excerpt": "let kx = 24/25\ndx = -1\nlet ky = -28/275\nlet dy = 267/550\nclone proto as badge at (objects[0].x + kx * objects[0].w + dx * objects[1].w, objects[0].y + ky * objects[0].h + dy * objects[1].h)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4410,
+        "completion_tokens": 19559,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 30190,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 109.73,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

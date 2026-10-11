@@ -1,0 +1,81 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:59:32+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge to the right of card0, aligned with its bottom edge plus a small vertical offset.",
+        "Place the badge at a fixed position on the canvas, independent of any object.",
+        "Place the badge by copying the proto\u2019s original location and adding a constant offset.",
+        "Place the badge relative to card0\u2019s center, with a small horizontal shift and a larger vertical shift upward."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 1100,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Create a badge sized like the second object, placed to the right of the first object with a 2\u2011unit gap from its right edge and aligned to its top.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near '.')",
+          "rule_excerpt": "let gap = 2\nclone objects[1] as badge at (objects[0].x + objects[0].w - badge.w + gap, objects[0].y)"
+        },
+        {
+          "summary": "Create a badge sized like the second object, positioned at a fixed offset (28,2) from the first object's top\u2011left corner.",
+          "reason": "contradicts teaching evidence - corrected_example: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 28]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]"
+        },
+        {
+          "summary": "Create a badge sized like the second object, placed so its left edge aligns with the vertical midline of the first object and its top edge aligns with the first object's top edge.",
+          "reason": "invalid rule: line 1: unknown name 'badge'; define it with let or a for loop first (near '.')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + objects[0].w/2 - badge.w/2, objects[0].y)"
+        },
+        {
+          "summary": "Create a badge sized like the second object, positioned at a fixed fraction (0.27) of the canvas width from the left and a fixed fraction (0.588) of the canvas height from the top.",
+          "reason": "invalid rule: line 1: unexpected closing brace or trailing text (near '}')",
+          "rule_excerpt": "clone objects[1] as badge at (0.27 * canvas.w, 0.588 * canvas.h)}]}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1669,
+        "completion_tokens": 469,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4226,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 10.02,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

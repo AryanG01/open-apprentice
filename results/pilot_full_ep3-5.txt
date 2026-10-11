@@ -1,0 +1,5 @@
+oa compare  split=development episodes=3..5 methods=['full_v1_2']
+matrix: 3 runs (3 episodes x 1 methods); model-based runs: 3; hard ceiling per run: 300000 tokens / 120 calls / 800 actions; worst-case model tokens: 900000 (global ceiling 800000); reasoning_effort=low
+method                    correct/sched    cond.  false_succ   tokens  calls  actions  teacher  failures
+full_v1_2                     6/24           1.0     0/6       472766     37      364       11  {"abstained": 18}
+results in results/runs/development-ep3-3-20261010T160334

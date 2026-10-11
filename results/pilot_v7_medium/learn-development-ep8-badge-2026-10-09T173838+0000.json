@@ -1,0 +1,72 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:38:38+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 8,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge at a fixed offset (27,3) from the top\u2011left of card0.",
+        "Clone proto as badge placed inside card0 with a constant 3\u2011pixel margin from the bottom\u2011right corner.",
+        "Clone proto as badge positioned using fractions of card0\u2019s width and height (0.54\u202fw, 0.0375\u202fh) from its top\u2011left."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge aligned to the right edge of card0, shifted left by proto\u2019s width and up by proto\u2019s height, both reduced by a 3\u2011pixel margin.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=37, y=417, w=20, h=20) but the evidence shows (x=37, y=403, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 3}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, {\"ref\": \"locals.margin\"}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 2106,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place badge relative to first object: if first is wider than second, offset right/down by fractions of the size difference; otherwise offset left/up by a fixed fraction of the second object's size.",
+        "Place badge relative to first object: if first is sufficiently wider than second (width > 1.2\u00d7second), use size\u2011difference fractions; otherwise use fixed fractions of the second object's size.",
+        "Place badge relative to first object: if first is wider than second, shift by multiples of the second object's size; otherwise shift by opposite multiples.",
+        "Place badge relative to first object: if first is to the right of second, use size\u2011difference fractions; otherwise use fixed fractions of the second object's size."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1665,
+        "completion_tokens": 6648,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11400,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 40.77,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

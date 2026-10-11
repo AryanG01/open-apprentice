@@ -1,0 +1,96 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:44:22+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "template_class": "PRIVATE (not shown to the model)",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge placed to the right of card0 with a small vertical offset.",
+          "reason": "invalid rule: line 1: unknown name 'proto'; define it with let or a for loop first (near 'as')",
+          "rule_excerpt": "clone proto as badge at (card0.x + card0.w - 28, card0.y + 8)\n"
+        },
+        {
+          "summary": "Clone proto as badge positioned using proportional offsets from card0's width and height.",
+          "reason": "invalid rule: line 1: unknown name 'card0'; define it with let or a for loop first (near '.')",
+          "rule_excerpt": "let offset_x = 0.7666666667 * card0.w\nlet offset_y = 0.1142857143 * card0.h\nclone proto as badge at (card0.x + offset_x, card0.y + offset_y)\n"
+        },
+        {
+          "summary": "Clone proto as badge at a fixed absolute location on the canvas.",
+          "reason": "invalid rule: line 1: unknown name 'proto'; define it with let or a for loop first (near 'as')",
+          "rule_excerpt": "clone proto as badge at (102, 368)\n"
+        },
+        {
+          "summary": "First move proto to align with card0's top\u2011left, then clone it with an offset.",
+          "reason": "invalid rule: line 1: unknown name 'proto'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "move proto to (card0.x, card0.y)\nclone proto as badge at (proto.x + 92, proto.y + 8)\n"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 817,
+        "completion_tokens": 772,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge placed a fixed offset left of card0's right edge and slightly below its top.",
+          "reason": "invalid rule: line 3: unknown name 'proto'; define it with let or a for loop first (near 'as')",
+          "rule_excerpt": "let dx = -28\nlet dy = 8\nclone proto as badge at (objects[0].x + objects[0].w + dx, objects[0].y + dy)"
+        },
+        {
+          "summary": "Clone proto as badge positioned using proportional offsets from card0's width and height.",
+          "reason": "invalid rule: line 3: unknown name 'proto'; define it with let or a for loop first (near 'as')",
+          "rule_excerpt": "let dx = -0.2333333333 * objects[0].w\nlet dy = 0.1142857143 * objects[0].h\nclone proto as badge at (objects[0].x + objects[0].w + dx, objects[0].y + dy)"
+        },
+        {
+          "summary": "Clone proto as badge placed at card0's top\u2011left shifted right by half its width and down by 10 pixels.",
+          "reason": "invalid rule: line 3: unknown name 'proto'; define it with let or a for loop first (near 'as')",
+          "rule_excerpt": "let dx = 0.5 * objects[0].w\nlet dy = 10\nclone proto as badge at (objects[0].x + dx, objects[0].y + dy)"
+        },
+        {
+          "summary": "Clone proto as badge placed at card0's bottom\u2011right shifted left by its full width and up by 2 pixels.",
+          "reason": "invalid rule: line 3: unknown name 'proto'; define it with let or a for loop first (near 'as')",
+          "rule_excerpt": "let dx = -objects[0].w\nlet dy = -2\nclone proto as badge at (objects[0].x + objects[0].w + dx, objects[0].y + objects[0].h + dy)"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1016,
+        "completion_tokens": 730,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3335,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 8.64,
+  "prompt_hashes": {
+    "hypotheses": "4ec72b5e7277a10a"
+  }
+}

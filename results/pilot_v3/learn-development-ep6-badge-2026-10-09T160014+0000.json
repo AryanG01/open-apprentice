@@ -1,0 +1,86 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:00:14+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge positioned at 60% of card0's width to the right and 40% of its height down.",
+        "Clone proto as badge placed at the point that is half the card's width plus a fixed 9 pixels right, and half the card's height minus 4 pixels down.",
+        "Clone proto as badge aligned to the card's top\u2011left corner offset by a fixed 54px right and 16px down."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge positioned relative to the canvas: x is 4.57% of canvas width and y is 50.9% of canvas height.",
+          "reason": "invalid rule: line 1: expected a statement (let / move / resize / clone / for / if) (near ']')",
+          "rule_excerpt": "clone proto as badge at (0.045714 * canvas.w, 0.508571 * canvas.h)]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 584,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the badge to the right of the first object, aligned with its vertical centre.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}]"
+        },
+        {
+          "summary": "Place the badge below the first object, aligned with its left edge plus a fixed offset.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 54]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}, 16]}}]"
+        },
+        {
+          "summary": "Place the badge at a fixed fraction of the canvas width and height.",
+          "reason": "contradicts teaching evidence - corrected_example: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"457142857/10000000000\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"2542857143/5000000000\"}]}}]"
+        },
+        {
+          "summary": "Place the badge relative to the proto\u2019s original position, shifted by the first object's width and height.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1635,
+        "completion_tokens": 828,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4035,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 7.68,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

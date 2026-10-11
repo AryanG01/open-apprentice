@@ -1,0 +1,126 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:04:23+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row with a fixed left margin of 80 and a fixed gap of 12 between them, keeping their original sizes.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 12\nlet start_x = 80\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, 100)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects horizontally starting at a margin equal to 5% of the canvas width, with a fixed 12\u2011pixel gap between them, and set their y to 100.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 12\nlet margin = 0.05 * canvas.w\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, 100)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Center the group of objects vertically at y=100 and distribute them evenly across the canvas width, preserving each object's width and adding equal spacing.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near 'total_w')",
+          "rule_excerpt": "let total_w = 0\nfor V in objects { total_w = total_w + V.w }\nlet free_space = canvas.w - total_w\nlet gap = free_space / (len(objects) + 1)\nlet x = gap\nfor V in objects {\n    move V to (x, 100)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object so its left edge aligns with a vertical grid spaced 40 pixels apart, starting at grid line 2, and set its y to 100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"grid\", \"value\": 40}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"mul\", \"args\": [{\"op\": \"add\", \"args\": [2, {\"ref\": \"locals.I\"}]}, {\"ref\": \"locals.grid\"}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row with a fixed left margin of 80 and a fixed gap of 12 between them, preserving sizes. Works for up to three objects.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 12]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Start the row at a margin equal to 5% of the canvas width, then place each object with a fixed 12\u2011pixel gap, preserving sizes.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=70, y=100, w=120, h=70) but the evidence shows (x=80, y=100, w=120, h=70)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/20\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.margin\"}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align the left edge of the first object at x=0, then chain each subsequent object directly after the previous one with a fixed offset of 80 pixels, keeping original sizes.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=0, y=100, w=120, h=70) but the evidence shows (x=80, y=100, w=120, h=70)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 0, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 80]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Distribute objects evenly across the canvas width, ignoring their widths, and set their y to 100; the first object starts at the left margin of 80 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=740, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"step\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.w\"}, 80]}, {\"op\": \"sub\", \"args\": [{\"op\": \"len\", \"args\": [{\"ref\": \"objects\"}]}, 1]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [80, {",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3173,
+        "completion_tokens": 2235,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Set all objects' y to 100 and arrange them horizontally with a left margin of 80 and a fixed gap of 12 between objects."
+      ],
+      "rejected": [
+        {
+          "summary": "Set all objects' y to 100 and arrange them horizontally with a left margin of 80 and gaps equal to each object's width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=200, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 80}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"ref\": \"locals.margin\"}}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"ref\": \"locals.cur_x\"}, \"y\": 100}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.cur_x\"}, {\"op\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set all objects' y to 100 and arrange them horizontally with a left margin of 80 and a gap proportional to the previous object's width (half).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=260, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 80}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"ref\": \"locals.margin\"}}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"ref\": \"locals.cur_x\"}, \"y\": 100}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"ref\": \"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set all objects' y to 100 and arrange them horizontally with a left margin of 80 and a gap that ensures the rightmost object ends at canvas width minus 80.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=665, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 80}, {\"op\": \"let\", \"name\": \"total_w\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"total_w\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.total_w\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"w\"]}]}}]}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"sub\", \"args\": [{\"o",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1636,
+        "completion_tokens": 452,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 7496,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 12.78,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

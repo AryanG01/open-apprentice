@@ -1,0 +1,115 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:57:34+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place badge relative to card0 using fractions of card0's width and height.",
+        "Place badge relative to card0 using fractions of proto's size.",
+        "Place badge at a fixed offset from card0's top\u2011left corner."
+      ],
+      "rejected": [
+        {
+          "summary": "Place badge based on canvas width and card0 position using a simple proportion.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=27.6, y=383.8, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1257142857142857/100000000000000000\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"5457142857142857/1000000000000000000\"}, {\"ref\": \"canvas.h\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 995,
+        "completion_tokens": 741,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place badge relative to card0 using fixed fractions of its width and height.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [11, 25]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"d",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at a fixed offset from card0's top\u2011left corner.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"rat\": \"88/5\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"rat\": \"12/5\"}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge using proto size scaled by card0 dimensions.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=45.2, y=384.8, w=20, h=20) but the evidence shows (x=27.6, y=382.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"sx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"22/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"sy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge based on canvas width proportion and card0 position.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near ']')",
+          "rule_excerpt": "let factor = canvas.w / 1400\nclone proto as badge at (card0.x + factor * 11/25 * card0.w, card0.y + factor * 3/50 * card0.h)]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge using canvas-scaled fixed offset from card0.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=0.8046, y=0.2194, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 1400]}, {\"rat\": \"88/5\"}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 700]}, {\"rat\": \"12/5\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\",",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place badge using canvas-width proportion of card0 width plus fixed y-offset.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=0.4827, y=2.4, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"factor\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 1400]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"locals.factor\"}, {\"rat\": \"11/25\"}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"object",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place badge using canvas-height proportion of card0 height plus fixed x-offset.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=17.6, y=0.1317, w=24, h=24) but the evidence shows (x=-1.44, y=1.44, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"factor\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 700]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"rat\": \"88/5\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"m",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place badge using both canvas width and height scaling of fixed offsets.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4105,
+        "completion_tokens": 1913,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 7754,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 13.53,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

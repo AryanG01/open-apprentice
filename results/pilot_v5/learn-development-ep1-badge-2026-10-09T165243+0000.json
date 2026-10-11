@@ -1,0 +1,112 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:52:43+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto and place it to the right of card0 at a fraction of card0's width, slightly below its top.",
+        "Clone proto and position it using a fixed offset from card0's left edge and a fixed offset from card0's top edge.",
+        "Clone proto and position it at a point that is a fixed fraction of the canvas width and height, independent of card0."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto and place it aligned with card0's bottom-right corner shifted left and up by a fraction of proto size.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=110, y=390, w=20, h=20) but the evidence shows (x=95.6, y=354.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"shift_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 997,
+        "completion_tokens": 609,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone proto and place it near card0's bottom\u2011right, offset by a fixed fraction of proto's size.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=-5.28, y=-30.72, w=24, h=24) but the evidence shows (x=-0.96, y=0.96, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"61/50\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"57/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"ad",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it at a fixed fraction of the canvas width and height.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"xf\", \"value\": {\"rat\": \"6828571428571429/100000000000000000\"}}, {\"op\": \"let\", \"name\": \"yf\", \"value\": {\"rat\": \"5062857142857143/10000000000000000\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"ref\": \"locals.xf\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"ref\": \"lo",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it aligned with card0's bottom edge, shifted left by half of card0's width.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=65, y=400, w=20, h=20) but the evidence shows (x=95.6, y=354.4, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"loca",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it using card0's top\u2011left plus a fixed offset.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"rat\": \"428/5\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"rat\": \"22/5\"}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it using card0's bottom\u2011right corner shifted left by 1.22\u00d7proto.w and up by 2.28\u00d7proto.h.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone proto and place it at a fixed offset from card0's top\u2011left corner.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone proto and place it using card0's bottom edge shifted left by half of card0's width.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone proto and place it at a fixed fraction of the canvas width and height.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4333,
+        "completion_tokens": 2272,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8211,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 13.65,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

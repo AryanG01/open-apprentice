@@ -1,0 +1,107 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:32:22+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place badge to the right of card0, left-aligned with card0's right edge minus proto width and one pixel, and one pixel below card0's top.",
+        "Place badge at a fixed fraction of card0's width to the right and a fixed fraction of its height down.",
+        "Place badge at a fixed fraction of the canvas width and height, independent of card0.",
+        "Place badge using card0 width minus proto width minus one for x, and proto height divided by twenty for y."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 3159,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place badge using a linear combination of the objects\u2019 widths and heights: shift right by 49/50 of the first object\u2019s width minus the second object\u2019s width, and shift down by 157/14000 of the first object\u2019s height plus 9/1750 of the second object\u2019s height."
+      ],
+      "rejected": [
+        {
+          "summary": "Place badge to the right of card0, aligned with its top edge, leaving a one\u2011pixel gap from card0\u2019s right side and a one\u2011pixel downward shift.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 1]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objec",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge using a fixed horizontal offset of 29 pixels from card0\u2019s left edge and a fixed vertical offset of 1 pixel from card0\u2019s top edge.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=29, y=1, w=24, h=41) but the evidence shows (x=-0.48, y=0.48, w=24, h=41)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 29]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 1]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge as far right and down as possible without exceeding the canvas, using a one\u2011pixel inset from card0\u2019s right/top edges.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"x\", \"value\": {\"op\": \"min\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 1]}, {\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}}, {\"op\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge using the same offsets but never allowing negative coordinates, clamping at zero.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=0, y=1, w=24, h=41) but the evidence shows (x=-0.48, y=0.48, w=24, h=41)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"x\", \"value\": {\"op\": \"max\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, 1]}, 0]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"max\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"arg",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge to the right of the first object, aligned with its top, shifting right by (first width minus second width minus one) pixels and down by one pixel; if the two objects have equal width, shift right additionally by 13/25 pixels and up by 13/25 pixels.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near 'dx')",
+          "rule_excerpt": "let dx = objects[0].w - objects[1].w - 1\nif objects[0].w == objects[1].w { dx = dx + 13/25 }\nlet dy = 1\nif objects[0].w == objects[1].w { dy = dy - 13/25 }\nclone objects[1] as badge at (objects[0].x + dx, objects[0].y + dy)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place badge using the base offset (first width minus second width minus one, down one), but if placing the badge would make its left or top edge negative, shift it right by 13/25 pixels and up by 13/25 pixels.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'dx')",
+          "rule_excerpt": "let dx = objects[0].w - objects[1].w - 1\nlet dy = 1\nif objects[0].x + dx < 0 or objects[0].y + dy < 0 { dx = dx + 13/25; dy = dy - 13/25 }\nclone objects[1] as badge at (objects[0].x + dx, objects[0].y + dy)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place badge at (first.x + first.w - second.w -1, first.y +1); if the first object is at the canvas origin (x=0,y=0), shift the badge right by 13/25 and up by -13/25.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'dx')",
+          "rule_excerpt": "let dx = objects[0].w - objects[1].w - 1\nlet dy = 1\nif objects[0].x == 0 and objects[0].y == 0 { dx = dx + 13/25; dy = dy - 13/25 }\nclone objects[1] as badge at (objects[0].x + dx, objects[0].y + dy)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4379,
+        "completion_tokens": 20453,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 28972,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 110.57,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

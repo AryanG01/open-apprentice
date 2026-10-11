@@ -1,0 +1,99 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:42:40+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align objects to a vertical line at canvas height/7 and space them horizontally with a fixed proportion of the canvas width.",
+        "Align objects to canvas height/7 and place each object at a horizontal position based on its index using canvas width fractions.",
+        "Align objects to canvas height/7, start at canvas width/35 and place each subsequent object a gap equal to the first object's width plus 16 pixels."
+      ],
+      "rejected": [
+        {
+          "summary": "Align objects to canvas height/7, start at canvas width/35 and place each subsequent object a fixed pixel gap of 16 to the right.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=56, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"x0\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 35]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 5311,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row starting at canvas width/35, each spaced by a fixed 126 pixels, all aligned to canvas height/7.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=1.829, y=9.143, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 35]}}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"step\", \"value\": 126}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"ar",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at canvas width/35, each spaced by the first object's width plus 16 pixels, all aligned to canvas height/7.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 35]}}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"step\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 16]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"k",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at canvas width/35, each spaced by the average width of the first two objects plus 16 pixels, all aligned to canvas height/7.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 35]}}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"step\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]},",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at canvas width/35, each subsequent object placed 16 pixels to the right of the previous object's right edge, all aligned to canvas height/7.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = canvas.h / 7\nlet gap = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (canvas.w / 35, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at x=40, y=100, each subsequent object placed 16 pixels to the right of the previous object's right edge.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 40\nlet y_target = 100\nlet gap = 16\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4534,
+        "completion_tokens": 8322,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 19201,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 64.59,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

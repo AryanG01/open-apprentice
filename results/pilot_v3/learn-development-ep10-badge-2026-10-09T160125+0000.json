@@ -1,0 +1,89 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:01:25+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Badge is a clone of proto positioned relative to card0 using fractions of card0's width and height.",
+        "Badge is a clone of proto positioned at the same y as card0 plus a small constant, and x based on proto width plus card0 x."
+      ],
+      "rejected": [
+        {
+          "summary": "Badge is a clone of proto placed at a fixed offset from the canvas origin scaled by canvas width and height.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"9857142857142857/100000000000000000\"}]}, \"y\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"5468571428571429/10000000000000000\"}]}}]"
+        },
+        {
+          "summary": "Badge is a clone of proto placed at the bottom\u2011right corner of card0 shifted left and up by a fraction of proto size.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, {\"rat\": \"3/10\"}]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\""
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 995,
+        "completion_tokens": 604,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Badge is a clone of proto placed at card0's x plus 44% of its width and y plus 6% of its height.",
+          "reason": "contradicts teaching evidence - neither: reproduces an output the user rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"11/25\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/50\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": "
+        },
+        {
+          "summary": "Badge is a clone of proto placed at 69% of card0's width (from left edge) and card0's y plus 6% of its height.",
+          "reason": "contradicts teaching evidence - corrected_example: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"69/100\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"3/50\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.x\"}, \"y\": {\"ref\": \"locals.y\"}}]"
+        },
+        {
+          "summary": "Badge is a clone of proto placed at card0's x plus half its width minus 6% of its width, and y plus 6% of its height.",
+          "reason": "contradicts teaching evidence - neither: reproduces an output the user rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"3/50\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/50\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"ar"
+        },
+        {
+          "summary": "Badge is a clone of proto placed at card0's x plus 44% of its width, and at card0's y plus 6% of its height, using the proto's size for the badge.",
+          "reason": "duplicate"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1583,
+        "completion_tokens": 2129,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 5311,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 15.03,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

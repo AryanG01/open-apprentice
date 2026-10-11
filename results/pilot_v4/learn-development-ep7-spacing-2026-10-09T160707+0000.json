@@ -1,0 +1,59 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:07:07+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each card upward to y=100 and rightward by an amount that decreases by 10 pixels per card index.",
+        "Move each card to y=100 and add a fixed horizontal offset of 30 pixels, then subtract 10 pixels for each subsequent card."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all cards to a common top y=100 and keep their horizontal spacing equal to the original spacing between card0 and card1.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=100, w=90, h=60) but the evidence shows (x=110, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"spacing\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\":",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards in a row starting at x=40 with uniform width\u2011based spacing, all aligned to y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=180, y=100, w=120, h=80) but the evidence shows (x=220, y=100, w=120, h=80)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.step\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1038,
+        "completion_tokens": 867,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 1905,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 4.92,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

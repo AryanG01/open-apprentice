@@ -1,0 +1,111 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:05:18+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move all objects to a fixed horizontal row at y=100 starting at x=40 with 126px spacing between left edges.",
+        "Arrange objects in a row at 1/7 canvas height, starting at 1/35 canvas width with step 9% of canvas width.",
+        "Align tops to the first object's y minus 250, then distribute horizontally from first object's x plus 30 with spacing equal to first object's width plus 16.",
+        "Align tops to 1/7 canvas height, then distribute horizontally from first object's x plus 30 with spacing equal to first object's width plus 16."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 14718,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row starting at fixed position (40,100) with a fixed 16-pixel gap.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let start_x = 40\\nlet start_y = 100\\nlet gap = 16\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, start_y)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (min(40, canvas.w/35), min(100, canvas.h/7)) with a fixed 16-pixel gap.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let start_x = min(40, canvas.w / 35)\\nlet start_y = min(100, canvas.h / 7)\\nlet gap = 16\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, start_y)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at fixed position (40,100) with a gap of at least 16 pixels or 1% of canvas width.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let start_x = 40\\nlet start_y = 100\\nlet gap = max(16, canvas.w / 100)\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, start_y)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (min(40, canvas.w/35), min(100, canvas.h/7)) with a gap of at least 16 pixels or 1% of canvas width.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let start_x = min(40, canvas.w / 35)\\nlet start_y = min(100, canvas.h / 7)\\nlet gap = max(16, canvas.w / 100)\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, start_y)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at fixed position (40,100) with a fixed 16-pixel gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 40\nlet start_y = 100\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, start_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (min(40, canvas.w/35), min(100, canvas.h/7)) with a fixed 16-pixel gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = min(40, canvas.w / 35)\nlet start_y = min(100, canvas.h / 7)\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, start_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at fixed position (40,100) with a gap of at least 16 pixels or 1% of canvas width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 40\nlet start_y = 100\nlet gap = max(16, canvas.w / 100)\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, start_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at (min(40, canvas.w/35), min(100, canvas.h/7)) with a gap of at least 16 pixels or 1% of canvas width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = min(40, canvas.w / 35)\nlet start_y = min(100, canvas.h / 7)\nlet gap = max(16, canvas.w / 100)\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, start_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, start_y)\n  }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5041,
+        "completion_tokens": 28930,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 49723,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 133.04,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

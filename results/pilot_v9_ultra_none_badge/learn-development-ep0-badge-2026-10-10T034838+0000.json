@@ -1,0 +1,60 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:48:38+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "none",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place it at a fixed offset from the top-right corner of the first object.",
+        "Clone the second object and place it at a fixed offset from the top-left corner of the first object."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place it at a proportional horizontal position (85%) and fixed vertical offset from the first object's top-left.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=92, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"prop_x\", \"value\": {\"rat\": \"17/20\"}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 8}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.prop_x\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at a proportional position relative to the first object's width and height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=92, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"prop_x\", \"value\": {\"rat\": \"17/20\"}}, {\"op\": \"let\", \"name\": \"prop_y\", \"value\": {\"rat\": \"2857142857142857/25000000000000000\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.prop_x\"}, {\"o",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 984,
+        "completion_tokens": 393,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 1377,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 2.39,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

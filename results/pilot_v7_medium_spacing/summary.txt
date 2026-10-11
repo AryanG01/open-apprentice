@@ -1,0 +1,15 @@
+oa learn  split=development trials=12  model=nvidia/nemotron-3-super-120b-a12b  reasoning_effort=medium
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 spacing  edge       UNRESOLVED       2       1 1a/0c      None   20509  58.32  
+  1 spacing  edge       UNRESOLVED       2       1 1a/1c      None   19201  64.59  
+  2 spacing  edge       INTENT_READY      2       1 1a/1c      True   13718  50.52  
+  3 spacing  edge       UNRESOLVED       2       0 0a/0c      None   22162  67.16  
+  4 spacing  edge       UNRESOLVED       2       1 1a/0c      None   12210  46.76  
+  5 spacing  edge       INTENT_READY      1       1 1a/0c      True    7451  19.73  
+  6 spacing  edge       INTENT_READY      2       1 1a/0c      True   15125  49.92  
+  7 spacing  edge       TEACHING         1       0 0a/0c      None       0 137.97  ProviderTimeout: read timeout; cost unknown until reconciled
+  8 spacing  edge       TEACHING         1       0 0a/0c      None       0 163.12  ProviderTimeout: read timeout; cost unknown until reconciled
+  9 spacing  edge       UNRESOLVED       2       1 1a/1c      None   26830 100.78  
+ 10 spacing  edge       INTENT_READY      1       1 1a/0c      True    4680   17.5  
+ 11 spacing  edge       UNRESOLVED       2       1 1a/1c      None   16588  52.96  
+recovered the hidden rule on held-out scenes: 4/12  |  total tokens 158474  |  results in results/pilot_v7_medium_spacing

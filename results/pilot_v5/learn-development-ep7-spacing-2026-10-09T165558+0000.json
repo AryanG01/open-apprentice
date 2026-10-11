@@ -1,0 +1,115 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:55:58+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each card left by an amount that decreases with its index (30,20,10) and move all cards to y=100."
+      ],
+      "rejected": [
+        {
+          "summary": "Move every card to the same vertical position y=100 while preserving horizontal order and reducing the gap between cards by 10 pixels.",
+          "reason": "invalid rule: line 3: unknown name 'index_of'; define it with let or a for loop first (near '(')",
+          "rule_excerpt": "let gap = 10\nfor V in objects {\n    move V to (V.x - gap * index_of(V), 100)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align the top edge of each card to y=100 and keep the horizontal spacing equal to the original spacing minus 10 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=180, y=100, w=120, h=80) but the evidence shows (x=220, y=100, w=120, h=80)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.step\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place each card at a fixed y=100 and set its x to the original x plus a correction that makes the leftmost card start at x=40.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=100, w=90, h=60) but the evidence shows (x=110, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"min_x\", \"value\": {\"op\": \"min\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, \"x\"]}]}}, {\"op\": \"let\", \"name\": \"correction\", \"value\": {\"op\": \"sub\", \"args\": [40, {\"ref\": \"locals.min_x\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"e",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1038,
+        "completion_tokens": 872,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each card left by an amount that decreases with its index (30,20,10) and move all cards to y=100."
+      ],
+      "rejected": [
+        {
+          "summary": "Move each card to y=100 and shift its x by a fixed amount that depends only on its index (30,20,10).",
+          "reason": "invalid rule: line 3: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "for V in objects with I {\n    if I == 0 { move V to (V.x + 30, 100) }\n    else if I == 1 { move V to (V.x + 20, 100) }\n    else { move V to (V.x + 10, 100) }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each card to y=100 and shift its x by a quantity that decreases linearly with its index, starting from 40 and subtracting 10 per index.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=50, y=100, w=50, h=80) but the evidence shows (x=40, y=100, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"sub\", \"args\": [40, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, 10]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each card to y=100 and shift its x by half the difference between the canvas width and the card's original x, scaled by a factor that depends on the card's index.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near ']')",
+          "rule_excerpt": "for V in objects with I {\n    let factor = 1.0 - I * 0.1666666667\n    move V to (V.x + 0.5 * (canvas.w - V.x) * factor, 100)\n]}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each card left by an amount that decreases linearly with its index (30,20,10) and move all cards to y=100.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Move each card to y=100 and adjust its x by a fixed offset that depends on its index via a conditional chain.",
+          "reason": "invalid rule: line 4: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "for V in objects with I {\n    if I == 0 {\n        move V to (V.x + 30, 100)\n    } else if I == 1 {\n        move V to (V.x + 20, 100)\n    } else {\n        move V to (V.x + 10, 100)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Shift each card's x by a weighted sum of boolean tests on its index, producing offsets 30,20,10, then set y=100.",
+          "reason": "contradicts teaching evidence - demonstration: your rule failed to run (number expected, got bool)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"eq\", \"args\": [{\"ref\": \"locals.I\"}, 0]}, 30]}, {\"op\": \"mul\", \"args\": [{\"op\": \"eq\", \"args\": [{\"ref\": \"locals.I\"}, 1]}, 20]}]}, {\"op\": \"mul\", \"args\": [{\"op\": \"eq\", \"args\": [{\"ref\": \"locals.I\"}, 2]}, 10]}]}}, {\"op\": \"emit",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3653,
+        "completion_tokens": 3130,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 8693,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 20.53,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

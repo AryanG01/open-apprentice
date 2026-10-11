@@ -1,0 +1,77 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:05:53+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Set every object's y to 120 and shift its x right by 70 minus 18 times its index. "
+      ],
+      "rejected": [
+        {
+          "summary": "Move all objects to y=120 and lay them out left\u2011to\u2011right with a fixed 12\u2011pixel gap, starting at x=80.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 12\nlet cursor_x = start_x\nfor V in objects {\n  move V to (cursor_x, 120)\n  cursor_x = cursor_x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift every object upward by 290 pixels and then shift its x right by an amount that decreases by 9 pixels for each subsequent object, beginning with +70 for the first.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=151, y=10, w=100, h=90) but the evidence shows (x=142, y=120, w=100, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [0, 290]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"sub\", \"args\": [70, {\"op\": \"mul\", \"args\": [9, {\"ref\": \"locals.I\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place each object so its top aligns with y=120 and its left aligns with the canvas left edge plus a margin that grows by the object's width plus 12 pixels, starting from a margin of 80.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = 80\nlet gap = 12\nfor V in objects with I {\n  if I == 0 {\n    move V to (margin, 120)\n  } else {\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, 120)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects at y=120 and place them left\u2011to\u2011right starting at x=80 with a fixed 12\u2011pixel gap between them. ",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 12\nlet cursor_x = start_x\nfor V in objects {\n  move V to (cursor_x, 120)\n  cursor_x = cursor_x + V.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Move each object up to y=120 and then shift its x right by an amount that decreases by 18 for each subsequent object, beginning with +70 for the first. ",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let dy = -290  // 120 - 410 for first object, but we compute per object\nfor V in objects with I {\n  let dx = 70 - 18 * I\n  move V to (V.x + dx, 120)\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2911,
+        "completion_tokens": 1650,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 4561,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 7.78,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

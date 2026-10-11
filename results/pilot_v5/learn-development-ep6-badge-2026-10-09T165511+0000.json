@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:55:11+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge positioned at 60% of card0's width to the right and 40% of its height down from card0's top\u2011left.",
+        "Clone proto as badge placed at a fixed offset of (54,16) pixels from card0's top\u2011left corner.",
+        "Clone proto as badge positioned at the point that is the maximum of card0's left edge plus half its width and a minimum threshold, similarly for y."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge positioned relative to the canvas: x is 4.57% of canvas width plus card0.x, y is 5.09% of canvas height plus card0.y.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=74, y=343.6, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"457142857/10000000000\"}, {\"ref\": \"canvas.w\"}]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"5142857/1000000000\"}, {\"ref\": ",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 641,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Badge is a clone of the second object placed at 60% of the first object's width and 40% of its height, offset from the first object's top\u2011left.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at a fixed fraction of the canvas width and height.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=5.12, y=38.14, w=24, h=24) but the evidence shows (x=72, y=16, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"457142857/10000000000\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2542857143/5000000000\"}, {\"ref\": \"canvas.h\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.offset_x\"}, \"y\": {\"ref\": \"locals.of",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed relative to the first object's bottom\u2011right corner using a fixed offset.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=74, y=404, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"sub\", \"args\": [0, 26]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 24}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.offset_",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is a clone of the second object placed at a position that scales with the first object's width and the canvas height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=64, y=350, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"ref\": \"canvas.h\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"o",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4327,
+        "completion_tokens": 2599,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8555,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 16.1,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

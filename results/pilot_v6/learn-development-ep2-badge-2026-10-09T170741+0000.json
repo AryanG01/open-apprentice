@@ -1,0 +1,140 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:07:41+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Create badge positioned relative to first object's top\u2011left using fixed offsets.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + 29, objects[0].y + 1)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge placed at a fixed fraction of the canvas width and height, independent of objects.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (canvas.w * 0.027857, canvas.h * 0.515714)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge anchored to the right edge of first object with a fixed gap and aligned to its top.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let gap = 1\nclone objects[0] as badge at (objects[0].x + objects[0].w - gap, objects[0].y + 1)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge positioned using a fixed offset from the first object's left edge and a fixed offset from the canvas top.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + 29, canvas.h * 0.515714)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Create badge positioned relative to first object's top\u2011left using fixed offsets.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + 29, objects[0].y + 1)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge placed at a fixed fraction of the canvas width and height, independent of objects.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (canvas.w * 0.027857142857142856, canvas.h * 0.5157142857142857)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge anchored to the right edge of first object with a fixed gap and aligned to its top.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let gap = 1\nclone objects[0] as badge at (objects[0].x + objects[0].w - gap, objects[0].y + 1)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge positioned using a fixed offset from the first object's left edge and a fixed offset from the canvas top.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + 29, canvas.h * 0.5157142857142857)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3523,
+        "completion_tokens": 1075,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone proto as badge with fixed offset from first object's top\u2011left.",
+        "Clone proto as badge positioned at a fixed fraction of the first object's width and height.",
+        "Clone proto as badge placed so its right edge is 1 pixel left of the first object's right edge and its top edge is 1 pixel below the first object's top edge."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the proto object as a badge with fixed size, placed at a fixed offset from the first object's top\u2011left.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone proto as badge at (objects[0].x + 29, objects[0].y + 1)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the proto object as a badge whose size is a fixed fraction of the first object, placed at the same fractional offset.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.4 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet bx = objects[0].x + 0.58 * objects[0].w\nlet by = objects[0].y + 0.0125 * objects[0].h\nclone proto as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the proto object as a badge with the same size as proto, positioned so its right edge is 1 pixel left of the first object's right edge and its top edge is 1 pixel below the first object's top edge.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone proto as badge at (objects[0].x + objects[0].w - 20 - 1, objects[0].y + 1)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the proto object as a badge with size matching the first object's width*2/5 and height*1/4, aligned to the first object's top\u2011left with a fixed 29\u2011pixel horizontal and 1\u2011pixel vertical offset.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.4 * objects[0].w\nlet bh = 0.25 * objects[0].h\nclone proto as badge at (objects[0].x + 29, objects[0].y + 1)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge with size matching proto, using a fixed horizontal offset and a fixed vertical offset from the first object's top\u2011left.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4394,
+        "completion_tokens": 1801,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 10793,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 15.34,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

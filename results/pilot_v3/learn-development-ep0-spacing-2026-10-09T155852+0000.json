@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:58:52+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Align all cards vertically at y=100 and space them horizontally with a fixed gap of 20 pixels.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'start_x')",
+          "rule_excerpt": "let gap = 20\nlet start_x = 80\nfor V in objects {\n  move V to (start_x, 100)\n  start_x = start_x + V.w + gap\n}"
+        },
+        {
+          "summary": "Place cards in a row starting at x=80, y=100, each card's left edge aligned to the previous card's right edge plus a gap equal to 10% of the canvas width.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let gap = 0.1 * canvas.w\nlet x = 80\nfor V in objects {\n  move V to (x, 100)\n  x = x + V.w + gap\n}"
+        },
+        {
+          "summary": "Shift each card so its left edge aligns to a grid of 80-pixel columns, keeping y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"column_width\", \"value\": 80}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.column_width\"}, {\"ref\": \"locals.I\"}]}, \"y\": 100}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Move each card to the same y=100 and set its x to its original x minus 10 plus a multiple of its width based on its index.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 10]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}]}, \"y\": 100}], \"index_var\": \"I\"}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 380,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move each card to y=100 and set its x to a fixed starting point plus an index\u2011dependent offset.",
+          "reason": "invalid rule: line 7: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "let start_x = 80\nlet offset0 = 0\nlet offset1 = 132\nlet offset2 = 254\nfor V in objects with I {\n  if I == 0 { move V to (start_x + offset0, 100) }\n  else if I == 1 { move V to (start_x + offset1, 100) }\n  else { move V to (start_x + offset2, 100) }\n}"
+        },
+        {
+          "summary": "Shift each card so its left edge aligns to a column grid of 80\u202fpx, then add a fixed vertical shift to y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"col_width\", \"value\": 80}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"target_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.col_width\"}, {\"op\": \"add\", \"args\": [{\"ref\": \"locals.I\"}, 1]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"ref\": \"locals.target_x\"}, \"y\": 100}], \"index_var\": \"I\"}]"
+        },
+        {
+          "summary": "Place cards in a row whose left edges are spaced by the average card width plus a fixed gap, starting at x=80, y=100.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near 'total_w')",
+          "rule_excerpt": "let total_w = 0\nfor V in objects { total_w = total_w + V.w }\nlet avg_w = total_w / 3\nlet gap = 20\nlet start_x = 80\nfor V in objects with I {\n  let target_x = start_x + I * (avg_w + gap)\n  move V to (target_x, 100)\n}"
+        },
+        {
+          "summary": "Keep each card\u2019s original horizontal offset from the left canvas edge, but move it to y=100 and add a uniform horizontal shift of 70\u202fpx.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift_x\", \"value\": 70}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.shift_x\"}]}, \"y\": 100}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1244,
+        "completion_tokens": 1068,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3733,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 9.34,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

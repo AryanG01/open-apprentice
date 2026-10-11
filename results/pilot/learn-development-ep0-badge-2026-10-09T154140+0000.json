@@ -1,0 +1,86 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:41:40+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "template_class": "PRIVATE (not shown to the model)",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the badge at a fixed horizontal offset from the left edge of card0 and a fixed vertical offset from its top edge.",
+          "reason": "invalid rule: add: wrong arity",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"marginY\", \"value\": 8}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"], \"ref\": \"locals.marginX\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"], \"ref\": \"locals.marginY\"}]}}]"
+        },
+        {
+          "summary": "Position the badge relative to card0 using multiples of the proto's width and height.",
+          "reason": "invalid rule: mul: wrong arity",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offsetY\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"], \"]}}, {\": 0.4}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"], \"ref\": \"locals.offsetX\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"], \"ref\": \"locals.offsetY\"}]}}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1019,
+        "completion_tokens": 1274,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the badge halfway across card0\u2019s width and one\u2011fifth down its height.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.cx')",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, {\"rat\": \"1/5\"}]}]}, \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.cx\"}, \"y\": {\"ref\": \"locals.cy\"}}]"
+        },
+        {
+          "summary": "Center the badge inside card0 both horizontally and vertically.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.cx')",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}, \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.cx\"}, \"y\": {\"ref\": \"locals.cy\"}}]"
+        },
+        {
+          "summary": "Put the badge at 10% of canvas width and 50% of canvas height.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"bx\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/10\"}]}}, {\"op\": \"let\", \"name\": \"by\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"1/2\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.bx\"}, \"y\": {\"ref\": \"locals.by\"}}]"
+        },
+        {
+          "summary": "Align badge to the right edge of card0 shifted left by half a proto width and down by half a proto height.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.rx')",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"name\": \"ry\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}, {\"rat\": \"1/2\"}]}]}, \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.rx\"}, \"y\": {\"ref\": \"locals.ry\"}}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1062,
+        "completion_tokens": 1260,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4615,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 12.71,
+  "prompt_hashes": {
+    "hypotheses": "1a81be6f47055b1f"
+  }
+}

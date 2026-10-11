@@ -1,0 +1,15 @@
+oa learn  split=development trials=12  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=none
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      INTENT_READY      1       1 1a/0c      True    1377   2.39  
+  1 badge    prop       UNRESOLVED       2       0 0a/0c      None    9032   6.21  
+  2 badge    min        UNRESOLVED       2       1 1a/0c      None    2888   3.62  
+  3 badge    const      UNRESOLVED       2       1 1a/1c      None    9284   6.61  
+  4 badge    prop       UNRESOLVED       2       1 1a/1c      None    6005   4.44  
+  5 badge    min        UNRESOLVED       2       1 1a/1c      None   10556   7.61  
+  6 badge    const      UNRESOLVED       2       1 1a/0c      None    2958   3.85  
+  7 badge    prop       UNRESOLVED       2       1 1a/1c      None    6120   4.52  
+  8 badge    min        UNRESOLVED       2       1 1a/1c      None    6019   4.19  
+  9 badge    const      UNRESOLVED       2       1 1a/1c      None    9961   6.81  
+ 10 badge    prop       UNRESOLVED       2       1 1a/0c      None    5796    4.9  
+ 11 badge    min        UNRESOLVED       2       1 1a/1c      None    6864   5.58  
+recovered the hidden rule on held-out scenes: 1/12  |  total tokens 76860  |  results in results/pilot_v9_ultra_none_badge

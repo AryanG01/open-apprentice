@@ -1,0 +1,117 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:38:40+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Set all y to 100; shift each object's x by 30 plus 6 times its index in the list.",
+        "Set y to canvas height divided by 7; shift x by canvas-width fractions 3/140 plus index times 3/700 of canvas width.",
+        "Set y to canvas height divided by 7; add 30, 36, or 42 to x depending on whether original x is <100, <200, or \u2265200."
+      ],
+      "rejected": [
+        {
+          "summary": "Set all y to 100; place first object at x=40, then each next object at previous.x + previous.w + 16.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=70, h=90) but the evidence shows (x=166, y=100, w=70, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 40, \"y\": 100}, {\"op\": \"let\", \"name\": \"prev\", \"value\": {\"ref\": \"objects.0\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"if\", \"cond\": {\"op\": \"eq\", \"args\": [{\"ref\": \"locals.I\"}, 0]}, \"then\": [], \"else\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 8076,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with a fixed left margin of 40 pixels, a fixed horizontal gap of 16 pixels, and align all tops at y=100.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let margin = 40\nlet gap = 16\nlet y_target = 100\nlet x = margin\nfor V in objects {\n    move V to (x, y_target)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Compute left margin as the first object's original x plus 30 (if that x is positive), otherwise use 40; then lay out objects with a fixed 16\u2011pixel gap and y=100.",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near 'if')",
+          "rule_excerpt": "let margin = if objects[0].x > 0 then objects[0].x + 30 else 40\nlet gap = 16\nlet y_target = 100\nlet x = margin\nfor V in objects {\n    move V to (x, y_target)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set left margin to canvas width divided by 35 when the width is a multiple of 35, otherwise use 40; then arrange objects with a 16\u2011pixel gap and y=100.",
+          "reason": "invalid rule: line 1: unexpected character ' '",
+          "rule_excerpt": "let margin = if canvas.w % 35 == 0 then canvas.w / 35 else 40\nlet gap = 16\nlet y_target = 100\nlet x = margin\nfor V in objects {\n    move V to (x, y_target)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Use a fixed left margin of 40; compute the gap as a proportional width of the first object (8/55 of its width for width 110, 2/3 of its width for width 24) falling back to 16 pixels, then lay out objects with that gap and y=100.",
+          "reason": "invalid rule: line 2: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near 'if')",
+          "rule_excerpt": "let margin = 40\nlet gap = if objects[0].w == 110 then (8/55) * objects[0].w else if objects[0].w == 24 then (2/3) * objects[0].w else 16\nlet y_target = 100\nlet x = margin\nfor V in objects {\n    move V to (x, y_target)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Fix the first object's final x at 40, then shift each object right by 6 pixels times its index plus the difference between 40 and the first object's original x.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[1] your rule gives (x=46, y=100, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin\", \"value\": 40}, {\"op\": \"let\", \"name\": \"delta\", \"value\": {\"op\": \"sub\", \"args\": [{\"ref\": \"locals.margin\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}}, {\"op\": \"let\", \"name\": \"step\", \"value\": 6}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"offset\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.delta\"}, {\"op\": \"m",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Keep a fixed left margin of 40 pixels, then position each object at that margin plus its original x offset from the first object plus 6 pixels times its index.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[1] your rule gives (x=46, y=100, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step\", \"value\": 6}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"ref\": \"locals.base\"}, {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"get\", \"ar",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set the left margin to the canvas width divided by 35 (which is 40 for the example), then position each object using its original x offset from the first object plus 6 pixels times its index.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=41.37, y=100, w=24, h=24) but the evidence shows (x=40, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 35]}}, {\"op\": \"let\", \"name\": \"step\", \"value\": 6}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"ref\": \"locals.base\"}, {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Choose a left margin of 40 pixels for wide canvases (>1000) or 20 pixels otherwise, then place each object at that margin plus its original x offset from the first object plus 6 pixels times its index.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[1] your rule gives (x=46, y=100, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"if\", \"cond\": {\"op\": \"gt\", \"args\": [{\"ref\": \"canvas.w\"}, 1000]}, \"then\": [{\"op\": \"let\", \"name\": \"margin\", \"value\": 40}], \"else\": [{\"op\": \"let\", \"name\": \"margin\", \"value\": 20}]}, {\"op\": \"let\", \"name\": \"step\", \"value\": 6}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4881,
+        "completion_tokens": 12839,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 26830,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 100.78,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

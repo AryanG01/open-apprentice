@@ -1,0 +1,141 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:09:25+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to a fixed vertical position (canvas height divided by 7) and lay them out left\u2011to\u2011right with a constant horizontal gap of 12 pixels, starting at a fixed left offset of 60 pixels.",
+        "Place objects in a row with a constant gap of 12, starting at a left margin that is a fixed fraction of the canvas width (approximately 0.0429), and align them to a vertical position that is a fixed fraction of the canvas height (1/7)."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to a fixed vertical position (canvas height divided by 7) and lay them out left\u2011to\u2011right with a constant horizontal gap of 12 pixels, starting at a fixed left offset of 60 pixels.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y0 = canvas.h / 7\nlet gap = 12\nlet x = 60\nfor V in objects {\n    move V to (x, y0)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row with a constant gap of 12, starting at a left margin that is a fixed fraction of the canvas width (approximately 0.0429), and align them to a vertical position that is a fixed fraction of the canvas height (1/7).",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y0 = canvas.h / 7\nlet start = canvas.w * 0.042857142857142855\nlet gap = 12\nlet x = start\nfor V in objects {\n    move V to (x, y0)\n    x = x + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep each object\u2019s original vertical offset relative to the first object, then shift the whole group so that the first object\u2019s top aligns to canvas height / 7, while preserving the original horizontal gaps between objects.",
+          "reason": "invalid rule: line 4: unexpected character '?'",
+          "rule_excerpt": "let dy = (canvas.h / 7) - objects[0].y\nlet gap0 = objects[1].x - (objects[0].x + objects[0].w)\nlet gap1 = objects[2].x - (objects[1].x + objects[1].w)\nlet x = objects[0].x + dy  // actually dx? we need compute dx from first object's movement\n// Instead compute shift based on first object's target x = 60\nlet shift_x = 60 - objects[0].x\nlet shift_y = (canvas.h / 7) - objects[0].y\nfor V in objects {\n",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift every object so that its top edge aligns to a fixed vertical coordinate (100) and then arrange them left\u2011to\u2011right with the original horizontal gaps preserved.",
+          "reason": "invalid rule: line 6: unexpected character ':'",
+          "rule_excerpt": "let y_target = 100\nlet dy = y_target - objects[0].y\nlet dx0 = objects[1].x - (objects[0].x + objects[0].w)\nlet dx1 = objects[2].x - (objects[1].x + objects[1].w)\nlet x = objects[0].x + (y_target - objects[0].y)  // placeholder, we will recompute\n// Better: compute shift to put first object at x=60\nlet shift_x = 60 - objects[0].x\nlet shift_y = y_target - objects[0].y\nfor V in objects {\n    move V t",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep each object\u2019s original vertical offset relative to the first object, then shift the whole group so that the first object\u2019s top aligns to canvas height / 7, while preserving the original horizontal gaps between objects.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=170, y=190, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}]}}, {\"op\": \"let\", \"name\": \"shift_x\", \"value\": {\"op\": \"sub\", \"args\": [60, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existin",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Shift every object so that its top edge aligns to a fixed vertical coordinate (100) and then arrange them left\u2011to\u2011right with the original horizontal gaps preserved.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=170, y=190, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 100}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [{\"ref\": \"locals.y_target\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}]}}, {\"op\": \"let\", \"name\": \"shift_x\", \"value\": {\"op\": \"sub\", \"args\": [60, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_ta",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4121,
+        "completion_tokens": 2127,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Set each object's top to a fixed y=100, start at x=60, and position objects so that the left edge of each is the previous object's right edge plus a constant gap of 12."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row with a fixed top margin of canvas height/7, starting at a fixed left offset of 60 and spacing each by its own width plus a constant gap of 12.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=182, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_margin\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 60}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed vertical coordinate y=100 and arrange them left\u2011to\u2011right with a constant gap of 12, beginning at a left margin that equals the original x of the first object plus 50.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=182, y=100, w=110, h=90) but the evidence shows (x=162, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 50]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"r",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set each object's top to a fixed y=100, keep its original horizontal ordering, and space them so that the distance between left edges equals the average width of all objects plus a constant gap of 12.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'total_w')",
+          "rule_excerpt": "let y_fixed = 100\nlet total_w = 0\nfor V in objects { total_w = total_w + V.w }\nlet avg_w = total_w / len(objects)\nlet start_x = 60\nfor V in objects with I {\n  move V to (start_x + I * (avg_w + 12), y_fixed)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Position objects so their tops align with canvas height divided by 7, and lay them out with a constant left margin of 60 and a uniform horizontal spacing of 12 between their right and left edges.",
+          "reason": "duplicate",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row with top aligned to canvas height/7, starting at x=60, and place each object after the previous one's width plus a fixed gap of 12.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 60}, {\"op\": \"let\", \"name\": \"offset\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"ref\": \"locals.offs",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects to y=100, begin at the original x of the first object plus 50, then lay them out with each object spaced by its width plus a constant gap of 12.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=50, y=100, w=24, h=24) but the evidence shows (x=60, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 50]}}, {\"op\": \"let\", \"name\": \"offset\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Position objects so their tops align with canvas height divided by 7, start at a left margin equal to the first object's original x plus 50, and space each object by its width plus a fixed gap of 12.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=50, y=9.143, w=24, h=24) but the evidence shows (x=60, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 50]}}, {\"op\": \"let\", \"name\": \"offset\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 6377,
+        "completion_tokens": 1989,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 14614,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 19.97,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

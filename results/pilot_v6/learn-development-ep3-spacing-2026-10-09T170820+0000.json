@@ -1,0 +1,155 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:08:20+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row with a fixed top margin, fixed left start, and fixed gap between them.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let TOP_MARGIN = 60\nlet LEFT_START = 60\nlet GAP = 16\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to a top margin that is a fixed fraction of canvas height, keep left start fixed, and use a fixed gap.",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let TOP_MARGIN = 0.0857142857 * canvas.h  // 60/700\nlet LEFT_START = 60\nlet GAP = 16\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Start the row at a left margin that is a fixed fraction of canvas width, use a fixed top margin, and fixed gap.",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let LEFT_START = 0.0428571429 * canvas.w  // 60/1400\nlet TOP_MARGIN = 60\nlet GAP = 16\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Use a fixed top margin, fixed gap that is a fraction of the average object width, and start at a fixed left offset.",
+          "reason": "invalid rule: line 4: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let TOP_MARGIN = 60\nlet LEFT_START = 60\nlet AVG_W = (objects[0].w + objects[1].w + objects[2].w) / 3\nlet GAP = 0.4 * AVG_W  // yields 16 for given widths\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row with a fixed top margin, fixed left start, and fixed gap between them.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let TOP_MARGIN = 60\nlet LEFT_START = 60\nlet GAP = 16\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects to a top margin that is a fixed fraction of canvas height, keep left start fixed, and use a fixed gap.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let TOP_MARGIN = 0.0857142857 * canvas.h\nlet LEFT_START = 60\nlet GAP = 16\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Start the row at a left margin that is a fixed fraction of canvas width, use a fixed top margin, and fixed gap.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let LEFT_START = 0.0428571429 * canvas.w\nlet TOP_MARGIN = 60\nlet GAP = 16\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Use a fixed top margin, fixed gap that is a fraction of the average object width, and start at a fixed left offset.",
+          "reason": "invalid rule: line 8: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let TOP_MARGIN = 60\nlet LEFT_START = 60\nlet AVG_W = (objects[0].w + objects[1].w + objects[2].w) / 3\nlet GAP = 0.4 * AVG_W\nlet x = LEFT_START\nfor V in objects {\n  move V to (x, TOP_MARGIN)\n  x = x + V.w + GAP\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3933,
+        "completion_tokens": 1355,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a horizontal row starting at x=60 with a fixed vertical margin of 60px and a constant gap of 16px.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let startX = 60\nlet topMargin = 60\nlet gap = 16\nmove objects[0] to (startX, topMargin)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, topMargin)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to a top margin that is a fixed fraction of canvas height (\u22480.0857) and space them using a fixed left start and constant gap.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let topMargin = 0.0857142857 * canvas.h\nlet startX = 60\nlet gap = 16\nmove objects[0] to (startX, topMargin)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, topMargin)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Start the row at a left margin that is a fixed fraction of canvas width (~0.0429) and use a fixed top margin of 60px with constant gap.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let leftMargin = 0.0428571429 * canvas.w\nlet topMargin = 60\nlet gap = 16\nmove objects[0] to (leftMargin, topMargin)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, topMargin)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row with a fixed top margin, fixed left start, and a gap that is a fixed fraction of the average object width.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let startX = 60\nlet topMargin = 60\nlet avgW = (objects[0].w + objects[1].w + objects[2].w) / 3\nlet gap = 0.2 * avgW\nmove objects[0] to (startX, topMargin)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, topMargin)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at x=60 with a fixed vertical margin of 60px and a constant gap of 16px.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 60\nlet topMargin = 60\nlet gap = 16\nmove objects[0] to (startX, topMargin)\nfor V in objects with I {\n    if I == 0 {}\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, topMargin)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects to a top margin that is a fixed fraction of canvas height (~0.0857) and space them using a fixed left start and constant gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let topMargin = 0.0857142857 * canvas.h\nlet startX = 60\nlet gap = 16\nmove objects[0] to (startX, topMargin)\nfor V in objects with I {\n    if I == 0 {}\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, topMargin)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Start the row at a left margin that is a fixed fraction of canvas width (~0.0429) and use a fixed top margin of 60px with constant gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let leftMargin = 0.0428571429 * canvas.w\nlet topMargin = 60\nlet gap = 16\nmove objects[0] to (leftMargin, topMargin)\nfor V in objects with I {\n    if I == 0 {}\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, topMargin)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a horizontal row with a fixed top margin, fixed left start, and a gap that is a fixed fraction of the average object width.",
+          "reason": "invalid rule: line 9: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 60\nlet topMargin = 60\nlet avgW = (objects[0].w + objects[1].w + objects[2].w) / 3\nlet gap = 0.2 * avgW\nmove objects[0] to (startX, topMargin)\nfor V in objects with I {\n    if I == 0 {}\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, topMargin)\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4961,
+        "completion_tokens": 1217,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11466,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 11.92,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

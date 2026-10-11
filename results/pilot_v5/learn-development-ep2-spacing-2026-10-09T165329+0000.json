@@ -1,0 +1,126 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:53:29+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a horizontal row starting at x=80 with spacing 70 and y=100. ",
+        "Place objects in a row with y set to canvas.h/7, x starting at 80 and stepping by 70 per index."
+      ],
+      "rejected": [
+        {
+          "summary": "Shift every object right by 1/20 of the canvas width and align its top to 1/7 of the canvas height.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=230, y=100, w=120, h=40) but the evidence shows (x=220, y=100, w=120, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/20\"}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"op\": \"div\", \"args\": [1, 7]}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"g",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each object to a fixed y of 100 and increase its x by 70 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=230, y=100, w=120, h=40) but the evidence shows (x=220, y=100, w=120, h=40)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 70]}, \"y\": 100}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a horizontal row starting at x = 80 with uniform y = 100, preserving each object's width and height.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'i')",
+          "rule_excerpt": "let start_x = 80\nlet row_y = 100\nlet i = 0\nfor V in objects {\n  move V to (start_x + i * 70, row_y)\n  i = i + 1\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to the same vertical line y = canvas.h/7 and shift them right by canvas.w/20.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=230, y=100, w=120, h=40) but the evidence shows (x=220, y=100, w=120, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"op\": \"div\", \"args\": [1, 7]}]}}, {\"op\": \"let\", \"name\": \"shift_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/20\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\":",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each object right by (80 - its original x) then set y to 100, preserving order with uniform spacing of 70.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects to a grid: x = 80 + 70 * index, y = 100, where index is the object's order in the list.",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3009,
+        "completion_tokens": 1597,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row starting at x=80 with step 70, all at y=100.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [80, {\"op\": \"mul\", \"args\": [70, {\"ref\": \"locals.I\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at x=80 with step canvas.w/20, all at y=canvas.h/7.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=80, y=101.1, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [80, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 20]}, {\"ref\": \"locals.I\"}]}]}, \"y\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at x=80 with step canvas.w/20, all at y=100.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[1] your rule gives (x=83.2, y=100, w=24, h=24) but the evidence shows (x=124, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [80, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 20]}, {\"ref\": \"locals.I\"}]}]}, \"y\": 100}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row starting at x=80 with step 70, all at y=canvas.h/7.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [80, {\"op\": \"mul\", \"args\": [70, {\"ref\": \"locals.I\"}]}]}, \"y\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}], \"index_var\": \"I\"}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "If object id contains 'card' use step 70 else step 44, all at y=100.",
+          "reason": "invalid rule: line 2: unexpected character ' '",
+          "rule_excerpt": "for V in objects with I {\n  if contains(V.id, \"card\") {\n    move V to (80 + 70*I, 100);\n  } else {\n    move V to (80 + 44*I, 100);\n  }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4878,
+        "completion_tokens": 1632,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11116,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 15.71,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

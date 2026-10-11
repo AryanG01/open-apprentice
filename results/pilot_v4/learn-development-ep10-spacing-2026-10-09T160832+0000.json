@@ -1,0 +1,155 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:08:32+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row at y=120, starting at x=80 with a fixed 16\u2011unit gap between them.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 16\nlet y_target = 120\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row at y = canvas.h * 0.171428571, starting at x = canvas.w * 0.057142857 with a fixed 16\u2011unit gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = canvas.w * 0.05714285714285714\nlet gap = 16\nlet y_target = canvas.h * 0.17142857142857143\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row at y = 120, starting at x = 80 with a gap equal to 0.32 times the average width of all objects.",
+          "reason": "invalid rule: line 13: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 80\nlet y_target = 120\nlet sum_w = 0\nfor V in objects {\n  let sum_w = sum_w + V.w\n}\nlet avg_w = sum_w / 3\nlet gap = 0.32 * avg_w\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row at y = canvas.h * 0.171428571, starting at x = canvas.w * 0.057142857 with a gap equal to 0.32 times the average width of all objects.",
+          "reason": "invalid rule: line 13: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = canvas.w * 0.05714285714285714\nlet y_target = canvas.h * 0.17142857142857143\nlet sum_w = 0\nfor V in objects {\n  let sum_w = sum_w + V.w\n}\nlet avg_w = sum_w / 3\nlet gap = 0.32 * avg_w\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, y_target)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row at y=120, starting at x=80 with a fixed 16-unit gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"let\", \"name\": \"prev_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"let\", \"name\": \"prev_w\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"if\", \"cond\": {\"op\": \"eq\", \"args\": [{\"ref\": \"locals.prev_w\"}, 0]}, \"the",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row at y = canvas.h * 0.171428571, starting at x = canvas.w * 0.057142857 with a fixed 16-unit gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"2857142857142857/50000000000000000\"}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"17142857142857143/100000000000000000\"}]}}, {\"op\": \"let\", \"name\": \"prev_x\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"let\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row at y=120, starting at x=80 with gap = 0.32 * average width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"let\", \"name\": \"sum_w\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"sum_w\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.sum_w\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}]}}]}, {\"op\": \"let\", \"name\": \"avg_w\", \"value\": {\"op\": ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row at y = canvas.h * 0.171428571, starting at x = canvas.w * 0.057142857 with gap = 0.32 * average width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"2857142857142857/50000000000000000\"}]}}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"17142857142857143/100000000000000000\"}]}}, {\"op\": \"let\", \"name\": \"sum_w\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3636,
+        "completion_tokens": 2691,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Arrange objects horizontally at y=120 with left edges spaced by their previous x plus half their width.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let base_y = 120\nlet start_x = 80\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (start_x, base_y)\n    } else {\n        let prev = objects[I-1]\n        move obj to (prev.x + prev.w * 0.5, base_y)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row at y=120, starting at x=80, each shifted right by 0.4 times its own width plus 16 units.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let base_y = 120\nlet start_x = 80\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (start_x, base_y)\n    } else {\n        let shift = 0.4 * obj.w + 16\n        move obj to (objects[I-1].x + shift, base_y)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects at y = canvas.h * 0.171428571, start at x = canvas.w * 0.057142857, gap = 0.32 * average width of previous two objects.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let base_y = canvas.h * 0.171428571\nlet start_x = canvas.w * 0.057142857\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (start_x, base_y)\n    } else {\n        let prev = objects[I-1]\n        let prev2 = objects[max(I-2,0)]\n        let avg = (prev.w + prev2.w) * 0.5\n        let gap = 0.32 * avg\n        move obj to (prev.x + gap, base_y)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Stack objects vertically at x=80, y starts at 120 and increments by 0.5 * object height plus 20.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let base_x = 80\nlet start_y = 120\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (base_x, start_y)\n    } else {\n        let prev = objects[I-1]\n        let inc = 0.5 * prev.h + 20\n        move obj to (base_x, prev.y + inc)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects horizontally at y=120 with left edges spaced by previous x plus half its width.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'prev_idx')",
+          "rule_excerpt": "let base_y = 120\nlet start_x = 80\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (start_x, base_y)\n    } else {\n        let prev_idx = I - 1\n        let prev = objects[prev_idx]\n        move obj to (prev.x + prev.w * 0.5, base_y)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place objects in a row at y=120, start x=80, each shifted right by 0.4*width+16.",
+          "reason": "invalid rule: line 9: object index must be a whole number (near 'prev_idx')",
+          "rule_excerpt": "let base_y = 120\nlet start_x = 80\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (start_x, base_y)\n    } else {\n        let prev_idx = I - 1\n        let shift = 0.4 * obj.w + 16\n        move obj to (objects[prev_idx].x + shift, base_y)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align objects at y = canvas.h * 0.171428571, start x = canvas.w * 0.057142857, gap = 0.32 * average width of previous two.",
+          "reason": "invalid rule: line 9: object index must be a whole number (near 'prev_idx')",
+          "rule_excerpt": "let base_y = canvas.h * 0.171428571\nlet start_x = canvas.w * 0.057142857\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (start_x, base_y)\n    } else {\n        let prev_idx = I - 1\n        let prev2_idx = max(I - 2, 0)\n        let prev = objects[prev_idx]\n        let prev2 = objects[prev2_idx]\n        let avg = (prev.w + prev2.w) * 0.5\n        let gap = 0.32 * avg\n        move obj ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Stack objects vertically at x=80, y starts at 120 and increments by 0.5*height+20.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'prev_idx')",
+          "rule_excerpt": "let base_x = 80\nlet start_y = 120\nfor obj in objects with I {\n    if I == 0 {\n        move obj to (base_x, start_y)\n    } else {\n        let prev_idx = I - 1\n        let prev = objects[prev_idx]\n        let inc = 0.5 * prev.h + 20\n        move obj to (base_x, prev.y + inc)\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4655,
+        "completion_tokens": 1440,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 12422,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 19.09,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

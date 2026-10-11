@@ -1,0 +1,115 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:11:02+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place first card at fixed (40,100); each next card sits 16px to the right of the previous card, keeping original sizes.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let TOP = 100\nlet FIRST_LEFT = 40\nlet GAP = 16\nmove objects[0] to (FIRST_LEFT, TOP)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let PREV = objects[I-1]\n        move V to (PREV.x + PREV.w + GAP, TOP)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align cards to a vertical fraction of the canvas (top at 1/7 height) and start at a horizontal fraction (left at 1/35 width); spread them with a fixed 16px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let TOP = canvas.h * (1/7)\nlet FIRST_LEFT = canvas.w * (1/35)\nlet GAP = 16\nmove objects[0] to (FIRST_LEFT, TOP)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let PREV = objects[I-1]\n        move V to (PREV.x + PREV.w + GAP, TOP)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift the first card right by 30px and up to y=100; then chain each card 16px to the right of the prior card.",
+          "reason": "invalid rule: line 9: unexpected character '\"'",
+          "rule_excerpt": "let TOP = 100\nlet GAP = 16\nmove objects[0] to (objects[0].x + 30, TOP)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let PREV = objects[I-1]\n        move V to (PREV.x + PREV.w + GAP, TOP)\n    }}\"}, {",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first card at fixed (40,100); each next card sits 16px to the right of the previous card, keeping original sizes.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=70, h=90) but the evidence shows (x=166, y=100, w=70, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"TOP\", \"value\": 100}, {\"op\": \"let\", \"name\": \"FIRST_LEFT\", \"value\": 40}, {\"op\": \"let\", \"name\": \"GAP\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.FIRST_LEFT\"}, \"y\": {\"ref\": \"locals.TOP\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align cards to a vertical fraction of the canvas (top at 1/7 height) and start at a horizontal fraction (left at 1/35 width); spread them with a fixed 16px gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=70, h=90) but the evidence shows (x=166, y=100, w=70, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"TOP\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"op\": \"div\", \"args\": [1, 7]}]}}, {\"op\": \"let\", \"name\": \"FIRST_LEFT\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"div\", \"args\": [1, 35]}]}}, {\"op\": \"let\", \"name\": \"GAP\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.FIRST_LEFT\"}, \"y",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Shift the first card right by 30px and up to y=100; then chain each card 16px to the right of the prior card.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=70, h=90) but the evidence shows (x=166, y=100, w=70, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"TOP\", \"value\": 100}, {\"op\": \"let\", \"name\": \"GAP\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 30]}, \"y\": {\"ref\": \"locals.TOP\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Keep the vertical alignment at y=100; compute the first card's left as 40px plus 10% of the canvas width; then place each subsequent card 16px to the right of the previous one.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=180, y=100, w=110, h=90) but the evidence shows (x=40, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"TOP\", \"value\": 100}, {\"op\": \"let\", \"name\": \"FIRST_LEFT\", \"value\": {\"op\": \"add\", \"args\": [40, {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/10\"}]}]}}, {\"op\": \"let\", \"name\": \"GAP\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.FIRST_LEFT\"}, \"y\": {\"ref\": \"locals.TOP\"}}, {\"op\": \"emit_target\", \"kind\": \"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3764,
+        "completion_tokens": 2747,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Keep all cards at y = canvas.h/7; shift each card right by (30 + 6*index) pixels from its original x.",
+        "Set all cards' y to canvas.h/7; arrange them horizontally with a fixed 16px gap, starting from a left margin that is 1/35 of the canvas width."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first card at (canvas.w/35, canvas.h/7) and chain each next card 16px to the right of the previous card, keeping the same y.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let first_x = canvas.w / 35\nlet first_y = canvas.h / 7\nmove objects[0] to (first_x, first_y)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + 16, first_y)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Fix the first card's left at 40px and top at 100px; each subsequent card is placed 16px to the right of the previous card's right edge, sharing the same top.",
+          "reason": "invalid rule: line 5: object index must be a whole number (near 'I')",
+          "rule_excerpt": "move objects[0] to (40, 100)\nfor V in objects with I {\n    if I == 0 { }\n    else {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + 16, 100)\n    }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1932,
+        "completion_tokens": 1517,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 9960,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 18.9,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

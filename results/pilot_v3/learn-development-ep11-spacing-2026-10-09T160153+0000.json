@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:01:53+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Set each card's y to a fixed vertical margin from the top, preserving its width and height while shifting x by a fixed offset.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, 30]}, \"y\": {\"ref\": \"locals.margin_y\"}}]}]"
+        },
+        {
+          "summary": "Align all cards to a common baseline calculated as a fraction of canvas height, keeping their original horizontal spacing.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"142857/1000000\"}, {\"ref\": \"canvas.h\"}]}}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, \"y\": {\"ref\": \"locals.base_y\"}}]}]"
+        },
+        {
+          "summary": "Shift each card right by a proportion of its own width and move it up to a fixed y coordinate.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"target_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, {\"ref\": \"locals.shift\"}]}, \"y\": {\"ref\": \"locals.target_y\"}}]}]"
+        },
+        {
+          "summary": "Move each card to a grid cell where x increments by a fixed step and y is set to a constant.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step_x\", \"value\": 76}, {\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.i\"}, {\"ref\": \"locals.step_x\"}]}]}, \"y\": {\"ref\": \"locals.y_fixed\"}}], \"index_var\": \"i\"}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1037,
+        "completion_tokens": 425,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place each card at a fixed horizontal spacing starting from left margin 40, aligning their tops at y=100.",
+          "reason": "invalid rule: line 4: unknown name 'index'; define it with let or a for loop first (near '(')",
+          "rule_excerpt": "let start_x = 40\nlet gap = 76\nfor obj in objects {\n  move obj to (start_x + index(obj)*gap, 100)\n}"
+        },
+        {
+          "summary": "Keep each card's original x offset but shift all cards vertically to y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Align cards to a vertical line at x = 40 plus each card's original x offset divided by 2, keeping y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [40, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, 2]}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Move each card so its left edge aligns with a grid where columns are spaced by the canvas width divided by 20, starting at column 2, and set y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"col_step\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 20]}}, {\"op\": \"let\", \"name\": \"start_col\", \"value\": 2}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"locals.start_col\"}, {\"ref\": \"locals.col_step\"}]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.i\"}, {\"ref\": \"locals.col_step\"}]}]}, \"y\": 100}], \"index_va"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1191,
+        "completion_tokens": 313,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 2966,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 4.98,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "config": "development-pilot",
+  "origins": [
+    "live"
+  ],
+  "label": "MEASURED (live model rows + non-model reference rows; split and n stated below)",
+  "episodes": [
+    "ep-f96ca92599"
+  ],
+  "n_rows": 9,
+  "methods_all_stages": {
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 2,
+        "scheduled": 8,
+        "rate": 0.25
+      },
+      "conditional": {
+        "correct": 2,
+        "committed": 2,
+        "rate": 1.0
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 2,
+        "rate": 0.0
+      },
+      "failures": {
+        "abstained": 6
+      },
+      "costs": {
+        "tokens": 115840,
+        "calls": 9,
+        "actions": 71,
+        "solver_s": 0.2953535841079429,
+        "teacher_interactions": 4,
+        "wall_s": 324.2350978316972,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    }
+  },
+  "methods_transfer_and_composition": {
+    "full_v1_2": {
+      "method": "full_v1_2",
+      "success": {
+        "correct": 0,
+        "scheduled": 4,
+        "rate": 0.0
+      },
+      "conditional": {
+        "correct": 0,
+        "committed": 0,
+        "rate": null
+      },
+      "false_success": {
+        "false_successes": 0,
+        "claimed_successes": 0,
+        "rate": null
+      },
+      "failures": {
+        "abstained": 4
+      },
+      "costs": {
+        "tokens": 115840,
+        "calls": 9,
+        "actions": 71,
+        "solver_s": 0.2953535841079429,
+        "teacher_interactions": 4,
+        "wall_s": 324.2350978316972,
+        "usd_known_total": 0,
+        "rows_with_unknown_usd": 9
+      }
+    }
+  },
+  "primary_comparison": {
+    "a": "full_v1_2",
+    "b": "full_v1_2",
+    "n_episodes": 1,
+    "diff": null,
+    "ci95": null,
+    "note": "fewer than 2 paired episodes: no uncertainty can be estimated"
+  },
+  "primary_vs_strongest_baseline": null,
+  "gates_27_5": {
+    "status": "evaluated",
+    "caveat": "prospective goals from spec 27.5; passing them would support considering an exceptional score, not guarantee one",
+    "transfer_composition_success": {
+      "observed": 0.0,
+      "goal": 0.9,
+      "met": false
+    }
+  },
+  "split_note": "DEVELOPMENT data, episodes 1..1; development tuning/diagnostics, NOT the locked study",
+  "infra_errors": []
+}

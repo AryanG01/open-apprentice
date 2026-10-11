@@ -1,0 +1,57 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:47:07+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each object rightward by an amount that decreases with its index, then place it at y=120.",
+        "Stack objects horizontally starting at x=80 with spacing equal to each object's width plus 12, all at y=120."
+      ],
+      "rejected": [
+        {
+          "summary": "Move each object to a fixed vertical position (y=120) while preserving its horizontal position.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": 120}]}]"
+        },
+        {
+          "summary": "Align the top edge of each object to a fraction of the canvas height (canvas.h/6).",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 6]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"ref\": \"locals.target_y\"}}]}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 891,
+        "completion_tokens": 753,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 1644,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 4.12,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

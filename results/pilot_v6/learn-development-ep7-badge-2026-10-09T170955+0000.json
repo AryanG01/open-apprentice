@@ -1,0 +1,111 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:09:55+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Create a badge copy of proto placed 28px right and 2px down from card0's top\u2011left."
+      ],
+      "rejected": [
+        {
+          "summary": "Create a badge positioned 28px right and 2px down from the top\u2011left of the first object, sized proportionally.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + 28, objects[0].y + 2)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at a fixed offset from the left edge of the first object, using its width for horizontal placement and a fixed vertical offset.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + objects[0].w * 7/25, objects[0].y + 2)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge appears at a position that is a fraction of the canvas width plus a constant, independent of the first object's size.",
+          "reason": "invalid rule: line 3: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let xpos = canvas.w * 0.027142857 + 10\nclone objects[0] as badge at (xpos, objects[0].y + 2)\nresize badge to (objects[0].w * 2/5, objects[0].h * 1/4)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge is created with same size as the prototype object and placed relative to the first object's top\u2011left corner.",
+          "reason": "invalid rule: line 2: unexpected character \"'\"",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + 28, objects[0].y + 2)\n/* badge keeps proto's size (20x20) */",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at a fixed horizontal offset from card0's left edge using its width, vertically 2px down.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=24, y=392, w=20, h=20) but the evidence shows (x=38, y=392, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 7]}, 25]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge appears at a canvas\u2011based x position plus card0's x, with a 2px vertical shift.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=48, y=392, w=20, h=20) but the evidence shows (x=38, y=392, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"xoff\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"27142857/1000000000\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.xoff\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge is a copy of proto positioned at card0's top\u2011left plus a constant offset (28,2).",
+          "reason": "duplicate",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3532,
+        "completion_tokens": 1031,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Create a badge copy of proto placed 28px right and 2px down from card0's top\u2011left.",
+        "Clone proto as badge placed at card0's left plus 56% of card0's width, and 2px down.",
+        "Clone proto as badge placed at a fixed screen position (38,392) regardless of card0."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge placed at card0's left plus card0's width minus 12px, and 2px down.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=48, y=392, w=20, h=20) but the evidence shows (x=38, y=392, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 12]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 2]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1853,
+        "completion_tokens": 614,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 7030,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 9.17,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

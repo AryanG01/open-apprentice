@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:28:49+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed position (102,368) independent of any objects.",
+        "Place the badge 8 units left of card0's right edge and 8 units below its top edge.",
+        "Place the badge using an offset equal to one fifteenth of card0's width.",
+        "Place the badge using an offset equal to 0.4 times the proto's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 984,
+        "completion_tokens": 5109,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 6093,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 24.41,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:56:24+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place a clone of the second object at the top-right of the first object, inset by 4% of the first object's width from the right and top edges.",
+        "Place a clone of the second object at the top-right of the first object, inset by 6% of the first object's height from the right and top edges.",
+        "Place a clone of the second object at the top-right of the first object, inset by 18% of the second object's width from the right and top edges.",
+        "Place a clone of the second object at the top-right of the first object, inset horizontally by 4% of the first object's width and vertically by 6% of the first object's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 10205,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 11193,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 27.16,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

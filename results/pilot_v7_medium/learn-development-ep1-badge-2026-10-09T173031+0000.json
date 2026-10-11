@@ -1,0 +1,49 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:30:31+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 1,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the proto object and place it relative to the card's width and height using fixed fractions and a small offset.",
+        "Clone the proto object and position it by subtracting a proportion of the card's height from its width, then adding a fixed vertical offset.",
+        "Clone the proto object and place it using the card's larger dimension for horizontal offset and the smaller dimension for vertical offset, with fixed fractions and offset.",
+        "Clone the proto object and place it at a calculated position, but clamp the coordinates so the badge stays within the canvas bounds."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 990,
+        "completion_tokens": 4706,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 23306,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 102.32,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

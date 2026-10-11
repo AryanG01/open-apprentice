@@ -1,0 +1,15 @@
+oa learn  split=development trials=12  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=low
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      INTENT_READY      1       1 1a/0c      True   12600  35.41  
+  1 badge    prop       TEACHING         1       0 0a/0c      None   12990  33.56  TruncatedOutput: output hit the completion limit; not executing partial output
+  2 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   20840  51.83  TruncatedOutput: output hit the completion limit; not executing partial output
+  3 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   19769  49.86  TruncatedOutput: output hit the completion limit; not executing partial output
+  4 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   22676  64.67  TruncatedOutput: output hit the completion limit; not executing partial output
+  5 badge    min        TEACHING         1       0 0a/0c      None   12988  36.51  TruncatedOutput: output hit the completion limit; not executing partial output
+  6 badge    const      TEACHING         1       0 0a/0c      None   12981  35.63  TruncatedOutput: output hit the completion limit; not executing partial output
+  7 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   20430  53.97  TruncatedOutput: output hit the completion limit; not executing partial output
+  8 badge    min        INTENT_READY      1       1 1a/0c      True    7638  18.85  
+  9 badge    const      INTENT_READY      1       1 1a/0c      True    5480   12.1  
+ 10 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   26465  66.91  TruncatedOutput: output hit the completion limit; not executing partial output
+ 11 badge    min        INTENT_READY      1       1 1a/0c      True    5777  13.43  
+recovered the hidden rule on held-out scenes: 4/12  |  total tokens 180634  |  results in results/pilot_v8_ultra_badge

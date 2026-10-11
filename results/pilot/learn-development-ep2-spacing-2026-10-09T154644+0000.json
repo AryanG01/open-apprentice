@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:46:44+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move all objects to a fixed top y\u2011position, laying them out left\u2011to\u2011right with a constant horizontal gap.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 20\nlet y_target = 100\nlet x = start_x\nfor V in objects {\n    move V to (x, y_target)\n    x = x + V.w + gap\n}"
+        },
+        {
+          "summary": "Shift every object vertically to the canvas top margin while preserving their original horizontal offsets.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [0, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dy\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"y\"]}, {\"ref\": \"locals.dy\"}]}}]}]"
+        },
+        {
+          "summary": "Align objects to a horizontal line at y = 100, keeping each object\u2019s original x coordinate unchanged.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Place objects in a row starting at the left edge of the canvas, spaced by each object's width plus a fixed padding.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let pad = 15\nlet x = 0\nfor V in objects {\n    move V to (x, 100)\n    x = x + V.w + pad\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 889,
+        "completion_tokens": 907,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place objects in a row starting at x=80, y=100, each spaced 20px right of the previous object's right edge.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let start_x = 80\nlet start_y = 100\nlet gap = 20\nlet cursor_x = start_x\nfor V in objects {\n    move V to (cursor_x, start_y)\n    cursor_x = cursor_x + V.w + gap\n}"
+        },
+        {
+          "summary": "Shift every object down to y=100 and right by a fixed 70 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 70]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Align objects along y=100, distributing them evenly across the canvas width with equal margins on both sides.",
+          "reason": "invalid rule: line 2: expected a statement (let / move / resize / clone / for / if) (near 'n')",
+          "rule_excerpt": "let n = 0\nfor V in objects { n = n + 1 }\nlet total_w = 0\nfor V in objects { total_w = total_w + V.w }\nlet margin = (canvas.w - total_w) / (n + 1)\nlet x = margin\nfor V in objects {\n    move V to (x, 100)\n    x = x + V.w + margin\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1090,
+        "completion_tokens": 1179,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 4065,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 12.27,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

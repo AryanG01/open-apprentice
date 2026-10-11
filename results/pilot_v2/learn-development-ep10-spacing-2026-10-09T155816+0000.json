@@ -1,0 +1,87 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:58:16+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move all objects to a fixed y\u2011position (120) and place them side\u2011by\u2011side with a constant horizontal gap of 16 pixels, starting at x = 80.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"let\", \"name\": \"y_target\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"w\"]}, {\"ref\": \"locals.gap\"}]}]}]}, \"y\": {\"ref\":"
+        },
+        {
+          "summary": "Shift each object right by the width of the preceding object plus a fixed offset (16) and lift it to a y\u2011position that is the canvas height minus 580.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'acc')",
+          "rule_excerpt": "let y_target = canvas.h - 580\nlet acc = 0\nfor V in objects with I {\n  if I == 0 {\n    move V to (80, y_target)\n    acc = V.w\n  } else {\n    move V to (80 + acc + I * 16, y_target)\n    acc = acc + V.w\n  }\n}"
+        },
+        {
+          "summary": "Align the bottom edges of all objects to a horizontal line whose y\u2011coordinate is 120, preserving original widths and heights, and keep the original left\u2011to\u2011right order.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y_target = 120\nlet x = 80\nfor V in objects {\n  move V to (x, y_target)\n  x = x + V.w + 16\n}"
+        },
+        {
+          "summary": "Create a new row at the top of the canvas by copying each object, setting its y to 120 and positioning it so that the left edge of the first copy is 80 and each subsequent copy is placed immediately after the previous one with a 16\u2011pixel gap.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let y_target = 120\nlet x = 80\nfor V in objects {\n  clone V as copy at (x, y_target)\n  x = x + V.w + 16\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 887,
+        "completion_tokens": 926,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place all objects on a fixed horizontal line (y=120) and chain them left\u2011to\u2011right with a constant gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y_target = 120\nlet gap = 16\nlet first_x = 80\nfor V in objects with I {\n    if I == 0 {\n        move V to (first_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}"
+        },
+        {
+          "summary": "Align all objects to a fixed y\u2011coordinate derived from the canvas height and space them evenly across the canvas width.",
+          "reason": "invalid rule: line 1: unexpected character ' '",
+          "rule_excerpt": "let y_target = canvas.h * 0.17142857142857142  // \u2248120 for 700px height\nlet n = objects.length\nfor V in objects with I {\n    move V to (canvas.w * (I + 1) / (n + 1), y_target)\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1104,
+        "completion_tokens": 958,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3875,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 10.07,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

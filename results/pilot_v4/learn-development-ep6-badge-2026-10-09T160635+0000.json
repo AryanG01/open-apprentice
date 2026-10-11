@@ -1,0 +1,121 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:06:35+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge positioned at 60% of card0's width and 40% of its height from card0's top\u2011left.",
+        "Clone proto as badge placed a fixed 54px right and 16px down from card0's top\u2011left."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto as badge aligned to the bottom\u2011right corner of card0, shifted left by half its width and up by half its height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=90, y=370, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto as badge positioned at the point where card0's horizontal midline meets a vertical line 20% across the canvas width.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=280, y=360, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"vx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/5\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.vx\"}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 508,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place badge at a fixed offset (54,16) from the top\u2011left of card0.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 54]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 16]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at 60% of card0 width and 40% of card0 height from its top\u2011left.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at card0's top\u2011left plus half of proto size, then add a fixed shift (44,6).",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=99, y=366, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shiftx\", \"value\": 44}, {\"op\": \"let\", \"name\": \"shifty\", \"value\": 6}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}, {\"ref\": \"locals.shiftx\"}]}, ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place badge at card0's top\u2011left plus a fraction of canvas width/height (0.0457,0.5086).",
+          "reason": "invalid rule: line 3: unexpected closing brace or trailing text (near '}')",
+          "rule_excerpt": "let dx = 0.0457142857 * canvas.w\nlet dy = 0.5085714286 * canvas.h\nclone proto as badge at (objects[0].x + dx, objects[0].y + dy)}]}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge positioned using weighted combination of card0 size and canvas size.",
+          "reason": "contradicts teaching evidence - corrected_example: your rule creates a new object at (x=8.213, y=6.04, w=24, h=24) but the evidence shows (x=-16, y=16, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [13, 45]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [1, 50]}, {\"ref\": \"canvas.w\"}]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [9, 40]}, {\"op\": \"get\", \"args\": [{\"ref\": \"o",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge positioned using weighted combination of the second object size and canvas size.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=43.78, y=351.5, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [13, 45]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [1, 50]}, {\"ref\": \"canvas.w\"}]}]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [9, 40]}, {\"op\": \"get\", \"args\": [{\"ref\": \"o",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge positioned with a fixed offset plus a small canvas\u2011dependent shift.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=78, y=359.5, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shiftx\", \"value\": {\"op\": \"add\", \"args\": [54, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [1, 100]}, {\"ref\": \"canvas.w\"}]}]}}, {\"op\": \"let\", \"name\": \"shifty\", \"value\": {\"op\": \"add\", \"args\": [16, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [1, 200]}, {\"ref\": \"canvas.h\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\":",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Badge positioned at card0's top\u2011left plus half of proto size, corrected by a canvas\u2011based term.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=105, y=391, w=20, h=20) but the evidence shows (x=64, y=356, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}, {\"op\": \"mul\", \"args\": [{\"op\": \"div\", \"args\": [1, 20]}, {\"ref\": \"canvas.w\"}]}]}, 20]}}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4201,
+        "completion_tokens": 2604,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 8301,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 16.76,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

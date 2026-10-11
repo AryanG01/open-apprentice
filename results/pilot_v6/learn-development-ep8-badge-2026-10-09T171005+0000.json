@@ -1,0 +1,59 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:10:05+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Badge anchored to card0's top\u2011left with offsets 27 right, 3 down; size copied from proto.",
+        "Badge positioned so its left edge is 27px from card0's left and its top edge 3px from card0's top; size equals proto."
+      ],
+      "rejected": [
+        {
+          "summary": "Create badge positioned 27px right and 3px down from card0's top\u2011left, sized 20\u00d720.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[0] as badge at (objects[0].x + 27, objects[0].y + 3)\nresize badge to (20, 20)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Badge placed at card0's left edge plus half its width, top edge plus 3px, same size as proto.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=35, y=403, w=20, h=20) but the evidence shows (x=37, y=403, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"half_w\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.half_w\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"o",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1310,
+        "completion_tokens": 334,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 1644,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 2.42,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

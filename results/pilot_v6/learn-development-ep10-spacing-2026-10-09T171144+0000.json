@@ -1,0 +1,143 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:11:44+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place the first card at a fixed left\u2011margin and top, then lay out each next card with a fixed horizontal gap after the previous card, keeping all tops aligned.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let startX = 80\nlet gap = 16\nlet yAlign = 120\nmove objects[0] to (startX, yAlign)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, yAlign)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Scale the left margin and vertical alignment to the canvas size, use a gap proportional to the first card\u2019s width, and stack cards horizontally with that gap.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let startX = canvas.w * 0.05714285714285714\nlet gap = 0.4 * objects[0].w\nlet yAlign = canvas.h * 0.1714285714285714\nmove objects[0] to (startX, yAlign)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, yAlign)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep the original vertical offset of each card but shift all cards right by a fixed amount, then align their tops to a common y\u2011position.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=130, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 70}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [0, 260]}}, {\"op\": \"let\", \"name\": \"yCommon\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"loca",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the first card at a fixed left-margin and top, then lay out each next card with a fixed horizontal gap after the previous card, keeping all tops aligned.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 80\nlet gap = 16\nlet yAlign = 120\nmove objects[0] to (startX, yAlign)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, yAlign)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Scale the left margin and vertical alignment to the canvas size, use a gap proportional to the first card\u2019s width, and stack cards horizontally with that gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = canvas.w * 0.05714285714285714\nlet gap = 0.4 * objects[0].w\nlet yAlign = canvas.h * 0.1714285714285714\nmove objects[0] to (startX, yAlign)\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        move V to (prev.x + prev.w + gap, yAlign)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Shift all cards right by a fixed amount and lift them to a common top while preserving each card\u2019s original vertical spacing relative to the first card.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=130, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 70}, {\"op\": \"let\", \"name\": \"yTop\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"ref\": \"locals.yTop\"}}]}]",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Arrange cards in a row with equal spacing derived from the canvas width minus total card widths divided by (n+1), aligning tops to a fixed y.",
+          "reason": "invalid rule: line 8: expected a statement (let / move / resize / clone / for / if) (near 'x')",
+          "rule_excerpt": "let n = 3\nlet totalW = objects[0].w + objects[1].w + objects[2].w\nlet space = (canvas.w - totalW) / (n + 1)\nlet x = space\nlet y = 120\nfor V in objects {\n    move V to (x, y)\n    x = x + V.w + space\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3731,
+        "completion_tokens": 2275,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move each card to start at x=80+sum of previous widths+16 gap, y=120.",
+          "reason": "invalid rule: line 6: expected 'objects' (only 'objects' can be iterated) (near '0')",
+          "rule_excerpt": "let baseX = 80\nlet baseY = 120\nlet gap = 16\nfor obj in objects with i {\n    let prevWidthSum = 0\n    for j in 0..i-1 { prevWidthSum = prevWidthSum + objects[j].w }\n    move obj to (baseX + prevWidthSum + i * gap, baseY)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align cards vertically at y=120 and space them horizontally by a fixed gap after each card\u2019s width.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let startX = 80\nlet startY = 120\nlet gap = 16\nmove objects[0] to (startX, startY)\nfor obj in objects with i {\n    if i == 0 { continue }\n    let prev = objects[i-1]\n    move obj to (prev.x + prev.w + gap, startY)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first card at (80,120); each subsequent card placed with same top and left offset equal to previous card\u2019s left plus its width plus 16.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "move objects[0] to (80, 120)\nfor obj in objects with i {\n    if i == 0 { continue }\n    let prev = objects[i-1]\n    move obj to (prev.x + prev.w + 16, objects[0].y)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep each card\u2019s original y offset relative to the first card\u2019s original y, then shift all cards so the first card ends at (80,120).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=80, y=500, w=40, h=40) but the evidence shows (x=80, y=120, w=40, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dy0\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 380]}}, {\"op\": \"let\", \"name\": \"dx0\", \"value\": {\"op\": \"sub\", \"args\": [80, 10]}}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first card at (80,120) then lay out each next card with a fixed horizontal gap after its width. ",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'sumW')",
+          "rule_excerpt": "let baseX = 80\nlet baseY = 120\nlet gap = 16\nlet sumW = 0\nfor obj in objects {\n    move obj to (baseX + sumW, baseY)\n    sumW = sumW + obj.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Scale the left margin and vertical alignment to the canvas size, keep a fixed pixel gap. ",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'sumW')",
+          "rule_excerpt": "let baseX = canvas.w * 0.05714285714285714\nlet baseY = canvas.h * 0.17142857142857143\nlet gap = 16\nlet sumW = 0\nfor obj in objects {\n    move obj to (baseX + sumW, baseY)\n    sumW = sumW + obj.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Use a gap that scales with canvas width while keeping fixed margins. ",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'sumW')",
+          "rule_excerpt": "let baseX = 80\nlet baseY = 120\nlet gap = canvas.w * 0.0114285714285714\nlet sumW = 0\nfor obj in objects {\n    move obj to (baseX + sumW, baseY)\n    sumW = sumW + obj.w + gap\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4756,
+        "completion_tokens": 2014,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 12776,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 21.62,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

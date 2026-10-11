@@ -1,0 +1,57 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:57:55+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the proto object and place it 80 pixels right and 10 pixels down from card0.",
+        "Clone the proto object and place it in a grid cell that is one column to the right and one row down from card0's top\u2011left, assuming a 20\u2011pixel cell size."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the proto object and place it at the point that is 80% of card0's width to the right of its left edge and 10% of its height below its top edge.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offsetX\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"4/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offsetY\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/10\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offsetX\"}]}, \"y\": {\"op\": \"add\", \"ar"
+        },
+        {
+          "summary": "Clone the proto object and align it to the vertical midline of card0, shifted right by half the difference between canvas width and card0 width, and down by 10 pixels.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"midShift\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"sub\", \"args\": [{\"ref\": \"canvas.w\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 2]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.midShift\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 10]}}]"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 841,
+        "completion_tokens": 559,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 1400,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 3.44,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

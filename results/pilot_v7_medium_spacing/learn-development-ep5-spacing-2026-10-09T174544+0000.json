@@ -1,0 +1,75 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:45:44+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a row with fixed left offset 60, fixed horizontal gap 12, and fixed top offset 100.",
+        "Position objects using canvas\u2011relative fractions: start at 3/70 of canvas width, gap 3/350 of canvas width, and top at 1/7 of canvas height.",
+        "Start the row at the first object\u2019s original x plus 50, keep a fixed gap of 12, and align all tops at y=100.",
+        "Fix the left offset at 60, compute the gap as 2/15 of the first object\u2019s width, and set the top to 100."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with fixed left offset 60, fixed horizontal gap 12, and fixed top offset 100.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'curX')",
+          "rule_excerpt": "let startX = 60\nlet gap = 12\nlet targetY = 100\nlet curX = startX\nfor V in objects {\n    move V to (curX, targetY)\n    curX = curX + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Position objects using canvas\u2011relative fractions: start at 3/70 of canvas width, gap 3/350 of canvas width, and top at 1/7 of canvas height.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'curX')",
+          "rule_excerpt": "let startX = canvas.w * 3 / 70\nlet gap = canvas.w * 3 / 350\nlet targetY = canvas.h / 7\nlet curX = startX\nfor V in objects {\n    move V to (curX, targetY)\n    curX = curX + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Start the row at the first object\u2019s original x plus 50, keep a fixed gap of 12, and align all tops at y=100.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'curX')",
+          "rule_excerpt": "let startX = objects[0].x + 50\nlet gap = 12\nlet targetY = 100\nlet curX = startX\nfor V in objects {\n    move V to (curX, targetY)\n    curX = curX + V.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Fix the left offset at 60, compute the gap as 2/15 of the first object\u2019s width, and set the top to 100.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'curX')",
+          "rule_excerpt": "let startX = 60\nlet gap = objects[0].w * 2 / 15\nlet targetY = 100\nlet curX = startX\nfor V in objects {\n    move V to (curX, targetY)\n    curX = curX + V.w + gap\n]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3157,
+        "completion_tokens": 4294,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 7451,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 19.73,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

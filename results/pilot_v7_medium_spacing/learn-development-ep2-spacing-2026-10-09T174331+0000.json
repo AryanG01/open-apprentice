@@ -1,0 +1,88 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:43:31+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a row with horizontal spacing of 5% of canvas width, starting at that spacing plus the original x of the first object, and align them vertically to canvas height divided by 7.",
+        "Shift each object right by 5% of canvas width minus one\u2011seventh of the difference between its width and the first object's width, then move it to the vertical position canvas height/7.",
+        "Lay out objects left\u2011to\u2011right with a fixed 20\u2011pixel gap, beginning at an offset of 5% canvas width plus the first object's original x, and align them to canvas height/7."
+      ],
+      "rejected": [
+        {
+          "summary": "Position the first object at 5% canvas width plus its original x, then place each following object to the right of the previous one by its width plus a fixed gap of canvas width divided by 70, all aligned to canvas height/7.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=100, w=50, h=60) but the evidence shows (x=150, y=100, w=50, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"spacing\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/20\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"startX\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.spacing\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 70]}}, {\"op\": \"let\", \"name\": \"rowY\", \"value\": {\"op\": \"div\", \"args",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 7153,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place all objects at a fixed vertical coordinate y=100, laying them out horizontally starting at x=80 with a constant 20\u2011unit gap between them."
+      ],
+      "rejected": [
+        {
+          "summary": "Horizontally arrange objects with a left margin of 5% canvas width plus 10 units, a fixed 20\u2011unit gap, and vertically align them at 1/7 of the canvas height.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=13.2, y=9.143, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/20\"}]}, 10]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 20}, {\"op\": \"let\", \"name\": \"y_fixed\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"bod",
+          "stage": "initial"
+        },
+        {
+          "summary": "Start the layout at the first object's original x plus 70 units, use a gap equal to 40% of the first object's width, and fix the vertical position at y=100.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=70, y=100, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 70]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\", \"var\": \"V\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Layout objects with a left margin of 5% canvas width plus 10 units, a gap of canvas width divided by 70, and a vertical position of canvas height divided by 7.",
+          "reason": "contradicts teaching evidence - corrected_example: for objects[0] your rule gives (x=13.2, y=9.143, w=24, h=24) but the evidence shows (x=80, y=100, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.w\"}, {\"rat\": \"1/20\"}]}, 10]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 70]}}, {\"op\": \"let\", \"name\": \"y_fixed\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"ref\": \"locals.start_x\"}}, {\"op\": \"for_each\"",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1832,
+        "completion_tokens": 3702,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 13718,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 50.52,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

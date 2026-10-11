@@ -1,0 +1,88 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:39:37+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "template_class": "PRIVATE (not shown to the model)",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Create a badge by cloning the proto object and placing it inside the first selected object, offset left by 28 pixels and down by 8 pixels from the object's bottom\u2011right corner.",
+          "reason": "invalid rule: bad ref root 'proto'"
+        },
+        {
+          "summary": "Clone the proto object and position it so its left edge is the first object's right edge minus 7/5 of the proto's width, and its top edge is the first object's top plus 2/5 of the proto's height.",
+          "reason": "invalid rule: bad ref root 'proto'"
+        },
+        {
+          "summary": "Place a cloned proto badge inside the first selected object, shifted left by the proto's width plus 8 pixels and down by 2/5 of the proto's height.",
+          "reason": "invalid rule: bad ref root 'proto'"
+        },
+        {
+          "summary": "Generate a badge by copying the proto object and anchoring it at a fixed offset of 92 pixels right and 8 pixels down from the first selected object's top\u2011left corner.",
+          "reason": "invalid rule: bad ref root 'first'"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 687,
+        "completion_tokens": 3563,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone the proto object and place it at a position that is a fixed fraction of the first object's width and height offset from its top\u2011left corner.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.x')"
+        },
+        {
+          "summary": "Clone the proto object and position it so that its bottom\u2011right corner is offset from the first object's bottom\u2011right corner by a fixed fraction of the object's width and height.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.obj.x')"
+        },
+        {
+          "summary": "Clone the proto object and place it such that its left edge is the first object's left edge plus four times the proto's width plus twelve pixels, and its top edge is the first object's top edge plus eight pixels.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.protoObj.w')"
+        },
+        {
+          "summary": "Clone the proto object and position it so that its center aligns with a point that is a fixed fraction of the first object's width and height from its top\u2011left corner.",
+          "reason": "contradicts teaching evidence - demonstration: rule failed to run (unbound local 'locals.x')"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 859,
+        "completion_tokens": 5526,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 10635,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 44.92,
+  "prompt_hashes": {
+    "hypotheses": "a206721bc2959314"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:36:56+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 6,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place a clone of proto at 60% of card0's width and 40% of its height from card0's top\u2011left.",
+        "Place a clone of proto at the center of card0 shifted right by 10% of its width and up by 10% of its height.",
+        "Place a clone of proto at the point that is 40% left of card0's right edge and 60% up from card0's bottom edge.",
+        "If card0 is wider than tall, place badge at (60% width, 40% height); otherwise swap the percentages."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 3480,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object; if its size differs from the first, place it at (first.x + 0.6*first.w, first.y + 0.4*first.h); otherwise place it at (-canvas.w/4, canvas.h/4).",
+        "Clone the second object; if the first object is not square, place it at (first.x + 0.6*first.w, first.y + 0.4*first.h); otherwise place it at (-canvas.w/4, canvas.h/4).",
+        "Clone the second object; if the second object's area is smaller than the first's, place it at (first.x + 0.6*first.w, first.y + 0.4*first.h); otherwise place it at (-canvas.w/4, canvas.h/4).",
+        "Clone the second object; if the first and second objects have different positions, place it at (first.x + 0.6*first.w, first.y + 0.4*first.h); otherwise place it at (-canvas.w/4, canvas.h/4)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1482,
+        "completion_tokens": 9601,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 15544,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 57.7,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

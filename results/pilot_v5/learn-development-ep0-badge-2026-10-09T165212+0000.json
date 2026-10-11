@@ -1,0 +1,81 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:52:12+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto and place it 8 pixels below and 92 pixels to the right of card0\u2019s top\u2011left corner."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone proto and align its bottom\u2011right corner with a point that is 28 pixels left and 8 pixels up from card0\u2019s bottom\u2011right corner.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=102, y=422, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 28]}}, {\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}, 8]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and position it so its left edge is at 75% of card0\u2019s width from card0\u2019s left edge, and its top edge is 8 pixels below card0\u2019s top edge.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"3/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone proto and place it inside card0 with a fixed margin of 10 pixels from the left and 8 pixels from the top, but shifted right by the width of proto.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=140, y=368, w=20, h=20) but the evidence shows (x=102, y=368, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 10]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 8]}}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 991,
+        "completion_tokens": 573,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone proto and place it 8 pixels below and 92 pixels to the right of card0\u2019s top\u2011left corner.",
+        "Place the badge at a fixed x\u2011coordinate of 102, 8 pixels below card0\u2019s top.",
+        "Place the badge 28 pixels left of card0\u2019s right edge, 8 pixels below its top.",
+        "Place the badge at 51/700 of the canvas width, 8 pixels below card0\u2019s top."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1417,
+        "completion_tokens": 919,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3900,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 8.41,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

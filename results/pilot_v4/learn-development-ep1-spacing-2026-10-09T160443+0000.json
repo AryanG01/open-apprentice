@@ -1,0 +1,47 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:04:43+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects in a row with a fixed left margin, fixed top margin, and fixed gap between them.",
+        "Align the top of each object to a fraction of the canvas height (1/7) and start the row at a fraction of the canvas width (1/35) with a fixed gap.",
+        "Keep the vertical position fixed at y=100, start at x=40, and space objects so that the distance between their left edges equals the width of the first object plus a constant offset."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 1659,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 2700,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 8.51,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

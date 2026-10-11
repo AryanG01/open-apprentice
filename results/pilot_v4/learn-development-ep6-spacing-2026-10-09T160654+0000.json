@@ -1,0 +1,155 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:06:54+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place all cards side\u2011by\u2011side starting at a fixed left margin, aligned to a common top Y.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'start_x')",
+          "rule_excerpt": "let start_x = 80\nlet row_y = 120\nfor obj in objects {\n  move obj to (start_x, row_y)\n  start_x = start_x + obj.w\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Center each card vertically in the canvas and stack them horizontally with a fixed gap.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'total_w')",
+          "rule_excerpt": "let gap = 10\nlet total_w = 0\nfor obj in objects { total_w = total_w + obj.w }\nlet start_x = (canvas.w - total_w - gap * (length(objects)-1)) / 2\nlet row_y = (canvas.h - objects[0].h) / 2\nfor obj in objects {\n  move obj to (start_x, row_y)\n  start_x = start_x + obj.w + gap\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align cards to a grid where each card\u2019s left edge is a multiple of its width plus an offset, all sharing the same Y.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'base_x')",
+          "rule_excerpt": "let base_x = 80\nlet row_y = 120\nfor obj in objects {\n  move obj to (base_x, row_y)\n  base_x = base_x + obj.w\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each card so its left edge aligns with the previous card\u2019s right edge, starting from a fixed X, and set Y to a fixed value.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'cur_x')",
+          "rule_excerpt": "let cur_x = 80\nlet fixed_y = 120\nfor obj in objects {\n  move obj to (cur_x, fixed_y)\n  cur_x = cur_x + obj.w\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards side\u2011by\u2011side starting at x=80, all with y=120. ",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=170, y=120, w=120, h=50) but the evidence shows (x=190, y=120, w=120, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"acc\", \"value\": 0}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [80, {\"ref\": \"locals.acc\"}]}, \"y\": 120}, {\"op\": \"let\", \"name\": \"acc\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.acc\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"w\"]}]}}]",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align cards to a vertical center line, stacking horizontally with a 10\u2011px gap.",
+          "reason": "invalid rule: line 4: unknown name 'length'; define it with let or a for loop first (near '(')",
+          "rule_excerpt": "let gap = 10\nlet total = 0\nfor obj in objects { let total = total + obj.w }\nlet start_x = (canvas.w - total - gap * (length(objects)-1)) / 2\nlet row_y = (canvas.h - objects[0].h) / 2\nlet acc = 0\nfor obj in objects {\n  move obj to (start_x + acc, row_y)\n  let acc = acc + obj.w + gap\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Left\u2011align cards at x=80, y=120, then shift each card right by its own width times its index.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=200, y=120, w=120, h=50) but the evidence shows (x=190, y=120, w=120, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"base_y\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.i\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set each card\u2019s left edge to the previous card\u2019s right edge, starting from x=80, and fix y=120.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=170, y=120, w=120, h=50) but the evidence shows (x=190, y=120, w=120, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cur_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"fixed_y\", \"value\": 120}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"ref\": \"locals.cur_x\"}, \"y\": {\"ref\": \"locals.fixed_y\"}}, {\"op\": \"let\", \"name\": \"cur_x\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.cur_x\"}, {\"op\"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3037,
+        "completion_tokens": 1204,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Place cards side\u2011by\u2011side starting at x=80 with a fixed 20\u202fpx gap, all aligned to y=120.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'y_target')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 20\ny_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Same layout but the gap is derived from the canvas height (canvas.h / 35), giving 20\u202fpx for the current canvas.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'y_target')",
+          "rule_excerpt": "let start_x = 80\nlet gap = canvas.h / 35\ny_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Start x is fixed at 80\u202fpx, gap fixed at 20\u202fpx, but the start x is expressed as a canvas\u2011relative term that evaluates to 80 for this canvas.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'y_target')",
+          "rule_excerpt": "let start_x = canvas.w * 0 + 80\nlet gap = 20\ny_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards side\u2011by\u2011side with a gap that is the smaller of 20\u202fpx and one\u2011third of the average card height, yielding 20\u202fpx here.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'y_target')",
+          "rule_excerpt": "let avg_h = (objects[0].h + objects[1].h + objects[2].h) / 3\nlet gap = min(20, avg_h / 3)\nlet start_x = 80\ny_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place cards side-by-side starting at x=80 with a fixed 20 px gap, all aligned to y=120.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 80\nlet gap = 20\nlet y_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Gap derived from canvas height (canvas.h / 35), start x fixed at 80, y fixed at 120.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = 80\nlet gap = canvas.h / 35\nlet y_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Start x expressed as canvas-w relative term (canvas.w * 0 + 80), gap fixed 20, y fixed 120.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = canvas.w * 0 + 80\nlet gap = 20\nlet y_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Gap is min(20, average card height / 3); start x fixed 80; y fixed 120.",
+          "reason": "invalid rule: line 9: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let avg_h = (objects[0].h + objects[1].h + objects[2].h) / 3\nlet gap = min(20, avg_h / 3)\nlet start_x = 80\nlet y_target = 120\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, y_target)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, y_target)\n    }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4632,
+        "completion_tokens": 2536,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 11409,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 19.8,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

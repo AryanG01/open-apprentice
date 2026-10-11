@@ -1,0 +1,147 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:49:07+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "none",
+  "split": "development",
+  "episode": 5,
+  "concept": "badge",
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place its top-left at a fixed offset from the first object's top-left.",
+        "Clone the second object and place its top-left at a fixed offset from the first object's center."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place its top-left at the center of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=55, y=330, w=20, h=20) but the evidence shows (x=76.4, y=303.6, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"e",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its center at the center of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=45, y=320, w=20, h=20) but the evidence shows (x=76.4, y=303.6, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"l",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the center of the canvas.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=700, y=350, w=20, h=20) but the evidence shows (x=76.4, y=303.6, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 2]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 2]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"ref\": \"locals.cx\"}, \"y\": {\"ref\": \"locals.cy\"}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its center at the center of the canvas.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=690, y=340, w=20, h=20) but the evidence shows (x=76.4, y=303.6, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 2]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 2]}}, {\"op\": \"let\", \"name\": \"ox\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}}, {\"op\": \"let\", \"name\": \"oy\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its center at a fixed offset from the first object's top-left.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=66.4, y=293.6, w=20, h=20) but the evidence shows (x=76.4, y=303.6, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"ox\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}, 2]}}, {\"op\": \"let\", \"name\": \"oy\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}, 2]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"ar",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place its center at a fixed offset from the first object's center.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=66.4, y=293.6, w=20, h=20) but the evidence shows (x=76.4, y=303.6, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"cx\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"cy\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"l",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2961,
+        "completion_tokens": 711,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone the second object, size it to 25% of the first object's dimensions, and place its top-left at 70% of the first object's width and 50% of its height from the first object's top-left.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet bx = objects[0].x + 0.7 * objects[0].w\nlet by = objects[0].y + 0.5 * objects[0].h\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object, size it to 25% of the first object's dimensions, and place its center at 80% of the first object's width and 60% of its height from the first object's top-left.",
+          "reason": "invalid rule: line 8: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet cx = objects[0].x + 0.8 * objects[0].w\nlet cy = objects[0].y + 0.6 * objects[0].h\nlet bx = cx - bw / 2\nlet by = cy - bh / 2\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object, size it to 25% of the first object's dimensions, and place its top-left at the first object's right edge minus 20% of the first object's width and at the first object's vertical center minus 12.5% of its height.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet bx = objects[0].x + 0.8 * objects[0].w - bw\nlet by = objects[0].y + 0.5 * objects[0].h - bh / 2\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object, size it to 25% of the first object's dimensions, and place its top-right corner at 80% of the first object's width from the left and its vertical center at 60% of the first object's height from the top.",
+          "reason": "invalid rule: line 8: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet rx = objects[0].x + 0.8 * objects[0].w\nlet cy = objects[0].y + 0.6 * objects[0].h\nlet bx = rx - bw\nlet by = cy - bh / 2\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object as badge, size it to 25% of the first object's dimensions, and place its top-left at 70% of the first object's width and 50% of its height from the first object's top-left.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet bx = objects[0].x + 0.7 * objects[0].w\nlet by = objects[0].y + 0.5 * objects[0].h\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object as badge, size it to 25% of the first object's dimensions, and place its center at 80% of the first object's width and 60% of its height from the first object's top-left.",
+          "reason": "invalid rule: line 8: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet cx = objects[0].x + 0.8 * objects[0].w\nlet cy = objects[0].y + 0.6 * objects[0].h\nlet bx = cx - bw / 2\nlet by = cy - bh / 2\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object as badge, size it to 25% of the first object's dimensions, and place its top-left at the first object's right edge minus 20% of the first object's width and at the first object's vertical center minus 12.5% of its height.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet bx = objects[0].x + 0.8 * objects[0].w - bw\nlet by = objects[0].y + 0.5 * objects[0].h - bh / 2\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object as badge, size it to 25% of the first object's dimensions, and place its top-right corner at 80% of the first object's width from the left and its vertical center at 60% of the first object's height from the top.",
+          "reason": "invalid rule: line 8: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let bw = 0.25 * objects[0].w\nlet bh = 0.25 * objects[0].h\nlet rx = objects[0].x + 0.8 * objects[0].w\nlet cy = objects[0].y + 0.6 * objects[0].h\nlet bx = rx - bw\nlet by = cy - bh / 2\nclone objects[1] as badge at (bx, by)\nresize badge to (bw, bh)",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5495,
+        "completion_tokens": 1389,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 10556,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 7.61,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:48:55+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "none",
+  "split": "development",
+  "episode": 3,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place it at the left edge of the first object, offset right by half the prototype's width and down by 10 pixels.",
+        "Clone the second object and place it at the left edge of the first object, offset right by a fixed 10 pixels and down by 10 pixels.",
+        "Clone the second object and place it at the left edge of the first object, offset right by one quarter of the first object's width and down by 10 pixels.",
+        "Clone the second object and place it at the left edge of the first object, offset right by a fixed proportion of the canvas width and down by 10 pixels."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place it at the top-right corner of the first object.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 10]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it with its left edge aligned to the right edge of the first object and its top edge 10 pixels below the first object's top edge.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.offset_y\"}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-right of the first object, offset vertically by half the prototype's height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}, 2]}]}}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-right of the first object, offset vertically by a fixed proportion of the first object's height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=50, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"ratio\", \"value\": {\"rat\": \"1111111111111111/10000000000000000\"}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2875,
+        "completion_tokens": 665,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by half the second object's width and down by 10.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by the second object's width and down by 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [1, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"ar",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by the first object's width minus the second object's width and down by 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"r",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by a quarter of the first object's width and down by 10.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/4\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by 10 and down by 10.",
+          "reason": "contradicts teaching evidence - neither: your rule reproduces a result the user already rejected",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": 10}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"ref\": \"locals.of",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by half the first object's width and down by 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by a quarter of the canvas width and down by 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=360, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/4\"}, {\"ref\": \"canvas.w\"}]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place it at the top-left of the first object, offset right by the first object's x plus 10 and down by 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=30, y=330, w=20, h=20) but the evidence shows (x=20, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 10]}}, {\"op\": \"let\", \"name\": \"offset_y\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.offset_x\"}]}, \"y\": {\"op\": \"add\", \"a",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4981,
+        "completion_tokens": 763,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 9284,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 6.61,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

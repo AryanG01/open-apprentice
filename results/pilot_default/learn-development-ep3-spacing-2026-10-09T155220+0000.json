@@ -1,0 +1,48 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:52:20+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place all objects at a fixed top margin y=60, pack them horizontally starting at x=60 with a constant gap of 16.",
+        "Align objects to a bottom margin (canvas.h\u2011640) and start at a left margin proportional to canvas width (3/70), with a gap proportional to canvas width (2/175).",
+        "Shift the first object to (original x+50, original y\u2011260) then pack the rest horizontally with a gap of 16, keeping the top edge at y=60.",
+        "Set the top edge to a fixed fraction of canvas height (6/70), start the horizontal pack at a fixed fraction of canvas width (3/70), and use a gap that is a fixed fraction of canvas width (2/175)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 879,
+        "completion_tokens": 4710,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5589,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 25.34,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

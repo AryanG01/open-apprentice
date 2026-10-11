@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:09:46+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each card right by 70\u202fpx plus 10\u202fpx times its index, and set its y\u2011coordinate to 120."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first card at (80,120) and each subsequent card 20 pixels to the right of the previous card\u2019s right edge, keeping the same y\u2011coordinate.",
+          "reason": "invalid rule: line 2: expected '{' to open a block (near 'where')",
+          "rule_excerpt": "move objects[0] to (80, 120)\nfor V in objects with I where I>0 {\n    move V to (objects[I-1].x + objects[I-1].w + 20, 120)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to a horizontal line y = canvas.h \u2013 580, then lay them out with a fixed 20\u202fpx gap between edges starting at x = 80.",
+          "reason": "invalid rule: line 3: expected '{' to open a block (near 'where')",
+          "rule_excerpt": "let y_line = canvas.h - 580\nmove objects[0] to (80, y_line)\nfor V in objects with I where I>0 {\n    move V to (objects[I-1].x + objects[I-1].w + 20, y_line)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep each card\u2019s original vertical offset relative to the first card\u2019s original y (\u2011220\u202fpx) and then add a uniform upward shift of 340\u202fpx, while spreading them horizontally with a 20\u202fpx edge gap starting at x = 80.",
+          "reason": "invalid rule: line 5: expected '{' to open a block (near 'where')",
+          "rule_excerpt": "let base_y = objects[0].y - 220\nlet shift_up = 340\nlet y_target = base_y + shift_up\nmove objects[0] to (80, y_target)\nfor V in objects with I where I>0 {\n    move V to (objects[I-1].x + objects[I-1].w + 20, y_target)\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1402,
+        "completion_tokens": 1444,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each card right by 70\u202fpx plus 10\u202fpx times its index, and set its y\u2011coordinate to 120.",
+        "Shift each card right by 70\u202fpx plus 10\u202fpx times its index, and set its y\u2011coordinate to 120 (same as the given rule but expressed with a let)."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first card at (80,120); each following card sits 20\u202fpx to the right of the previous card\u2019s right edge, all at y=120.",
+          "reason": "invalid rule: line 4: object index must be a whole number (near 'I')",
+          "rule_excerpt": "move objects[0] to (80, 120);\nfor V in objects with I {\n    if I > 0 {\n        move V to (objects[I-1].x + objects[I-1].w + 20, 120);\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to the horizontal line y = 120 and lay them out left\u2011to\u2011right preserving original order with a fixed 20\u202fpx gap between cards.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'run_x')",
+          "rule_excerpt": "let gap = 20;\nlet run_x = 80;\nfor V in objects {\n    move V to (run_x, 120);\n    run_x = run_x + V.w + gap;\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1718,
+        "completion_tokens": 1029,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5593,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 12.93,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

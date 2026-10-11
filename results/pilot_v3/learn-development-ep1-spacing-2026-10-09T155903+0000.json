@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:59:03+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Move every card to y=100 while preserving its horizontal position.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Shift each card right by a fixed amount of 30 pixels and set its y to 100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card1 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, 30]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Shift each card right by 12% of its vertical distance from y=100, then set y to 100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card2 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"y\"]}, 100]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"3/25\"}, {\"ref\": \"locals.dy\"}]}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Place cards in a row starting at x=40 with spacing equal to each card's width plus 10px, all at y=100.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'cursor_x')",
+          "rule_excerpt": "let cursor_x = 40\nfor V in objects {\n  move V to (cursor_x, 100)\n  cursor_x = cursor_x + V.w + 10\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1041,
+        "completion_tokens": 735,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Align all cards to y=100 and space them horizontally with gaps proportional to their widths.",
+          "reason": "invalid rule: line 7: expected a statement (let / move / resize / clone / for / if) (near 'set')",
+          "rule_excerpt": "let start_x = 40\nlet gap_factor = 0.5\nlet cursor_x = start_x\nfor obj in objects {\n  move obj to (cursor_x, 100)\n  let gap = obj.w * gap_factor\n  set cursor_x = cursor_x + obj.w + gap\n}"
+        },
+        {
+          "summary": "Shift each card right by half its width and place it at y=100.",
+          "reason": "contradicts teaching evidence - demonstration: geometry of card0 does not match",
+          "rule_excerpt": "[{\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"w\"]}]}]}, \"y\": 100}]}]"
+        },
+        {
+          "summary": "Arrange cards in a row at y=100 with uniform 20\u2011pixel spacing starting at x=40.",
+          "reason": "invalid rule: line 6: expected a statement (let / move / resize / clone / for / if) (near 'set')",
+          "rule_excerpt": "let start_x = 40\nlet spacing = 20\nlet cursor_x = start_x\nfor obj in objects {\n  move obj to (cursor_x, 100)\n  set cursor_x = cursor_x + obj.w + spacing\n}"
+        },
+        {
+          "summary": "Move each card to y=100 and align its left edge with the cumulative sum of previous cards' widths plus 40.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'set')",
+          "rule_excerpt": "let offset = 40\nfor obj in objects with i {\n  let prev_width_sum = 0\n  for prev in objects with j {\n    if j < i { set prev_width_sum = prev_width_sum + prev.w }\n  }\n  move obj to (offset + prev_width_sum, 100)\n}"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1222,
+        "completion_tokens": 379,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 3377,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 6.83,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

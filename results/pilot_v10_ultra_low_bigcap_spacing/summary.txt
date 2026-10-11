@@ -1,0 +1,15 @@
+oa learn  split=development trials=12  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=low
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 spacing  edge       UNRESOLVED       2       2 2a/1c      None   32839  94.44  
+  1 spacing  edge       UNRESOLVED       2       1 1a/1c      None   49723 133.04  
+  2 spacing  edge       INTENT_READY      2       2 2a/1c      True   31710   86.1  
+  3 spacing  edge       INTENT_READY      1       1 1a/0c     False   28119  81.42  
+  4 spacing  edge       INTENT_READY      1       1 1a/0c      True   12668  37.16  
+  5 spacing  edge       INTENT_READY      1       1 1a/0c      True   10843  32.85  
+  6 spacing  edge       INTENT_READY      1       1 1a/0c     False   12249  39.36  
+  7 spacing  edge       INTENT_READY      1       1 1a/0c      True   14716  47.85  
+  8 spacing  edge       UNRESOLVED       2       2 2a/1c      None   38413 105.79  
+  9 spacing  edge       INTENT_READY      1       1 1a/0c      True   16660  58.17  
+ 10 spacing  edge       INTENT_READY      1       1 1a/0c      True   10875  31.37  
+ 11 spacing  edge       INTENT_READY      1       1 1a/0c     False   18127  46.94  
+recovered the hidden rule on held-out scenes: 6/12  |  total tokens 276942  |  results in results/pilot_v10_ultra_low_bigcap_spacing

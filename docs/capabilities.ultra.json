@@ -1,0 +1,219 @@
+{
+  "accepted_options": {
+    "completion_limit_field": "max_tokens",
+    "json_object": true,
+    "json_schema": true,
+    "reasoning_effort": {
+      "low": {
+        "accepted": true,
+        "reasoning_tokens": 128,
+        "valid_json": true
+      },
+      "none": {
+        "accepted": true,
+        "reasoning_tokens": 0,
+        "valid_json": true
+      }
+    },
+    "seed": true
+  },
+  "base_url": "https://api.tokenfactory.nebius.com/v1/",
+  "calls_made": 8,
+  "checks": [
+    {
+      "http_status": 200,
+      "model_count": 25,
+      "name": "list_models",
+      "nemotron_models": [
+        "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+        "nvidia/Nemotron-3-Ultra-550b-a55b",
+        "nvidia/Nemotron-3_5-Lightning",
+        "nvidia/nemotron-3-super-120b-a12b"
+      ],
+      "ok": true,
+      "requested_model_listed": true
+    },
+    {
+      "cap": 32,
+      "completion_tokens_details": {
+        "reasoning_tokens": 31
+      },
+      "finish_reason": "length",
+      "http_status": 200,
+      "latency_ms": 710,
+      "limit_field": "max_tokens",
+      "message_fields": [
+        "annotations",
+        "audio",
+        "content",
+        "function_call",
+        "reasoning_content",
+        "refusal",
+        "role",
+        "tool_calls"
+      ],
+      "name": "small_cap_behaviour",
+      "ok": true,
+      "reasoning_fields_present": [],
+      "request_id": "d0b5cdd906b400b4a0421bf58fba89f6",
+      "usage": {
+        "completion_tokens": 32,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 21,
+        "prompt_tokens": 21,
+        "total_tokens": 53
+      },
+      "visible_content_chars": 138
+    },
+    {
+      "cap": 512,
+      "completion_tokens_details": {
+        "reasoning_tokens": 35
+      },
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_ms": 701,
+      "name": "minimal_completion",
+      "ok": true,
+      "request_id": "95a1ef93b7d18509f154c9ca17b91944",
+      "returned_model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "usage": {
+        "completion_tokens": 38,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 21,
+        "prompt_tokens": 21,
+        "total_tokens": 59
+      },
+      "visible_content_chars": 2
+    },
+    {
+      "completion_tokens_details": {
+        "reasoning_tokens": 49
+      },
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_ms": 829,
+      "name": "json_object",
+      "ok": true,
+      "parsed_ok": true,
+      "request_id": "8178b776b245b49f33ff1210628415cd",
+      "status": "ok",
+      "usage": {
+        "completion_tokens": 57,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 27,
+        "prompt_tokens": 27,
+        "total_tokens": 84
+      }
+    },
+    {
+      "completion_tokens_details": {
+        "reasoning_tokens": 128
+      },
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_ms": 1189,
+      "name": "reasoning_effort=low",
+      "ok": true,
+      "parsed_ok": true,
+      "reasoning_tokens": 128,
+      "request_id": "d47a3110e75b1e442330adadc6a3ce69",
+      "usage": {
+        "completion_tokens": 136,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 27,
+        "prompt_tokens": 27,
+        "total_tokens": 163
+      }
+    },
+    {
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      },
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_ms": 701,
+      "name": "reasoning_effort=none",
+      "ok": true,
+      "parsed_ok": true,
+      "reasoning_tokens": 0,
+      "request_id": "3f20cb06bf6f2b23fbab1e3ea48f9095",
+      "usage": {
+        "completion_tokens": 7,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 27,
+        "prompt_tokens": 27,
+        "total_tokens": 34
+      }
+    },
+    {
+      "completion_tokens_details": {
+        "reasoning_tokens": 46
+      },
+      "finish_reason": "stop",
+      "http_status": 200,
+      "latency_ms": 591,
+      "name": "json_schema",
+      "ok": true,
+      "parsed_ok": true,
+      "request_id": "122fd911a41fdc018e7f152221143ec2",
+      "status": "ok",
+      "usage": {
+        "completion_tokens": 55,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 21,
+        "prompt_tokens": 21,
+        "total_tokens": 76
+      }
+    },
+    {
+      "completion_tokens_details": {
+        "reasoning_tokens": 21
+      },
+      "http_status": 200,
+      "latency_ms": 710,
+      "name": "seed_and_temperature",
+      "ok": true,
+      "request_id": "6428308d405330a148114e334887e162",
+      "usage": {
+        "completion_tokens": 24,
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 21,
+        "prompt_tokens": 21,
+        "total_tokens": 45
+      }
+    }
+  ],
+  "cost_note": "dollar cost not computed: rates are only used when INPUT/OUTPUT_USD_PER_MILLION are configured",
+  "limits": {
+    "max_calls": 8,
+    "max_total_tokens": 6000
+  },
+  "probed_at": "2026-10-10T03:40:15+00:00",
+  "reasoning_model_detected": false,
+  "requested_model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "returned_model_ids": [
+    "nvidia/Nemotron-3-Ultra-550b-a55b"
+  ],
+  "summary": {
+    "assumptions_in_adapter": {
+      "json_mode_default": true,
+      "limit_field_default": "max_tokens"
+    },
+    "authenticated": true,
+    "json_schema_status": "ok",
+    "model_identity_matches_request": true,
+    "recommended_json_mode": "json_schema",
+    "usage_reported": true
+  },
+  "tokens_observed": 514,
+  "usage_fields_seen": [
+    "completion_tokens",
+    "completion_tokens_details",
+    "prompt_cache_hit_tokens",
+    "prompt_cache_miss_tokens",
+    "prompt_tokens",
+    "prompt_tokens_details",
+    "total_tokens"
+  ]
+}

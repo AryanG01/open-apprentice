@@ -1,0 +1,75 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:14:45+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move all three objects to fixed y=100, then pack left-to-right from fixed x=40 with fixed 16px gaps.",
+        "Move all three objects to fixed y=100, then pack left-to-right starting from 4 times the first object's x with fixed 16px gaps.",
+        "Move all three objects to fixed y=100, then pack left-to-right starting from the first object's horizontal center (x + w/2) with fixed 16px gaps.",
+        "Move all three objects to y=canvas.h/7, then pack left-to-right from x=canvas.w/35 with gap=canvas.w/87.5 (all canvas-proportional)."
+      ],
+      "rejected": [
+        {
+          "summary": "Move all objects to fixed y=100, then pack left-to-right from fixed x=40 with fixed 16px gaps.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet start_x = 40\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, target_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move all objects to fixed y=100, then pack left-to-right starting from the first object's horizontal center (x + w/2) with fixed 16px gaps.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet start_x = objects[0].x + objects[0].w / 2\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, target_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move all objects to y=canvas.h/7, then pack left-to-right from x=canvas.w/35 with gap=canvas.w/87.5 (all canvas-proportional).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = canvas.h / 7\nlet start_x = canvas.w / 35\nlet gap = canvas.w / 87.5\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, target_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move all objects to fixed y=100, then pack left-to-right starting from 4 times the first object's x with fixed 16px gaps.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet start_x = objects[0].x * 4\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, target_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3304,
+        "completion_tokens": 14823,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 18127,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 46.94,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

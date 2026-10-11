@@ -1,0 +1,111 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:53:02+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each card to y=100 and add a fixed offset that depends on its index (30,36,22)."
+      ],
+      "rejected": [
+        {
+          "summary": "Place all cards at y=100 and arrange them horizontally with a fixed 16\u2011unit gap, starting at x=40.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 16\nlet start_x = 40\nfor V in objects with I {\n    if I == 0 {\n        move V to (start_x, 100)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to y=100 and set each card\u2019s x to its original x plus a fixed offset that depends on its index (30, 36, 22).",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '[')",
+          "rule_excerpt": "let offsets = [30, 36, 22]\nfor V in objects with I {\n    move V to (V.x + offsets[I], 100)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift every card to y=100 and then shift its x so that the left edge aligns with a grid of 20\u2011unit steps starting at x=40.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=60, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step\", \"value\": 20}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"let\", \"name\": \"target_x\", \"value\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.base\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"ref\": \"locals.step\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set y=100 for all cards and compute x as the canvas width multiplied by a fixed ratio plus the card\u2019s index times its own width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=150, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"ratio\", \"value\": {\"rat\": \"2857142857142857/100000000000000000\"}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"locals.ratio\"}, {\"ref\": \"canvas.w\"}]}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.I\"}, {\"op\": \"get\", \"args\":",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first card at x=40,y=100 and each next card at previous x + previous width + 16, all y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=136, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 40, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.gap\"}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all cards to y=100 and arrange them on a vertical grid starting at x=40 with 20\u2011unit steps, using each card's index.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=60, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [40, {\"op\": \"mul\", \"args\": [0, 20]}]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [40, {\"op\": \"mul\", \"args\": [1, 20]}]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.2\"}, \"x\": {\"o",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Set y=100 for all cards and compute x as a fixed fraction of canvas width plus the card's index times its own width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=150, y=100, w=110, h=90) but the evidence shows (x=166, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"ratio\", \"value\": {\"rat\": \"2857142857142857/100000000000000000\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"mul\", \"args\": [{\"ref\": \"locals.ratio\"}, {\"ref\": \"canvas.w\"}]}, {\"op\": \"mul\", \"args\": [0, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_exi",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3131,
+        "completion_tokens": 2129,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each card to y=100 and add a fixed offset that depends on its index (30,36,22).",
+        "Place cards at y=100 and lay them out left\u2011to\u2011right starting at x=40 with a fixed 16\u2011unit gap between cards."
+      ],
+      "rejected": [
+        {
+          "summary": "Shift each card to y=100 and add an offset that depends on its index: +30 for the first, +36 for the second, +22 for the third.",
+          "reason": "invalid rule: line 3: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "for V in objects with I {\n  if I == 0 { move V to (V.x + 30, 100) }\n  else if I == 1 { move V to (V.x + 36, 100) }\n  else { move V to (V.x + 22, 100) }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1818,
+        "completion_tokens": 1437,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 8515,
+  "calls": 3,
+  "unknown_cost_calls": 3,
+  "wall_s": 18.55,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

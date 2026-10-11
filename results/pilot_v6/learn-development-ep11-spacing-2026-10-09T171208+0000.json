@@ -1,0 +1,92 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:12:08+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 2,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift every card leftwards by an amount that decreases by 14 pixels for each subsequent card, while aligning their tops to y=100."
+      ],
+      "rejected": [
+        {
+          "summary": "Align the top of every card to y=100 and shrink each horizontal gap between consecutive cards by 14 pixels.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nfor V in objects {\n    move V to (V.x, target_y)\n}\nlet gap_reduction = 14\nfor I in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        let cur = objects[I]\n        let desired_x = prev.x + prev.w + (cur.x - (prev.x + prev.w)) - gap_reduction\n        move cur to (desired_x, cur.y)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Set each card\u2019s y to a fixed fraction of the canvas height (approximately 1/7) and keep their x coordinates unchanged.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=100, w=60, h=90) but the evidence shows (x=40, y=100, w=60, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"2857142857142857/20000000000000000\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"ref\": \"locals.target_y\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each card so its top aligns to y=100 and its x equals the original x plus a correction that makes the leftmost card start at x=40.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet leftmost_target_x = 40\nfor V in objects with I {\n    if I == 0 {\n        move V to (leftmost_target_x, target_y)\n    } else {\n        let prev = objects[I-1]\n        let gap = V.x - (prev.x + prev.w)  // original gap\n        let new_gap = gap - 14\n        let new_x = prev.x + prev.w + new_gap\n        move V to (new_x, target_y)\n    }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1397,
+        "completion_tokens": 1242,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift every card leftwards by an amount that decreases by 14 pixels for each subsequent card, while aligning their tops to y=100.",
+        "Align the top of every card to y=100 and shift each card rightward by an amount that equals its original x plus a fixed offset that depends on its index: offset = 30 - 14*index."
+      ],
+      "rejected": [
+        {
+          "summary": "Place each card so its top is at y=100 and its left edge follows a running total: first card at x=40, each next card placed to the right of the previous one by its width plus a fixed 16\u2011pixel gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 16\nlet run_x = 40\nfor V in objects with I {\n    if I == 0 {\n        move V to (run_x, 100)\n    } else {\n        let prev = objects[I-1]\n        let run_x = prev.x + prev.w + gap\n        move V to (run_x, 100)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Keep each card\u2019s original vertical position unchanged, then move it so its top aligns to y=100 while preserving its horizontal ordering by adding a constant left\u2011margin of 30 pixels to the first card and preserving the original gaps between cards.",
+          "reason": "invalid rule: line 4: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let margin = 30\nlet first_x = objects[0].x + margin\nmove objects[0] to (first_x, 100)\nlet gap = objects[1].x - objects[0].x  // original gap between card0 and card1\nfor V in objects with I {\n    if I > 0 {\n        let prev = objects[I-1]\n        let target_x = prev.x + prev.w + gap\n        move V to (target_x, 100)\n    }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1746,
+        "completion_tokens": 855,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 5240,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 10.94,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

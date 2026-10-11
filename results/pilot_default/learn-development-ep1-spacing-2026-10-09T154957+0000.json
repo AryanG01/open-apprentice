@@ -1,0 +1,46 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:49:57+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "All cards are moved to y = 100 and then laid out horizontally with a fixed 16\u2011unit gap, starting at x = 40.",
+        "Each card is moved to a y position that scales with canvas height (100/700 of the canvas) and then arranged horizontally with gaps that scale with canvas width (16/1400 of the canvas), starting at an x that also scales (40/1400 of the canvas)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 885,
+        "completion_tokens": 4308,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5193,
+  "calls": 1,
+  "unknown_cost_calls": 1,
+  "wall_s": 19.92,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

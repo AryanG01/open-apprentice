@@ -1,0 +1,75 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T04:08:05+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to fixed top-left margins (60,60) and pack them horizontally with a fixed 16px gap.",
+        "Align tops to y=60; start the row at the first object's original right edge plus 10px, then pack with a fixed 16px gap.",
+        "Scale the layout with the canvas: top and left margins are 3/35 of canvas height, gap is 2/175 of canvas width.",
+        "Align to fixed margins (60,60); horizontal gap is 40% of the first object's width."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to a fixed top-left margin (60,60) and pack them horizontally with a fixed 16px gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = 60\nlet left = 60\nlet gap = 16\nmove objects[0] to (left, top)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align to fixed margins (60,60); horizontal gap is 40% of the first object's width.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = 60\nlet left = 60\nlet gap = 0.4 * objects[0].w\nmove objects[0] to (left, top)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to y=60; start the row at the first object's original right edge plus 10px, then pack with 16px gaps.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = 60\nlet left = objects[0].x + objects[0].w + 10\nlet gap = 16\nmove objects[0] to (left, top)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Scale the layout with the canvas: top and left margins are 3/35 of canvas height, gap is 2/175 of canvas width.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let top = canvas.h * 3 / 35\nlet left = canvas.w * 3 / 70\nlet gap = canvas.w * 2 / 175\nmove objects[0] to (left, top)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3225,
+        "completion_tokens": 24894,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 28119,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 81.42,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

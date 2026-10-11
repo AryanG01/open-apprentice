@@ -1,0 +1,15 @@
+oa learn  split=development trials=12  model=nvidia/nemotron-3-super-120b-a12b  reasoning_effort=provider default
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   14064  58.18  TruncatedOutput: output hit the completion limit; not executing partial output
+  0 spacing  edge       TEACHING         1       0 0a/0c      None    6885  33.06  TruncatedOutput: output hit the completion limit; not executing partial output
+  1 badge    prop       INTENT_READY      1       0 0a/0c     False    6785  30.72  
+  1 spacing  edge       INTENT_READY      1       1 1a/0c      True    5193  19.92  
+  2 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   11666  43.16  TruncatedOutput: output hit the completion limit; not executing partial output
+  2 spacing  edge       TEACHING         1       0 0a/0c      None    6882  27.08  TruncatedOutput: output hit the completion limit; not executing partial output
+  3 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   11502  47.35  TruncatedOutput: output hit the completion limit; not executing partial output
+  3 spacing  edge       INTENT_READY      1       1 1a/0c      True    5589  25.34  
+  4 badge    prop       INTENT_READY      2       1 1a/1c     False   10382  37.44  
+  4 spacing  edge       INTENT_READY      1       1 1a/0c      True    5807  25.14  
+  5 badge    min        TEACHING         1       0 0a/0c      None    6839  31.15  TruncatedOutput: output hit the completion limit; not executing partial output
+  5 spacing  edge       TEACHING         1       0 0a/0c      None    6883  33.86  TruncatedOutput: output hit the completion limit; not executing partial output
+recovered the hidden rule on held-out scenes: 3/12  |  total tokens 98477  |  results in results/pilot_default

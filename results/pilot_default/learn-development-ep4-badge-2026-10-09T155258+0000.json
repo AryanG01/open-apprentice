@@ -1,0 +1,83 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T15:52:58+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "provider default",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset of 28 pixels right and 2 pixels down from the card\u2019s top\u2011left corner.",
+        "Position the badge using proportional offsets: 14/25 of the card\u2019s width to the right and 2/90 of the card\u2019s height down from its top\u2011left.",
+        "Locate the badge at fixed fractions of the canvas: 19/700 of the canvas width and 103/175 of the canvas height."
+      ],
+      "rejected": [
+        {
+          "summary": "First align the badge to the card\u2019s top\u2011right edge (matching the proto\u2019s width), then shift it left 2 pixels and down 2 pixels.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone proto as badge at (card0.x + card0.w - proto.w, card0.y)\nmove badge to (badge.x - 2, badge.y + 2)"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 832,
+        "completion_tokens": 3834,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object as a badge placed just inside the top\u2011right corner of the first object, with a margin equal to 10% of the badge\u2019s width."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object as a badge aligned to the top\u2011right of the first object, then shift it left and down by 10% of its width.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w, objects[0].y)\nmove badge to (badge.x - 0.1 * objects[1].w, badge.y + 0.1 * objects[1].w)"
+        },
+        {
+          "summary": "Clone the second object as a badge positioned at the first object\u2019s top edge, horizontally aligned with its right side, then move it slightly downward and leftward by 10% of its height.",
+          "reason": "invalid rule: line 2: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "clone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w, objects[0].y)\nmove badge to (badge.x - 0.1 * objects[1].h, badge.y + 0.1 * objects[1].h)"
+        },
+        {
+          "summary": "Clone the second object as a badge placed at a point that is 90% of the way from the first object\u2019s left edge to its right edge, and 10% of the badge\u2019s width below the first object\u2019s top edge.",
+          "reason": "contradicts teaching evidence - demonstration: created objects do not match",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"xPos\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"9/10\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}}, {\"op\": \"let\", \"name\": \"yPos\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [{\"rat\": \"1/10\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}]}}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \""
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1517,
+        "completion_tokens": 4199,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 10382,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 37.44,
+  "prompt_hashes": {
+    "hypotheses": "6cd9a07709da3011"
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-10T03:49:26+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 12000,
+  "reasoning_effort": "none",
+  "split": "development",
+  "episode": 9,
+  "concept": "badge",
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place its top-left at the first object's left edge plus 80, and at the first object's top edge plus 10.",
+        "Clone the second object and place its top-left at the first object's left edge plus 80, and vertically centered on the first object's top quarter."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object and place its top-left at the first object's right edge minus the clone's width, and at the first object's top edge plus 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=330, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's right edge minus the clone's width, and vertically centered on the first object's top quarter.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=330, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\",",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's right edge minus the clone's width, and at the first object's vertical center minus half the clone's height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=355, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's right edge minus the clone's width, and at the first object's top edge plus one-ninth of the canvas height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=397.8, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\",",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's right edge minus the first object's width, and at the first object's top edge plus 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=10, y=330, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"offset\", \"value\": 10}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, \"y\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object and place its top-left at the first object's left edge plus 80, and at the first object's vertical center minus half the clone's height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=90, y=355, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 80}, {\"op\": \"emit_target\", \"kind\": \"clone_place\", \"proto\": {\"ref\": \"objects.1\"}, \"symbol\": \"badge\", \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"ref\": \"locals.dx\"}]}, \"y\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2939,
+        "completion_tokens": 733,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Clone the second object as a badge with the same size, positioned at the first object's right edge minus the badge width, and vertically aligned to the first object's top plus 10.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_w = objects[1].w\nlet badge_h = objects[1].h\nlet x_pos = objects[0].x + objects[0].w - badge_w\nlet y_pos = objects[0].y + 10\nclone objects[1] as badge at (x_pos, y_pos)\nresize badge to (badge_w, badge_h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object as a badge with the same size, positioned at the first object's right edge minus the badge width, and vertically aligned to the first object's top plus one-tenth of its height.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_w = objects[1].w\nlet badge_h = objects[1].h\nlet x_pos = objects[0].x + objects[0].w - badge_w\nlet y_pos = objects[0].y + 0.1 * objects[0].h\nclone objects[1] as badge at (x_pos, y_pos)\nresize badge to (badge_w, badge_h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object as a badge sized to the first object's width (capped at the second object's size), positioned at the first object's right edge minus the badge width, and vertically aligned to the first object's top plus 10.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_w = min(objects[0].w, objects[1].w)\nlet badge_h = min(objects[0].h, objects[1].h)\nlet x_pos = objects[0].x + objects[0].w - badge_w\nlet y_pos = objects[0].y + 10\nclone objects[1] as badge at (x_pos, y_pos)\nresize badge to (badge_w, badge_h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object as a badge with the same size, positioned at the first object's right edge minus the badge width, and vertically aligned to the second object's top plus 10.",
+          "reason": "invalid rule: line 6: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let badge_w = objects[1].w\nlet badge_h = objects[1].h\nlet x_pos = objects[0].x + objects[0].w - badge_w\nlet y_pos = objects[1].y + 10\nclone objects[1] as badge at (x_pos, y_pos)\nresize badge to (badge_w, badge_h)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object as a badge with the same size, positioned at the first object's right edge minus the badge width, and vertically aligned to the first object's top plus 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=330, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"badge_w\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}}, {\"op\": \"let\", \"name\": \"badge_h\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}}, {\"op\": \"let\", \"name\": \"x_pos\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.b",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object as a badge with the same size, positioned at the first object's right edge minus the badge width, and vertically aligned to the first object's top plus one-tenth of its height.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=329, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"badge_w\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}}, {\"op\": \"let\", \"name\": \"badge_h\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}}, {\"op\": \"let\", \"name\": \"x_pos\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.b",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object as a badge sized to the minimum of both objects' dimensions, positioned at the first object's right edge minus the badge width, and vertically aligned to the first object's top plus 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=330, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"badge_w\", \"value\": {\"op\": \"min\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"badge_h\", \"value\": {\"op\": \"min\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}]}}, {\"op\": \"let\", \"name\": \"x_pos\", \"value\": {\"op\": \"sub\", \"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Clone the second object as a badge with the same size, positioned at the first object's right edge minus the badge width, and vertically aligned to the second object's top plus 10.",
+          "reason": "contradicts teaching evidence - demonstration: your rule creates a new object at (x=100, y=10, w=20, h=20) but the evidence shows (x=90, y=330, w=20, h=20)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"badge_w\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"w\"]}}, {\"op\": \"let\", \"name\": \"badge_h\", \"value\": {\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"h\"]}}, {\"op\": \"let\", \"name\": \"x_pos\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, {\"ref\": \"locals.b",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5207,
+        "completion_tokens": 1082,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 9961,
+  "calls": 4,
+  "unknown_cost_calls": 4,
+  "wall_s": 6.81,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

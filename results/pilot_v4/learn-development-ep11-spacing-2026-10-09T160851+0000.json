@@ -1,0 +1,89 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T16:08:51+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 0,
+  "teacher_interactions": {
+    "answers": 0,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Set each card's y to a fixed 100 and shift its x by an amount that decreases linearly with the card's index. "
+      ],
+      "rejected": [
+        {
+          "summary": "Set each card's y to a fixed vertical margin from the top, preserving its width and height while shifting x by a fixed offset.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=130, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"margin_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, 30]}, \"y\": {\"ref\": \"locals.margin_y\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all cards to a common baseline calculated as a fraction of canvas height, keeping their original horizontal spacing.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=100, w=60, h=90) but the evidence shows (x=40, y=100, w=60, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"base_y\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"142857/1000000\"}, {\"ref\": \"canvas.h\"}]}}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.obj\"}, \"x\"]}, \"y\": {\"ref\": \"locals.base_y\"}}]}]",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift each card right by a proportion of its own width and move it up to a fixed y coordinate.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=130, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"shift\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"target_y\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move each card to a grid cell where x increments by a fixed step and y is set to a constant.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=192, y=100, w=60, h=40) but the evidence shows (x=222, y=100, w=60, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step_x\", \"value\": 76}, {\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.i\"}, {\"ref\": \"",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all cards on a horizontal line at y = 100, with x starting at 40 and increasing by a fixed step of 76 per card. ",
+          "reason": "contradicts teaching evidence - demonstration: for objects[2] your rule gives (x=192, y=100, w=60, h=40) but the evidence shows (x=222, y=100, w=60, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_fixed\", \"value\": 100}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"step_x\", \"value\": 76}, {\"op\": \"for_each\", \"var\": \"obj\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.obj\"}, \"x\": {\"op\": \"add\", \"args\": [{\"ref\": \"locals.start_x\"}, {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.i\"}, {\"ref\": \"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align cards to a y position that is a fixed fraction of canvas height, and shift each card's x by a fraction of canvas width that decreases with index. ",
+          "reason": "invalid rule: line 1: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let y_fixed = (1/7) * canvas.h   // 100 when canvas.h=700\nfor obj in objects with i {\n  let dx = (3/140) * canvas.w - (1/100) * canvas.w * i   // 30 - 14*i when canvas.w=1400\n  move obj to (obj.x + dx, y_fixed)\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Keep each card's original width and height, move it to y=100, and shift its x by a combination of half the first card's width minus a multiple of that width. ",
+          "reason": "invalid rule: line 2: expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '(' (near '/')",
+          "rule_excerpt": "let y_fixed = 100\nlet half_first = 0.5 * objects[0].w   // 30\nlet seventh_first = (7/30) * objects[0].w   // 14\nfor obj in objects with i {\n  let dx = half_first - seventh_first * i\n  move obj to (obj.x + dx, y_fixed)\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 2985,
+        "completion_tokens": 1672,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 4657,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 9.33,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

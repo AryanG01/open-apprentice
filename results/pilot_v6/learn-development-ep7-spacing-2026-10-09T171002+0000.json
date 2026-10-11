@@ -1,0 +1,86 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:10:02+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift every object upward so its top aligns with y=100, and shift each object right by an amount that decreases by 10 pixels per object in order."
+      ],
+      "rejected": [
+        {
+          "summary": "Place all objects at y=100, leftmost at x=40, then each next object placed to the right of the previous one with a fixed 20\u2011pixel gap.",
+          "reason": "invalid rule: line 5: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let y_fixed = 100\nlet gap = 20\nmove objects[0] to (40, y_fixed)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    move V to (prev.x + prev.w + gap, y_fixed)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align the tops of all objects to y=100 and preserve the original horizontal spacing between consecutive objects.",
+          "reason": "invalid rule: line 4: expected a statement (let / move / resize / clone / for / if) (near 'continue')",
+          "rule_excerpt": "let y_target = 100\nmove objects[0] to (objects[0].x + (40 - objects[0].x), y_target)\nfor V in objects with I {\n    if I == 0 { continue }\n    let prev = objects[I-1]\n    let gap = V.x - (prev.x + prev.w)  // original gap\n    move V to (prev.x + prev.w + gap, y_target)\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move all objects to a vertical position that is a fixed fraction of the canvas height (\u22480.143) and keep their original x coordinates unchanged.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[0] your rule gives (x=10, y=100, w=50, h=80) but the evidence shows (x=40, y=100, w=50, h=80)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"canvas.h\"}, {\"rat\": \"2857142857142857/20000000000000000\"}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, \"y\": {\"ref\": \"locals.y_target\"}}]}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1400,
+        "completion_tokens": 924,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift every object upward so its top aligns with y=100, and shift each object right by an amount that decreases by 10 pixels per object in order.",
+        "Set all objects' top to y=100 and space them horizontally starting at x=40 with a gap equal to the previous object's width plus 20."
+      ],
+      "rejected": [
+        {
+          "summary": "Align objects' tops to y=100 and keep their original left offsets relative to the first object's left after shifting the first object to x=40.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=100, w=90, h=60) but the evidence shows (x=110, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"y_target\", \"value\": 100}, {\"op\": \"let\", \"name\": \"first_dx\", \"value\": {\"op\": \"sub\", \"args\": [40, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}]}}, {\"op\": \"for_each\", \"var\": \"V\", \"over\": {\"ref\": \"objects\"}, \"body\": [{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"locals.V\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"locals.V\"}, \"x\"]}, ",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1761,
+        "completion_tokens": 229,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 4314,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 6.97,
+  "prompt_hashes": {
+    "hypotheses": "69a623ebb44daba2"
+  }
+}

@@ -1,0 +1,10 @@
+oa compare  split=development episodes=1..2 methods=['enumerative_reference', 'full_v1_2', 'fresh_full_context', 'text_memory', 'structured_procedure']
+matrix: 10 runs (2 episodes x 5 methods); model-based runs: 8; hard ceiling per run: 300000 tokens / 120 calls / 800 actions; worst-case model tokens: 2400000 (global ceiling 2000000); reasoning_effort=low
+INFRA ERRORS (8 runs missing from the results): [{"episode": "ep-f96ca92599", "method": "full_v1_2", "error": "TruncatedOutput: output hit the completion limit; not executing partial output"}, {"episode": "ep-f96ca92599", "method": "fresh_full_context", "error": "TruncatedOutput: output hit the completion limit; not executing partial output"}, {"episode": "ep-f96ca92599", "method": "text_memory", "error": "TruncatedOutput: output hit the completion limit; not executing partial output"}, {"episode": "ep-f96ca92599", "method": "structured_procedure", "error": "TruncatedOutput: output hit the completion limit; not executing partial output"}, {
+method                    correct/sched    cond.  false_succ   tokens  calls  actions  teacher  failures
+enumerative_reference        15/16           1.0     0/15           0      0      336        2  {"abstained": 1}
+full_v1_2                     0/0           None     0/0            0      0        0        0  {}
+fresh_full_context            0/0           None     0/0            0      0        0        0  {}
+text_memory                   0/0           None     0/0            0      0        0        0  {}
+structured_procedure          0/0           None     0/0            0      0        0        0  {}
+results in results/runs/development-ep1-2-20261010T123043

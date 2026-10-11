@@ -1,0 +1,88 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-09T17:45:25+00:00",
+  "model": "nvidia/nemotron-3-super-120b-a12b",
+  "completion_cap": 16000,
+  "reasoning_effort": "medium",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Shift each object right by an amount that decreases linearly with its index, based on canvas width, and align all to a fixed vertical fraction of the canvas height."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row with a left margin and uniform gap both based on canvas width, and align them to a fixed vertical fraction of the canvas height.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'targetY')",
+          "rule_excerpt": "let margin = 0.057142857 * canvas.w\nlet gap = 0.008571428 * canvas.w\ntargetY = 0.171428571 * canvas.h\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, targetY)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a row using a margin and gap derived from the width of the first object, while vertically aligning to a fixed fraction of the canvas height.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = 1.6 * objects[0].w\nlet gap = 0.24 * objects[0].w\nlet targetY = 0.171428571 * canvas.h\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, targetY)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n    }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place objects in a row with margin and gap based on canvas height, and align them to a fixed vertical fraction of the canvas height.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let margin = 0.114285714 * canvas.h\nlet gap = 0.017142857 * canvas.h\nlet targetY = 0.171428571 * canvas.h\nfor V in objects with I {\n    if I == 0 {\n        move V to (margin, targetY)\n    } else {\n        move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n    }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1033,
+        "completion_tokens": 4927,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Shift each object right by an amount that decreases linearly with its index, based on canvas width, and align all to a fixed vertical fraction of the canvas height.",
+        "Place objects in a row by shifting each right by an amount that decreases linearly with its index, based on the width of the first object.",
+        "Place objects in a row by shifting each right by an amount that decreases linearly with its index, based on the canvas height."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects in a row by shifting each right by a fixed amount that decreases linearly with its index, using constant pixel values.",
+          "reason": "invalid rule: line 3: expected a statement (let / move / resize / clone / for / if) (near 'targetY')",
+          "rule_excerpt": "let baseOffset = 80\nlet decrement = 18\ntargetY = 120\nfor V in objects with I {\n    move V to (V.x + baseOffset - I * decrement, targetY)\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1356,
+        "completion_tokens": 4894,
+        "label": "LIVE",
+        "model": "nvidia/nemotron-3-super-120b-a12b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 12210,
+  "calls": 2,
+  "unknown_cost_calls": 2,
+  "wall_s": 46.76,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}
