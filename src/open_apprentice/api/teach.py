@@ -50,9 +50,8 @@ from open_apprentice.concepts.bindings import (
     targets_from_rule,
 )
 from open_apprentice.concepts.domain import DomainManifest
-from open_apprentice.concepts.enumerative import EnumerativeSource, _badge_rule, _lit
+from open_apprentice.concepts.enumerative import EnumerativeSource
 from open_apprentice.concepts.hybrid import HybridSource
-from open_apprentice.concepts.rules import evaluate_rule
 from open_apprentice.concepts.schemas import Concept
 from open_apprentice.concepts.teaching import State, TeachingSession
 from open_apprentice.concepts.transfer import repair_binding, transfer_concept
@@ -93,8 +92,18 @@ def _label(mode: str, model_id: str = "") -> dict:
     }
 
 
+class DemoIn(BaseModel):
+    """The visitor's own demonstration: where they put the badge on a card. Distances are from the card's right and top edges to the badge's."""
+
+    width: int = Field(default=150, ge=60, le=600)
+    height: int = Field(default=80, ge=40, le=200)
+    inset_right: int = Field(default=12, ge=-100, le=300)
+    inset_top: int = Field(default=12, ge=-100, le=300)
+
+
 class StartIn(BaseModel):
     mode: str = Field(default="reference", pattern="^(reference|nemotron)$")
+    demonstration: Optional[DemoIn] = None
 
 
 class AnswerIn(BaseModel):
@@ -377,10 +386,18 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
             None, ledger, dom, [2], pool=pool, teacher_source="user",
             candidate_source=EnumerativeSource(dom, [2]), prefer_readable_queries=True,
         )  # fmt: skip
-    before = card_scene(150)
-    after = evaluate_rule(
-        _badge_rule("top-right", _lit(12)), before["objects"], before["canvas"]
-    )  # all candidates coincide at width 150
+    d = body.demonstration if body and body.demonstration else DemoIn()
+    before = card_scene(d.width, d.height)
+    badge = {
+        "x": Fraction(100 + d.width - d.inset_right - 20),
+        "y": Fraction(100 + d.inset_top),
+        "w": Fraction(20),
+        "h": Fraction(20),
+    }
+    after = {o["id"]: {k: o[k] for k in ("x", "y", "w", "h")} for o in before["objects"]}
+    after["badge"] = (
+        badge  # the demonstration is exactly where the visitor put the badge; whether any rule can express it is for the learner to find out
+    )
     demo = {
         "canvases": [
             view("Before", boxes_of_scene(before)),

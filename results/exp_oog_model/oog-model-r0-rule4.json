@@ -1,0 +1,55 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:43:38+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 4,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "top-right inset 12, badge sized to a quarter of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "BudgetExhausted: BUDGET_EXHAUSTED[tokens] 27627+0+34961>60000",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge at 80% of card0's width from its left and 15% of its height from its top.",
+        "Clone proto as badge at a fixed offset of 32 left and 12 down from card0's top-right corner.",
+        "Clone proto as badge at card0's top-right minus 1.6 times proto's width and plus 0.6 times proto's height.",
+        "Clone proto as badge at card0's top-right minus 4% of canvas width and plus 2% of canvas height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 3419,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 27627,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 109.56,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 0
+}

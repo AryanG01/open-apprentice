@@ -1,0 +1,73 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:40:54+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 0,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": true,
+  "hybrid_model_errors": [],
+  "final_rule_origin": "model",
+  "evaluator_template": "inset is 10% of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "[model] Clone proto as badge, inset 10% of card0's height from card0's top-right corner.",
+        "[model] Clone proto as badge, inset 40% of proto's size from card0's top-right corner.",
+        "[model] Clone proto as badge, fixed 8-pixel inset from card0's top-right corner.",
+        "[search] top-right inset 1/20*w",
+        "[search] top-right inset max(1/20*w,3)",
+        "[search] top-right inset max(1/20*w,4)"
+      ],
+      "rejected": [],
+      "usage": {
+        "label": "HYBRID",
+        "from_model": 3,
+        "from_search": 3,
+        "model_error": null,
+        "model_usage": {
+          "prompt_tokens": 985,
+          "completion_tokens": 9901,
+          "label": "LIVE",
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        },
+        "search_usage": {
+          "label": "ENUMERATIVE",
+          "grammar_round": 1,
+          "enumerated": 1307,
+          "search_limit": 200000,
+          "limit_hit": false,
+          "cpu_seconds": 0.1615,
+          "expressible": true,
+          "pool_size": 7408
+        }
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 10886,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 30.8,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "hybrid",
+  "rep": 0
+}

@@ -153,3 +153,31 @@ def test_security_headers_are_set(client):
         and h["x-frame-options"] == "DENY"
         and "frame-ancestors 'none'" in h["content-security-policy"]
     )
+
+
+def test_a_visitor_demonstration_is_used_exactly_as_placed(client):
+    st = client.post(
+        "/api/teach",
+        json={"demonstration": {"width": 200, "height": 100, "inset_right": 20, "inset_top": 20}},
+    ).json()
+    after = {b["id"]: b for b in st["demonstration"]["canvases"][1]["boxes"]}
+    # card at (100, 100) 200 wide: badge 20 wide, 20 px from the right edge and 20 px from the top
+    assert (after["badge"]["x"], after["badge"]["y"]) == (100 + 200 - 20 - 20, 100 + 20)
+    assert st["state"] in ("AWAITING_USER", "INTENT_READY")
+
+
+def test_a_placement_no_rule_can_express_ends_unresolved_honestly_not_forced(client):
+    st = client.post(
+        "/api/teach",
+        json={"demonstration": {"width": 150, "height": 80, "inset_right": 5, "inset_top": 40}},
+    ).json()
+    assert (
+        st["state"] == "UNRESOLVED"
+        and "no proposed rule fits" in st["note"]
+        and "concept" not in st
+    )
+
+
+@pytest.mark.parametrize("bad", [{"width": 5}, {"inset_right": 9999}, {"height": 1000}])
+def test_demonstration_values_are_range_checked(client, bad):
+    assert client.post("/api/teach", json={"demonstration": bad}).status_code == 422

@@ -1,0 +1,55 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:40:37+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 0,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "inset is 10% of card height",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge as a copy of proto at a fixed offset of 28 pixels left and 8 pixels down from card0's top-right corner.",
+        "Place the badge as a copy of proto at card0's top-right corner, inset by proto's width plus a margin equal to 10% of card0's height horizontally, and offset down by that same margin.",
+        "Place the badge as a copy of proto at card0's top-right corner, inset horizontally by proto's width plus 5% of card0's width, and vertically by 10% of card0's height.",
+        "Place the badge as a copy of proto at card0's top-right corner, inset horizontally by 1.4 times proto's width, and vertically by 0.4 times proto's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 4288,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 5273,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 13.19,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 0
+}

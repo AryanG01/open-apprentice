@@ -1,1 +1,4 @@
 oa learn-oog  arm=hybrid trials=12 model=nvidia/Nemotron-3-Ultra-550b-a55b
+saved rule0 rep0: INTENT_READY recovered=True tokens=10886 (total 10886)
+saved rule1 rep0: UNRESOLVED recovered=None tokens=39191 (total 50077)
+saved rule2 rep0: INTENT_READY recovered=True tokens=9334 (total 59411)

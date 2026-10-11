@@ -1,0 +1,55 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:41:00+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 1,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "inset is 10% of the shorter side",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset of 28 pixels left and 8 pixels down from the top-right corner of the first object.",
+        "Place the badge at a fixed offset of 132 pixels right and 8 pixels down from the top-left corner of the first object.",
+        "Place the badge so its top is 10% of the first object's height down from its top, and its right edge is 10% of the first object's height left from its right edge (accounting for the badge's width).",
+        "Place the badge at a fixed offset of 8 pixels down from the first object's top, and horizontally so its right edge is 8 pixels left from the first object's right edge plus the badge's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 985,
+        "completion_tokens": 7623,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 8608,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 23.54,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 0
+}

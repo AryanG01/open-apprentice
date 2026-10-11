@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { CARD_H, CARD_W, DemoCanvas, type Placement } from "./DemoCanvas";
 import { Attempts, AxisChips, Checks, Hash, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
 import type { Axes, BreakResult, LiveRepair, LiveRun, LiveState, Meter, ReadyInfo, ReplayResult } from "./types";
@@ -86,6 +87,7 @@ export function TryIt() {
   const [toolChange, setToolChange] = useState(false);
   const [run, setRun] = useState<LiveRun | null>(null);
   const [repair, setRepair] = useState<LiveRepair | null>(null);
+  const [placement, setPlacement] = useState<Placement>({ inset_right: 12, inset_top: 12 });
   const [replay, setReplay] = useState<ReplayResult | null>(null);
   const [stress, setStress] = useState<BreakResult | null>(null);
   const [learner, setLearner] = useState<"reference" | "nemotron">("reference");
@@ -140,7 +142,7 @@ export function TryIt() {
       setRepair(null);
       setStress(null);
       setPicked(null);
-      setLive(await api<LiveState>("/api/teach", "POST", { mode: learner }, signal));
+      setLive(await api<LiveState>("/api/teach", "POST", { mode: learner, demonstration: { width: CARD_W, height: CARD_H, ...placement } }, signal));
       void refreshModel();
     });
 
@@ -274,7 +276,7 @@ export function TryIt() {
 
       <main className="stage" id="stage">
         <p className="eyebrow" role="status" aria-live="polite">Live · {busy ? "working…" : live ? live.state.replace(/_/g, " ").toLowerCase() : "not started"}</p>
-        <h2>{!live ? "Teach it a layout rule" : concept ? "The rule is sealed. Now use it." : "Which result did you mean?"}</h2>
+        <h2>{!live ? "Teach it by placing the badge" : concept ? "The rule is sealed. Now use it." : live.state === "UNRESOLVED" ? "No rule it knows fits that placement" : "Which result did you mean?"}</h2>
         {error ? <p className="callout bad" role="alert">{error}</p> : null}
         {live?.pool ? (
           <p className="callout" role="note" aria-label="Candidate pool">
@@ -287,13 +289,28 @@ export function TryIt() {
         ) : null}
 
         {!live ? (
-          <p className="lede">
-            You will see one demonstration of a badge placed in a card's top-right corner. Several different rules fit it equally well, so the system will find an
-            input where they disagree and ask you which result you meant.
-          </p>
+          <>
+            <p className="lede">
+              Show it where the badge goes. Several different rules can fit one example, so the system will find an input where they disagree and ask you which result you meant.
+            </p>
+            <DemoCanvas value={placement} onChange={setPlacement} disabled={busy} />
+          </>
         ) : null}
 
-        {live && !q && !concept && !live.correction ? <p className="callout" role="note">{live.note || "Could not settle on a rule."}</p> : null}
+        {live && !q && !concept && !live.correction ? (
+          <div className="callout" role="note">
+            <strong>It will not guess.</strong>{" "}
+            {live.note.startsWith("candidate_generation_failure")
+              ? "None of the rules it can propose reproduces your placement exactly, so it stops here instead of committing to a wrong rule."
+              : live.note.startsWith("ambiguity_remains")
+                ? "More than one rule still fits your answers and it cannot tell them apart within its question limit, so it declines to commit."
+                : "It could not settle on a single rule."}{" "}
+            {live.mode === "reference"
+              ? "The free reference learner only knows corner insets that depend on the card's width. Try a corner with equal gaps, or switch to Nemotron mode if it is enabled."
+              : "Try a placement with a clearer pattern, or start over."}
+            <details><summary>Technical reason</summary><code>{live.note || "none recorded"}</code></details>
+          </div>
+        ) : null}
 
         {live ? (
           <div className="scenes n2">

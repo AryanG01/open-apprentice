@@ -1,0 +1,55 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T11:41:29+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "oog-dev",
+  "episode": 2,
+  "concept": "badge",
+  "audit": false,
+  "hybrid": false,
+  "hybrid_model_errors": null,
+  "final_rule_origin": null,
+  "evaluator_template": "centred on the top edge, straddling it",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype as a badge centered horizontally at the card's right edge minus the card's height, and vertically at the card's top edge.",
+        "Clone the prototype as a badge centered horizontally at the card's horizontal center, and vertically at the card's top edge.",
+        "Clone the prototype as a badge centered horizontally at the card's left edge plus the card's height, and vertically at the card's top edge.",
+        "Clone the prototype as a badge centered horizontally at the card's right edge minus four times the prototype's width, and vertically at the card's top edge."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 984,
+        "completion_tokens": 9434,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 10418,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 28.96,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  },
+  "arm": "model",
+  "rep": 0
+}
