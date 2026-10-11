@@ -341,6 +341,21 @@ def learn(
                 )
             )
             spent += out[-1]["tokens"]
+            os.makedirs(
+                output_dir, exist_ok=True
+            )  # save EVERY trial the moment it finishes: a crash or a stall must not lose paid work
+            r = out[-1]
+            with open(
+                os.path.join(
+                    output_dir,
+                    f"learn-{split}-ep{r['episode']}-{r['concept']}-{r['ran_at'].replace(':', '')}.json",
+                ),
+                "w",
+            ) as f:
+                json.dump(r, f, indent=2, default=str)
+            typer.echo(
+                f"saved ep{r['episode']} {r['concept']}: {r['final_state']} recovered={r['recovered_latent_on_heldout']} tokens={r['tokens']} (total {spent})"
+            )
         await provider.aclose()
         return out
 
