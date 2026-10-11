@@ -1,0 +1,84 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:18:38+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 3,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object as a badge positioned 2 pixels inset from the top-right corner of the first object.",
+        "Clone the second object as a badge with horizontal padding 4% of the first object's width and vertical padding 2.5% of its height from the top-right corner.",
+        "Clone the second object as a badge with padding equal to 10% of the cloned object's own width and height from the top-right corner of the first object.",
+        "Clone the second object as a badge with padding proportional to the canvas size (1/700 of width, 1/350 of height) from the top-right corner of the first object."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 5176,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place a clone of the second object just left of the first object's right edge, offset down by 4% of the first object's width.",
+        "Place a clone of the second object left of the first object's right edge, offset down by 8% of the first object's height minus 4.4.",
+        "Place a clone of the second object left of the first object's right edge, offset down by 3% of the second object's y-position plus 2.",
+        "Place a clone of the second object left of the first object's right edge, offset down by a value derived from canvas height (6.2 minus 0.6% of canvas height)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1737,
+        "completion_tokens": 22101,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 3,
+      "accepted": [
+        "Place a clone of the second object just left of the first object's right edge, offset down by 4% of the first object's width.",
+        "Clone the second object as a badge left of the first object's right edge and below its top, with a margin of 4% of the first object's smaller dimension.",
+        "Clone the second object as a badge left of the first object's right edge and below its top, using 4% of the first object's width as margin if the canvas is wider than tall, otherwise 4% of its height.",
+        "Clone the second object as a badge left of the first object's right edge and below its top, using 4% of the first object's width as margin when the first object is not above the second, otherwise 4% of its height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 2098,
+        "completion_tokens": 18798,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 50891,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 167.41,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

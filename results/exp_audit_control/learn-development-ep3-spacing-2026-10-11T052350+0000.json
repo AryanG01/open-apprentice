@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:23:50+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 3,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange the three objects in a horizontal row at fixed position (60,60) with a fixed 16px gap between them.",
+        "Arrange in a horizontal row using canvas-proportional margins (3/35 of height, 3/70 of width) and canvas-proportional gap (2/175 of width).",
+        "Arrange in a horizontal row at y=60, starting at the first object's original x plus 50, with a fixed 16px gap.",
+        "Arrange in a horizontal row at fixed (60,60) with a gap proportional to the first object's width (0.4\u00d7)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1028,
+        "completion_tokens": 7151,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 8179,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 21.42,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

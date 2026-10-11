@@ -1,1 +1,51 @@
 oa learn  split=development trials=48  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=low
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      UNRESOLVED       2       2 2a/0c      None   18147  48.09  
+  0 spacing  edge       INTENT_READY      2       1 1a/1c     False   59860 252.08  
+  1 badge    prop       UNRESOLVED       2       2 2a/0c      None   44092 144.53  
+  1 spacing  edge       UNRESOLVED       2       2 2a/1c      None   58841 241.83  
+  2 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   45105 193.76  TruncatedOutput: output hit the completion limit; not executing partial output
+  2 spacing  edge       INTENT_READY      2       2 2a/0c     False   42855  141.4  
+  3 badge    const      UNRESOLVED       2       2 2a/1c      None   30209 117.83  
+  3 spacing  edge       UNRESOLVED       2       2 2a/0c      None   28095  96.74  
+  4 badge    prop       UNRESOLVED       3       2 2a/1c      None   52078 174.26  
+  4 spacing  edge       UNRESOLVED       2       2 2a/0c      None   32921 125.64  
+  5 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   51239 177.34  TruncatedOutput: output hit the completion limit; not executing partial output
+  5 spacing  edge       UNRESOLVED       2       2 2a/0c      None   20089  70.12  
+  6 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   41184 164.02  TruncatedOutput: output hit the completion limit; not executing partial output
+  6 spacing  edge       UNRESOLVED       2       2 2a/0c      None   26223  80.55  
+  7 badge    prop       UNRESOLVED       3       2 2a/1c      None   50891 167.41  
+  7 spacing  edge       INTENT_READY      2       2 2a/0c      True   18580  63.65  
+  8 badge    min        UNRESOLVED       3       2 2a/1c      None   47369 155.28  
+  8 spacing  edge       INTENT_READY      2       2 2a/0c     False   24335  74.04  
+  9 badge    const      UNRESOLVED       2       2 2a/0c      None   26796  80.26  
+  9 spacing  edge       UNRESOLVED       2       2 2a/0c      None   29955  89.11  
+ 10 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   54041 189.08  TruncatedOutput: output hit the completion limit; not executing partial output
+ 10 spacing  edge       INTENT_READY      2       2 2a/0c      True   28626  92.21  
+ 11 badge    min        UNRESOLVED       3       2 2a/1c      None   61470  210.2  
+ 11 spacing  edge       HYPOTHESES_READY      2       1 1a/1c      None   48659 165.86  TruncatedOutput: output hit the completion limit; not executing partial output
+  0 badge    const      UNRESOLVED       2       1 1a/1c      None   27161  85.08  
+  0 spacing  edge       UNRESOLVED       2       1 1a/1c      None   70751 266.83  
+  1 badge    prop       UNRESOLVED       2       2 2a/1c      None   40788 138.17  
+  1 spacing  edge       UNRESOLVED       3       2 2a/1c      None   70565  186.6  
+  2 badge    min        UNRESOLVED       2       1 1a/1c      None   41593 129.76  
+  2 spacing  edge       UNRESOLVED       2       2 2a/0c      None   19373  45.62  
+  3 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   68706 221.13  TruncatedOutput: output hit the completion limit; not executing partial output
+  3 spacing  edge       UNRESOLVED       2       2 2a/0c      None   29914  91.87  
+  4 badge    prop       UNRESOLVED       3       2 2a/1c      None   54524 159.08  
+  4 spacing  edge       INTENT_READY      2       2 2a/0c      True   21552  61.17  
+  5 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   10810 381.87  ProviderTimeout: read timeout; cost unknown until reconciled
+  5 spacing  edge       INTENT_READY      2       2 2a/0c      True   22873  57.19  
+  6 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   42590 130.21  TruncatedOutput: output hit the completion limit; not executing partial output
+  6 spacing  edge       UNRESOLVED       2       2 2a/0c      None   35260 102.82  
+  7 badge    prop       INTENT_READY      2       2 2a/0c      True   36932 111.47  
+  7 spacing  edge       INTENT_READY      2       2 2a/0c      True   31021  87.83  
+  8 badge    min        UNRESOLVED       2       2 2a/0c      None   25251  64.54  
+  8 spacing  edge       UNRESOLVED       2       1 1a/0c      None   61082  183.5  
+  9 badge    const      UNRESOLVED       2       2 2a/0c      None   17570  42.04  
+  9 spacing  edge       UNRESOLVED       2       2 2a/0c      None   26632  70.58  
+ 10 badge    prop       UNRESOLVED       2       2 2a/0c      None   25622  63.66  
+ 10 spacing  edge       INTENT_READY      2       1 1a/0c     False   42464   92.7  
+ 11 badge    min        UNRESOLVED       2       2 2a/0c      None   33320  92.85  
+ 11 spacing  edge       UNRESOLVED       2       2 2a/0c      None   26934   60.9  
+recovered the hidden rule on held-out scenes: 6/48  |  total tokens 1824948  |  results in results/exp_audit_on

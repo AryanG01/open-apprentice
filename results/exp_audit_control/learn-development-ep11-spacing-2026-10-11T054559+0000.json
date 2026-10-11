@@ -1,0 +1,83 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:45:59+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align tops to y=100; distribute centers equally starting from first object's original right edge (x+w) with 91px spacing."
+      ],
+      "rejected": [
+        {
+          "summary": "Place all objects at absolute y=100, first object at x=40, then each subsequent object 16px after the previous one's right edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y = 100\nlet first_x = 40\nlet gap = 16\nmove objects[0] to (first_x, y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Position relative to canvas: y = canvas.h/7, first x = canvas.w/35, gap = canvas.w*2/175.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y = canvas.h / 7\nlet first_x = canvas.w / 35\nlet gap = canvas.w * 2 / 175\nmove objects[0] to (first_x, y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to y=100; set first object's left edge to its original center (x + w/2); gap = 0.4 times that left edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let y = 100\nlet first_x = objects[0].x + objects[0].w / 2\nlet gap = first_x * 0.4\nmove objects[0] to (first_x, y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1030,
+        "completion_tokens": 13571,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align tops to y=100; distribute centers equally starting from first object's original right edge (x+w) with 91px spacing.",
+        "Align tops to canvas.h/7; place first object's center at canvas.w/20 and space subsequent centers equally by canvas.w*0.065.",
+        "Align tops to canvas.h/7; shift each object rightward by a linearly decreasing offset starting from one-third of the first object's height and decreasing by canvas.h/50 per index.",
+        "Align tops to canvas.h/7; shift each object rightward by a linearly decreasing offset starting from half the first object's width and decreasing by canvas.w/100 per index."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1384,
+        "completion_tokens": 22832,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 38817,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 142.68,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:11:46+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to one-seventh of the canvas height and pack them horizontally starting at the first object's height with a gap of one-fifth of that height.",
+        "Align all objects to one-fourteenth of the canvas width and pack them horizontally starting at the first object's height with a gap of one-fifth of that height.",
+        "Move all objects to a fixed row at y=100 starting at x=60 with a fixed 12-pixel gap between them.",
+        "Align all objects to the first object's original y minus 200 and pack them horizontally starting at the first object's height with a gap of one-fifth of that height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 7518,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Move all objects to a fixed row at y=100 starting at x=60 with a fixed 12-pixel gap between them.",
+        "Place objects in a row at y=100 starting at x=min(60, canvas width) with a fixed 12-pixel gap.",
+        "Place objects in a row at y=min(100, 2*canvas height) starting at x=60 with a gap of max(12, first object width/7.5).",
+        "Place objects in a row at y=max(100, first object y-200) starting at x=max(60, first object height) with a gap of max(12, first object height/5)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1464,
+        "completion_tokens": 10075,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 20089,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 70.12,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

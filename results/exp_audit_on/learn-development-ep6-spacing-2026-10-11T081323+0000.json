@@ -1,0 +1,79 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:13:23+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 6,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange objects in a horizontal row at fixed coordinates (80, 120) with a fixed 20px gap.",
+        "Position the row using margins and gap proportional to the canvas dimensions (left 80/1400, top 120/700, gap 20/1400).",
+        "Align the row top to the second object's original y minus 190, set gap to 0.4 times the third object's width, and start at x=80."
+      ],
+      "rejected": [
+        {
+          "summary": "Move the first object by a fixed offset (+70, -220) then pack the rest to its right using a gap of half the first object's height.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=120, y=340, w=120, h=50) but the evidence shows (x=190, y=120, w=120, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"dx\", \"value\": 70}, {\"op\": \"let\", \"name\": \"dy\", \"value\": {\"op\": \"sub\", \"args\": [0, 220]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"1/2\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 14003,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Arrange objects in a horizontal row at fixed coordinates (80, 120) with a fixed 20px gap.",
+        "Pack objects horizontally in order starting at (80,120) with a fixed 20px gap, using a loop to handle any number of objects.",
+        "Pack objects horizontally starting at (80,120) with a gap of 20px capped by the first object's width (gap = min(20, first_width))."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first three objects at fixed coordinates (80,120), (190,120), (330,120) regardless of their sizes or count.",
+          "reason": "contradicts teaching evidence - answer: for objects[1] your rule gives (x=190, y=120, w=24, h=24) but the evidence shows (x=124, y=120, w=24, h=24)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 120}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": 190, \"y\": 120}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.2\"}, \"x\": 330, \"y\": 120}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1569,
+        "completion_tokens": 18656,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 35260,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 102.82,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

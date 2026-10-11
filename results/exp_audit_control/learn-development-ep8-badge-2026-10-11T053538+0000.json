@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:35:38+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "badge",
+  "audit": false,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object as a badge at the top-right of the first object with a fixed 3-pixel margin on both axes.",
+        "Clone the second object as a badge at the top-right of the first object with margins equal to 15% of the badge's width and height.",
+        "Clone the second object as a badge at the top-right of the first object with a horizontal margin of 6% of the first object's width and a fixed 3-pixel vertical margin.",
+        "Clone the second object as a badge at the top-right of the first object with a fixed 3-pixel horizontal margin and a vertical margin of 15% of the badge's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 11236,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 45887,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 178.43,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

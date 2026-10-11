@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:05:11+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange objects in a horizontal row at one-seventh canvas height, starting at one-thirty-fifth canvas width with one-seventieth canvas width spacing.",
+        "Move all objects to fixed coordinates: top at y=100, first left at x=40, with 20px gaps.",
+        "Align tops to y=100, shift the first object right by the original gap between the first two objects, then pack horizontally with 20px gaps.",
+        "Scale the layout to the first object's height: top at 1.25\u00d7height, left at 0.5\u00d7height, gaps at 0.25\u00d7height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 6909,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 7940,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 23.14,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

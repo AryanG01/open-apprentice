@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:49:27+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=witness_found; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype as a badge offset from the card's top-left by a vector derived from the card's dimensions and the prototype's size using a fixed scale factor of 10.",
+        "Clone the prototype as a badge at the card's top-left plus a horizontal offset of card width minus prototype width minus card width over 25, and vertical offset of card width over 25.",
+        "Clone the prototype as a badge offset from the card's top-left using the canvas aspect ratio to scale the card width for the vertical offset with constant 50, and mirroring it for horizontal.",
+        "Clone the prototype as a badge offset from the card's top-left using the canvas width to scale the card width for the vertical offset with constant 56, and mirroring it for horizontal."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 990,
+        "completion_tokens": 23978,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the prototype as a badge at the card's top-left plus a horizontal offset of card width minus prototype width minus card width over 25, and vertical offset of card width over 25.",
+        "Clone the second object as a badge at the first object's top-right corner offset by a fixed margin of 4.4 pixels.",
+        "Clone the second object as a badge at the first object's top-right corner offset by a margin equal to 4% of the first object's larger dimension (width or height).",
+        "Clone the second object as a badge at the first object's top-right corner offset by a margin proportional to the first object's x-coordinate (11/25 of x)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1592,
+        "completion_tokens": 17532,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 44092,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 144.53,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

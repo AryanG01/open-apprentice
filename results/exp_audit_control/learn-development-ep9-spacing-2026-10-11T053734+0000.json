@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:37:34+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange all objects in a horizontal row at y=100 starting from x=40 with a fixed 16px gap.",
+        "Shift each object upward to y=100 and rightward by an increasing offset (30, 36, 42) based on its index.",
+        "Arrange all objects in a horizontal row at one-seventh canvas height from the top, starting at one-thirty-fifth canvas width from the left, with a fixed 16px gap.",
+        "Align all tops to y=100, then reflow horizontally using the original inter-object gap to compute a new left margin (original left + 3*gap) and a new gap (original gap + 6)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 11363,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 12397,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 37.33,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

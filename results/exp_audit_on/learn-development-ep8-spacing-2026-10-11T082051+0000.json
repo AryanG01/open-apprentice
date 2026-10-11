@@ -1,0 +1,93 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:20:51+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 1/2)",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move each object to fixed absolute coordinates.",
+        "Align all objects to y=120 and pack horizontally with a 20px gap starting at x=40.",
+        "Align all objects to y=120 and space their centers equally at 75px intervals starting from 65."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to y=120 and shift each horizontally by a fixed offset depending on its index (30, 20, 30).",
+          "reason": "invalid rule: line 3: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "for V in objects with I {\n  if I == 0 { move V to (V.x + 30, 120) }\n  else if I == 1 { move V to (V.x + 20, 120) }\n  else { move V to (V.x + 30, 120) }\n}]}]",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1029,
+        "completion_tokens": 8817,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to y=120 and pack horizontally with a 20px gap starting at x=40.",
+        "Compute each object's x position using let bindings for a running total, then move them.",
+        "Use a loop to place the first object, then explicitly place the remaining two.",
+        "Move objects in reverse order using the same position formulas."
+      ],
+      "rejected": [
+        {
+          "summary": "Pack all objects horizontally starting at (40,120) with a 20px gap, using a loop that places each object after the previous one.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let baseline_y = 120\nlet start_x = 40\nlet gap = 20\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, baseline_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to y=120 and place the first three at x=40, x=40+w0+20, x=40+w0+20+w1+20 using a loop with explicit conditionals for each index.",
+          "reason": "invalid rule: nesting too deep",
+          "rule_excerpt": "let baseline_y = 120\nlet start_x = 40\nlet gap = 20\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, baseline_y)\n  } else {\n    if I == 1 {\n      move V to (start_x + objects[0].w + gap, baseline_y)\n    } else {\n      if I == 2 {\n        move V to (start_x + objects[0].w + gap + objects[1].w + gap, baseline_y)\n      }\n    }\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to y=120 and chain them horizontally from x=40 with 20px gap by moving each object relative to the previous object's new position.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 20}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": \"locals.baseline_y\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4072,
+        "completion_tokens": 47164,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 61082,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 183.5,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

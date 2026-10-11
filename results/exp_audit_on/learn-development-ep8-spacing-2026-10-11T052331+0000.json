@@ -1,0 +1,73 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:23:31+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "All objects are moved to a fixed horizontal line at y=120 and arranged left-to-right with a fixed left margin of 40 and a fixed gap of 20 between adjacent objects.",
+        "All objects are moved to a fixed horizontal line at y=120 and arranged so that their centers are equally spaced with the first center at x=65 and a center spacing of 75.",
+        "All objects are moved to a horizontal line 200 units above the topmost object's original y, and arranged left-to-right with a fixed left margin of 40 and a fixed gap of 20.",
+        "All objects are moved to a fixed horizontal line at y=120 and arranged left-to-right with a gap of 20, where the left margin is 30 units to the right of the first object's original x position."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1029,
+        "completion_tokens": 8468,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "All objects are moved to a fixed horizontal line at y=120 and arranged left-to-right with a fixed left margin of 40 and a fixed gap of 20 between adjacent objects.",
+        "Baseline, margin, and gap are fixed minimums but also scale with the first object's dimensions.",
+        "The target row y=120 and left margin=40 are floors, but the first object's original position pulls them to at least 30 right and 280 up from its start."
+      ],
+      "rejected": [
+        {
+          "summary": "Objects form a horizontal row at y=120 starting at x=40, with each gap at least 20 but increasing with the previous object's height.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let baseline_y = 120\nlet left_margin = 40\nmove objects[0] to (left_margin, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    let prev = objects[I-1]\n    let gap = max(20, prev.h / 4)\n    move V to (prev.x + prev.w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1463,
+        "completion_tokens": 13375,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 24335,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 74.04,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

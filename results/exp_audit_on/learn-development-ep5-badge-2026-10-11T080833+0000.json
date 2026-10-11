@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:08:33+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "ProviderTimeout: read timeout; cost unknown until reconciled",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at a fixed offset of (66.4, 3.6) from the top-left of the first object.",
+        "Place the badge at an offset proportional to the first object's size (166/225 of width, 3/50 of height) from its top-left.",
+        "Place the badge at fixed canvas coordinates (76.4, 303.6) regardless of the first object.",
+        "Place the badge at a fixed offset of (-23.6, 3.6) from the top-right corner of the first object."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 9822,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 10810,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 381.87,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

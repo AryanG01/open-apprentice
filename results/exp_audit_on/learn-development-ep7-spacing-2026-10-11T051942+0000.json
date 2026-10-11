@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:19:42+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange objects in a horizontal row at 1/7 canvas height, starting at 1/35 canvas width with 1/70 canvas width spacing.",
+        "Move all objects to fixed position y=100, x=40, then pack horizontally with 20px gaps.",
+        "Align all objects to y=100, start first object at its original x plus the original gap to the second object, then pack with 20px gaps.",
+        "Place objects in a row at 1/7 canvas height, starting at 0.8\u00d7first object's width, spaced by 1/4 of first object's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 6235,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Move all objects to fixed position y=100, x=40, then pack horizontally with 20px gaps.",
+        "Baseline y and start x adapt to canvas size via max(100, canvas.h-600) and max(40, canvas.w-1360); fixed 20px gap.",
+        "Fixed baseline (40,100); gap adapts to canvas width as max(20, canvas.w/70).",
+        "Baseline y adapts as max(100, canvas.h-600); fixed start x=40; gap adapts as max(20, canvas.w/70)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1428,
+        "completion_tokens": 9886,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 18580,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 63.65,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

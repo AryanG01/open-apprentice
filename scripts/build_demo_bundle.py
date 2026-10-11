@@ -502,7 +502,18 @@ def stored_evidence():
                 "unresolved": sum(1 for x in ds if x.get("final_state") == "UNRESOLVED"),
             }
         )
+    from scripts.analyze_audit_experiment import summarise
+
+    experiments = []
+    for arm, label in (("control", "Without the audit round"), ("on", "With the audit round")):
+        d = f"results/exp_audit_{arm}"
+        if glob.glob(f"{d}/learn-*.json"):
+            m = summarise(d)
+            experiments.append(
+                {"name": "audit", "arm": label, **{k: v for k, v in m.items() if k != "by_concept"}}
+            )
     return {
+        "experiments": experiments,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "runs": runs,
         "teaching_trials": trials,

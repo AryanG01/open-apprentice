@@ -1,0 +1,138 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:43:10+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "candidate_generation_failure: no proposed rule fits all teaching evidence",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to one-seventh of canvas height, start first object at its original x plus its height, and space subsequent objects by one-tenth of the first object's width.",
+        "Align all objects to a fixed y-coordinate of 100, start first object at its original x plus its height, and space subsequent objects by one-tenth of the first object's width.",
+        "Align all objects to one-seventh of canvas height, start first object at canvas width divided by 17.5, and space subsequent objects by one-tenth of the first object's width.",
+        "Align all objects to one-seventh of canvas height, start first object at its original x plus its height, and space subsequent objects by 1.2 times the original gap between the first two objects."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to one-seventh of the canvas height, start the first object at its original x plus its height, and space subsequent objects by one-tenth of the first object's width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"new_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 10]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_targ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to one-seventh of the canvas height, start the first object at its original x plus its height, and space subsequent objects at 80% of the average original gap between consecutive objects.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"new_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"let\", \"name\": \"gap01\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"add\", \"args\": ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed y-coordinate of 100, start the first object at its original x plus its height, and space subsequent objects by one-tenth of the first object's width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"new_y\", \"value\": 100}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 10]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"re",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to one-seventh of the canvas height, start the first object at its original y minus four times its height, and space subsequent objects by one-tenth of the first object's width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"new_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 10]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [4, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3640,
+        "completion_tokens": 19542,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Arrange all objects in a horizontal row at fixed position (80,100) with a constant 12px gap between them.",
+          "reason": "invalid rule: line 5: object index must be a whole number (near 'I')",
+          "rule_excerpt": "for V in objects with I {\n  if I == 0 {\n    move V to (80, 100)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + 12, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange all objects in a horizontal row at y = canvas height / 7, starting at fixed x=80 with a constant 12px gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = canvas.h / 7\nfor V in objects with I {\n  if I == 0 {\n    move V to (80, target_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + 12, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange all objects in a horizontal row at fixed y=100, starting at x = first object's original x + 70, with a constant 12px gap.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = objects[0].x + 70\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, 100)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + 12, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange all objects in a horizontal row at fixed position (80,100) with a gap equal to one tenth of the first object's width.",
+          "reason": "invalid rule: line 6: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = objects[0].w / 10\nfor V in objects with I {\n  if I == 0 {\n    move V to (80, 100)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first object at fixed (80,100), then each subsequent object 12px right of previous object's right edge, all at y=100.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 12]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all objects to y = canvas height / 7, start first at x=80, then each subsequent 12px right of previous right edge.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": {\"ref\": \"locals.target_y\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all objects to fixed y=100, start first at x = its original x + 70, then each subsequent 12px right of previous right edge.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 70]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all objects to fixed y=100, start first at x=80, then each subsequent with gap = first object's width / 10.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 10]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5539,
+        "completion_tokens": 42030,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 70751,
+  "calls": 4,
+  "unknown_cost_calls": 0,
+  "wall_s": 266.83,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

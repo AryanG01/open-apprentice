@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:07:39+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed coordinates y=120, x=80 with a fixed 12px gap.",
+        "Arrange objects in a row at canvas-relative coordinates (2/35 width, 6/35 height) with gap 3/350 width.",
+        "Position the row relative to the first object's original top-left: 70px right, 290px up, with 12px gaps.",
+        "Align row top to 180px above the second object, start at first object's x + 70, with 12px gaps."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1033,
+        "completion_tokens": 13654,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed coordinates y=120, x=80 with a fixed 12px gap.",
+        "Horizontal row with 12px gap; left/top margins are 80/120 for large canvases (width>1000, height>500) but shrink to 10px for small canvases.",
+        "Horizontal row at fixed (80,120) with 12px gap for up to 3 objects; gap widens to 20px for 4 or more objects.",
+        "Horizontal row at x=80 with 12px gap; vertical position is the larger of 120 and one-sixth of canvas height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1450,
+        "completion_tokens": 16784,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 32921,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 125.64,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

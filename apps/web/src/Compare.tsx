@@ -81,6 +81,36 @@ export function Compare({ data }: { data: Evidence }) {
         ))}
       </div>
 
+      {data.experiments && data.experiments.length > 0 ? (
+        <>
+          <h2>Does asking harder fix the wrong commits? A controlled test</h2>
+          <p className="muted">
+            Same 12 development episodes, both concepts, 2 repetitions, one extra model round that hunts for other rules fitting all the evidence (the "audit"). Result: <strong>it did not help.</strong>
+            It made the system silent, mostly on cases it would have got right.
+          </p>
+          <div className="table-wrap">
+            <table className="data">
+              <thead><tr><th>Arm</th><th>Trials</th><th>Committed</th><th>Correct</th><th>Wrong</th><th>Wrong share of committed</th><th>Abstained</th><th>Lost to errors</th><th>Tokens</th></tr></thead>
+              <tbody>
+                {data.experiments.map((e) => (
+                  <tr key={e.arm}>
+                    <th scope="row">{e.arm}</th>
+                    <td>{e.trials}</td>
+                    <td>{e.committed}</td>
+                    <td>{e.correct}</td>
+                    <td className={e.wrong > 0 ? "fail-text" : ""}>{e.wrong}</td>
+                    <td>{e.wrong_share_of_committed === null ? "–" : `${Math.round(e.wrong_share_of_committed * 100)}%`}</td>
+                    <td>{e.abstained}</td>
+                    <td>{e.errors}</td>
+                    <td>{e.tokens.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : null}
+
       <h2>Limits of this evidence</h2>
       <ul className="caveats">
         {data.caveats.map((c) => (

@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:09:30+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed position y=100 starting at x=60 with a fixed gap of 12.",
+        "Arrange objects in a row at one-seventh of canvas height, starting at three-seventieths of canvas width, with gap three-three-hundred-fiftieths of canvas width.",
+        "Arrange objects in a row where the top is one-third of the first object's original y, the left margin equals the first object's height, and the gap is one-fifth of that height.",
+        "Arrange objects in a row where the top is 200 pixels above the first object's original y, the left margin equals the first object's height, and the gap is one-fifth of that height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 11098,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed position y=100 starting at x=60 with a fixed gap of 12.",
+        "Place objects in a horizontal row where the starting x is at least 60 or 50 right of the first object's original x, the y is at least 100 or 200 above the first object's original y, and the gap is at least 12 or one tenth of the first object's width.",
+        "Place objects in a horizontal row with the left margin at most 60 or one twentieth of canvas width, the top margin at most 100 or one seventh of canvas height, and a fixed gap of 12.",
+        "Place objects in a horizontal row where the starting x is at least 60 or 50 right of the leftmost object, the y is at least 100 or 200 above the topmost object, and the gap is at least 12 or one tenth of the first object's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1444,
+        "completion_tokens": 9299,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 22873,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 57.19,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

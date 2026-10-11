@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:38:43+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 1/2)",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at the card's top-right corner, inset left by 40% of the card's height and down by 40% of the badge's height.",
+        "Place the badge at the card's top-right corner, inset left by 40% of the card's height, and down so the badge's bottom sits at 40% of the card's height from the top.",
+        "Place the badge at the card's top-right corner, inset left by 140% of the badge's width and down by 40% of the badge's height.",
+        "Place the badge at the card's top-right corner, inset left by 140% of the badge's width, and down so the badge's bottom aligns with 40% of the card's height from the top."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 984,
+        "completion_tokens": 8521,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place a clone of the second object at the top-right of the first object with a fixed 8px margin on both axes.",
+        "Place a clone of the second object at the top-right of the first object with margins proportional to the clone's size (40%) but capped at 8px.",
+        "Place a clone of the second object at the top-right of the first object with a fixed 8px horizontal margin and a vertical margin proportional to the clone's height capped at 8px.",
+        "Place a clone of the second object at the top-right of the first object with a horizontal margin proportional to the clone's width capped at 8px and a fixed 8px vertical margin."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1675,
+        "completion_tokens": 15981,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 27161,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 85.08,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

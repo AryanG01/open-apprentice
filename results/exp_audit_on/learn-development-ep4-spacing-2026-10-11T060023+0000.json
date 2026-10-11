@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T06:00:23+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed coordinates (80,120) with 12px spacing.",
+        "Arrange in a horizontal row with canvas-proportional margins (2/35 width, 6/35 height) and gap (3/350 width).",
+        "Align tops to min object y minus twice max height, start horizontally at first object's x plus canvas height/10, with 12px gap.",
+        "Align tops to fixed y=120, start horizontally at first object's x plus canvas height/10, with 12px gap."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1033,
+        "completion_tokens": 9908,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Arrange all objects in a horizontal row at fixed coordinates (80,120) with 12px spacing.",
+        "Arrange in a horizontal row with margins and gap scaled by canvas size but capped at 80, 120, and 12 respectively.",
+        "Arrange in a horizontal row starting at x = max(80, first object's original x) and fixed y=120 with 12px gap.",
+        "Arrange in a horizontal row with margins and gap scaled by canvas size but floored at 80, 120, and 12 respectively."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1433,
+        "completion_tokens": 9178,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 21552,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 61.17,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

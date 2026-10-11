@@ -1,5 +1,31 @@
 {
- "generated_at": "2026-10-11T04:46:53+00:00",
+ "experiments": [
+  {
+   "name": "audit",
+   "arm": "Without the audit round",
+   "trials": 48,
+   "errors": 5,
+   "committed": 34,
+   "correct": 19,
+   "wrong": 15,
+   "abstained": 9,
+   "wrong_share_of_committed": 0.441,
+   "tokens": 1082035
+  },
+  {
+   "name": "audit",
+   "arm": "With the audit round",
+   "trials": 48,
+   "errors": 8,
+   "committed": 10,
+   "correct": 6,
+   "wrong": 4,
+   "abstained": 30,
+   "wrong_share_of_committed": 0.4,
+   "tokens": 1824948
+  }
+ ],
+ "generated_at": "2026-10-11T08:28:53+00:00",
  "runs": [
   {
    "run": "development-ep1-1-20261010T144833",

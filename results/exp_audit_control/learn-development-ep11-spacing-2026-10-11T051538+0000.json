@@ -1,0 +1,112 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:15:38+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Align all objects to a fixed row at y=100 starting at x=40 with 16px horizontal gaps.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet first_x = 40\nlet gap = 16\nmove objects[0] to (first_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a canvas-proportional row at 1/7 height, starting at 0.4*row_y with gaps of 0.16*row_y.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = canvas.h / 7\nlet first_x = target_y * 0.4\nlet gap = target_y * 0.16\nmove objects[0] to (first_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=100, position first at 2/3 its width, and space by 8/45 of first object's height.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet first_x = objects[0].w * (2/3)\nlet gap = objects[0].h * (8/45)\nmove objects[0] to (first_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move row to first object's y minus 3x its height, start first at second object's x minus first's width, and scale original gap by 8/15.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = objects[0].y - 3 * objects[0].h\nlet first_x = objects[1].x - objects[0].w\nlet original_gap = objects[1].x - (objects[0].x + objects[0].w)\nlet gap = original_gap * (8/15)\nmove objects[0] to (first_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed row at y=100 starting at x=40 with 16px horizontal gaps.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=86, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": 100}, {\"op\": \"let\", \"name\": \"first_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.first_x\"}, \"y\": {\"ref\": \"locals.target_y\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all objects to a canvas-proportional row at 1/7 height, starting at 0.4*row_y with gaps of 0.16*row_y.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=86, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 7]}}, {\"op\": \"let\", \"name\": \"first_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.target_y\"}, {\"rat\": \"2/5\"}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"ref\": \"locals.target_y\"}, {\"rat\": \"4/25\"}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Align all objects to y=100, position first at 2/3 its width, and space by 8/45 of first object's height.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=86, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": 100}, {\"op\": \"let\", \"name\": \"first_x\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"op\": \"div\", \"args\": [2, 3]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, {\"op\": \"div\", \"args\": [8, 45]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"tar",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Move row to first object's y minus 3x its height, start first at second object's x minus first's width, and scale original gap by 8/15.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=86, y=100, w=90, h=40) but the evidence shows (x=116, y=100, w=90, h=40)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"target_y\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"mul\", \"args\": [3, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}]}}, {\"op\": \"let\", \"name\": \"first_x\", \"value\": {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"ori",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3368,
+        "completion_tokens": 13362,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to a fixed row at y=100, starting the first object at two-thirds of its width, with a 16px gap.",
+        "Align all objects to a row at one-seventh of canvas height, starting the first object at two-thirds of its width, with a 16px gap.",
+        "Align all objects to a row at the first object's y minus three times its height, starting at the second object's x minus the first object's width, with a gap of 0.4 times the second object's height.",
+        "Align all objects to a fixed row at y=100, starting the first object at x=40, with a 16px gap."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1614,
+        "completion_tokens": 9520,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 27864,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 80.46,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

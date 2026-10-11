@@ -1,0 +1,97 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:47:03+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 0,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "remaining candidates agree everywhere in the encoded domain (not a proof of intent)",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all cards to one-seventh of canvas height, then pack horizontally starting at first card's x plus its height with spacing one-tenth of first card's width.",
+        "Align all cards to one-seventh of canvas height, then pack horizontally starting at first card's x plus its height with spacing one-fifth of the minimum card height.",
+        "Align all cards to one-seventh of canvas height, then pack horizontally starting at eight times the first card's x with spacing one-tenth of first card's width.",
+        "Align all cards to ten-sevenths of the first card's height, then pack horizontally starting at first card's x plus its height with spacing one-tenth of first card's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 10368,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Explicit running total with let bindings for start, gap, and intermediate x positions.",
+        "Absolute positions computed from start and cumulative widths without intermediate lets."
+      ],
+      "rejected": [
+        {
+          "summary": "Single-pass sequential layout: first object placed at (80,100), each subsequent placed 12px right of previous.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 80\nlet startY = 100\nlet gap = 12\nmove objects[0] to (startX, startY)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, startY)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Center-referenced first placement: first object centered at (80+w/2,100+h/2) yielding top-left (80,100), then sequential packing with 12px gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startCenterX = 80 + objects[0].w / 2\nlet startCenterY = 100 + objects[0].h / 2\nmove objects[0] to (startCenterX - objects[0].w / 2, startCenterY - objects[0].h / 2)\nlet gap = 12\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, 100)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Two-pass layout: all objects initially stacked at (80,100), then spread horizontally with 12px gaps in a second pass.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = 80\nlet startY = 100\nlet gap = 12\nfor V in objects { move V to (startX, startY) }\nmove objects[0] to (startX, startY)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, startY)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Sequential placement using each object's moved position: first at (80,100), each next at previous right + 12.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 12]}, \"y\": 100}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", ",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Center-based initial placement then sequential packing with fixed gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=142, y=100, w=110, h=90) but the evidence shows (x=212, y=100, w=110, h=90)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"startCenterX\", \"value\": {\"op\": \"add\", \"args\": [80, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, 2]}]}}, {\"op\": \"let\", \"name\": \"startCenterY\", \"value\": {\"op\": \"add\", \"args\": [100, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}, 2]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": ",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4717,
+        "completion_tokens": 43741,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 59860,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 252.08,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

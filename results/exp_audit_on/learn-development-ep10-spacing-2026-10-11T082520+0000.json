@@ -1,0 +1,134 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:25:20+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the first object at fixed coordinates (80,120) and pack subsequent objects to the right with a fixed 16-pixel gap.",
+        "Place the first object at twice its width and three times its height, then pack subsequent objects with a gap of 0.4\u00d7 the first object's width.",
+        "Place the first object at twice its width and three times its height, then pack subsequent objects with a fixed 16-pixel gap.",
+        "Place the first object at a fixed x=80 and at three times its height, then pack subsequent objects with a gap of 0.4\u00d7 the first object's width."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first object at fixed coordinates (80,120) and pack subsequent objects to the right with a 16-pixel gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": 80, \"y\": 120}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}, 16]}, \"y\": 120}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the first object at (2\u00d7its width, 3\u00d7its height) and pack subsequent objects to the right with a gap of 0.4\u00d7the first object's width.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [2, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"mul\", \"args\": [3, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_targe",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed baseline y=120 starting at x=80, with horizontal spacing proportional to the first object's width (0.4\u00d7).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"mul\", \"args\": [{\"rat\": \"2/5\"}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": \"locals.baseline_y\"}}, {\"op\": \"emit_target\", ",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a baseline at 3\u00d7the first object's height starting at 2\u00d7its width, with a fixed 16-pixel horizontal gap.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"mul\", \"args\": [3, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"mul\", \"args\": [2, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3447,
+        "completion_tokens": 18260,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place the first object at fixed coordinates (80,120) and pack subsequent objects to the right with a fixed 16-pixel gap."
+      ],
+      "rejected": [
+        {
+          "summary": "Place first object at x=min(80,2*width), y=min(120,3*height) and pack rightwards with gap=min(16,0.4*height).",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = min(80, 2 * objects[0].w)\nlet baseline_y = min(120, 3 * objects[0].h)\nlet gap = min(16, 0.4 * objects[0].h)\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first object at x=max(80,canvas.w/20), y=max(120,canvas.h/6) and pack rightwards with gap=max(16,canvas.w/100).",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = max(80, canvas.w / 20)\nlet baseline_y = max(120, canvas.h / 6)\nlet gap = max(16, canvas.w / 100)\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first object at x=max(80,original_x+70), y=max(120,original_y-260) and pack rightwards with fixed gap 16.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let start_x = max(80, objects[0].x + 70)\nlet baseline_y = max(120, objects[0].y - 260)\nlet gap = 16\nmove objects[0] to (start_x, baseline_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place first object at x=min(80,2*width), y=min(120,3*height) and pack rightwards with gap=min(16,0.4*height).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"min\", \"args\": [80, {\"op\": \"mul\", \"args\": [2, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}]}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"min\", \"args\": [120, {\"op\": \"mul\", \"args\": [3, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"h\"]}]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"min\", \"args\": [16, {\"op\": \"mul\", \"args\": [{\"r",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place first object at x=max(80,canvas.w/20), y=max(120,canvas.h/6) and pack rightwards with gap=max(16,canvas.w/100).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"max\", \"args\": [80, {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 20]}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"max\", \"args\": [120, {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.h\"}, 6]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"max\", \"args\": [16, {\"op\": \"div\", \"args\": [{\"ref\": \"canvas.w\"}, 100]}]}}, {\"op\": \"emit_target\", \"kind\": \"mo",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place first object at x=max(80,original_x+70), y=max(120,original_y-260) and pack rightwards with fixed gap 16.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"max\", \"args\": [80, {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 70]}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"max\", \"args\": [120, {\"op\": \"sub\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, 260]}]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 16}, {\"op\": \"emit_target\", \"kind\": \"move_existing\"",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place first object at fixed (80,120) and pack rightwards with gap=min(16,first_width/2.5).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=66, y=120, w=70, h=50) but the evidence shows (x=136, y=120, w=70, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"start_x\", \"value\": 80}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"min\", \"args\": [16, {\"op\": \"div\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"w\"]}, {\"rat\": \"5/2\"}]}]}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": \"locals.baseline",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4814,
+        "completion_tokens": 15943,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 42464,
+  "calls": 4,
+  "unknown_cost_calls": 0,
+  "wall_s": 92.7,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -231,3 +231,12 @@ on the research claim." Entries are append-only; append, never rewrite history.
     default `origin="model"` would have recorded scripted programs as model-generated.
 43. **Code quality pass (2026-10-11):** black on all of src/tests/scripts; ruff clean (per-file ignores for terse AST-builder lambdas and `l` in tests are
     explicit in pyproject.toml); added `Provider.aclose`. KNOWN DEBT: `mypy src` still reports 84 errors, almost all imprecise dict typing; not fixed.
+44. **RESULT (negative): the audit round (#40) does not reduce wrong commits; it reduces correct ones.** Controlled experiment, dev split, Nemotron-3-Ultra low effort,
+    12 episodes x 2 concepts x 2 reps = 48 trials per arm (results/exp_audit_control, results/exp_audit_on; `scripts/analyze_audit_experiment.py`):
+    control committed 34 (19 correct, 15 wrong = 44%), abstained 9, 5 trials lost to truncation; audit committed 10 (6 correct, 4 wrong = 40%), abstained 30 (25 of them
+    `ambiguity_remains`), 8 trials lost to truncation/timeout. The audit finds alternative rules that fit all evidence and genuinely disagree elsewhere, but with at most
+    two questions they cannot be resolved, so the system abstains on most correct cases too. Wrong share of committed outputs is unchanged within noise (n small).
+    Tokens: 1.08M vs 1.82M. Conclusion: more model-side hypothesis hunting is not the lever. Audit stays OFF by default and is kept as a documented negative result.
+    Also: ~10-15% of model trials in BOTH arms end in `TruncatedOutput` even with a 32k completion floor (reasoning runaway): a reliability issue to report.
+    Caveat to state with the non-model reference's 100%: its grammar was designed with the benchmark's rule families in mind (generic constants, but family-shaped), so
+    it shows the tasks are solvable inside a declared grammar, not that the reference "understands" layout.

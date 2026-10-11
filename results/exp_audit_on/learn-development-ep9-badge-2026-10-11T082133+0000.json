@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:21:33+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "const",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone proto as badge with 10px margins from card0's top and right edges.",
+        "Clone proto as badge at fixed offset (80, 10) from card0's top-left corner.",
+        "Clone proto as badge 30px left from card0's top-right corner and 10px down from its top.",
+        "Clone proto as badge horizontally inset by one-third of card0's height from its right edge, 10px down from top."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 983,
+        "completion_tokens": 4966,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone proto as badge with 10px margins from card0's top and right edges.",
+        "Clone the second object as a badge at the first object's top-right corner with a margin of 10 pixels or half the badge width, whichever is smaller.",
+        "Clone the second object as a badge at the first object's top-right corner with a margin of at least 10 pixels, increasing if the first object's left coordinate exceeds 10.",
+        "Clone the second object as a badge at the first object's top-right corner with a margin of 10 pixels minus the second object's x-coordinate."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1321,
+        "completion_tokens": 10300,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 17570,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 42.04,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

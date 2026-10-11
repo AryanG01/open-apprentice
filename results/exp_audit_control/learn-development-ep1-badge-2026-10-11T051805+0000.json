@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:18:05+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "badge",
+  "audit": false,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at the card's top-right corner, shifted left by the proto width plus a fraction of it, and down by the same fraction of proto height, where the fraction is the card's aspect ratio divided by 10.",
+        "Place the badge at the card's top-right corner, shifted left by the proto width plus a fraction of it, and down by the same fraction of proto height, where the fraction is twice the card's aspect ratio divided by the proto width.",
+        "Place the badge at the card's top-right corner, shifted left by the proto width plus a fixed offset, and down by the same fixed offset, where the offset is 11 divided by the card height times the proto size.",
+        "Place the badge at the card's top-right corner, shifted left by the proto width plus a delta, and down by that delta, where delta is twice the card's width divided by its height (independent of proto size)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 990,
+        "completion_tokens": 13543,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 14533,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 48.61,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

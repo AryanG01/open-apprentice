@@ -1,0 +1,89 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:08:51+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to a fixed baseline y=120 and distribute them horizontally so that their centers are equally spaced, with the first center 30 units right of the first object's original center and the spacing equal to the average of the original center-to-center distances."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to a fixed baseline y=120 and arrange them horizontally with a fixed left margin of 40 and a fixed gap of 20 between adjacent objects.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 20}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": \"locals.baseline_y\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a baseline 200 units below the topmost object, then arrange them horizontally with a fixed left margin of 40 and a fixed gap of 20.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"min_y\", \"value\": {\"op\": \"min\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"y\"]}, {\"op\": \"min\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.1\"}, \"y\"]}, {\"op\": \"get\", \"args\": [{\"ref\": \"objects.2\"}, \"y\"]}]}]}}, {\"op\": \"let\", \"name\": \"baseline_y\", \"value\": {\"op\": \"sub\", \"args\": [{\"ref\": \"locals.min_y\"}, 200]}}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": 40}, {\"op",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed baseline y=120 and arrange them horizontally starting 30 units right of the first object's original left edge, with a fixed gap of 20 between adjacent objects.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=120, w=60, h=50) but the evidence shows (x=110, y=120, w=60, h=50)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"baseline_y\", \"value\": 120}, {\"op\": \"let\", \"name\": \"start_x\", \"value\": {\"op\": \"add\", \"args\": [{\"op\": \"get\", \"args\": [{\"ref\": \"objects.0\"}, \"x\"]}, 30]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 20}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.start_x\"}, \"y\": {\"ref\": \"locals.baseline_y\"}}, {\"op\": \"emit_target\", \"kind\": \"mov",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1029,
+        "completion_tokens": 13645,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to a fixed baseline y=120 and distribute them horizontally so that their centers are equally spaced, with the first center 30 units right of the first object's original center and the spacing equal to the average of the original center-to-center distances.",
+        "Align all objects to a baseline 580 units above the canvas bottom, then distribute them horizontally with equal center spacing starting from the first object's center shifted right by 30.",
+        "Align all objects to a fixed baseline y=120, shift the first object right by 30, then arrange the remaining objects with equal edge-to-edge gaps computed from the original total gap."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to a fixed baseline y=120, anchor the first and last objects by shifting their left edges right by 30, and place middle objects by linearly interpolating their centers between the anchored centers.",
+          "reason": "invalid rule: line 9: expected '{' to open a block (near 'if')",
+          "rule_excerpt": "let baseline_y = 120\nlet first_left_new = objects[0].x + 30\nlet last_left_new = objects[2].x + 30\nlet first_center_new = first_left_new + objects[0].w / 2\nlet last_center_new = last_left_new + objects[2].w / 2\nlet center_span = last_center_new - first_center_new\nfor V in objects with I {\n  if I == 0 { move V to (first_left_new, baseline_y) }\n  else if I == 2 { move V to (last_left_new, baseline_y)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1521,
+        "completion_tokens": 12058,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 28253,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 92.2,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:34:32+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 3,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object as a badge placed 3 pixels left and 3 pixels down from the top-right corner of the first object.",
+        "Clone the second object as a badge placed with a margin of 15% of its own size from the top-right corner of the first object.",
+        "Clone the second object as a badge placed with a horizontal gap of 5% of the first object's width and a vertical offset of 15% of the badge's height from the top-right of the first object.",
+        "Clone the second object as a badge positioned at the top-center of the first object, shifted right by 35% of the badge's width and down by 15% of its height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 8437,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Place the badge as a clone of the second object, inset from the first object's top-right corner by a gap equal to one twentieth of the first object's width.",
+        "Place the badge as a clone of the second object, inset from the first object's top-right corner by a gap equal to one twentieth of the smaller dimension of the first object.",
+        "Place the badge as a clone of the second object, inset from the first object's top-right corner by a gap of width/20 if the first object is square, otherwise height/30.",
+        "Place the badge as a clone of the second object, inset from the first object's top-right corner by a gap of width/20 capped at a maximum of 10."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1672,
+        "completion_tokens": 21791,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 3,
+      "accepted": [
+        "Place the badge as a clone of the second object, inset from the first object's top-right corner by a gap equal to one twentieth of the first object's width.",
+        "Use a wide-object threshold to change the inset gap from 5% to 10% of the first object's width for very wide objects.",
+        "Use a wide-canvas threshold to change the inset gap from 5% to 10% of the first object's width for very wide canvases.",
+        "Use a tall-object threshold to change the inset gap from 5% to 10% of the first object's width for very tall objects."
+      ],
+      "rejected": [
+        {
+          "summary": "Use a wide-object threshold to change the inset gap from 5% to 10% of the first object's width for very wide objects.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "if objects[0].w >= 1000 { let gap = objects[0].w / 10 } else { let gap = objects[0].w / 20 }\\nclone objects[1] as badge at (objects[0].x + objects[0].w - gap - objects[1].w, objects[0].y + gap)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Use a wide-canvas threshold to change the inset gap from 5% to 10% of the first object's width for very wide canvases.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "if canvas.w >= 2000 { let gap = objects[0].w / 10 } else { let gap = objects[0].w / 20 }\\nclone objects[1] as badge at (objects[0].x + objects[0].w - gap - objects[1].w, objects[0].y + gap)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Use a tall-object threshold to change the inset gap from 5% to 10% of the first object's width for very tall objects.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "if objects[0].h >= 100 { let gap = objects[0].w / 10 } else { let gap = objects[0].w / 20 }\\nclone objects[1] as badge at (objects[0].x + objects[0].w - gap - objects[1].w, objects[0].y + gap)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 4868,
+        "completion_tokens": 23721,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 61470,
+  "calls": 4,
+  "unknown_cost_calls": 0,
+  "wall_s": 210.2,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -160,3 +160,8 @@ candidate-generation wording before decision #39 and without the 32k floor chang
 - Break it: `/api/teach/{id}/break` (bounded sampling, deterministic per seed). Offline replay: `oa replay-evidence`, `/api/replay`; 8 tamper cases are detected.
 - 309 tests pass (incl. engine-backed); fresh `git clone` + README steps verified (uv sync, npm ci, playwright, build:web, tests, lint-imports).
 - Open: Vercel CLI is logged out (public deployment waits for `vercel login`); audit-vs-control experiment still running.
+
+## 2026-10-11 night: audit experiment RESULT (negative) — see decisions #44
+Control: 34 committed (19 correct, 15 wrong = 44%), 9 abstained, 5 lost to truncation. Audit: 10 committed (6 correct, 4 wrong = 40%), 30 abstained, 8 lost. The audit trades
+correct answers for silence without improving precision. Spacing is the weak concept (control: 11 of 21 committed rules wrong; badge: 4 of 13). ~10-15% of model trials
+end in TruncatedOutput in both arms. This is shown in the Compare tab. The research claim "asking/auditing more reduces false success" is NOT supported.

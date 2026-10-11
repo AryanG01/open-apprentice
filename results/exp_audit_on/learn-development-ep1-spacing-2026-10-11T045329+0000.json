@@ -1,0 +1,98 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:53:29+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to y=100 and space left edges evenly starting at x=40 with step 126.",
+        "Align tops to 1/7 canvas height; place first object at 1/35 canvas width; step left edges by 9/100 canvas width.",
+        "Move all objects up by 5\u00d7 the first object's height; place first object right by 0.6\u00d7 its height; then step left edges by 126."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to y=100 and space left edges evenly starting at x=40 with step 126.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let targetY = 100\\nlet startX = 40\\nlet stepX = 126\\nfor V in objects with I {\\n  move V to (startX + I * stepX, targetY)\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to 1/7 canvas height; place first object at 1/35 canvas width; step left edges by 9/100 canvas width.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let targetY = canvas.h / 7\\nlet startX = canvas.w / 35\\nlet stepX = canvas.w * 9 / 100\\nfor V in objects with I {\\n  move V to (startX + I * stepX, targetY)\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Move all objects up by 5\u00d7 the first object's height; place first object right by 0.6\u00d7 its height; then step left edges by 126.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let targetY = objects[0].y - 5 * objects[0].h\\nlet startX = objects[0].x + 0.6 * objects[0].h\\nlet stepX = 126\\nfor V in objects with I {\\n  move V to (startX + I * stepX, targetY)\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=100; place first object at x=40; then pack each next object 16 pixels right of the previous object's right edge.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let targetY = 100\\nlet startX = 40\\nlet gap = 16\\nmove objects[0] to (startX, targetY)\\nfor V in objects with I {\\n  if I > 0 {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=100; place first object at x=40; then pack each next object 16 pixels right of the previous object's right edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let targetY = 100\nlet startX = 40\nlet gap = 16\nmove objects[0] to (startX, targetY)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n  }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3104,
+        "completion_tokens": 31129,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to y=100, place the first at x=40, and space each subsequent object by the first object's width plus 16.",
+        "Align all objects to y=100, place the first at x=40, and space each subsequent object by the average width of the first two objects plus 16.",
+        "Align objects to y=min(100, canvas height/7) and x=min(40, canvas width/35), then space horizontally by the first object's width plus 16.",
+        "Align all objects to y=100, place the first at x=40, and space each subsequent object by the maximum width of the first two objects plus 16."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1972,
+        "completion_tokens": 22636,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 58841,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 241.83,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

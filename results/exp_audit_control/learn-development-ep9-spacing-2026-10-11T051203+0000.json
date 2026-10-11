@@ -1,0 +1,93 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:12:03+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 9,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to y=100 and shift each horizontally by 30 plus 6 times its index.",
+        "Arrange objects in a horizontal row at y=canvas.h/7 starting from x=canvas.w/35 with a fixed gap of 16.",
+        "Arrange objects in a horizontal row at y=canvas.h/7 starting from x=canvas.w/35 with gap equal to 0.4 times the left margin.",
+        "Measure the original gap between the first two objects, then reflow all objects with increased gap (original+6) starting from the first object's x plus three times the original gap, aligning tops to y=canvas.h/7."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 11024,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Arrange objects in a horizontal row at y=100 starting from x=40 with a fixed 16-pixel gap.",
+        "Arrange objects in a horizontal row using canvas-relative parameters clamped so that the row starts at max(40, canvas.width/35), sits at min(100, canvas.height/7), and uses a gap of max(16, canvas.width/100).",
+        "Arrange objects in a horizontal row using canvas-relative parameters clamped oppositely: start at min(40, canvas.width/28), y at max(100, canvas.height/8), gap at min(16, canvas.width/50).",
+        "Arrange objects in a horizontal row using the first object's original geometry clamped so that the row starts at max(40, first.x+30), sits at max(100, first.y-220), and uses a gap of max(16, first.width-94)."
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange objects in a horizontal row at y=100 starting from x=40 with a fixed 16-pixel gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 16\nlet y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (40, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row using canvas-relative parameters clamped so that the row starts at max(40, canvas.width/35), sits at min(100, canvas.height/7), and uses a gap of max(16, canvas.width/100).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = max(16, canvas.w / 100)\nlet y = min(100, canvas.h / 7)\nlet startX = max(40, canvas.w / 35)\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row using the first object's original geometry clamped so that the row starts at max(40, first.x+30), sits at max(100, first.y-220), and uses a gap of max(16, first.width-94).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = max(16, objects[0].w - 94)\nlet y = max(100, objects[0].y - 220)\nlet startX = max(40, objects[0].x + 30)\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row using canvas-relative parameters clamped oppositely: start at min(40, canvas.width/28), y at max(100, canvas.height/8), gap at min(16, canvas.width/50).",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let startX = min(40, canvas.w / 28)\nlet y = max(100, canvas.h / 8)\nlet gap = min(16, canvas.w / 50)\nfor V in objects with I {\n  if I == 0 {\n    move V to (startX, y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5068,
+        "completion_tokens": 28657,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 45783,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 168.4,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

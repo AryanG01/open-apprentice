@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:56:28+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "badge",
+  "audit": false,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the badge at the top-right of the first object, inset by a constant 2px padding and the badge's width.",
+        "Place the badge at a fixed offset of (28,2) from the first object's top-left corner.",
+        "Place the badge horizontally at 56% of the first object's width from its left edge, and 2px below its top.",
+        "Place the badge at the first object's top-right corner with horizontal padding 10% of the badge width and vertical padding 10% of the badge height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 6830,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object to the left of the first object's right edge by the second object's width plus 4% of the first object's width, and down by 4% of the first object's width.",
+        "Clone the second object aligned to the first object's top-right corner, then shift diagonally by 4% of the first object's smaller dimension (width or height).",
+        "Clone the second object aligned to the first object's top-right corner with a diagonal nudge of 4% of the first object's width, but capped at a maximum of 10 pixels.",
+        "Clone the second object positioned relative to the first object's top-right corner and the second object's own location, nudged by 4% of the first object's width."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1670,
+        "completion_tokens": 29615,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 39096,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 173.16,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

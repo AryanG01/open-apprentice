@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:57:06+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 4,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "All objects are moved to a fixed horizontal row at y=120 starting at x=80 with a 12-pixel gap between them.",
+        "The row's left edge starts at the first object's original x plus 5% of canvas width, the row's top is fixed at y=120, and objects are spaced 12 pixels apart.",
+        "Objects are arranged in a fixed row at (80,120) but the horizontal gap equals 12% of the second object's width.",
+        "The row's vertical position is set to the second object's original y minus twice the first object's height, with fixed horizontal start and gap."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1033,
+        "completion_tokens": 9838,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 10871,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 37.97,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

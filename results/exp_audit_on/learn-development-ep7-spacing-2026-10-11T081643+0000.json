@@ -1,0 +1,78 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:16:43+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to a fixed top coordinate (100) and pack them horizontally from a fixed left margin (40) with a fixed gap (20).",
+        "Align all objects to a canvas-relative top (1/7 of height) and left (1/35 of width) with a canvas-relative gap (1/70 of width).",
+        "Align tops to y=100; set the first object's right edge to the second object's original left edge; use 2/3 of the original gap between first and second as the new gap.",
+        "Align tops to 5/3 of the second object's height; set left margin to first object's width minus 10; set gap to one third of the second object's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 12014,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to a fixed top coordinate (100) and pack them horizontally from a fixed left margin (40) with a fixed gap (20).",
+        "Pack objects left-to-right in a loop with a running x coordinate (generalizes to any number of objects)."
+      ],
+      "rejected": [
+        {
+          "summary": "Chain positions using each object's updated right edge with fixed margins (100, 40, 20).",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=100, w=90, h=60) but the evidence shows (x=110, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"top\", \"value\": 100}, {\"op\": \"let\", \"name\": \"left\", \"value\": 40}, {\"op\": \"let\", \"name\": \"gap\", \"value\": 20}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.0\"}, \"x\": {\"ref\": \"locals.left\"}, \"y\": {\"ref\": \"locals.top\"}}, {\"op\": \"emit_target\", \"kind\": \"move_existing\", \"target\": {\"ref\": \"objects.1\"}, \"x\": {\"op\": \"add\", \"args\": [{\"op\": \"add\", \"args\": [{",
+          "stage": "initial"
+        },
+        {
+          "summary": "Compute margins from canvas size capped at the first scene's dimensions (1400x700), then chain positions.",
+          "reason": "contradicts teaching evidence - demonstration: for objects[1] your rule gives (x=80, y=100, w=90, h=60) but the evidence shows (x=110, y=100, w=90, h=60)",
+          "rule_excerpt": "[{\"op\": \"let\", \"name\": \"left\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"min\", \"args\": [{\"ref\": \"canvas.w\"}, 1400]}, 35]}}, {\"op\": \"let\", \"name\": \"top\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"min\", \"args\": [{\"ref\": \"canvas.h\"}, 700]}, 7]}}, {\"op\": \"let\", \"name\": \"gap\", \"value\": {\"op\": \"div\", \"args\": [{\"op\": \"min\", \"args\": [{\"ref\": \"canvas.w\"}, 1400]}, 70]}}, {\"op\": \"emit_target\", \"kind\": \"move_exis",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1459,
+        "completion_tokens": 16517,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 31021,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 87.83,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

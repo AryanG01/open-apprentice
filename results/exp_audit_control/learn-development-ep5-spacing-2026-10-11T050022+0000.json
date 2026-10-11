@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:00:22+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 5,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all cards to one-seventh of the canvas height, then pack them horizontally starting at the first card's height with a gap of one-fifth of that height.",
+        "Align all cards to one-fourteenth of the canvas width, then pack them horizontally starting at the first card's height with a gap of one-fifth of that height.",
+        "Align all cards to one-third of the first card's original y-coordinate, then pack them horizontally starting at the first card's height with a gap of one-fifth of that height.",
+        "Move all cards to a fixed position (y=100) and arrange them in a row starting at x=60 with a fixed 12-pixel gap."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1032,
+        "completion_tokens": 8479,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 9511,
+  "calls": 1,
+  "unknown_cost_calls": 0,
+  "wall_s": 30.98,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:21:13+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [],
+      "rejected": [
+        {
+          "summary": "Align objects to a horizontal baseline at 1/7 canvas height, start the row at 1/35 canvas width, and space objects by 0.4\u00d7 the start offset.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let baseline = canvas.h / 7\\nlet start_x = canvas.w / 35\\nlet gap = start_x * 0.4\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, baseline)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place all objects at fixed coordinates: first at (40,100), each subsequent 16px right of the previous.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let baseline = 100\\nlet start_x = 40\\nlet gap = 16\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, baseline)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Shift the first object by (+30, -250) and pack the rest to its right with a 16px gap.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let baseline = objects[0].y - 250\\nlet start_x = objects[0].x + 30\\nlet gap = 16\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, baseline)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Anchor layout to the first object's geometry: baseline 5\u00d7 its height above, start 0.6\u00d7 its height right, gap 0.32\u00d7 its height.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let baseline = objects[0].y - 5 * objects[0].h\\nlet start_x = objects[0].x + 0.6 * objects[0].h\\nlet gap = 0.32 * objects[0].h\\nfor V in objects with I {\\n  if I == 0 {\\n    move V to (start_x, baseline)\\n  } else {\\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\\n  }\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align objects to a horizontal baseline at 1/7 canvas height, start the row at 1/35 canvas width, and space objects by 0.4\u00d7 the start offset.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let baseline = canvas.h / 7\nlet start_x = canvas.w / 35\nlet gap = start_x * 0.4\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, baseline)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Place all objects at fixed coordinates: first at (40,100), each subsequent 16px right of the previous.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let baseline = 100\nlet start_x = 40\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, baseline)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Shift the first object by (+30, -250) and pack the rest to its right with a 16px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let baseline = objects[0].y - 250\nlet start_x = objects[0].x + 30\nlet gap = 16\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, baseline)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\n  }\n}",
+          "stage": "after_correction"
+        },
+        {
+          "summary": "Anchor layout to the first object's geometry: baseline 5\u00d7 its height above, start 0.6\u00d7 its height right, gap 0.32\u00d7 its height.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let baseline = objects[0].y - 5 * objects[0].h\nlet start_x = objects[0].x + 0.6 * objects[0].h\nlet gap = 0.32 * objects[0].h\nfor V in objects with I {\n  if I == 0 {\n    move V to (start_x, baseline)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, baseline)\n  }\n}",
+          "stage": "after_correction"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3354,
+        "completion_tokens": 38993,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align objects to a horizontal baseline at 1/7 canvas height, start the row at fixed x=40, and pack with 16px gaps.",
+        "Align objects to a horizontal baseline at 1/7 canvas height, shift the first object right by 30px, and pack the rest with 16px gaps.",
+        "Align objects to a horizontal baseline at 1/7 canvas height, start the row at 1/35 canvas width, and pack with 16px gaps.",
+        "Align objects to a horizontal baseline 250px above the first object's original top, start the row at fixed x=40, and pack with 16px gaps."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1397,
+        "completion_tokens": 7387,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 51131,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 187.48,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

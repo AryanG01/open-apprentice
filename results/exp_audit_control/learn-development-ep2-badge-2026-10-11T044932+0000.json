@@ -1,0 +1,76 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:49:32+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "audit": false,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object to the top-right of the first object with a fixed 1px padding.",
+        "Clone the second object to the top-right of the first object with padding proportional to 2% of the first object's smaller dimension.",
+        "Clone the smaller object to the top-right of the larger object (by area) with 1px padding.",
+        "Clone the object at the origin (0,0) to the top-right of the other object with 1px padding."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the second object to the top-right of the first object with a fixed 1px padding.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let ref = objects[0]\\nlet src = objects[1]\\nlet pad = 1\\nclone src as badge at (ref.x + ref.w - src.w - pad, ref.y + pad)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the second object to the top-right of the first object with padding proportional to 2% of the first object's smaller dimension.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let ref = objects[0]\\nlet src = objects[1]\\nlet pad = 0.02 * min(ref.w, ref.h)\\nclone src as badge at (ref.x + ref.w - src.w - pad, ref.y + pad)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the smaller object to the top-right of the larger object (by area) with 1px padding.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let a0 = objects[0].w * objects[0].h\\nlet a1 = objects[1].w * objects[1].h\\nif a1 > a0 {\\n  clone objects[0] as badge at (objects[1].x + objects[1].w - objects[0].w - 1, objects[1].y + 1)\\n} else {\\n  clone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w - 1, objects[0].y + 1)\\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Clone the object at the origin (0,0) to the top-right of the other object with 1px padding.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "if objects[0].x == 0 and objects[0].y == 0 {\\n  clone objects[0] as badge at (objects[1].x + objects[1].w - objects[0].w - 1, objects[1].y + 1)\\n} else {\\n  clone objects[1] as badge at (objects[0].x + objects[0].w - objects[1].w - 1, objects[0].y + 1)\\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3043,
+        "completion_tokens": 28977,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 32020,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 118.38,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

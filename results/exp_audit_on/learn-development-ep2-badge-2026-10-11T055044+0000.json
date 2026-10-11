@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:50:44+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 1/2)",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object onto the first object's top-right with a fixed 1px margin on both axes.",
+        "Clone the second object onto the first's top-right with margins equal to 5% of the clone's own width and height.",
+        "Clone the second object onto the first's top-right with a horizontal margin of 2% of the first object's width and a fixed 1px vertical margin.",
+        "Clone the second object onto the first's top-right with a fixed 1px horizontal margin and a vertical margin of 5% of the clone's height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 8663,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object and place it with a margin of 2% of the first object's width from the first's right and top edges.",
+        "Clone the second object with a 2% width margin capped at a maximum of 10 pixels.",
+        "Clone the second object with a 2% width margin floored at a minimum of 1 pixel.",
+        "Clone the second object using a margin equal to the first object's width divided by 50."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1739,
+        "completion_tokens": 30210,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 41593,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 129.76,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

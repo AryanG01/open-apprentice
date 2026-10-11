@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:51:30+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Move all cards to a fixed row at y=100 starting at x=80 with 20px gaps.",
+        "Arrange cards horizontally with 20px gap starting at the first card's right edge, all at y=100.",
+        "Place cards in a row at 1/7 canvas height starting from the second card's original x with 20px gaps.",
+        "Align cards at y=100 from x=80 with spacing proportional to first card's width (40%)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1031,
+        "completion_tokens": 6781,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Move all cards to a fixed row at y=100 starting at x=80 with 20px gaps.",
+        "Start the row at x = max(80, first object's x) and y = 100 with a fixed 20px gap.",
+        "Start the row at x = max(80, canvas width / 20) and y = max(100, canvas height / 7) with a fixed 20px gap.",
+        "Fix the row at (80, 100) but set the gap to max(20, 0.4 times the first object's width)."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1468,
+        "completion_tokens": 10093,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 19373,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 45.62,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

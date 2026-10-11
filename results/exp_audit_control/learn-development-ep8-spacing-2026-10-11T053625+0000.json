@@ -1,0 +1,76 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:36:25+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 8,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Arrange objects in a horizontal row with fixed left margin 40, top margin 120, and gap 20.",
+        "Arrange objects in a horizontal row using canvas fractions: left margin 1/35 of canvas width, top margin 6/35 of canvas height, gap 1/35 of canvas height.",
+        "Arrange objects in a horizontal row based on the first object: left margin offset by 3/8 of its height, top margin raised by 3.5 times its height, gap 1/4 of its height.",
+        "Arrange objects in a horizontal row preserving the original average horizontal gap and aligning to the second object's top minus 2.5 times the first object's height."
+      ],
+      "rejected": [
+        {
+          "summary": "Arrange objects in a horizontal row with fixed left margin 40, top margin 120, and gap 20.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'i')",
+          "rule_excerpt": "let left = 40\nlet top = 120\nlet gap = 20\nfor obj in objects with i {\n  if i == 0 {\n    move obj to (left, top)\n  } else {\n    move obj to (objects[i-1].x + objects[i-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row using canvas fractions: left margin 1/35 of canvas width, top margin 6/35 of canvas height, gap 1/35 of canvas height.",
+          "reason": "invalid rule: line 10: object index must be a whole number (near 'i')",
+          "rule_excerpt": "let unit_w = canvas.w / 35\nlet unit_h = canvas.h / 35\nlet left = unit_w\nlet top = 6 * unit_h\nlet gap = unit_h\nfor obj in objects with i {\n  if i == 0 {\n    move obj to (left, top)\n  } else {\n    move obj to (objects[i-1].x + objects[i-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row based on the first object: left margin offset by 3/8 of its height, top margin raised by 3.5 times its height, gap 1/4 of its height.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'i')",
+          "rule_excerpt": "let left = objects[0].x + 0.375 * objects[0].h\nlet top = objects[0].y - 3.5 * objects[0].h\nlet gap = 0.25 * objects[0].h\nfor obj in objects with i {\n  if i == 0 {\n    move obj to (left, top)\n  } else {\n    move obj to (objects[i-1].x + objects[i-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Arrange objects in a horizontal row preserving the original average horizontal gap and aligning to the second object's top minus 2.5 times the first object's height.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'i')",
+          "rule_excerpt": "let left = objects[1].x - objects[0].w\nlet top = objects[1].y - 2.5 * objects[0].h\nlet gap = (objects[2].x - objects[0].x - objects[0].w - objects[1].w) / 2\nfor obj in objects with i {\n  if i == 0 {\n    move obj to (left, top)\n  } else {\n    move obj to (objects[i-1].x + objects[i-1].w + gap, top)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3383,
+        "completion_tokens": 14247,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 17630,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 47.1,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

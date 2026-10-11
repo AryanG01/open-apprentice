@@ -1,0 +1,76 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:50:16+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 1,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place the first object at fixed position (80,100), then arrange the next two objects horizontally to the right with a constant 20px gap.",
+        "Place the first object just to the right of its original right edge (plus 20px) at y=100, then arrange the next two objects horizontally with a constant 20px gap.",
+        "Place the first object at x=80 and y=canvas.height/7, then arrange the next two objects horizontally with a constant 20px gap.",
+        "Place the first object at fixed position (80,100), then arrange the next two objects horizontally with a gap equal to one quarter of the first object's height."
+      ],
+      "rejected": [
+        {
+          "summary": "Place the first object at fixed position (80,100), then arrange subsequent objects horizontally to the right with a 20px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 20\nlet anchor_x = 80\nlet anchor_y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (anchor_x, anchor_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, anchor_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the first object just to the right of its original position (original right edge + 20px) at y=100, then arrange subsequent objects horizontally with a 20px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 20\nlet anchor_x = objects[0].x + objects[0].w + 20\nlet anchor_y = 100\nfor V in objects with I {\n  if I == 0 {\n    move V to (anchor_x, anchor_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, anchor_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the first object at x=80 and y=canvas.height/7, then arrange subsequent objects horizontally with a 20px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let gap = 20\nlet anchor_x = 80\nlet anchor_y = canvas.h / 7\nfor V in objects with I {\n  if I == 0 {\n    move V to (anchor_x, anchor_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, anchor_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Place the first object at fixed position (80,100), then arrange subsequent objects horizontally with a gap equal to one quarter of the first object's height.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let anchor_x = 80\nlet anchor_y = 100\nlet gap = objects[0].h / 4\nfor V in objects with I {\n  if I == 0 {\n    move V to (anchor_x, anchor_y)\n  } else {\n    move V to (objects[I-1].x + objects[I-1].w + gap, anchor_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3271,
+        "completion_tokens": 12309,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 15580,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 43.46,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

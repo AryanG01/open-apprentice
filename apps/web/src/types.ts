@@ -126,7 +126,21 @@ export interface TeachingTrials {
   unresolved: number;
 }
 
+export interface ExperimentArm {
+  name: string;
+  arm: string;
+  trials: number;
+  errors: number;
+  committed: number;
+  correct: number;
+  wrong: number;
+  abstained: number;
+  wrong_share_of_committed: number | null;
+  tokens: number;
+}
+
 export interface Evidence {
+  experiments?: ExperimentArm[];
   generated_at: string;
   runs: RunEvidence[];
   teaching_trials: TeachingTrials[];

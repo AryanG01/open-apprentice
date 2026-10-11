@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:15:15+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 7,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype as a badge at the top-right of the first object with a fixed 2-pixel padding.",
+        "Clone the prototype as a badge at the top-right of the first object with padding equal to 10% of the prototype's width.",
+        "Clone the prototype as a badge at the top-right of the first object with padding equal to 4% of the first object's width.",
+        "Clone the prototype as a badge at a fixed offset of (28, 2) from the first object's top-left corner."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 5634,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the prototype as a badge at the top-right of the first object with padding equal to 4% of the first object's width.",
+        "Clone the prototype as a badge at the top-right of the first object with padding equal to 4% of the first object's smaller dimension (width or height).",
+        "Clone the prototype as a badge at the top-right of the first object with padding equal to 4% of the first object's width, but capped at a maximum of 2 pixels.",
+        "If the first object is taller than it is wide (or square), place the badge at the top-right with 4% width padding; otherwise place it at the top-left with the same padding."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1343,
+        "completion_tokens": 28974,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 36932,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 111.47,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

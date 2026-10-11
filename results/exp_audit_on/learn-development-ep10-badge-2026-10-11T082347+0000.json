@@ -1,0 +1,67 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:23:47+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 10,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "prop",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "unresolved",
+  "unresolved_reason": "neither_with_no_generation_rounds_left",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype at an offset from the reference top-left proportional to the prototype's own dimensions.",
+        "Clone the prototype at an offset from the reference top-left proportional to the reference object's dimensions.",
+        "Clone the prototype with horizontal position relative to the reference right edge and vertical position relative to the reference top edge, both scaled by prototype size.",
+        "Clone the prototype so that its center is offset from the reference center by a fixed fraction of the reference size."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 988,
+        "completion_tokens": 9101,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the prototype with horizontal position relative to the reference right edge and vertical position relative to the reference top edge, both scaled by prototype size.",
+        "Place the badge at the reference's top-right corner, inset horizontally and vertically by 12% of the smaller of the reference and badge dimensions.",
+        "Place the badge at the reference's top-right corner, inset horizontally by 12% of the smaller width and vertically by 12% of the badge height.",
+        "Place the badge at the reference's top-right corner, inset horizontally by 12% of the badge width and vertically by 12% of the smaller height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1340,
+        "completion_tokens": 14193,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 25622,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 63.66,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

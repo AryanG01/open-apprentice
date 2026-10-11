@@ -1,1 +1,51 @@
 oa learn  split=development trials=48  model=nvidia/Nemotron-3-Ultra-550b-a55b  reasoning_effort=low
+ ep concept  template   state       rounds queries     teach recovered  tokens wall_s  note
+  0 badge    const      INTENT_READY      1       1 1a/0c      True    9149  25.37  
+  0 spacing  edge       INTENT_READY      2       2 2a/1c      True   40730 172.81  
+  1 badge    prop       INTENT_READY      1       1 1a/0c      True   23967  87.73  
+  1 spacing  edge       INTENT_READY      2       1 1a/0c     False   15759  45.73  
+  2 badge    min        INTENT_READY      1       1 1a/0c     False   32020 118.38  
+  2 spacing  edge       INTENT_READY      1       1 1a/0c     False   15580  43.46  
+  3 badge    const      HYPOTHESES_READY      2       1 1a/1c      None   37721 160.73  TruncatedOutput: output hit the completion limit; not executing partial output
+  3 spacing  edge       INTENT_READY      1       1 1a/0c      True   10505  38.23  
+  4 badge    prop       UNRESOLVED       2       2 2a/1c      None   39096 173.16  
+  4 spacing  edge       INTENT_READY      1       1 1a/0c      True   10871  37.97  
+  5 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   46244 164.82  TruncatedOutput: output hit the completion limit; not executing partial output
+  5 spacing  edge       INTENT_READY      1       1 1a/0c     False    9511  30.98  
+  6 badge    const      UNRESOLVED       2       2 2a/1c      None   34587 122.08  
+  6 spacing  edge       INTENT_READY      1       1 1a/0c      True    7434  21.31  
+  7 badge    prop       UNRESOLVED       2       2 2a/1c      None   34121 122.81  
+  7 spacing  edge       INTENT_READY      1       1 1a/0c     False    7940  23.14  
+  8 badge    min        INTENT_READY      2       2 2a/1c      True   36011 127.17  
+  8 spacing  edge       UNRESOLVED       2       1 1a/0c      None   28253   92.2  
+  9 badge    const      INTENT_READY      1       1 1a/0c      True    7963  24.41  
+  9 spacing  edge       INTENT_READY      2       2 2a/1c     False   45783  168.4  
+ 10 badge    prop       INTENT_READY      1       1 1a/0c     False   13060  41.27  
+ 10 spacing  edge       INTENT_READY      1       1 1a/0c      True   14899  64.79  
+ 11 badge    min        INTENT_READY      1       2 2a/0c      True    5218  28.32  
+ 11 spacing  edge       INTENT_READY      2       1 1a/0c      True   27864  80.46  
+  0 badge    const      INTENT_READY      1       1 1a/0c      True   19010  63.58  
+  0 spacing  edge       INTENT_READY      1       1 1a/0c     False    9347  34.76  
+  1 badge    prop       INTENT_READY      1       1 1a/0c     False   14533  48.61  
+  1 spacing  edge       UNRESOLVED       2       1 1a/0c      None   51131 187.48  
+  2 badge    min        INTENT_READY      1       1 1a/0c      True    9111  31.97  
+  2 spacing  edge       INTENT_READY      1       1 1a/0c     False    8370  26.36  
+  3 badge    const      UNRESOLVED       2       2 2a/1c      None   25590  77.18  
+  3 spacing  edge       INTENT_READY      1       1 1a/0c     False    8179  21.42  
+  4 badge    prop       UNRESOLVED       2       2 2a/1c      None   31654 101.53  
+  4 spacing  edge       INTENT_READY      1       1 1a/0c      True   11349  32.76  
+  5 badge    min        INTENT_READY      1       1 1a/0c     False   16335  48.88  
+  5 spacing  edge       INTENT_READY      1       1 1a/0c     False   10439  36.25  
+  6 badge    const      UNRESOLVED       2       2 2a/1c      None   30326 110.78  
+  6 spacing  edge       INTENT_READY      1       1 1a/0c      True    7403  22.82  
+  7 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   43268  153.5  TruncatedOutput: output hit the completion limit; not executing partial output
+  7 spacing  edge       INTENT_READY      1       1 1a/0c      True    7238  23.44  
+  8 badge    min        HYPOTHESES_READY      2       1 1a/1c      None   45887 178.43  TruncatedOutput: output hit the completion limit; not executing partial output
+  8 spacing  edge       INTENT_READY      1       1 1a/0c      True   17630   47.1  
+  9 badge    const      INTENT_READY      1       2 2a/0c      True    9249   31.9  
+  9 spacing  edge       INTENT_READY      1       1 1a/0c     False   12397  37.33  
+ 10 badge    prop       HYPOTHESES_READY      2       1 1a/1c      None   42531 150.15  TruncatedOutput: output hit the completion limit; not executing partial output
+ 10 spacing  edge       INTENT_READY      1       1 1a/0c     False   19688  66.01  
+ 11 badge    min        INTENT_READY      2       2 2a/1c      True   38267 145.61  
+ 11 spacing  edge       UNRESOLVED       2       1 1a/0c      None   38817 142.68  
+recovered the hidden rule on held-out scenes: 19/48  |  total tokens 1082035  |  results in results/exp_audit_control

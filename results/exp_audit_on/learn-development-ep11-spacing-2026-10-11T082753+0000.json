@@ -1,0 +1,93 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T08:27:53+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Align all objects to a fixed y=100, place the first at x=40, and pack the rest to the right with a fixed 16px gap using a running x position.",
+        "Align all objects to y=canvas.h/7, place the first at x=canvas.w/35, and pack the rest to the right with a gap proportional to canvas width (16/1400).",
+        "Align all objects to a fixed y=100, place the first object 30px right of its original x position, and pack the rest to the right with a fixed 16px gap.",
+        "Align all objects to y=canvas.h/7, place the first at a fixed x=40, and pack the rest to the right with a fixed 16px gap."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to a fixed y=100, place the first at x=40, and pack the rest to the right with a fixed 16px gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = 100\nlet start_x = 40\nlet gap = 16\nmove objects[0] to (start_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=canvas.h/7, place the first at x=canvas.w/35, and pack the rest to the right with a gap proportional to canvas width (16/1400).",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = canvas.h / 7\nlet start_x = canvas.w / 35\nlet gap = canvas.w * 16 / 1400\nmove objects[0] to (start_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to a fixed y=100, place the first object 30px right of its original x position, and pack the rest to the right with a fixed 16px gap.",
+          "reason": "invalid rule: line 8: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let orig_x0 = objects[0].x\nlet target_y = 100\nlet start_x = orig_x0 + 30\nlet gap = 16\nmove objects[0] to (start_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=canvas.h/7, place the first at a fixed x=40, and pack the rest to the right with a fixed 16px gap.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let target_y = canvas.h / 7\nlet start_x = 40\nlet gap = 16\nmove objects[0] to (start_x, target_y)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, target_y)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3318,
+        "completion_tokens": 13210,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to a fixed y=100, place the first at x=40, and pack the rest to the right with a fixed 16px gap using a running x position.",
+        "Align all objects to y=100, start the first at x=40, and pack the rest to the right with a gap of 16 that never exceeds the first object's width.",
+        "Align all objects to y=min(100, canvas height/7), start the first at x=40, and pack the rest to the right with a fixed gap of 16.",
+        "Align all objects to y=100, start the first at x=max(40, first object's original x+30), and pack the rest to the right with a fixed gap of 16."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1652,
+        "completion_tokens": 8754,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 26934,
+  "calls": 3,
+  "unknown_cost_calls": 0,
+  "wall_s": 60.9,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:48:35+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "audit": true,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "UNRESOLVED",
+  "intent_state": "consistent_with_examples",
+  "unresolved_reason": "ambiguity_remains: candidates still disagree or could not be checked (solver status=incomplete; query budget 2/2)",
+  "rounds": 3,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Place objects on a horizontal line at 1/7 canvas height, starting at 1/35 canvas width with step 9/100 canvas width.",
+        "Anchor layout to first object: move up 250 and right 30, then repeat with spacing equal to first object width plus 16.",
+        "Align tops to 1/7 canvas height, start at 1/35 canvas width, step by first object width plus 16.",
+        "Align tops to lowest object top minus 250, then distribute with fixed left margin 40 and fixed step 126."
+      ],
+      "rejected": [
+        {
+          "summary": "Place objects on a horizontal line at 1/7 canvas height, starting at 1/35 canvas width with step 9/100 canvas width.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let top = canvas.h / 7\\nlet left = canvas.w / 35\\nlet step = canvas.w * 0.09\\nmove objects[0] to (left, top)\\nmove objects[1] to (left + step, top)\\nmove objects[2] to (left + 2 * step, top)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Anchor layout to first object: move up 250 and right 30, then repeat with spacing equal to first object width plus 16.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let top = objects[0].y - 250\\nlet left = objects[0].x + 30\\nlet gap = 16\\nlet step = objects[0].w + gap\\nmove objects[0] to (left, top)\\nmove objects[1] to (left + step, top)\\nmove objects[2] to (left + 2 * step, top)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to 1/7 canvas height, start at 1/35 canvas width, step by first object width plus 16.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let top = canvas.h / 7\\nlet left = canvas.w / 35\\nlet step = objects[0].w + 16\\nmove objects[0] to (left, top)\\nmove objects[1] to (left + step, top)\\nmove objects[2] to (left + 2 * step, top)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align tops to lowest object top minus 250, then distribute with fixed left margin 40 and fixed step 126.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let min01 = min(objects[0].y, objects[1].y)\\nlet miny = min(min01, objects[2].y)\\nlet top = miny - 250\\nlet left = 40\\nlet step = 126\\nmove objects[0] to (left, top)\\nmove objects[1] to (left + step, top)\\nmove objects[2] to (left + 2 * step, top)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 3207,
+        "completion_tokens": 15793,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Align all objects to y=100, place first at x=40, then each next object 16 pixels right of previous object's right edge.",
+        "Align all objects to y=100, place first at x=40, then space objects evenly by the maximum object width plus 16.",
+        "Align all objects to y=100, place first at x=40, then space objects evenly by the first object's width plus 16.",
+        "Align all objects to y=100, place first at x=40, then space objects evenly by the second object's width plus 16."
+      ],
+      "rejected": [
+        {
+          "summary": "Align all objects to y=100, place first at x=40, then each next object 16 pixels right of previous object's right edge.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let y = 100\\nlet start_x = 40\\nlet gap = 16\\nmove objects[0] to (start_x, y)\\nmove objects[1] to (start_x + objects[0].w + gap, y)\\nmove objects[2] to (start_x + objects[0].w + gap + objects[1].w + gap, y)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=100, place first at x=40, then space objects evenly by the maximum object width plus 16.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let y = 100\\nlet start_x = 40\\nlet step = max(max(objects[0].w, objects[1].w), objects[2].w) + 16\\nmove objects[0] to (start_x, y)\\nmove objects[1] to (start_x + step, y)\\nmove objects[2] to (start_x + 2 * step, y)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=100, place first at x=40, then space objects evenly by the first object's width plus 16.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let y = 100\\nlet start_x = 40\\nlet step = objects[0].w + 16\\nmove objects[0] to (start_x, y)\\nmove objects[1] to (start_x + step, y)\\nmove objects[2] to (start_x + 2 * step, y)",
+          "stage": "initial"
+        },
+        {
+          "summary": "Align all objects to y=100, place first at x=40, then space objects evenly by the second object's width plus 16.",
+          "reason": "invalid rule: line 1: unexpected character '\\\\'",
+          "rule_excerpt": "let y = 100\\nlet start_x = 40\\nlet step = objects[1].w + 16\\nmove objects[0] to (start_x, y)\\nmove objects[1] to (start_x + step, y)\\nmove objects[2] to (start_x + 2 * step, y)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "correction_turn": true,
+        "prompt_tokens": 5149,
+        "completion_tokens": 32346,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 2
+    },
+    {
+      "round": 3,
+      "accepted": [
+        "Align all objects to y=100, place first at x=40, then each next object 16 pixels right of previous object's right edge.",
+        "Align tops to max(1/7 canvas height, 100), start at max(1/35 canvas width, 40), gap 16.",
+        "Align tops to max(first object top minus 250, 100), start at max(first object left plus 30, 40), gap min(16, canvas width/4).",
+        "Align tops to min(100, 2*canvas height), start at min(40, 5/8*canvas width), gap 16."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 2619,
+        "completion_tokens": 11451,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 70565,
+  "calls": 5,
+  "unknown_cost_calls": 0,
+  "wall_s": 186.6,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:47:34+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 1,
+  "concept": "spacing",
+  "audit": false,
+  "evaluator_template": "edge",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "resolved_within_candidate_set",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 0
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Objects are aligned to fixed y=100, the first at x=40, and subsequent objects spaced at a fixed step equal to the first object's width plus 16."
+      ],
+      "rejected": [
+        {
+          "summary": "All objects are moved to a fixed y=100, with the first at x=40 and each subsequent object placed 16 pixels after the previous object's right edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let targetY = 100\nlet startX = 40\nlet gap = 16\nmove objects[0] to (startX, targetY)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Objects are aligned to y = canvas height / 7, the first object placed at x = canvas width / 35, and each next object positioned 16 pixels after the previous one's right edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let targetY = canvas.h / 7\nlet startX = canvas.w / 35\nlet gap = 16\nmove objects[0] to (startX, targetY)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n  }\n}",
+          "stage": "initial"
+        },
+        {
+          "summary": "Objects are aligned to y = first object's y minus 5 times its height, the first object placed at x = 4 times its original x, and each next object positioned 16 pixels after the previous one's right edge.",
+          "reason": "invalid rule: line 7: object index must be a whole number (near 'I')",
+          "rule_excerpt": "let targetY = objects[0].y - 5 * objects[0].h\nlet startX = 4 * objects[0].x\nlet gap = 16\nmove objects[0] to (startX, targetY)\nfor V in objects with I {\n  if I > 0 {\n    move V to (objects[I-1].x + objects[I-1].w + gap, targetY)\n  }\n}",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1034,
+        "completion_tokens": 9873,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Objects are aligned to fixed y=100, the first at x=40, and subsequent objects spaced at a fixed step equal to the first object's width plus 16.",
+        "Objects aligned to y = canvas height / 7, first object at x = 40, spaced by first object's width + 16",
+        "Objects aligned to y = first object's original y minus 5 times its height, first object shifted right by 30, fixed spacing 126",
+        "Objects aligned to y = canvas height - 600, first object at x = 40, spaced by first object's width + 16"
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 1367,
+        "completion_tokens": 3485,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": false,
+  "tokens": 15759,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 45.73,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

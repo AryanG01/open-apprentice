@@ -1,0 +1,73 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T05:43:36+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 11,
+  "concept": "badge",
+  "audit": false,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": null,
+  "final_state": "INTENT_READY",
+  "intent_state": "user_corrected",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 2,
+  "teacher_interactions": {
+    "answers": 2,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the prototype as a badge at the top-right of the first object, inset by a fixed 3-pixel margin.",
+        "Clone the prototype as a badge at the top-right of the first object, inset by a margin equal to 15% of the badge's width.",
+        "Clone the prototype as a badge at the top-right of the first object, with horizontal inset 5% of the card width and vertical inset 15% of the badge height.",
+        "Clone the prototype as a badge near the top-center of the first object, offset right by 35% of badge width and down by 15% of badge height."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 7559,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    },
+    {
+      "round": 2,
+      "accepted": [
+        "Clone the second object and place it to the right of the first object, offset vertically by 1/20 of the first object's width.",
+        "Clone the second object, using the maximum of 1/20 of the first object's width and 1/30 of its height as the vertical offset.",
+        "Clone the second object, using 1/30 of the first object's height as vertical offset if it is taller than wide, otherwise 1/20 of its width."
+      ],
+      "rejected": [
+        {
+          "summary": "Clone the first object, position it with a vertical offset of 1/20 of its width, then resize it to match the second object's dimensions.",
+          "reason": "invalid rule: line 4: unknown name 'badge'; define it with let or a for loop first (near 'to')",
+          "rule_excerpt": "let dw = objects[0].w - objects[1].w\nlet dy = objects[0].w / 20\nclone objects[0] as badge at (objects[0].x + dw - dy, objects[0].y + dy)\nresize badge to (objects[1].w, objects[1].h)",
+          "stage": "initial"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 1672,
+        "completion_tokens": 28055,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": true,
+  "tokens": 38267,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 145.61,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}

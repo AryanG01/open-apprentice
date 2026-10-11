@@ -1,0 +1,50 @@
+{
+  "label": "LIVE",
+  "ran_at": "2026-10-11T04:56:43+00:00",
+  "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+  "completion_cap": 32000,
+  "reasoning_effort": "low",
+  "split": "development",
+  "episode": 2,
+  "concept": "badge",
+  "audit": true,
+  "evaluator_template": "min",
+  "template_note": "evaluator-only; never sent to the model",
+  "error": "TruncatedOutput: output hit the completion limit; not executing partial output",
+  "final_state": "HYPOTHESES_READY",
+  "intent_state": "unresolved",
+  "unresolved_reason": "",
+  "rounds": 2,
+  "queries": 1,
+  "teacher_interactions": {
+    "answers": 1,
+    "corrections": 1
+  },
+  "generation": [
+    {
+      "round": 1,
+      "accepted": [
+        "Clone the second object and place it flush against the first object's top-right corner with a 1-pixel gap on the right and top.",
+        "Clone the second object and place it with its left edge 21 pixels left of the first object's right edge and its top edge 1 pixel below the first object's top edge.",
+        "Clone the second object and place it with a gap of 5% of its width from the first object's right edge and 5% of its height from the first object's top edge.",
+        "Clone the second object and place it at a fixed offset of 29 pixels right and 1 pixel down from the first object's top-left corner."
+      ],
+      "rejected": [],
+      "usage": {
+        "prompt_tokens": 981,
+        "completion_tokens": 10457,
+        "label": "LIVE",
+        "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+      },
+      "model_calls": 1
+    }
+  ],
+  "recovered_latent_on_heldout": null,
+  "tokens": 45105,
+  "calls": 2,
+  "unknown_cost_calls": 0,
+  "wall_s": 193.76,
+  "prompt_hashes": {
+    "hypotheses": "b4a3ba6d78d851c2"
+  }
+}
