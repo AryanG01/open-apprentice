@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Attempts, AxisChips, Checks, Hash, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
-import type { Axes, LiveRepair, LiveRun, LiveState, Meter, ReadyInfo } from "./types";
+import type { Axes, BreakResult, LiveRepair, LiveRun, LiveState, Meter, ReadyInfo, ReplayResult } from "./types";
 
 class ApiError extends Error {
   constructor(
@@ -86,6 +86,8 @@ export function TryIt() {
   const [toolChange, setToolChange] = useState(false);
   const [run, setRun] = useState<LiveRun | null>(null);
   const [repair, setRepair] = useState<LiveRepair | null>(null);
+  const [replay, setReplay] = useState<ReplayResult | null>(null);
+  const [stress, setStress] = useState<BreakResult | null>(null);
   const [learner, setLearner] = useState<"reference" | "nemotron">("reference");
   const [modelInfo, setModelInfo] = useState<ReadyInfo["model"] | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -136,6 +138,7 @@ export function TryIt() {
     guarded(async (signal) => {
       setRun(null);
       setRepair(null);
+      setStress(null);
       setPicked(null);
       setLive(await api<LiveState>("/api/teach", "POST", { mode: learner }, signal));
       void refreshModel();
@@ -154,6 +157,25 @@ export function TryIt() {
       if (!live) return;
       setRepair(null);
       setRun(await api<LiveRun>(`/api/teach/${live.id}/run`, "POST", { width, backend, tool_change: toolChange && backend === "fabric" }, signal));
+      void refreshModel();
+    });
+
+  const doReplay = (text: string | null) =>
+    guarded(async (signal) => {
+      let pkg: unknown;
+      try {
+        pkg = text === null ? await api<unknown>(`/api/teach/${live?.id}/evidence.json`, "GET", undefined, signal) : JSON.parse(text);
+      } catch (e) {
+        if (e instanceof ApiError) throw e;
+        throw new ApiError("That file is not valid JSON.", 0);
+      }
+      setReplay(await api<ReplayResult>("/api/replay", "POST", { package: pkg }, signal));
+    });
+
+  const doBreak = () =>
+    guarded(async (signal) => {
+      if (!live) return;
+      setStress(await api<BreakResult>(`/api/teach/${live.id}/break`, "POST", { backend, tool_change: toolChange && backend === "fabric", samples: 40, seed: Math.floor(Math.random() * 1000) }, signal));
       void refreshModel();
     });
 
@@ -237,6 +259,9 @@ export function TryIt() {
               <button className="primary" onClick={doRun} disabled={busy}>Run</button>
               <button onClick={doRepair} disabled={busy || !repairNow}>Repair native procedure</button>
             </div>
+            <div className="controls">
+              <button onClick={doBreak} disabled={busy} title="Runs 40 generated inputs on the real engine and judges each with the independent verifier">Try to break it (40 inputs)</button>
+            </div>
           </fieldset>
         ) : null}
         <p className="muted small">
@@ -308,8 +333,28 @@ export function TryIt() {
           <div className="controls export" role="group" aria-label="Export">
             <a className="btn primary" href={`/api/teach/${live.id}/export.svg`} download>Download editable SVG</a>
             <a className="btn" href={`/api/teach/${live.id}/evidence.json`} download>Evidence package (JSON)</a>
+            <button onClick={() => doReplay(null)} disabled={busy}>Re-check this package offline</button>
+            <label className="btn filebtn">
+              Check a package file…
+              <input type="file" accept="application/json,.json" onChange={(e) => { const f = e.target.files?.[0]; if (f) void f.text().then((t) => doReplay(t)); e.target.value = ""; }} />
+            </label>
             <span className="muted small">The SVG keeps every object id and carries the rule hash, backend and verifier result inside the file.</span>
           </div>
+        ) : null}
+        {replay ? (
+          <section className={replay.passed ? "callout ok" : "callout bad"} role="note" aria-label="Offline re-check">
+            <strong>{replay.passed ? "Every offline check passed." : "At least one offline check FAILED."}</strong>
+            <span className="muted"> Re-derived from the package alone, with no engine and no model. It does not re-run the graphics engine.</span>
+            <ul className="replay">
+              {replay.checks.map((c) => (
+                <li key={c.name} className={c.passed === null ? "" : c.passed ? "ok-text" : "fail-text"}>
+                  <span aria-hidden="true">{c.passed === null ? "ℹ" : c.passed ? "✓" : "✗"}</span>
+                  <span className="visually-hidden">{c.passed === null ? "Finding: " : c.passed ? "Passed: " : "Failed: "}</span> {c.name} <span className="muted">({c.detail})</span>
+                </li>
+              ))}
+            </ul>
+            <p className="muted small">Command line: <code>uv run python -m open_apprentice.cli replay-evidence evidence.json</code></p>
+          </section>
         ) : null}
 
         {run && runFrame ? (
@@ -334,6 +379,33 @@ export function TryIt() {
               </div>
             ) : null}
           </>
+        ) : null}
+
+        {stress ? (
+          <section className={stress.failed === 0 ? "callout ok" : "callout bad"} role="note" aria-label="Stress test result">
+            <strong>
+              {stress.failed === 0 ? `Could not break it: ${stress.passed} of ${stress.tested} inputs passed.` : `Broke it: ${stress.failed} of ${stress.tested} inputs failed.`}
+            </strong>{" "}
+            On {stress.backend}{stress.tool_change ? " after the silent tool change" : ""}, using binding v{stress.binding.version} ({stress.binding.origin === "model" ? "model-generated" : "scripted fixture"}), {stress.elapsed_s}s.
+            <span className="muted"> {stress.coverage}</span>
+            {stress.failures.length > 0 ? (
+              <div className="table-wrap">
+                <table className="data">
+                  <caption>First failures (width × height at x, y)</caption>
+                  <thead><tr><th>Input</th><th>What failed</th><th>Expected vs observed</th></tr></thead>
+                  <tbody>
+                    {stress.failures.map((f, i) => (
+                      <tr key={i}>
+                        <td>{f.width} × {f.height} at {f.x}, {f.y}</td>
+                        <td>{f.native_error ?? (f.failed_checks.join(", ").replace(/_/g, " ") || "native check")}</td>
+                        <td>{f.native_diffs[0] ? `${f.native_diffs[0].key}: (${f.native_diffs[0].expected.slice(0, 2).map((n) => Math.round(n * 10) / 10).join(", ")}) vs (${f.native_diffs[0].observed.slice(0, 2).map((n) => Math.round(n * 10) / 10).join(", ")})` : "–"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : null}
+          </section>
         ) : null}
 
         {repair ? (

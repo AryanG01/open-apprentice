@@ -220,3 +220,38 @@ export interface ReadyInfo {
   engine_error: string | null;
   model: { available: boolean; id: string; spend_usd: number; cap_usd: number; error: string | null };
 }
+
+export interface BreakFailure {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  native_passed: boolean;
+  failed_checks: string[];
+  native_diffs: { key: string; expected: number[]; observed: number[] }[];
+  native_error: string | null;
+}
+
+export interface BreakResult {
+  backend: string;
+  tool_change: boolean;
+  binding: { version: number; origin: string; program_hash: string };
+  tested: number;
+  passed: number;
+  failed: number;
+  failures: BreakFailure[];
+  seed: number;
+  elapsed_s: number;
+  coverage: string;
+}
+
+export interface ReplayCheck {
+  name: string;
+  passed: boolean | null;
+  detail: string;
+}
+
+export interface ReplayResult {
+  passed: boolean;
+  checks: ReplayCheck[];
+}
