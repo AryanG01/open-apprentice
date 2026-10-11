@@ -510,7 +510,12 @@ def stored_evidence():
         if glob.glob(f"{d}/learn-*.json"):
             m = summarise(d)
             experiments.append(
-                {"name": "audit", "arm": label, **{k: v for k, v in m.items() if k != "by_concept"}}
+                {
+                    "name": "audit",
+                    "variant": "control" if arm == "control" else "audit",
+                    "arm": label,
+                    **{k: v for k, v in m.items() if k != "by_concept"},
+                }
             )
     return {
         "experiments": experiments,

@@ -128,6 +128,7 @@ export interface TeachingTrials {
 
 export interface ExperimentArm {
   name: string;
+  variant: "control" | "audit";
   arm: string;
   trials: number;
   errors: number;

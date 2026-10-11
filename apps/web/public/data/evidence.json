@@ -2,6 +2,7 @@
  "experiments": [
   {
    "name": "audit",
+   "variant": "control",
    "arm": "Without the audit round",
    "trials": 48,
    "errors": 5,
@@ -14,6 +15,7 @@
   },
   {
    "name": "audit",
+   "variant": "audit",
    "arm": "With the audit round",
    "trials": 48,
    "errors": 8,
@@ -25,7 +27,7 @@
    "tokens": 1824948
   }
  ],
- "generated_at": "2026-10-11T08:28:53+00:00",
+ "generated_at": "2026-10-11T08:39:57+00:00",
  "runs": [
   {
    "run": "development-ep1-1-20261010T144833",

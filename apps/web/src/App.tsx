@@ -2,13 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Compare } from "./Compare";
 import { Attempts, AxisChips, Checks, Facts, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
+import { Home } from "./Home";
 import { TryIt } from "./TryIt";
 import type { Demo, Evidence, Step } from "./types";
 
-type Mode = "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live";
-const MODES: Mode[] = ["Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live"];
+type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live";
+const MODES: Mode[] = ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live"];
 
 const MODE_HELP: Record<Mode, string> = {
+  Home: "What this is and what we measured.",
   Learn: "Show one example. It asks only when its candidate rules disagree.",
   Reuse: "Apply the frozen rule to a new input.",
   Transfer: "Carry the same rule to a second graphics backend.",
@@ -23,10 +25,11 @@ async function loadJson<T>(name: string): Promise<T> {
   return (await res.json()) as T;
 }
 
-const HASH: Record<string, Mode> = { learn: "Learn", reuse: "Reuse", transfer: "Transfer", challenge: "Challenge", compare: "Compare", live: "Try it live" };
+const HASH: Record<string, Mode> = {
+  home: "Home", learn: "Learn", reuse: "Reuse", transfer: "Transfer", challenge: "Challenge", compare: "Compare", live: "Try it live" };
 
 function modeFromHash(): Mode {
-  return HASH[window.location.hash.replace("#", "")] ?? "Learn";
+  return HASH[window.location.hash.replace("#", "")] ?? "Home";
 }
 
 function prefersReducedMotion(): boolean {
@@ -129,6 +132,9 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
   const [index, setIndex] = useState(0);
   const [mode, setMode] = useState<Mode>(modeFromHash);
+  const goHash = (h: string) => {
+    window.location.hash = h;
+  };
   const [playing, setPlaying] = useState(false);
   const stageRef = useRef<HTMLElement | null>(null);
 
@@ -172,7 +178,7 @@ export function App() {
   const pickMode = (m: Mode) => {
     setMode(m);
     window.location.hash = Object.keys(HASH).find((k) => HASH[k] === m) ?? "";
-    if (m !== "Compare" && m !== "Try it live") {
+    if (m !== "Compare" && m !== "Try it live" && m !== "Home") {
       const first = steps.findIndex((s) => s.mode === m);
       if (first >= 0) setIndex(first);
     }
@@ -200,12 +206,23 @@ export function App() {
         {mode === "Try it live" ? (
           <div className="banner" role="note">
             <span className="pill live">LIVE ENGINE</span>
-            <span>You are driving the real Konva and Fabric engines and the independent verifier. Choose who proposes the rules: the free reference learner (no model) or NVIDIA Nemotron (live and metered). Every response says which one produced what.</span>
+            <span>
+              You are driving the real Konva and Fabric engines and the independent verifier. Choose who proposes the rules: the free reference learner (no model) or NVIDIA Nemotron
+              (live and metered). Every response says which one produced what.
+            </span>
           </div>
-        ) : (
+        ) : mode === "Compare" ? (
+          <div className="banner" role="note">
+            <span className="pill live">STORED RESULTS</span>
+            <span>Rows from real Nemotron runs on the development split. Not the locked study.</span>
+          </div>
+        ) : mode === "Home" ? null : (
           <div className="banner" role="note">
             <span className="pill recorded">RECORDED</span>
-            <span>Offline walkthrough on the real Konva and Fabric engines and the independent verifier. No language model is used here; the candidate rules, the teacher and the two native procedures are scripted.</span>
+            <span>
+              Offline walkthrough on the real Konva and Fabric engines and the independent verifier. No language model is used here; the candidate rules, the teacher and the two native
+              procedures are scripted.
+            </span>
           </div>
         )}
         <nav aria-label="Modes">
@@ -221,7 +238,9 @@ export function App() {
         </nav>
       </header>
 
-      {mode === "Try it live" ? (
+      {mode === "Home" ? (
+        <Home data={evidence} go={goHash} />
+      ) : mode === "Try it live" ? (
         <TryIt />
       ) : mode === "Compare" ? (
         <main className="page" id="stage"><Compare data={evidence} /></main>

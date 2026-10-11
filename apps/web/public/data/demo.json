@@ -1,7 +1,7 @@
 {
  "label": "RECORDED",
  "origin": "offline deterministic story on the real Konva and Fabric engines and the independent verifier; no language model is used: candidate rules and binding programs are scripted fixtures; the teacher is scripted",
- "generated_at": "2026-10-11T08:28:53+00:00",
+ "generated_at": "2026-10-11T08:39:57+00:00",
  "steps": [
   {
    "id": "demonstrate",

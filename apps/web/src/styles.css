@@ -323,3 +323,14 @@ table.data thead th { font-size: 0.78rem; letter-spacing: 0.04em; text-transform
 .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
 .filebtn:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
 ul.replay { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 4px; font-size: 0.9rem; }
+
+/* ---- home ------------------------------------------------------------------------ */
+.home { max-width: 1040px; }
+.hero h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); max-width: 22ch; letter-spacing: -0.02em; }
+.hero .lede { font-size: 1.1rem; max-width: 62ch; }
+.cta { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
+.cta .btn { padding: 11px 18px; font-size: 1rem; cursor: pointer; }
+.pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin: 28px 0; }
+.pillars article, .honest { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+.pillars h3 { margin-bottom: 6px; font-size: 1.05rem; }
+.honest ul { padding-left: 20px; display: grid; gap: 8px; margin: 10px 0; }
