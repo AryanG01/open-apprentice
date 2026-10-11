@@ -27,6 +27,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.engine = None
     app.state.engine_error = None
     app.state.spend = {"usd": 0.0, "tokens": 0}
+    app.state.rate = {}
     app.state.provider = None
     app.state.model_error = None
     async with AsyncExitStack() as stack:
@@ -50,6 +51,22 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Open Apprentice", version=__version__, lifespan=lifespan)
+
+
+@app.middleware("http")
+async def security_headers(request, call_next):
+    """Basic hardening for a public deployment: no sniffing, no framing, no referrer leakage, same-origin resources only."""
+    resp = await call_next(request)
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "DENY")
+    resp.headers.setdefault("Referrer-Policy", "no-referrer")
+    resp.headers.setdefault(
+        "Content-Security-Policy",
+        "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'",
+    )
+    return resp
+
+
 app.include_router(teach_router)
 app.include_router(replay_router)
 

@@ -239,6 +239,24 @@ def _require_model_budget(request: Request) -> None:
         )
 
 
+RATE_WINDOW_S = 3600
+RATE_LIMITS = {
+    "reference": 60,
+    "nemotron": 8,
+}  # new sessions per client per hour; the paid mode is deliberately scarce
+
+
+def _rate_limit(request: Request, mode: str) -> None:
+    """In-memory sliding window per client address. Enough to stop one visitor draining the model budget; a real deployment adds a proxy limit too."""
+    client = request.client.host if request.client else "unknown"
+    hits = request.app.state.rate.setdefault((client, mode), [])
+    now = time.time()
+    hits[:] = [t for t in hits if now - t < RATE_WINDOW_S]
+    if len(hits) >= RATE_LIMITS[mode]:
+        raise HTTPException(429, f"too many {mode} sessions from this address; try again later")
+    hits.append(now)
+
+
 def _provider_failure(e: ProviderError) -> HTTPException:
     return HTTPException(502, f"the model call failed ({e.code}): {str(e)[:160]}")
 
@@ -295,6 +313,7 @@ def _state(request: Request, live: Live) -> dict:
 @router.post("")
 async def start(request: Request, body: Optional[StartIn] = None) -> dict:
     mode = body.mode if body else "reference"
+    _rate_limit(request, mode)
     provider: Optional[Provider] = None
     if mode == "nemotron":
         provider = getattr(request.app.state, "provider", None)
@@ -575,24 +594,30 @@ async def break_it(request: Request, sid: str, body: BreakIn) -> dict:
         t0 = time.time()
         failures: list[dict] = []
         cases = _break_cases(body.samples, body.seed)
-        for w, h, x, y in cases:
-            sc = card_scene(w, h, x, y)
-            targets = targets_from_rule(rule, sc)
-            sess = opener(sc)
-            initial = opener.initials[-1]
-            try:
-                res = native_run(binding.prog, targets, sess, CANVAS, NativeBudget(60))
-                rep = harness.judge_expected(sess, initial, expected_state(rule, sc), ["card"])
-            finally:
-                sess.close()
-            if not rep.passed or not res["passed"]:
-                failures.append(
-                    {
-                        "width": w, "height": h, "x": x, "y": y, "native_passed": bool(res["passed"]),
-                        "failed_checks": [c.name for c in rep.checks if not c.passed], "native_diffs": res.get("diffs", [])[:2],
-                        "native_error": res.get("error"),
-                    }
-                )  # fmt: skip
+
+        def stress_loop() -> (
+            None
+        ):  # blocking engine calls: run in a worker thread so the server keeps answering other visitors
+            for w, h, x, y in cases:
+                sc = card_scene(w, h, x, y)
+                targets = targets_from_rule(rule, sc)
+                sess = opener(sc)
+                initial = opener.initials[-1]
+                try:
+                    res = native_run(binding.prog, targets, sess, CANVAS, NativeBudget(60))
+                    rep = harness.judge_expected(sess, initial, expected_state(rule, sc), ["card"])
+                finally:
+                    sess.close()
+                if not rep.passed or not res["passed"]:
+                    failures.append(
+                        {
+                            "width": w, "height": h, "x": x, "y": y, "native_passed": bool(res["passed"]),
+                            "failed_checks": [c.name for c in rep.checks if not c.passed], "native_diffs": res.get("diffs", [])[:2],
+                            "native_error": res.get("error"),
+                        }
+                    )  # fmt: skip
+
+        await asyncio.to_thread(stress_loop)
         out = {
             "backend": body.backend,
             "tool_change": body.tool_change,
