@@ -1,0 +1,294 @@
+{
+ "ok_local_frame": {
+  "initial": {
+   "canvas": {
+    "width": 800,
+    "height": 500
+   },
+   "nodes": [
+    {
+     "id": "g",
+     "parent": null,
+     "type": "group",
+     "x": 40,
+     "y": 20,
+     "width": 0,
+     "height": 0,
+     "scaleX": 2,
+     "scaleY": 2,
+     "rotation": 0
+    },
+    {
+     "id": "a",
+     "parent": "g",
+     "type": "rect",
+     "x": 0,
+     "y": 50,
+     "width": 50,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "b",
+     "parent": "g",
+     "type": "rect",
+     "x": 100,
+     "y": 55,
+     "width": 30,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "c",
+     "parent": "g",
+     "type": "rect",
+     "x": 200,
+     "y": 60,
+     "width": 40,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "d",
+     "parent": null,
+     "type": "rect",
+     "x": 600,
+     "y": 50,
+     "width": 50,
+     "height": 40,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "blue"
+    }
+   ]
+  },
+  "final": {
+   "canvas": {
+    "width": 800,
+    "height": 500
+   },
+   "nodes": [
+    {
+     "id": "g",
+     "parent": null,
+     "type": "group",
+     "x": 40,
+     "y": 20,
+     "width": 0,
+     "height": 0,
+     "scaleX": 2,
+     "scaleY": 2,
+     "rotation": 0
+    },
+    {
+     "id": "a",
+     "parent": "g",
+     "type": "rect",
+     "x": 20,
+     "y": 50,
+     "width": 50,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "b",
+     "parent": "g",
+     "type": "rect",
+     "x": 82,
+     "y": 50,
+     "width": 30,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "c",
+     "parent": "g",
+     "type": "rect",
+     "x": 124,
+     "y": 50,
+     "width": 40,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "d",
+     "parent": null,
+     "type": "rect",
+     "x": 600,
+     "y": 50,
+     "width": 50,
+     "height": 40,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "blue"
+    }
+   ]
+  }
+ },
+ "drifted_world_frame": {
+  "initial": {
+   "canvas": {
+    "width": 800,
+    "height": 500
+   },
+   "nodes": [
+    {
+     "id": "g",
+     "parent": null,
+     "type": "group",
+     "x": 40,
+     "y": 20,
+     "width": 0,
+     "height": 0,
+     "scaleX": 2,
+     "scaleY": 2,
+     "rotation": 0
+    },
+    {
+     "id": "a",
+     "parent": "g",
+     "type": "rect",
+     "x": 0,
+     "y": 50,
+     "width": 50,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "b",
+     "parent": "g",
+     "type": "rect",
+     "x": 100,
+     "y": 55,
+     "width": 30,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "c",
+     "parent": "g",
+     "type": "rect",
+     "x": 200,
+     "y": 60,
+     "width": 40,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "d",
+     "parent": null,
+     "type": "rect",
+     "x": 600,
+     "y": 50,
+     "width": 50,
+     "height": 40,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "blue"
+    }
+   ]
+  },
+  "final": {
+   "canvas": {
+    "width": 800,
+    "height": 500
+   },
+   "nodes": [
+    {
+     "id": "g",
+     "parent": null,
+     "type": "group",
+     "x": 40,
+     "y": 20,
+     "width": 0,
+     "height": 0,
+     "scaleX": 2,
+     "scaleY": 2,
+     "rotation": 0
+    },
+    {
+     "id": "a",
+     "parent": "g",
+     "type": "rect",
+     "x": -10,
+     "y": 15,
+     "width": 50,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "b",
+     "parent": "g",
+     "type": "rect",
+     "x": 21,
+     "y": 15,
+     "width": 30,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "c",
+     "parent": "g",
+     "type": "rect",
+     "x": 42,
+     "y": 15,
+     "width": 40,
+     "height": 20,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "red"
+    },
+    {
+     "id": "d",
+     "parent": null,
+     "type": "rect",
+     "x": 600,
+     "y": 50,
+     "width": 50,
+     "height": 40,
+     "scaleX": 1,
+     "scaleY": 1,
+     "rotation": 0,
+     "fill": "blue"
+    }
+   ]
+  }
+ }
+}
