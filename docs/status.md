@@ -194,3 +194,8 @@ inventory and coverage (rotated element refused with a reason), UI tab. NOT done
 
 
 - Docker image built and measured (details in docs/deploy.md section 3): 512 MiB + 1 CPU runs the whole flow (peak ~335 MiB unlimited); 0.1 CPU makes the symbolic search time out and sessions end UNRESOLVED. The earlier macOS figure (~585 MB peak) double-counted shared pages and overstated memory.
+- Browser check of Repair, Break and export (headless Chromium, reference mode, local server, 2026-10-12): teach, answer, seal; Konva run and Fabric run pass; Fabric + silent tool change shows "Reproduced native mismatch" (badge expected (368,112,20,20), observed (358,102,20,20)), Native axis "Reproduced mismatch", Independent verifier FAIL, Repair enabled; Repair -> "Repaired. Your rule and its sealed hash are byte-identical"; re-run after repair verifier PASS;
+  "Try to break it (40 inputs)" -> "Could not break it: 40 of 40 inputs passed" (binding v2, scripted fixture, 3.8 s); SVG download (valid XML with oa: metadata, no script element) and evidence.json download work; "Re-check this package offline" -> "Every offline check passed" on the untouched package and "At least one offline check FAILED" after flipping verifier_passed/native_passed in the JSON. No page errors, no HTTP errors.
+  Not checked in the browser: the same three actions in Nemotron live mode and in replay mode past the first Run (replay has no recorded repair), phone width, other browsers, screen readers. The ad-hoc Playwright scripts used for this are not committed (no repeatable UI test exists yet).
+  UI nit seen: the learner box always shows the REPLAY and "not enabled" helper text, even when Reference is selected.
+
