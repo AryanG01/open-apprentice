@@ -136,3 +136,16 @@ def test_calls_with_unknown_cost_count_against_the_cap_at_a_conservative_rate(cl
     assert m["unknown_cost_calls"] >= 1
     expected = m["session_tokens"] * teach.CONSERVATIVE_USD_PER_MILLION / 1e6
     assert app.state.spend["usd"] - start_spend == pytest.approx(expected) and expected > 0
+
+
+def test_a_full_store_evicts_a_free_session_before_a_paid_one(client, monkeypatch):
+    from open_apprentice.api import teach
+    from open_apprentice.api.app import app
+
+    monkeypatch.setattr(teach, "MAX_SESSIONS", 2)
+    app.state.live.clear()
+    app.state.provider = MockProvider({"hypotheses": [_cands(), _cands()]})
+    paid = client.post("/api/teach", json={"mode": "nemotron"}).json()["id"]
+    free = client.post("/api/teach").json()["id"]
+    client.post("/api/teach")  # store is full: something must go
+    assert paid in app.state.live and free not in app.state.live

@@ -407,7 +407,9 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
         _require_model_budget(request)
     store = _store(request)
     if len(store) >= MAX_SESSIONS:
-        oldest = min(store.values(), key=lambda v: v.touched)
+        # Evict a free session first; a visitor's paid model session is only evicted when every session is a paid one.
+        free = [v for v in store.values() if v.mode != "nemotron" or v.replay]
+        oldest = min(free or list(store.values()), key=lambda v: v.touched)
         del store[oldest.id]
     dom = DomainManifest(
         query_visible_difference_px=Fraction(VISIBLE_DIFF_PX)
@@ -420,7 +422,10 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
     pool = getattr(request.app.state, "pool", None)
     hybrid: Optional[HybridSource] = None
     if mode == "nemotron":
-        cap = int(os.environ.get("NEBIUS_COMPLETION_CAP", "32000") or 32000)
+        try:
+            cap = int(os.environ.get("NEBIUS_COMPLETION_CAP", "32000") or 32000)
+        except ValueError:
+            cap = 32000  # a malformed setting must not turn every model session into a server error
         sess = TeachingSession(
             provider,
             ledger,
