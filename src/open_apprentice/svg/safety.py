@@ -95,9 +95,15 @@ def validate_svg(text: str) -> Checked:
         depth -= 1
         stack.pop()
 
+    def processing_instruction(target: str, _data: str) -> None:
+        # The XML declaration is not a processing instruction to expat, so it stays allowed. Anything else is refused: an HTML
+        # parser (which renders this document for measurement) ends a PI at the first ">", so a PI can smuggle in live markup.
+        raise SvgRejected(f"processing instruction <?{target} ...?> is not accepted")
+
     p = expat.ParserCreate(namespace_separator="}")
     p.StartElementHandler = start
     p.EndElementHandler = end
+    p.ProcessingInstructionHandler = processing_instruction
     try:
         p.Parse(raw, True)
     except expat.ExpatError as e:

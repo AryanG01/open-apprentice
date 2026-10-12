@@ -43,3 +43,29 @@ test("active content and oversized or malformed requests are refused", async () 
     await e.close();
   }
 });
+
+test("script never runs in the measuring page, even when markup slips past the text filter", async () => {
+  const e = new Engine();
+  await e.start();
+  try {
+    // An HTML parser turns this <img> into live markup; "/onerror=" has no whitespace before "on", so the regex alone does not see it.
+    const evil = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200"><rect id="a" x="5" y="7" width="20" height="10"/><img src="x"/onerror="document.getElementById('a').setAttribute('x','999')"></svg>`;
+    const [a] = await e.measureSvg(evil, ["a"]);
+    assert.equal(a.x, 5, "the handler must not have run");
+  } finally {
+    await e.close();
+  }
+});
+
+test("processing instructions other than the XML declaration are refused", async () => {
+  const e = new Engine();
+  await e.start();
+  try {
+    const pi = `<svg xmlns="http://www.w3.org/2000/svg"><?x ><img src="x"/onerror="1"?><rect id="a" width="1" height="1"/></svg>`;
+    await assert.rejects(e.measureSvg(pi, ["a"]), /active content|processing instruction/);
+    const [r] = await e.measureSvg(SVG, ["r"]); // a leading <?xml ...?> declaration is still fine
+    assert.equal(r.x, 55);
+  } finally {
+    await e.close();
+  }
+});

@@ -16,6 +16,7 @@ const BACKENDS = {
 
 const MAX_SESSIONS = 4;          // spec 19.2 parallel browser contexts
 const ACTION_DEADLINE_MS = 5000; // per-action deadline (spec 6.5)
+const MEASURE_TIMEOUT_MS = 10000; // an SVG measurement that hangs is abandoned and its context closed
 
 // PUBLIC tool contract. Identical across drift variants by construction: it is a constant,
 // never derived from private config, so an undocumented semantic change leaves the hash unchanged.
@@ -93,12 +94,20 @@ export class Engine {
     if (/<\s*(script|foreignObject|iframe|object|embed)\b|\son[a-z]+\s*=/i.test(svg)) {
       throw Object.assign(new Error("active content is not allowed"), { code: "INVALID_ARGUMENT" });
     }
-    const context = await this.#browser.newContext();
+    const body = svg.replace(/^\s*<\?xml[^>]*\?>/, "");
+    // The page is parsed as HTML, where a processing instruction ends at the first ">" and can smuggle live markup in.
+    if (body.includes("<?")) {
+      throw Object.assign(new Error("processing instructions are not allowed (active content)"), { code: "INVALID_ARGUMENT" });
+    }
+    // JavaScript is OFF in this context, so nothing in the document can run even if a filter above misses it; page.evaluate still works.
+    const context = await this.#browser.newContext({ javaScriptEnabled: false });
+    let timer;
     try {
       await context.route("**/*", (route) => route.abort());
       const page = await context.newPage();
-      await page.setContent(`<!doctype html><html><body style="margin:0">${svg.replace(/^\s*<\?xml[^>]*\?>/, "")}</body></html>`);
-      return await page.evaluate((wanted) => {
+      const work = (async () => {
+        await page.setContent(`<!doctype html><html><body style="margin:0">${body}</body></html>`);
+        return page.evaluate((wanted) => {
         const root = document.querySelector("svg");
         if (!root) return { error: "no <svg> root" };
         const inv = root.getScreenCTM().inverse();
@@ -118,8 +127,14 @@ export class Engine {
           const x0 = Math.min(...xs), y0 = Math.min(...ys);
           return { id, x: x0, y: y0, width: Math.max(...xs) - x0, height: Math.max(...ys) - y0 };
         });
-      }, ids);
+        }, ids);
+      })();
+      const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(Object.assign(new Error("measurement timed out"), { code: "TIMEOUT" })), MEASURE_TIMEOUT_MS);
+      });
+      return await Promise.race([work, timeout]);
     } finally {
+      clearTimeout(timer);
       await context.close();
     }
   }

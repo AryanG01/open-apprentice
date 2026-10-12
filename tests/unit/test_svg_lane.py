@@ -101,6 +101,11 @@ def test_a_rotated_element_is_refused_with_a_reason_and_shown_in_the_coverage():
             '<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml"><h:div/></svg>',
             "namespace",
         ),
+        # An HTML parser ends this processing instruction at the first ">" and turns the <img> into live markup.
+        (
+            f'<svg {SVG}><?x ><img src="x"/onerror="alert(1)"?><rect id="a"/></svg>',
+            "processing instruction",
+        ),
     ],
 )
 def test_incompatible_documents_are_rejected_with_a_reason_not_sanitised(doc, why):
