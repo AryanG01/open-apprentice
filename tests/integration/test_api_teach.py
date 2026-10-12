@@ -238,3 +238,32 @@ def test_break_it_reports_what_was_tested_and_finds_the_unrepaired_tool_change(c
         fixed["failed"] == 0 and fixed["passed"] == 20
     )  # after the repair, the changed tool passes too
     assert client.get(f"/api/teach/{sid}/evidence.json").json()["stress_test"]["tested"] == 20
+
+
+def test_a_replay_session_is_labelled_replay_everywhere_including_its_evidence(client):
+    from open_apprentice.api.app import app
+
+    if app.state.tape is None:
+        pytest.skip("no replay tape installed")
+    st = client.post("/api/teach", json={"mode": "replay"}).json()
+    for _ in range(3):
+        if st["state"] != "AWAITING_USER":
+            break
+        q = st["question"]
+        st = client.post(
+            f"/api/teach/{st['id']}/answer",
+            json={
+                "query_id": q["query_id"],
+                "answer": q["options"][0]["id"],
+                "candidate_set_hash": q["candidate_set_hash"],
+            },
+        ).json()
+    assert st["state"] == "INTENT_READY", st
+    sid = st["id"]
+    run = client.post(f"/api/teach/{sid}/run", json={"width": 300, "backend": "konva"}).json()
+    assert run["label"]["mode"].startswith("REPLAY"), run["label"]
+    evidence = client.get(f"/api/teach/{sid}/evidence.json").json()
+    assert evidence["label"]["mode"].startswith("REPLAY"), evidence["label"]
+    svg = client.get(f"/api/teach/{sid}/export.svg").text
+    assert "replay" in svg.lower()
+    assert "LIVE ENGINE + NVIDIA NEMOTRON" not in svg

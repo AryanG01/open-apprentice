@@ -595,7 +595,7 @@ async def run(request: Request, sid: str, body: RunIn) -> dict:
                 "height": body.height,
             }
         out = {
-            "label": _label(live.mode, live.model_id),
+            "label": _label(live.mode, live.model_id, live.replay),
             "meter": _meter(request, live),
             "fallbacks": list(live.fallbacks),
             "backend": body.backend,
@@ -748,7 +748,11 @@ async def export_svg(request: Request, sid: str) -> Response:
         "binding_program_hash": r["binding"]["program_hash"],
         "native_check": "pass" if r["native_passed"] else "FAIL",
         "independent_verifier": "pass" if r["verifier_passed"] else "FAIL",
-        "model_used": live.model_id if live.mode == "nemotron" else "none",
+        "model_used": (
+            f"{live.model_id} (REPLAY of a recorded run; no model was called)"
+            if live.replay
+            else live.model_id if live.mode == "nemotron" else "none"
+        ),
     }
     svg = build_svg(live.last_run["boxes"], live.last_run["canvas"], meta)
     return Response(
@@ -768,7 +772,7 @@ async def export_evidence(request: Request, sid: str) -> JSONResponse:
     c = live.concept
     cur = live.registry.current(CONCEPT_ID, live.last_run["request"]["backend"])
     pkg = {
-        "label": _label(live.mode, live.model_id),
+        "label": _label(live.mode, live.model_id, live.replay),
         "concept": {
             "rule_text": c.summary,
             "rule": c.rule,
@@ -885,7 +889,7 @@ async def repair(request: Request, sid: str) -> dict:
         new = reg.current(CONCEPT_ID, "fabric")
         live.last_failure = None if status == "validated" else live.last_failure
         out = {
-            "label": _label(live.mode, live.model_id),
+            "label": _label(live.mode, live.model_id, live.replay),
             "meter": _meter(request, live),
             "fallbacks": list(live.fallbacks),
             "status": status,
