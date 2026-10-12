@@ -48,6 +48,9 @@ class HybridSource:
         rep = GenerationReport(rnd)
         found = await self.search(constraints, rnd, rejected)
         model = GenerationReport(rnd)
+        round_error: Optional[str] = (
+            None  # this round's failure only; an earlier round's error must not be reported as current
+        )
         if self.provider is not None:
             try:
                 model = await generate_candidates(
@@ -60,25 +63,31 @@ class HybridSource:
                 ProviderError
             ) as e:  # truncation, timeout, format: keep the search results, record why
                 self.model_errors.append(e.code)
-        seen: dict[str, str] = {}
-        merged: list[Candidate] = []
+                round_error = e.code
+        # 1) Deduplicate: behaviourally identical rules count once; the first origin (the model's) wins.
+        seen: set[str] = set()
+        unique: dict[str, list[Candidate]] = {"model": [], "search": []}
         for origin, cands in (("model", model.accepted), ("search", found.accepted)):
             for c in cands:
-                key = (
-                    self.search._behaviour_key(c.rule) or c.hash
-                )  # behaviourally identical rules count once; the first origin wins
+                key = self.search._behaviour_key(c.rule) or c.hash
                 if key in seen:
                     continue
-                seen[key] = origin
+                seen.add(key)
                 tagged = Candidate(f"[{origin}] {c.summary}", c.rule, c.hash, c.symbolic, c.text)
                 self.origins[tagged.hash] = origin
-                merged.append(tagged)
+                unique[origin].append(tagged)
+        # 2) Interleave the two sources under the cap. Listing every model proposal first let a long model list push every
+        #    search candidate past the cap, undoing the coverage the search exists to provide (decisions #50).
+        merged: list[Candidate] = []
+        m, s = unique["model"], unique["search"]
+        for i in range(max(len(m), len(s))):
+            merged.extend(m[i : i + 1] + s[i : i + 1])
         rep.accepted = merged[: self.max_union]
         rep.rejected = model.rejected + found.rejected
         rep.model_calls = model.model_calls
         rep.usage = {
             "label": "HYBRID", "from_model": sum(1 for c in rep.accepted if self.origins.get(c.hash) == "model"),
             "from_search": sum(1 for c in rep.accepted if self.origins.get(c.hash) == "search"),
-            "model_error": self.model_errors[-1] if self.model_errors else None, "model_usage": model.usage, "search_usage": found.usage,
+            "model_error": round_error, "model_usage": model.usage, "search_usage": found.usage,
         }  # fmt: skip
         return rep

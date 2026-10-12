@@ -105,3 +105,28 @@ async def test_hybrid_session_reaches_the_intended_rule_even_when_the_model_is_u
         assert evaluate_rule(sess.finalize().rule, sc["objects"], sc["canvas"]) == evaluate_rule(
             latent, sc["objects"], sc["canvas"]
         )
+
+
+async def test_the_cap_never_drops_every_search_candidate_when_the_model_proposes_many():
+    from tests.fixtures_rules import CLAMPED_MARGIN
+
+    model = MockProvider(
+        {
+            "hypotheses": [
+                {
+                    "candidates": [
+                        {"summary": "fixed 12px", "rule": CONST_MARGIN},
+                        {"summary": "clamped inset", "rule": CLAMPED_MARGIN()},
+                    ]
+                }
+            ]
+        }
+    )
+    src = HybridSource(model, ledger(), DOM, [2])
+    src.max_union = 2  # as many slots as the model filled on its own
+    rep = await src(constraint(PROP_MARGIN()), 1, [])
+    origins = [c.summary.split("]")[0] + "]" for c in rep.accepted]
+    assert (
+        "[search]" in origins
+    ), origins  # the search exists to cover what the model omitted; the cap must not undo that
+    assert "[model]" in origins, origins
