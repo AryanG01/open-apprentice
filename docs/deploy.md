@@ -29,7 +29,11 @@ Open `http://<host>:8000`. Health: `/health/ready` reports engine and model avai
 **Cost correction (2026-10-12):** creating a Docker Space on free CPU Basic returned `402 Payment Required` (it now needs a PRO subscription, about $9/month); only **static** Spaces are free. The steps below are
 correct for a PRO account (2 vCPU, 16 GB RAM; sleeps after 48 h idle) but were not run to completion. **Free static copy (deployed 2026-10-12):** `https://huggingface.co/spaces/AryanG01/open-apprentice-static`
 (built from `apps/web/dist` plus a Space README with `sdk: static`; Home, Compare and the walkthrough work, "Try it live" shows that it needs the backend). Measured memory for the full app, one session on macOS: ~384 MB idle,
-~585 MB peak (Node engine ~186 MB, Python ~110 MB, Chromium ~280 MB), so 512 MB free tiers (Render, Koyeb) are too small; 1-2 GiB is the realistic minimum.
+~585 MB peak (Node engine ~186 MB, Python ~110 MB, Chromium ~280 MB), (macOS figure, overstated: see the Linux measurements below, where 512 MiB is enough).
+**Linux container measurements (2026-10-12, Docker Desktop, image `docker/demo.Dockerfile`, 2.47 GB on disk, `docker stats`, sampled about every 2 s):** unlimited: ~205 MiB idle, peak 335 MiB across a replay flow, a reference flow and three parallel replay flows (all passed).
+Hard limits, replay flow (teach, 2 answers, Konva, Fabric, tool change) then reference flow: **512 MiB + 1 CPU: 3/3 and 5/5 passed, no OOM, ~290 MiB used**; 0.5 CPU: replay flow 5 s, 3/3; 0.25 CPU: 13 s, 3/3, start 4 s;
+**0.1 CPU: start took 18 s and the session ended UNRESOLVED (`solver status=incomplete`), because the symbolic search runs against a wall-clock budget**, so outcomes depend on CPU speed. Memory is therefore NOT the constraint (512 MiB is enough for one visitor at a time);
+CPU is: plan for at least 0.5 vCPU, 1 vCPU preferred. Free tiers that give 0.1 CPU (Render, Koyeb) are too slow. Not measured: many simultaneous visitors, the Nemotron live mode under load, an ARM or Cloud Run runtime.
 Front-matter gotchas: `short_description` must be at most 60 characters and must not contain a colon.
 `scripts/make_hf_space.sh dist/hf-space` builds a push-ready folder (no `.env`, no secrets; Dockerfile for UID 1000 on port 7860; README with the Space front matter). It was built and run locally exactly as
 the Space would (port 7860, UID 1000): layout flow and the SVG lane both pass. Then, with your own Hugging Face login:

@@ -192,3 +192,5 @@ inventory and coverage (rotated element refused with a reason), UI tab. NOT done
   Replay finding: answering B instead of A sealed a different rule (15% of height) yet still matched the tape, because the binding prompt carries the rule's target positions, not its text; the procedure was re-checked live. Wording in the UI, README and decisions #49 was corrected.
 - Not checked: Firefox/Safari, phone width, screen readers. No ESLint rules-of-hooks lint exists in the repo, which is why the hooks bug was not caught earlier.
 
+
+- Docker image built and measured (details in docs/deploy.md section 3): 512 MiB + 1 CPU runs the whole flow (peak ~335 MiB unlimited); 0.1 CPU makes the symbolic search time out and sessions end UNRESOLVED. The earlier macOS figure (~585 MB peak) double-counted shared pages and overstated memory.
