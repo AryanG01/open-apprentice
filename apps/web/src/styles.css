@@ -215,15 +215,19 @@ fieldset.options { border: 0; padding: 0; margin: 16px 0 0; }
 .callout.bad { border-left-color: var(--bad); background: var(--bad-soft); }
 .callout.ok { border-left-color: var(--ok); background: var(--ok-soft); }
 .callout ul { margin: 6px 0 0; padding-left: 18px; }
+.callout ol.story { margin: 6px 0 0; padding-left: 22px; display: grid; gap: 4px; }
+.callout ol.story li:last-child { font-weight: 600; }
 
 .attempts ol { padding-left: 20px; display: grid; gap: 10px; }
 .cases { margin: 4px 0 0; padding-left: 18px; font-size: 0.9rem; }
 
 .diff pre {
+  position: relative; /* contains the absolutely positioned screen-reader-only spans, which otherwise stretched the whole page */
   margin: 8px 0 0; padding: 10px; max-height: 340px; overflow: auto; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; line-height: 1.35;
 }
-.dl.add { background: var(--ok-soft); color: var(--ok); display: inline-block; width: 100%; }
-.dl.del { background: var(--bad-soft); color: var(--bad); display: inline-block; width: 100%; }
+.dl { display: block; }  /* one diff line per row (inline-block lines sat side by side on a single row tens of thousands of px wide) */
+.dl.add { background: var(--ok-soft); color: var(--ok); }
+.dl.del { background: var(--bad-soft); color: var(--bad); }
 
 /* ---- evidence ----------------------------------------------------------------- */
 .evidence { display: grid; gap: 16px; position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow: auto; }

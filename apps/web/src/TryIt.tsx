@@ -75,6 +75,12 @@ function MeterPanel({ meter }: { meter: Meter | null }) {
   );
 }
 
+const sleep = (ms: number, signal: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    const id = window.setTimeout(resolve, ms);
+    signal.addEventListener("abort", () => { window.clearTimeout(id); reject(new ApiError("Cancelled in the browser.", 0)); }, { once: true });
+  });
+
 export function TryIt() {
   const [live, setLive] = useState<LiveState | null>(null);
   const [ready, setReady] = useState<"checking" | "yes" | "no">("checking");
@@ -94,6 +100,7 @@ export function TryIt() {
   const [modelInfo, setModelInfo] = useState<ReadyInfo["model"] | null>(null);
   const [replayInfo, setReplayInfo] = useState<ReadyInfo["replay"] | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [story, setStory] = useState<{ steps: string[]; done: boolean } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -144,6 +151,7 @@ export function TryIt() {
       setRepair(null);
       setStress(null);
       setPicked(null);
+      setStory(null);
       setLive(await api<LiveState>("/api/teach", "POST", { mode: learner, demonstration: learner === "replay" ? undefined : { width: CARD_W, height: CARD_H, ...placement } }, signal));
       void refreshModel();
     });
@@ -191,6 +199,56 @@ export function TryIt() {
       void refreshModel();
     });
 
+  /** One click through the whole story with the real API; every caption is built from what the server returned. */
+  const playStory = (kind: "reference" | "replay") =>
+    guarded(async (signal) => {
+      const steps: string[] = [];
+      const say = async (text: string, pauseMs = 1600) => {
+        steps.push(text);
+        setStory({ steps: [...steps], done: false });
+        await sleep(pauseMs, signal);
+      };
+      setLearner(kind);
+      setRun(null); setRepair(null); setStress(null); setReplay(null); setPicked(null); setBackend("konva"); setToolChange(false);
+      await say(`Teaching by example: one badge, 12 px in from the card's top-right corner (${kind === "replay" ? "recorded Nemotron session, no model is called now" : "reference learner, no model"}).`, 900);
+      let st = await api<LiveState>("/api/teach", "POST", { mode: kind, demonstration: kind === "replay" ? undefined : { width: CARD_W, height: CARD_H, inset_right: 12, inset_top: 12 } }, signal);
+      setLive(st);
+      for (let i = 0; st.question && i < 6; i += 1) {
+        await say(i === 0 ? `Several rules fit that one example, so it found an input where they disagree and asks which picture you meant. The story picks option ${st.question.options[0].id}; in your own session you choose.` : `Still more than one rule fits, so it asks again with a new input. The story picks option ${st.question.options[0].id}.`);
+        st = await api<LiveState>(`/api/teach/${st.id}/answer`, "POST", { query_id: st.question.query_id, answer: st.question.options[0].id, candidate_set_hash: st.question.candidate_set_hash }, signal);
+        setLive(st);
+      }
+      if (!st.concept) throw new ApiError(`The story could not settle on a rule (state ${st.state.toLowerCase().replace(/_/g, " ")}). Try teaching it yourself.`, 0);
+      await say(`Rule sealed: "${st.concept.rule_text}". Now reuse it on a wider card, on two real graphics engines.`);
+      const runIt = async (be: "konva" | "fabric", tc: boolean) => {
+        setBackend(be); setToolChange(tc);
+        const r = await api<LiveRun>(`/api/teach/${st.id}/run`, "POST", { width, backend: be, tool_change: tc }, signal);
+        setRepair(null); setRun(r);
+        return r;
+      };
+      const verdict = (r: LiveRun) => `independent verifier ${r.verifier_passed ? "PASS" : "FAIL"}, native check ${r.native_passed ? "pass" : "FAIL"}`;
+      let r = await runIt("konva", false);
+      await say(`Konva, card width ${width}: ${verdict(r)} (${r.binding.origin === "model" ? "model-generated" : "scripted"} native procedure).`);
+      r = await runIt("fabric", false);
+      await say(`Fabric, same rule: ${verdict(r)}.`);
+      r = await runIt("fabric", true);
+      if (r.can_repair) {
+        await say(`The tool changes silently underneath. The rule did not change, but Fabric's result is now off: ${verdict(r)}. Only the native procedure is at fault.`);
+        const rep = await api<LiveRepair>(`/api/teach/${st.id}/repair`, "POST", undefined, signal);
+        setRun(null); setRepair(rep);
+        await say(`Repair ${rep.status}. ${rep.rule_unchanged ? "The rule and its sealed hash are byte-identical; only the native procedure changed." : "The rule hash changed, so this promotion would have been refused."}`);
+        r = await runIt("fabric", true);
+        setRepair(rep);
+        await say(`Re-run after the repair: ${verdict(r)}.`);
+      } else {
+        await say(`The tool changes silently underneath, and this procedure still passes (${verdict(r)}), so there is nothing to repair. ${kind === "replay" ? "The recorded run contains no repair." : ""}`);
+      }
+      const b = await api<BreakResult>(`/api/teach/${st.id}/break`, "POST", { backend: "fabric", tool_change: true, samples: 40, seed: 7 }, signal);
+      setStress(b);
+      setStory({ steps: [...steps, `Stress test: ${b.passed} of ${b.tested} generated inputs passed on Fabric after the tool change. Everything shown is live state: export the SVG, re-check the evidence offline, or start over and teach your own placement.`], done: true });
+      void refreshModel();
+    });
+
   useEffect(() => {
     if (!live?.concept) return;
     try {
@@ -225,6 +283,14 @@ export function TryIt() {
     <div className="workspace try">
       <aside className="tasks" aria-label="Live controls">
         <p className="muted">Teach the badge rule yourself, then reuse it, change the tool underneath, and repair it.</p>
+        <fieldset className="runbox">
+          <legend>New here? Watch the whole story</legend>
+          <div className="controls">
+            <button className="primary" onClick={() => playStory("reference")} disabled={busy}>Watch the story (about 20 s)</button>
+            {replayInfo?.available ? <button onClick={() => playStory("replay")} disabled={busy}>Watch it with recorded Nemotron</button> : null}
+          </div>
+          <span className="muted small">Teach, reuse on Konva and Fabric, silent tool change, repair, stress test, all on the real engines. The recorded Nemotron version has no model call and no repair.</span>
+        </fieldset>
         <fieldset className="runbox">
           <legend>Who proposes the rules?</legend>
           <label className="check">
@@ -297,6 +363,12 @@ export function TryIt() {
         <p className="eyebrow" role="status" aria-live="polite">Live · {busy ? "working…" : live ? live.state.replace(/_/g, " ").toLowerCase() : "not started"}</p>
         <h2>{!live ? "Teach it by placing the badge" : concept ? "The rule is sealed. Now use it." : live.state === "UNRESOLVED" ? "No rule it knows fits that placement" : "Which result did you mean?"}</h2>
         {error ? <p className="callout bad" role="alert">{error}</p> : null}
+        {story ? (
+          <section className={story.done ? "callout ok" : "callout"} aria-label="Story">
+            <strong>{story.done ? "Done." : "Playing the story…"}</strong>
+            <ol className="story" aria-live="polite">{story.steps.map((t, i) => <li key={i}>{t}</li>)}</ol>
+          </section>
+        ) : null}
         {live?.pool ? (
           <p className="callout" role="note" aria-label="Candidate pool">
             <strong>Candidate pool:</strong> {live.pool.from_model} rule{live.pool.from_model === 1 ? "" : "s"} from Nemotron, {live.pool.from_search} from the bounded symbolic search.
@@ -407,7 +479,12 @@ export function TryIt() {
               ))}
             </div>
             {run.native_error ? <p className="callout bad" role="alert">The native procedure failed to run: {run.native_error}</p> : null}
-            {run.tool_change && run.native_passed && run.verifier_passed ? (
+            {run.tool_change && run.native_passed && run.verifier_passed && run.binding.version > 1 ? (
+              <p className="callout ok" role="note">
+                <strong>Passes after the silent tool change.</strong> This run used binding v{run.binding.version}, a later version of the native procedure than the first one; the rule and its sealed hash are unchanged.
+              </p>
+            ) : null}
+            {run.tool_change && run.native_passed && run.verifier_passed && run.binding.version <= 1 ? (
               <p className="callout ok" role="note">
                 <strong>Survived the silent tool change.</strong> This native procedure measures what the tool actually did and corrects it, so Fabric's changed behaviour did not
                 break it and no repair was needed. Turn the tool change off or try again to see a procedure that does break.

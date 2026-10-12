@@ -214,6 +214,45 @@ describe("web app in a real browser", { skip: !enabled && "set OA_E2E=1 to run b
     await close();
   });
 
+  test("guided story, reference learner: teach, reuse, tool change, repair, stress test in one click", async () => {
+    const { page, problems, close } = await newPage();
+    await openTryIt(page, API);
+    await page.getByRole("button", { name: /Watch the story/ }).first().click();
+    await page.waitForSelector('[aria-label="Story"] strong:text-is("Done.")', { timeout: 180_000 });
+    const text = await bodyText(page);
+    assert.match(text, /Repair validated\./);
+    assert.match(text, /byte-identical/);
+    assert.match(text, /Re-run after the repair: independent verifier PASS/);
+    assert.match(text, /Stress test: 40 of 40 generated inputs passed/);
+    const size = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight }));
+    assert.ok(size.w <= 1280, `page is ${size.w}px wide: something overflows horizontally (the repair diff once did, by ~73,000 px)`);
+    assert.ok(size.h < 5000, `page is ${size.h}px tall: something stretches it (the repair diff once made it 6,828px)`);
+    assert.match(text, /Repaired\./, "the repair result should stay on screen");
+    assert.match(text, /Passes after the silent tool change/, "after a repair the run panel must not claim it survived without one");
+    assert.doesNotMatch(text, /Survived the silent tool change/);
+    assert.match(text, /Could not break it: 40 of 40/, "the stress result should stay on screen");
+    assert.deepEqual(problems, []);
+    await close();
+  });
+
+  test("guided story, recorded Nemotron: labelled replay, no repair claimed", async (t) => {
+    const ready = await (await fetch(`${API}/health/ready`)).json();
+    if (!ready.replay?.available) return t.skip("no replay tape installed");
+    const { page, problems, close } = await newPage();
+    await openTryIt(page, API);
+    await page.getByRole("button", { name: /Watch it with recorded Nemotron/ }).click();
+    await page.waitForSelector('[aria-label="Story"] strong:text-is("Done.")', { timeout: 180_000 });
+    const text = await bodyText(page);
+    assert.match(text, /recorded Nemotron session, no model is called now/);
+    assert.match(text, /Model usage REPLAY/);
+    assert.match(text, /model-generated native procedure/);
+    assert.match(text, /nothing to repair/);
+    assert.match(text, /The recorded run contains no repair/);
+    assert.doesNotMatch(text, /Repair validated/);
+    assert.deepEqual(problems, []);
+    await close();
+  });
+
   test("a static copy with no backend says so plainly", async () => {
     // a static host has no API: /health/ready and the SVG lane's /api calls legitimately 404 there
     const { page, problems, close } = await newPage({}, /\/(health\/ready|api\/.*)$/);

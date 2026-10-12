@@ -36,7 +36,7 @@ OA_ENGINE_TESTS=1 .venv/bin/pytest -q tests                                  # +
 .venv/bin/lint-imports; .venv/bin/ruff check src tests scripts; .venv/bin/black --check src tests scripts
 (cd apps/web && ../../node_modules/.bin/tsc --noEmit && ../../node_modules/.bin/vite build)
 npm run lint                                                                # eslint, incl. react-hooks/rules-of-hooks (1 known exhaustive-deps warning in App.tsx)
-npm run build:web && npm run test:e2e                                       # 5 browser tests (tests/e2e/ui.test.mjs): tabs, learner box, replay, repair/break/export/tamper, static-copy wording; needs Chromium, run UNSANDBOXED
+npm run build:web && npm run test:e2e                                       # 7 browser tests (tests/e2e/ui.test.mjs): tabs, learner box, replay, repair/break/export/tamper, both guided stories (+ page-size regression), static-copy wording; needs Chromium, run UNSANDBOXED
 PYTHONPATH=src .venv/bin/python -m uvicorn open_apprentice.api.app:app --port 8000   # whole product at http://localhost:8000 (serves apps/web/dist)
 DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=2 ...same...                          # adds capped Nemotron mode (needs .env key)
 PYTHONPATH=src:. .venv/bin/python scripts/build_demo_bundle.py               # regenerate UI data (needs Chromium); then rebuild web

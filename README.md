@@ -27,6 +27,8 @@ Open <http://localhost:8000>. No account, no API key and no model call is needed
 procedure for each backend and writes the repair. Every output is checked on the real engine before it is accepted; if it fails, a scripted fixture is used instead and the
 interface says so. A live meter shows tokens, calls and estimated dollars, and the server refuses model sessions once the cap is reached.
 
+**One-click story.** In *Try it live*, "Watch the story" teaches a badge, reuses the rule on Konva and Fabric, applies the silent tool change, repairs, and stress-tests it in about 20 seconds with the free reference learner; every caption is built from what the server returned. "Watch it with recorded Nemotron" does the same with the replay below (no model call, and no repair, because the recorded procedure survived the tool change).
+
 **Nemotron replay (free, always available when the tape is installed).** `docs/replay/nemotron_tape.json` holds the raw output of one real Nemotron session (recorded 2026-10-12: 3 calls, 32k tokens, about $0.09).
 Choosing "Nemotron replay" runs the same teaching loop with that recorded output, against the live engine and verifier, with the model off and no cost. It is labelled REPLAY everywhere. It answers only requests identical to the recorded
 ones, so it covers the default badge position (anything else is refused, never improvised; a different teaching answer still matches when it leads to a byte-identical model prompt, and the recorded procedure is then checked live against the rule you taught). It does not show a model repair: in the recorded run the model's procedure survived the silent tool change.

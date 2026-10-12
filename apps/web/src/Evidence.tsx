@@ -119,7 +119,6 @@ export function ProgramDiff({ before, after }: { before: Program; after: Program
             <span aria-hidden="true">{l.kind === "add" ? "+ " : l.kind === "del" ? "- " : "  "}</span>
             <span className="visually-hidden">{l.kind === "add" ? "added: " : l.kind === "del" ? "removed: " : ""}</span>
             {l.text}
-            {"\n"}
           </span>
         ))}
       </pre>
