@@ -6,7 +6,7 @@ colorTo: gray
 sdk: docker
 app_port: 7860
 pinned: false
-short_description: Teach a layout rule once; it asks when unsure and proves what it did.
+short_description: Teach a layout rule once; it asks when unsure.
 ---
 
 # Open Apprentice (live demo)

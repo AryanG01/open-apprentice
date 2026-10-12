@@ -25,12 +25,17 @@ Open `http://<host>:8000`. Health: `/health/ready` reports engine and model avai
 - Rate limiting is in-process by client address; put a proxy limit in front of a public host.
 - `docker compose` (db/worker/web) is not the demo path: the worker command is not implemented. Use the container above.
 
-## 3. Hugging Face Space (free CPU Basic: 2 vCPU, 16 GB RAM; sleeps after 48 h without visitors)
+## 3. Hugging Face Space
+**Cost correction (2026-10-12):** creating a Docker Space on free CPU Basic returned `402 Payment Required` (it now needs a PRO subscription, about $9/month); only **static** Spaces are free. The steps below are
+correct for a PRO account (2 vCPU, 16 GB RAM; sleeps after 48 h idle) but were not run to completion. **Free static copy (deployed 2026-10-12):** `https://huggingface.co/spaces/AryanG01/open-apprentice-static`
+(built from `apps/web/dist` plus a Space README with `sdk: static`; Home, Compare and the walkthrough work, "Try it live" shows that it needs the backend). Measured memory for the full app, one session on macOS: ~384 MB idle,
+~585 MB peak (Node engine ~186 MB, Python ~110 MB, Chromium ~280 MB), so 512 MB free tiers (Render, Koyeb) are too small; 1-2 GiB is the realistic minimum.
+Front-matter gotchas: `short_description` must be at most 60 characters and must not contain a colon.
 `scripts/make_hf_space.sh dist/hf-space` builds a push-ready folder (no `.env`, no secrets; Dockerfile for UID 1000 on port 7860; README with the Space front matter). It was built and run locally exactly as
 the Space would (port 7860, UID 1000): layout flow and the SVG lane both pass. Then, with your own Hugging Face login:
 ```
 hf auth login                                   # write-scope token, entered by you in the terminal prompt, never pasted into chat
-hf repo create <you>/open-apprentice --type space --space_sdk docker
+hf repo create <you>/open-apprentice --repo-type space --space_sdk docker
 cd dist/hf-space && git init && git remote add space https://huggingface.co/spaces/<you>/open-apprentice
 git add -A && git commit -m "deploy" && git push space HEAD:main
 ```
