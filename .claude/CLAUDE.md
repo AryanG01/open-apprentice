@@ -15,7 +15,7 @@ Vite (apps/web), a Node/Playwright engine service driving real Konva/Fabric in a
   `oa admin create --username owner`, `oa doctor` (see docs/status.md for exact tested commands).
 - Test (Python): `uv run pytest tests/unit tests/integration tests/contracts tests/evaluation`
 - Trust-boundary check: `uv run lint-imports`
-- Test (web/engine): `npm test -w services/engine`; `npx playwright test`
+- Test (web/engine): `npm test -w services/engine`; browser smoke tests: `npm run build:web && npm run test:e2e` (real Chromium + real engine, needs unsandboxed run); web lint: `npm run lint` (includes react-hooks/rules-of-hooks)
 - CLI entry point: `oa <command>` — see §24.5 of the spec for the full surface.
 
 # Rules for this repo

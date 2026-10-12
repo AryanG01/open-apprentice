@@ -3,10 +3,17 @@
   "private": true,
   "version": "0.1.0",
   "license": "MIT",
-  "workspaces": ["apps/web", "services/engine"],
-  "engines": { "node": ">=22.12 <23 || >=24" },
+  "workspaces": [
+    "apps/web",
+    "services/engine"
+  ],
+  "engines": {
+    "node": ">=22.12 <23 || >=24"
+  },
   "scripts": {
     "test": "npm test -w services/engine",
-    "build:web": "npm run build -w apps/web"
+    "build:web": "npm run build -w apps/web",
+    "test:e2e": "OA_E2E=1 node --test tests/e2e/ui.test.mjs",
+    "lint": "npm run lint -w apps/web"
   }
 }

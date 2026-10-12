@@ -233,20 +233,19 @@ export function TryIt() {
           </label>
           <label className="check">
             <input type="radio" name="learner" checked={learner === "nemotron"} onChange={() => setLearner("nemotron")} disabled={busy || !modelInfo?.available} />
-            NVIDIA Nemotron (live, metered)
+            NVIDIA Nemotron (live, metered){!modelInfo?.available ? <span className="muted small"> not enabled on this server</span> : null}
           </label>
           <label className="check">
             <input type="radio" name="learner" checked={learner === "replay"} onChange={() => setLearner("replay")} disabled={busy || !replayInfo?.available} />
-            Nemotron replay (recorded, free)
+            Nemotron replay (recorded, free){!replayInfo?.available ? <span className="muted small"> no recording installed</span> : null}
           </label>
-          {replayInfo?.available ? (
+          {learner === "replay" && replayInfo?.available ? (
             <span className="muted small">REPLAY of a real Nemotron run recorded {replayInfo.recorded_at}. No model is called now; it only answers requests identical to the recorded ones (default badge position; a different answer can still match if the model would have seen the same prompt). The engine and verifier still run live.</span>
           ) : null}
-          {!modelInfo?.available ? (
-            <span className="muted small">Not enabled on this server{modelInfo?.error ? `: ${modelInfo.error}` : " (start it with DEMO_MODEL_ENABLED=1 and a Nebius key)"}.</span>
-          ) : (
+          {learner === "nemotron" && modelInfo?.available ? (
             <span className="muted small">Model: {modelInfo.id.split("/").pop()}. Server spend ${modelInfo.spend_usd.toFixed(2)} of a ${modelInfo.cap_usd.toFixed(2)} cap.</span>
-          )}
+          ) : null}
+          {!modelInfo?.available && modelInfo?.error ? <span className="muted small">Nemotron mode: {modelInfo.error}.</span> : null}
         </fieldset>
         <div className="controls">
           <button className="primary" onClick={start} disabled={busy}>{live ? "Start over" : "Start teaching"}</button>
