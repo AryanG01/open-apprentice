@@ -193,6 +193,7 @@ export interface CandidatePool {
 export interface LiveState {
   id: string;
   mode: string;
+  replay: boolean;
   pool: CandidatePool | null;
   meter: Meter | null;
   fallbacks: string[];
@@ -254,6 +255,7 @@ export interface ReadyInfo {
   engine: boolean;
   engine_error: string | null;
   model: { available: boolean; id: string; spend_usd: number; cap_usd: number; error: string | null };
+  replay: { available: boolean; recorded_at: string | null; id: string };
 }
 
 export interface BreakFailure {

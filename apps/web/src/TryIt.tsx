@@ -63,7 +63,7 @@ function MeterPanel({ meter }: { meter: Meter | null }) {
   if (!meter) return null;
   return (
     <section className="meter" aria-label="Model usage">
-      <h3>Model usage <span className="pill live">LIVE</span></h3>
+      <h3>Model usage <span className="pill live">{meter.label}</span></h3>
       <dl>
         <dt>Model</dt><dd>{meter.model.split("/").pop()}</dd>
         <dt>Calls / tokens</dt><dd>{meter.session_calls} / {meter.session_tokens.toLocaleString()}</dd>
@@ -90,8 +90,9 @@ export function TryIt() {
   const [placement, setPlacement] = useState<Placement>({ inset_right: 12, inset_top: 12 });
   const [replay, setReplay] = useState<ReplayResult | null>(null);
   const [stress, setStress] = useState<BreakResult | null>(null);
-  const [learner, setLearner] = useState<"reference" | "nemotron">("reference");
+  const [learner, setLearner] = useState<"reference" | "nemotron" | "replay">("reference");
   const [modelInfo, setModelInfo] = useState<ReadyInfo["model"] | null>(null);
+  const [replayInfo, setReplayInfo] = useState<ReadyInfo["replay"] | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -101,6 +102,7 @@ export function TryIt() {
         setReady(r.engine ? "yes" : "no");
         setReason(r.engine_error ?? "The graphics engine is not running on the server.");
         setModelInfo(r.model);
+        setReplayInfo(r.replay);
       })
       .catch((e: Error) => {
         setReady("no");
@@ -142,7 +144,7 @@ export function TryIt() {
       setRepair(null);
       setStress(null);
       setPicked(null);
-      setLive(await api<LiveState>("/api/teach", "POST", { mode: learner, demonstration: { width: CARD_W, height: CARD_H, ...placement } }, signal));
+      setLive(await api<LiveState>("/api/teach", "POST", { mode: learner, demonstration: learner === "replay" ? undefined : { width: CARD_W, height: CARD_H, ...placement } }, signal));
       void refreshModel();
     });
 
@@ -233,6 +235,13 @@ export function TryIt() {
             <input type="radio" name="learner" checked={learner === "nemotron"} onChange={() => setLearner("nemotron")} disabled={busy || !modelInfo?.available} />
             NVIDIA Nemotron (live, metered)
           </label>
+          <label className="check">
+            <input type="radio" name="learner" checked={learner === "replay"} onChange={() => setLearner("replay")} disabled={busy || !replayInfo?.available} />
+            Nemotron replay (recorded, free)
+          </label>
+          {replayInfo?.available ? (
+            <span className="muted small">REPLAY of a real Nemotron run recorded {replayInfo.recorded_at}. No model is called now; it only covers the default badge position and the answers given in the recording. The engine and verifier still run live.</span>
+          ) : null}
           {!modelInfo?.available ? (
             <span className="muted small">Not enabled on this server{modelInfo?.error ? `: ${modelInfo.error}` : " (start it with DEMO_MODEL_ENABLED=1 and a Nebius key)"}.</span>
           ) : (
@@ -245,7 +254,7 @@ export function TryIt() {
         </div>
         {busy ? (
           <p className="callout" role="status" aria-live="polite">
-            Working… {elapsed}s elapsed{learner === "nemotron" || live?.mode === "nemotron" ? ". Waiting for the model; one call can take a minute or two." : "."}
+            Working… {elapsed}s elapsed{learner === "nemotron" || (live?.mode === "nemotron" && !live.replay) ? ". Waiting for the model; one call can take a minute or two." : "."}
           </p>
         ) : null}
         {concept ? (
@@ -276,7 +285,9 @@ export function TryIt() {
           </fieldset>
         ) : null}
         <p className="muted small">
-          {live?.mode === "nemotron"
+          {live?.replay
+            ? "Replay: the rules and procedures below are Nemotron output recorded from a real run, not produced now; each is still checked on the real engine, and any scripted fallback is labelled. "
+            : live?.mode === "nemotron"
             ? "Nemotron proposes the rules and writes the native procedure; every output is checked on the real engine before it is accepted, and any scripted fallback is labelled. "
             : "In reference mode nothing calls a language model: rules come from a non-model learner and native procedures are scripted fixtures. "}
           Every number on the canvas is read back from the real engine.

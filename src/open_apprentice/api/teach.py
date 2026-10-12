@@ -58,6 +58,7 @@ from open_apprentice.concepts.transfer import repair_binding, transfer_concept
 from open_apprentice.evaluation.harness import EvaluatorHarness
 from open_apprentice.providers.base import Provider, ProviderError
 from open_apprentice.providers.mock import MockProvider
+from open_apprentice.providers.replay import ReplayMismatch, ReplayProvider
 
 router = APIRouter(prefix="/api/teach", tags=["teach"])
 replay_router = APIRouter(prefix="/api", tags=["replay"])
@@ -69,14 +70,21 @@ VISIBLE_DIFF_PX = 6  # the evaluation uses 1 px; a human looking at a picture ne
 DRIFT = {
     "move_origin": "center"
 }  # private tool change; only the Fabric backend supports it in this demo
-DEFAULT_MODEL_CAP_USD = 2.0  # global ceiling for model-mode spend on one server process
-SESSION_TOKEN_LIMIT = 250_000
-SESSION_CALL_LIMIT = 40
+DEFAULT_MODEL_CAP_USD = 1.5  # global ceiling for model-mode spend on one server process
+SESSION_TOKEN_LIMIT = 120_000
+SESSION_CALL_LIMIT = 24
 CONSERVATIVE_USD_PER_MILLION = 3.0  # used only if the provider reported no cost for a call
 RESERVE_USD = 0.25  # a model session is refused unless at least this much of the cap is left
 
 
-def _label(mode: str, model_id: str = "") -> dict:
+def _label(mode: str, model_id: str = "", replay: bool = False) -> dict:
+    if mode == "nemotron" and replay:
+        return {
+            "mode": "REPLAY OF A RECORDED NEMOTRON SESSION (engine is live)",
+            "candidate_rules": f"{model_id or 'Nemotron'} output recorded from a real run; no model is called now. Unioned with the bounded symbolic search, as in the live mode",
+            "native_procedures": "the recorded Nemotron procedure, re-checked now on the real backend; a scripted fixture is used instead, and labelled, if it fails",
+            "verifier": "independent verifier, judging against the rule you taught",
+        }
     if mode == "nemotron":
         return {
             "mode": "LIVE ENGINE + NVIDIA NEMOTRON",
@@ -102,7 +110,7 @@ class DemoIn(BaseModel):
 
 
 class StartIn(BaseModel):
-    mode: str = Field(default="reference", pattern="^(reference|nemotron)$")
+    mode: str = Field(default="reference", pattern="^(reference|nemotron|replay)$")
     demonstration: Optional[DemoIn] = None
 
 
@@ -134,6 +142,9 @@ class Live:
     ledger: Ledger
     mode: str = "reference"
     provider: Optional[Provider] = None
+    replay: bool = (
+        False  # a recorded Nemotron session served at zero cost; the pipeline treats it as model mode
+    )
     model_id: str = ""
     registry: BindingRegistry = field(default_factory=BindingRegistry)
     concept: Optional[Concept] = None
@@ -211,6 +222,8 @@ def _spend(request: Request) -> dict:
 
 def _account(request: Request, live: Live) -> None:
     """Move this session's new consumption into the process-wide total. Unknown cost is charged at a conservative rate, never zero."""
+    if live.replay:
+        return  # recorded output costs nothing and must not use up the live budget
     snap = live.ledger.snapshot()["consumed"]
     d_tokens = snap["tokens"] - live.counted_tokens
     usd = (
@@ -230,6 +243,18 @@ def _meter(request: Request, live: Live) -> Optional[dict]:
         return None
     snap = live.ledger.snapshot()
     sp = _spend(request)
+    if live.replay:
+        return {
+            "model": live.model_id,
+            "label": "REPLAY",
+            "session_tokens": snap["consumed"]["tokens"],
+            "session_calls": snap["consumed"]["calls"],
+            "session_usd": 0.0,
+            "unknown_cost_calls": 0,
+            "server_spend_usd": round(sp["usd"], 4),
+            "server_cap_usd": _cap_usd(),
+            "note": f"recorded {request.app.state.tape.get('recorded_at', '')}; no model is called and nothing is billed now. Token counts are from the original run",
+        }
     return {
         "model": live.model_id,
         "label": "LIVE",
@@ -243,7 +268,9 @@ def _meter(request: Request, live: Live) -> Optional[dict]:
     }
 
 
-def _require_model_budget(request: Request) -> None:
+def _require_model_budget(request: Request, live: Optional[Live] = None) -> None:
+    if live is not None and live.replay:
+        return
     sp = _spend(request)
     if sp["usd"] + RESERVE_USD > _cap_usd():
         raise HTTPException(
@@ -255,7 +282,8 @@ def _require_model_budget(request: Request) -> None:
 RATE_WINDOW_S = 3600
 RATE_LIMITS = {
     "reference": 60,
-    "nemotron": 8,
+    "nemotron": 3,
+    "replay": 60,
     "svg": 120,
 }  # new sessions per client per hour; the paid mode is deliberately scarce
 
@@ -272,6 +300,11 @@ def _rate_limit(request: Request, mode: str) -> None:
 
 
 def _provider_failure(e: ProviderError) -> HTTPException:
+    if isinstance(e, ReplayMismatch):
+        return HTTPException(
+            409,
+            f"{e}. Choose the same answers as the recording, or use the live or reference learner.",
+        )
     return HTTPException(502, f"the model call failed ({e.code}): {str(e)[:160]}")
 
 
@@ -295,7 +328,8 @@ def _state(request: Request, live: Live) -> dict:
     out: dict[str, Any] = {
         "id": live.id,
         "mode": live.mode,
-        "label": _label(live.mode, live.model_id),
+        "replay": live.replay,
+        "label": _label(live.mode, live.model_id, live.replay),
         "meter": _meter(request, live),
         "fallbacks": list(live.fallbacks),
         "pool": _pool(live),
@@ -344,7 +378,17 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
     mode = body.mode if body else "reference"
     _rate_limit(request, mode)
     provider: Optional[Provider] = None
-    if mode == "nemotron":
+    replay = mode == "replay"
+    if replay:
+        tape = getattr(request.app.state, "tape", None)
+        if tape is None:
+            raise HTTPException(503, "no recorded Nemotron session is installed on this server")
+        if body.demonstration is not None and body.demonstration != DemoIn():
+            raise HTTPException(
+                422, "replay only covers the recorded demonstration; leave the badge where it is"
+            )
+        provider, mode = ReplayProvider(tape), "nemotron"  # same pipeline, recorded model output
+    elif mode == "nemotron":
         provider = getattr(request.app.state, "provider", None)
         if provider is None:
             raise HTTPException(
@@ -406,7 +450,7 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
         ]
     }
     live = Live(uuid.uuid4().hex[:12], sess, jsonable_encoder(demo), ledger, mode=mode, provider=provider, hybrid=hybrid,
-                model_id=getattr(provider, "requested_model", "") if provider else "")  # fmt: skip
+                replay=replay, model_id=getattr(provider, "requested_model", "") if provider else "")  # fmt: skip
     store[live.id] = live
     try:
         await sess.start({"scene": before, "after": after})
@@ -429,7 +473,7 @@ async def get_state(request: Request, sid: str) -> dict:
 async def answer(request: Request, sid: str, body: AnswerIn) -> dict:
     live = _get(request, sid)
     if live.mode == "nemotron":
-        _require_model_budget(request)
+        _require_model_budget(request, live)
     async with live.lock:
         try:
             await live.session.answer(body.query_id, body.answer, body.candidate_set_hash)
@@ -469,7 +513,7 @@ async def _ensure_binding(request: Request, live: Live, backend: str) -> Optiona
     scenes = [card_scene(150), card_scene(60)]
     note: Optional[str] = None
     if live.mode == "nemotron" and live.provider is not None:
-        _require_model_budget(request)
+        _require_model_budget(request, live)
         r = await transfer_concept(
             live.concept,
             backend,
@@ -802,7 +846,7 @@ async def repair(request: Request, sid: str) -> dict:
         attempts: list[dict] = []
         status = "failed"
         if live.mode == "nemotron" and live.provider is not None:
-            _require_model_budget(request)
+            _require_model_budget(request, live)
             try:
                 r = await repair_binding(
                     concept,

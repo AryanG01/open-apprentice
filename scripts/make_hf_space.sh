@@ -4,7 +4,7 @@
 set -euo pipefail
 OUT="${1:-dist/hf-space}"
 rm -rf "$OUT" && mkdir -p "$OUT"
-for p in src prompts configs services/engine apps/web pyproject.toml uv.lock package.json package-lock.json docs/capabilities.json LICENSE; do
+for p in src prompts configs services/engine apps/web pyproject.toml uv.lock package.json package-lock.json docs/capabilities.json docs/replay LICENSE; do
   mkdir -p "$OUT/$(dirname "$p")"
   rsync -a --exclude node_modules --exclude dist --exclude __pycache__ --exclude '.venv' "$p" "$OUT/$(dirname "$p")/"
 done

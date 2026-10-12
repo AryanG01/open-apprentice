@@ -25,6 +25,7 @@ COPY services/engine services/engine
 COPY prompts prompts
 COPY configs configs
 COPY docs/capabilities.json docs/capabilities.json
+COPY docs/replay docs/replay
 
 RUN mkdir -p /tmp/home && chmod 1777 /tmp/home
 # UID 1000 is the `node` user in this base image; Hugging Face Spaces also runs containers as UID 1000.

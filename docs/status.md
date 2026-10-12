@@ -183,3 +183,7 @@ Live demo now starts from the visitor's own badge placement (drag / number field
 ## 2026-10-12: Real-SVG lane (experimental, no model)
 Built and tested: validator (15 rejection cases), byte-exact editor (property-tested), typed patch with 7 harmful-patch rejections, rule applied to three authored SVGs with Chromium-measured verification (0.000 px on the samples),
 inventory and coverage (rotated element refused with a reason), UI tab. NOT done: matched baseline pilot, model-written patches, paths/rotation/styles. See decisions #48.
+
+## 2026-10-12: replay mode (decisions #49)
+- Recorded one real Nemotron session (balance $2.57 before; ~$0.09 spent) to `docs/replay/nemotron_tape.json`; replayed it with the model disabled: same questions, rule and verifier results at $0. Tested: `tests/unit/test_replay.py` (scripted mock) plus the manual `scripts/live_flow_check.py --mode replay` run against the real engine.
+- UI: third learner option "Nemotron replay (recorded, free)". Not yet checked in a browser, and not yet deployed anywhere.

@@ -10,13 +10,13 @@ Two artifacts. Neither needs a database.
 ```
 docker build -f docker/demo.Dockerfile -t open-apprentice-demo .
 docker run --rm -p 8000:8000 open-apprentice-demo                                   # reference mode: no model, no credentials
-docker run --rm -p 8000:8000 --env-file .env -e DEMO_MODEL_ENABLED=1 -e DEMO_MODEL_MAX_USD=2 open-apprentice-demo   # adds Nemotron mode
+docker run --rm -p 8000:8000 --env-file .env -e DEMO_MODEL_ENABLED=1 -e DEMO_MODEL_MAX_USD=1.5 open-apprentice-demo   # adds Nemotron mode
 ```
 Open `http://<host>:8000`. Health: `/health/ready` reports engine and model availability and spend (never keys).
 
 ### Safety defaults
-- Model mode is **off** unless `DEMO_MODEL_ENABLED=1`; a global cap `DEMO_MODEL_MAX_USD` (default 2) refuses new model sessions instead of degrading silently.
-- Per-client limits: 60 free sessions/hour, 8 model sessions/hour. Per-session ceiling 250k tokens / 40 calls.
+- Model mode is **off** unless `DEMO_MODEL_ENABLED=1`; a global cap `DEMO_MODEL_MAX_USD` (default 1.5) refuses new model sessions instead of degrading silently.
+- Per-client limits: 60 free and 60 replay sessions/hour, 3 live model sessions/hour. Per-session ceiling 120k tokens / 24 calls (a measured full session used 32k tokens / 3 calls).
 - Security headers (CSP same-origin, no framing, no sniffing). No cookies, no accounts, no uploads except a user-chosen JSON file that is only parsed.
 - The engine child runs with a minimal environment (no API keys); the evaluator token is random per process and never leaves the server.
 

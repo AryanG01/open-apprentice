@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 import pathlib
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -15,10 +16,14 @@ from open_apprentice.api.svg import router as svg_router
 from open_apprentice.api.teach import replay_router, router as teach_router
 from open_apprentice.config import load_settings
 from open_apprentice.providers.factory import MissingCredential, make_provider
+from open_apprentice.providers.replay import RecordingProvider, load_tape
 from open_apprentice.concepts.witness import SolverPool
 from open_apprentice.evaluation.local_engine import local_engine
 
 ROOT = pathlib.Path(__file__).resolve().parents[3]
+TAPE_PATH = pathlib.Path(
+    os.environ.get("DEMO_REPLAY_TAPE", ROOT / "docs" / "replay" / "nemotron_tape.json")
+)
 
 
 @asynccontextmanager
@@ -39,6 +44,19 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 stack.push_async_callback(app.state.provider.aclose)
             except MissingCredential as e:
                 app.state.model_error = str(e)[:160]
+            record = os.environ.get("DEMO_RECORD_TAPE")
+            if (
+                record and app.state.provider is not None
+            ):  # one-off: capture a real session for replay
+                p = app.state.provider
+                app.state.provider = RecordingProvider(
+                    p,
+                    pathlib.Path(record),
+                    {"model": p.requested_model, "recorded_at": datetime.date.today().isoformat()},
+                )
+        app.state.tape = None
+        if TAPE_PATH.is_file():
+            app.state.tape = load_tape(TAPE_PATH)
         app.state.pool = stack.enter_context(SolverPool())
         url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
         if url and token:
@@ -89,6 +107,11 @@ def ready() -> dict:
         "engine": app.state.engine is not None,
         "engine_error": app.state.engine_error,
         "live_sessions": len(app.state.live),
+        "replay": {
+            "available": app.state.tape is not None,
+            "recorded_at": (app.state.tape or {}).get("recorded_at"),
+            "id": (app.state.tape or {}).get("model", ""),
+        },
         "model": {
             "available": p is not None,
             "id": getattr(p, "requested_model", "") if p else "",
