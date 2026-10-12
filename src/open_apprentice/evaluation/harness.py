@@ -41,13 +41,15 @@ class EvaluatorHarness:
         )
         r.raise_for_status()
         d = r.json()
-        initial = self.native(d["session_id"], owner)
-        return (
-            EngineSession.attach(
-                self._base, d["session_id"], owner, d["revision"], d["public_schema_hash"]
-            ),
-            initial,
+        session = EngineSession.attach(
+            self._base, d["session_id"], owner, d["revision"], d["public_schema_hash"]
         )
+        try:
+            initial = self.native(d["session_id"], owner)
+        except Exception:
+            session.close()  # never leave an engine slot held by a session nobody can use
+            raise
+        return session, initial
 
     def native(self, session_id: str, owner: str) -> dict:
         r = self._c.get(f"/internal/sessions/{session_id}/native", params={"owner": owner})

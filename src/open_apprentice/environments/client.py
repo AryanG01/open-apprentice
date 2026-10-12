@@ -88,6 +88,6 @@ class EngineSession:
 
     def close(self) -> None:
         try:
-            self._c.delete(f"/sessions/{self.session_id}")
+            self._c.delete(f"/sessions/{self.session_id}", params={"owner": self.owner})
         finally:
             self._c.close()

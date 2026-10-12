@@ -33,5 +33,7 @@ test("full agent flow over HTTP; native state is not reachable from the agent su
   assert.equal(n.json().nodes[0].x, 5);
   const wrongOwner = await app.inject({ method: "POST", url: `/sessions/${c.session_id}/actions`, payload: { owner: "x", tool: "inspect_scene" } });
   assert.equal(wrongOwner.statusCode, 404);
-  await app.inject({ method: "DELETE", url: `/sessions/${c.session_id}` });
+  // only the owner may end a session
+  assert.equal((await app.inject({ method: "DELETE", url: `/sessions/${c.session_id}?owner=x` })).statusCode, 404);
+  assert.equal((await app.inject({ method: "DELETE", url: `/sessions/${c.session_id}?owner=u` })).statusCode, 200);
 });

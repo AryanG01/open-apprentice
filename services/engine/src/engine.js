@@ -17,6 +17,7 @@ const BACKENDS = {
 const MAX_SESSIONS = 4;          // spec 19.2 parallel browser contexts
 const ACTION_DEADLINE_MS = 5000; // per-action deadline (spec 6.5)
 const MEASURE_TIMEOUT_MS = 10000; // an SVG measurement that hangs is abandoned and its context closed
+const SESSION_IDLE_MS = 10 * 60 * 1000; // a session nobody has touched for this long is reclaimed (abandoned visitors must not exhaust the cap)
 
 // PUBLIC tool contract. Identical across drift variants by construction: it is a constant,
 // never derived from private config, so an undocumented semantic change leaves the hash unchanged.
@@ -38,9 +39,28 @@ export const publicSchemaHash = (backend = "konva") =>
 export class Engine {
   #browser = null;
   #sessions = new Map();
+  #idleMs;
+  #healthy = false;
+  #onDisconnect = null;
+
+  constructor({ idleMs = SESSION_IDLE_MS } = {}) {
+    this.#idleMs = idleMs;
+  }
+
+  get healthy() { return this.#healthy; }
+  get sessionCount() { return this.#sessions.size; }
+  onDisconnect(fn) { this.#onDisconnect = fn; }
 
   async start() {
-    this.#browser = await chromium.launch({ headless: true, args: process.env.OA_CHROMIUM_NO_SANDBOX === "1" ? ["--no-sandbox"] : [] });
+    const args = ["--disable-dev-shm-usage", ...(process.env.OA_CHROMIUM_NO_SANDBOX === "1" ? ["--no-sandbox"] : [])];
+    this.#browser = await chromium.launch({ headless: true, args });
+    this.#healthy = true;
+    // A crashed browser must be visible to health checks, not discovered request by request.
+    this.#browser.on("disconnected", () => { this.#healthy = false; this.#onDisconnect?.(); });
+  }
+
+  async killBrowserForTest() {
+    await this.#browser.close();
   }
 
   async close() {
@@ -51,29 +71,49 @@ export class Engine {
   // privateConfig is accepted ONLY from the evaluator path (server.js enforces the token).
   async create(scene, { owner, privateConfig, backend = "konva" } = {}) {
     if (!BACKENDS[backend]) throw Object.assign(new Error(`unknown backend ${backend}`), { code: "INVALID_ARGUMENT" });
+    await this.#reapIdle();
     if (this.#sessions.size >= MAX_SESSIONS) throw Object.assign(new Error("session limit"), { code: "LIMIT" });
-    const context = await this.#browser.newContext();
-    // Block every network request: local bundled assets only (spec 18.2).
-    await context.route("**/*", (route) => route.abort());
-    const page = await context.newPage();
-    await page.setContent('<!doctype html><html><body><div id="c"></div></body></html>');
-    await page.addScriptTag({ path: BACKENDS[backend].lib });
-    await page.addScriptTag({ path: BACKENDS[backend].dispatcher });
-    let loaded;
-    try {
-      loaded = await page.evaluate(([s, c]) => window.__engine.load(s, c), [scene, privateConfig ?? null]);
-    } catch (e) {
-      await context.close();
-      throw Object.assign(new Error(String(e.message).split("\n")[0].slice(0, 200)), { code: "INVALID_SCENE" });
-    }
+    // Reserve the slot BEFORE the first await, so parallel creates cannot all pass the cap check.
     const id = randomUUID();
-    this.#sessions.set(id, { context, page, owner });
-    return { session_id: id, backend, revision: loaded.revision, public_schema_hash: publicSchemaHash(backend) };
+    const slot = { context: null, page: null, owner, touched: Date.now(), pending: true };
+    this.#sessions.set(id, slot);
+    try {
+      const context = await this.#browser.newContext();
+      slot.context = context;
+      // Block every network request: local bundled assets only (spec 18.2).
+      await context.route("**/*", (route) => route.abort());
+      const page = await context.newPage();
+      slot.page = page;
+      await page.setContent('<!doctype html><html><body><div id="c"></div></body></html>');
+      await page.addScriptTag({ path: BACKENDS[backend].lib });
+      await page.addScriptTag({ path: BACKENDS[backend].dispatcher });
+      let loaded;
+      try {
+        loaded = await page.evaluate(([sc, c]) => window.__engine.load(sc, c), [scene, privateConfig ?? null]);
+      } catch (e) {
+        throw Object.assign(new Error(String(e.message).split("\n")[0].slice(0, 200)), { code: "INVALID_SCENE" });
+      }
+      slot.pending = false;
+      return { session_id: id, backend, revision: loaded.revision, public_schema_hash: publicSchemaHash(backend) };
+    } catch (e) {
+      // Any failure frees the slot and the browser context; nothing half-built is left behind.
+      this.#sessions.delete(id);
+      await slot.context?.close().catch(() => {});
+      throw e;
+    }
+  }
+
+  async #reapIdle() {
+    const now = Date.now();
+    for (const [id, s] of this.#sessions) {
+      if (!s.pending && now - s.touched > this.#idleMs) await this.destroy(id);
+    }
   }
 
   #get(id, owner) {
     const s = this.#sessions.get(id);
-    if (!s || s.owner !== owner) throw Object.assign(new Error("no such session"), { code: "NOT_FOUND" });
+    if (!s || s.pending || s.owner !== owner) throw Object.assign(new Error("no such session"), { code: "NOT_FOUND" });
+    s.touched = Date.now();
     return s;
   }
 
@@ -144,10 +184,16 @@ export class Engine {
     return this.#get(id, owner).page.evaluate(() => window.__engine.nativeState());
   }
 
+  // Agent-facing delete: only the session's owner may end it.
+  async destroyOwned(id, owner) {
+    this.#get(id, owner);
+    await this.destroy(id);
+  }
+
   async destroy(id) {
     const s = this.#sessions.get(id);
     if (!s) return;
     this.#sessions.delete(id);
-    await s.context.close().catch(() => {});   // already-gone contexts must not break shutdown
+    await s.context?.close().catch(() => {});   // already-gone contexts must not break shutdown
   }
 }

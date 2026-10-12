@@ -24,7 +24,10 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
     return true;
   };
 
-  app.get("/health/live", async () => ({ status: "ok", service: "engine", public_schema_hash: publicSchemaHash() }));
+  app.get("/health/live", async (req, reply) => {
+    if (!engine.healthy) return reply.code(503).send({ status: "browser down", service: "engine" });
+    return { status: "ok", service: "engine", public_schema_hash: publicSchemaHash(), sessions: engine.sessionCount };
+  });
 
   app.post("/sessions", async (req, reply) => {
     const { scene, owner, private_config, backend } = req.body ?? {};
@@ -36,7 +39,7 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
     try { return await engine.act(req.params.id, owner, action); } catch (e) { return fail(reply, e); }
   });
   app.delete("/sessions/:id", async (req, reply) => {
-    try { await engine.destroy(req.params.id); return { ok: true }; } catch (e) { return fail(reply, e); }
+    try { await engine.destroyOwned(req.params.id, req.query.owner); return { ok: true }; } catch (e) { return fail(reply, e); }
   });
 
   app.post("/internal/sessions", async (req, reply) => {
@@ -59,6 +62,7 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
 if (import.meta.url === `file://${process.argv[1]}`) {
   const engine = new Engine();
   await engine.start();
+  engine.onDisconnect(() => { console.error("browser disconnected; exiting so the supervisor restarts the engine"); process.exit(1); });
   const app = buildServer(engine);
   for (const sig of ["SIGTERM", "SIGINT"]) {
     process.on(sig, async () => { await app.close(); await engine.close(); process.exit(0); });

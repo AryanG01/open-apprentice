@@ -8,6 +8,7 @@ import pathlib
 from contextlib import AsyncExitStack, asynccontextmanager
 from typing import AsyncIterator
 
+import httpx
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -103,9 +104,19 @@ def ready() -> dict:
     from open_apprentice.api.teach import _cap_usd
 
     p = app.state.provider
+    engine_ok, engine_error = app.state.engine is not None, app.state.engine_error
+    if app.state.engine is not None:
+        try:  # a configured engine whose browser crashed must not be reported ready
+            engine_ok = (
+                httpx.get(f"{app.state.engine[0]}/health/live", timeout=2.0).status_code == 200
+            )
+        except httpx.HTTPError:
+            engine_ok = False
+        if not engine_ok:
+            engine_error = "the graphics engine is not responding (its browser may have crashed); restart the server"
     return {
-        "engine": app.state.engine is not None,
-        "engine_error": app.state.engine_error,
+        "engine": engine_ok,
+        "engine_error": engine_error,
         "live_sessions": len(app.state.live),
         "replay": {
             "available": app.state.tape is not None,
