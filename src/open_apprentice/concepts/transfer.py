@@ -98,6 +98,9 @@ def _run_on(  # blocking engine I/O: callers run it via asyncio.to_thread
     return res
 
 
+RETRY_NUDGE = "Your previous answer was cut off before it finished. Keep your reasoning brief this time and reply with ONLY the JSON object."
+
+
 async def _propose(
     provider: Provider,
     ledger: Ledger,
@@ -124,6 +127,9 @@ async def _propose(
         except TruncatedOutput:
             if attempt:
                 raise
+            # At temperature 0 an identical retry would most likely truncate again and be billed twice, so the retry is a
+            # different request: it asks the model to keep its reasoning short and answer straight away.
+            msgs = msgs + [Message("user", RETRY_NUDGE)]
     return comp.parsed.candidates[:MAX_NATIVE_CANDIDATES], comp.parsed.model_dump_json()
 
 
