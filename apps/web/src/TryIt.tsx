@@ -205,7 +205,7 @@ export function TryIt() {
     return (
       <main className="page">
         <div className="callout bad" role="alert">
-          <strong>Live mode needs the backend.</strong> {reason} Start it from the repository root with:
+          <strong>Not available in this copy.</strong> {reason.startsWith("HTTP") || reason.includes("not reachable") ? "There is no live backend here." : reason} To try it, run it locally from the repository root:
           <pre tabIndex={0}>uv run uvicorn open_apprentice.api.app:app --port 8000{"\n"}npm run dev -w apps/web</pre>
           The recorded walkthrough and Compare tabs work without it.
         </div>

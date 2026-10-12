@@ -138,6 +138,13 @@ export function App() {
     window.location.hash = h;
   };
   const [playing, setPlaying] = useState(false);
+  const [backend, setBackend] = useState<"checking" | "yes" | "no">("checking");
+  useEffect(() => {
+    fetch("/health/ready")
+      .then((r) => (r.ok ? (r.json() as Promise<{ engine?: boolean }>) : Promise.reject(new Error("no api"))))
+      .then((j) => setBackend(j.engine ? "yes" : "no"))
+      .catch(() => setBackend("no"));
+  }, []);
   const stageRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -205,7 +212,15 @@ export function App() {
           <h1>Open Apprentice</h1>
           <p>Teach a layout rule once. It asks when unsure, reuses the rule across graphics backends, and repairs only the part that broke.</p>
         </div>
-        {mode === "Try it live" ? (
+        {(mode === "Try it live" || mode === "Real SVG") && backend === "no" ? (
+          <div className="banner" role="note">
+            <span className="pill recorded">NOT AVAILABLE IN THIS COPY</span>
+            <span>
+              This copy is a static preview with no backend. The live engine needs Python and real browser engines, so it runs only locally or on a full server.
+              Home, the walkthrough and Compare work here.
+            </span>
+          </div>
+        ) : mode === "Try it live" ? (
           <div className="banner" role="note">
             <span className="pill live">LIVE ENGINE</span>
             <span>
