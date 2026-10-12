@@ -175,3 +175,20 @@ def test_resize_rule_violates_preserve_sizes(pool):
     ]
     res = find_public_constraint_violation(rule, ["preserve_sizes"], [2], DOM, pool=pool)
     assert res.status == "witness_found"
+
+
+def test_the_work_limit_gives_the_same_verdict_every_time_and_reports_its_usage(pool):
+    """Verdicts must not depend on CPU speed: a run limited by z3's resource counter is reproducible, unlike a wall clock."""
+    runs = [
+        find_disagreement(
+            [gap_rule(), center_spacing_rule()],
+            [2],
+            DOM,
+            budget=SolverBudget(rlimit=1),
+            pool=pool,  # far below what any check needs
+        ).status
+        for _ in range(3)
+    ]
+    assert runs == ["timeout"] * 3, runs
+    ok = find_disagreement([gap_rule(), center_spacing_rule()], [2], DOM, pool=pool)
+    assert ok.status == "witness_found"

@@ -45,12 +45,21 @@ class GroundingError(Exception):
 
 @dataclass
 class SolverBudget:
+    """How much solving one teaching session may do.
+
+    The binding limits are DETERMINISTIC: a call count and a per-call z3 resource limit (`rlimit`, units of solver work),
+    so the same query gets the same verdict on any CPU. Wall-clock fields are only crash guards: measured on the 24
+    development tasks every call used < 2,000 rlimit units and < 0.3 s, so the guards never bind on a working host
+    (decisions #51). On a 0.1-vCPU host the old 0.5 s / 6 s wall-clock budget made sessions end UNRESOLVED.
+    """
+
     max_calls: int = 12
-    per_call_ms: int = 500
-    total_s: float = 6.0
+    rlimit: int = 1_000_000  # per call; ~500x the largest measured use
+    per_call_ms: int = 30_000  # crash guard only
+    total_s: float = 300.0  # crash guard only
     memory_mb: int = 512
     calls: int = 0
-    elapsed_s: float = 0.0
+    elapsed_s: float = 0.0  # reported, never part of an answer
 
     def can_run(self) -> bool:
         return self.calls < self.max_calls and self.elapsed_s < self.total_s
@@ -117,13 +126,19 @@ def _solve(payload: dict) -> dict:
     else:
         goal = violation_formula(sa, objs, cv, tuple(payload["constraints"]))
     s = z3.Solver()
-    s.set("timeout", payload["timeout_ms"])
+    if payload.get("rlimit"):
+        s.set("rlimit", payload["rlimit"])  # deterministic work limit: same verdict on any CPU
+    s.set("timeout", payload["timeout_ms"])  # crash guard only
     s.add(*domain_constraints(objs, cv, dom))
     if payload.get("integers"):
         s.add(*[z3.IsInt(v) for v in vars_])
     s.add(goal)
     r = s.check()
     out: dict[str, Any] = {"version": z3.get_version_string()}
+    try:  # deterministic work done by this check (z3's resource counter), recorded for calibration and audit
+        out["rlimit_used"] = int(s.statistics().get_key_value("rlimit count"))
+    except (z3.Z3Exception, KeyError, ValueError):
+        pass
     if r == z3.sat:
         m = s.model()
         vals = {}
@@ -135,13 +150,14 @@ def _solve(payload: dict) -> dict:
         out.update(status="unsat", smtlib=s.to_smt2())
     else:
         why = s.reason_unknown()
-        out.update(
-            status="timeout" if ("timeout" in why or "canceled" in why) else "unknown", detail=why
-        )
+        limited = "timeout" in why or "canceled" in why or "resource limit" in why
+        out.update(status="timeout" if limited else "unknown", detail=why)
     return out
 
 
 def _worker(conn) -> None:
+    import z3  # noqa: F401  load the solver once at start-up, not on the first (timed) query
+
     while True:
         try:
             payload = conn.recv()
@@ -166,6 +182,10 @@ class SolverPool:
             self._conn, child = self._ctx.Pipe()
             self._proc = self._ctx.Process(target=_worker, args=(child,), daemon=True)
             self._proc.start()
+
+    def start(self) -> None:
+        """Start the worker now (e.g. at server start-up) instead of on the first query."""
+        self._ensure()
 
     def solve(self, payload: dict, wall_s: float) -> Optional[dict]:
         self._ensure()
@@ -274,7 +294,9 @@ def _run(
                 )
                 continue
             payload = make_payload(subject, n)
-            payload.update(timeout_ms=budget.per_call_ms, memory_mb=budget.memory_mb)
+            payload.update(
+                rlimit=budget.rlimit, timeout_ms=budget.per_call_ms, memory_mb=budget.memory_mb
+            )
             c0 = time.perf_counter()
             res = pool.solve(payload, wall_s=budget.per_call_ms / 1000 + 5.0)
             el = time.perf_counter() - c0

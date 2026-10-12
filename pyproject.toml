@@ -14,7 +14,7 @@ dependencies = [
   "sqlalchemy>=2.0,<2.1",
   "alembic>=1.13,<1.14",
   "psycopg[binary]>=3.2,<3.3",
-  "z3-solver>=4.13,<4.14",
+  "z3-solver==4.13.4.0",  # exact: the deterministic rlimit work counts are only reproducible on one z3 build (decisions #51)
   "typer>=0.12,<0.13",
   "click>=8.1,<8.2",
   "structlog>=24.4,<25",

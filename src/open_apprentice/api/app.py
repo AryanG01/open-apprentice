@@ -59,6 +59,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if TAPE_PATH.is_file():
             app.state.tape = load_tape(TAPE_PATH)
         app.state.pool = stack.enter_context(SolverPool())
+        app.state.pool.start()  # pay the solver start-up once, before any visitor is waiting
         url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
         if url and token:
             app.state.engine = (url, token)
