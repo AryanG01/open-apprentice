@@ -10,6 +10,8 @@ teacher is an external object that only sees the public query view.
 
 from __future__ import annotations
 
+import asyncio
+
 import enum
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Optional
@@ -183,9 +185,11 @@ class TeachingSession:
             return
         rules = [c.rule for c in self.candidates]
         if self.queries_asked >= MAX_QUERIES:
-            self._settle_without_more_questions(rules)
+            await self._settle_without_more_questions(rules)
             return
-        sc = select_query(
+        # Solver work runs in a worker thread so one visitor's search never stalls the server for everyone else.
+        sc = await asyncio.to_thread(
+            select_query,
             rules,
             self.dom,
             self.object_counts,
@@ -195,7 +199,7 @@ class TeachingSession:
             prefer_readable=self.prefer_readable_queries,
         )
         if sc is None:
-            self._settle_without_more_questions(rules)
+            await self._settle_without_more_questions(rules)
             return
         self.pending = build_query(rules, sc)
         self.pending_kind = "question"
@@ -211,10 +215,15 @@ class TeachingSession:
         )
         self.state = State.AWAITING_USER
 
-    def _settle_without_more_questions(self, rules: list[list]) -> None:
+    async def _settle_without_more_questions(self, rules: list[list]) -> None:
         """No (more) askable question. Decide honestly whether the survivors are equivalent in the model."""
-        res = find_disagreement(
-            rules, self.object_counts, self.dom, budget=self.solver_budget, pool=self.pool
+        res = await asyncio.to_thread(
+            find_disagreement,
+            rules,
+            self.object_counts,
+            self.dom,
+            budget=self.solver_budget,
+            pool=self.pool,
         )
         if res.status == "no_witness_in_model":
             self._ready(

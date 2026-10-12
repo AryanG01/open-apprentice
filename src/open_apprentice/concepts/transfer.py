@@ -12,6 +12,8 @@ current environment. Promotion re-checks the sealed concept hash.
 
 from __future__ import annotations
 
+import asyncio
+
 import json
 import pathlib
 from dataclasses import dataclass, field
@@ -77,7 +79,7 @@ def _scene_hash(scene: dict) -> str:
     return sha(neutral(scene))[:12]
 
 
-def _run_on(
+def _run_on(  # blocking engine I/O: callers run it via asyncio.to_thread
     factory: SessionFactory, program: list, concept: Concept, scene: dict, budget: NativeBudget
 ) -> dict:
     targets = targets_from_rule(concept.rule, scene)
@@ -236,7 +238,7 @@ async def transfer_concept(
                 registry.promote(res.binding, concept, "ablation: abstract-only acceptance")
                 res.status, res.native_status = "validated", NativeStatus.UNTESTED
                 return res
-            nat = _run_on(factory, c.program, concept, scenes[0], budget)
+            nat = await asyncio.to_thread(_run_on, factory, c.program, concept, scenes[0], budget)
             att["native"] = {k: nat.get(k) for k in ("passed", "diffs", "error", "native_actions")}
             res.native_actions = budget.used
             if nat.get("budget_exhausted"):
@@ -254,7 +256,7 @@ async def transfer_concept(
                         "abstract_check_passed": True,
                     }
                 continue
-            conf = _run_on(factory, c.program, concept, scenes[1], budget)
+            conf = await asyncio.to_thread(_run_on, factory, c.program, concept, scenes[1], budget)
             att["confirm"] = {
                 k: conf.get(k) for k in ("passed", "diffs", "error", "native_actions")
             }
@@ -372,7 +374,7 @@ async def repair_binding(
         )
         cases, ok = [], True
         for name, fac, scene in stages:
-            r = _run_on(fac, c.program, concept, scene, budget)
+            r = await asyncio.to_thread(_run_on, fac, c.program, concept, scene, budget)
             res.native_actions = budget.used
             cases.append(
                 {

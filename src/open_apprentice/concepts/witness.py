@@ -19,6 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 import multiprocessing as mp
+import threading
 import time
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -176,6 +177,9 @@ class SolverPool:
         self._ctx = mp.get_context("spawn")
         self._proc = None
         self._conn = None
+        # One worker and one pipe are shared by every thread: a request and its reply (or the kill after an overrun) must
+        # never interleave with another thread's, or one session would read another's answer.
+        self._lock = threading.RLock()
 
     def _ensure(self) -> None:
         if self._proc is None or not self._proc.is_alive():
@@ -185,9 +189,14 @@ class SolverPool:
 
     def start(self) -> None:
         """Start the worker now (e.g. at server start-up) instead of on the first query."""
-        self._ensure()
+        with self._lock:
+            self._ensure()
 
     def solve(self, payload: dict, wall_s: float) -> Optional[dict]:
+        with self._lock:
+            return self._solve_locked(payload, wall_s)
+
+    def _solve_locked(self, payload: dict, wall_s: float) -> Optional[dict]:
         self._ensure()
         self._conn.send(payload)
         if self._conn.poll(wall_s):
@@ -200,6 +209,10 @@ class SolverPool:
         return None  # wall-clock overrun
 
     def kill(self) -> None:
+        with self._lock:
+            self._kill_locked()
+
+    def _kill_locked(self) -> None:
         if self._proc is not None:
             try:
                 if self._proc.is_alive():

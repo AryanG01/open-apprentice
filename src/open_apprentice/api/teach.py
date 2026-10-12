@@ -591,14 +591,18 @@ async def run(request: Request, sid: str, body: RunIn) -> dict:
         rule = live.concept.rule
         targets = targets_from_rule(rule, sc)
         harness, opener = _opener(request, body.backend, DRIFT if body.tool_change else None)
-        s = opener(sc)
-        initial = opener.initials[-1]
-        try:
-            res = native_run(binding.prog, targets, s, CANVAS, NativeBudget(60))
-            rep = harness.judge_expected(s, initial, expected_state(rule, sc), ["card"])
-            observed = observed_boxes(s, targets)
-        finally:
-            s.close()
+
+        def on_engine() -> tuple[dict, Any, Any]:  # blocking engine I/O, run in a worker thread
+            s = opener(sc)
+            initial = opener.initials[-1]
+            try:
+                res = native_run(binding.prog, targets, s, CANVAS, NativeBudget(60))
+                rep = harness.judge_expected(s, initial, expected_state(rule, sc), ["card"])
+                return res, rep, observed_boxes(s, targets)
+            finally:
+                s.close()
+
+        res, rep, observed = await asyncio.to_thread(on_engine)
         passed = bool(rep.passed)
         if body.tool_change and not res["passed"]:
             live.last_failure = {

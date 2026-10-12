@@ -14,6 +14,8 @@ A target outside this grammar is reported as not expressible (coverage), never f
 
 from __future__ import annotations
 
+import asyncio
+
 import time
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -199,6 +201,12 @@ class EnumerativeSource:
         return sha(sig)
 
     async def __call__(
+        self, constraints: list[Constraint], rnd: int, rejected: list[str]
+    ) -> GenerationReport:
+        # CPU-heavy enumeration runs in a worker thread so it never stalls the server for other visitors.
+        return await asyncio.to_thread(self._enumerate, constraints, rnd, rejected)
+
+    def _enumerate(
         self, constraints: list[Constraint], rnd: int, rejected: list[str]
     ) -> GenerationReport:
         t0, evaluated = time.process_time(), 0
