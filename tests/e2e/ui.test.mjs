@@ -253,6 +253,34 @@ describe("web app in a real browser", { skip: !enabled && "set OA_E2E=1 to run b
     await close();
   });
 
+  test("skip link moves focus to the stage and keeps the current tab", async () => {
+    const { page, problems, close } = await newPage();
+    await page.goto(`${API}/#compare`, { waitUntil: "networkidle" }); // fresh page, deep-linked to a non-Home tab
+    await page.keyboard.press("Tab"); // the skip link is the first focusable element, shown only on focus
+    assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), "Skip to the canvas");
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(500);
+    assert.equal(await page.locator('[role="tab"][aria-selected="true"]').innerText(), "Compare");
+    assert.equal(await page.evaluate(() => document.activeElement?.id), "stage");
+    assert.deepEqual(problems, []);
+    await close();
+  });
+
+  test("leaving the live tab mid-story stops further API calls", async () => {
+    const { page, close } = await newPage();
+    await openTryIt(page, API);
+    let calls = 0;
+    page.on("request", (r) => { if (/\/api\/teach/.test(r.url())) calls += 1; });
+    await page.getByRole("button", { name: /Watch the story/ }).first().click();
+    await page.waitForTimeout(2500); // the story is mid-way: started, answering
+    await page.getByText("Compare", { exact: true }).first().click();
+    const atLeave = calls;
+    await page.waitForTimeout(6000); // the story would have made several more calls in this time
+    assert.ok(atLeave > 0, "the story should have started");
+    assert.equal(calls, atLeave, "no API calls after leaving the tab");
+    await close();
+  });
+
   test("a static copy with no backend says so plainly", async () => {
     // a static host has no API: /health/ready and the SVG lane's /api calls legitimately 404 there
     const { page, problems, close } = await newPage({}, /\/(health\/ready|api\/.*)$/);

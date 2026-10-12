@@ -102,6 +102,8 @@ export function TryIt() {
   const [elapsed, setElapsed] = useState(0);
   const [story, setStory] = useState<{ steps: string[]; done: boolean } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  // Leaving the tab cancels whatever is in flight, so a story or a paid model call does not keep running unseen.
+  useEffect(() => () => abortRef.current?.abort(), []);
 
   useEffect(() => {
     api<ReadyInfo>("/health/ready")

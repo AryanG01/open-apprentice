@@ -206,7 +206,21 @@ export function App() {
 
   return (
     <div className="app">
-      <a className="skip" href="#stage">Skip to the canvas</a>
+      <a
+        className="skip"
+        href="#stage"
+        onClick={(e) => {
+          // the hash router would treat "#stage" as a tab name and jump to Home; move focus instead
+          e.preventDefault();
+          const stage = document.getElementById("stage");
+          if (stage) {
+            if (!stage.hasAttribute("tabindex")) stage.setAttribute("tabindex", "-1");
+            stage.focus();
+          }
+        }}
+      >
+        Skip to the canvas
+      </a>
       <header className="top">
         <div className="brand">
           <h1>Open Apprentice</h1>
