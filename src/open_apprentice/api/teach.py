@@ -295,8 +295,14 @@ RATE_LIMITS = {
 def _rate_limit(request: Request, mode: str) -> None:
     """In-memory sliding window per client address. Enough to stop one visitor draining the model budget; a real deployment adds a proxy limit too."""
     client = request.client.host if request.client else "unknown"
-    hits = request.app.state.rate.setdefault((client, mode), [])
     now = time.time()
+    rate = request.app.state.rate
+    if (
+        len(rate) > 10_000
+    ):  # forget addresses whose window has fully expired, so the table cannot grow without bound
+        for k in [k for k, v in rate.items() if not v or now - v[-1] >= RATE_WINDOW_S]:
+            del rate[k]
+    hits = rate.setdefault((client, mode), [])
     hits[:] = [t for t in hits if now - t < RATE_WINDOW_S]
     if len(hits) >= RATE_LIMITS[mode]:
         raise HTTPException(429, f"too many {mode} sessions from this address; try again later")
