@@ -101,3 +101,16 @@ def test_a_failing_model_call_degrades_to_search_only_and_says_so(client):
     assert (
         st.json()["state"] == "AWAITING_USER"
     )  # the symbolic search still produced a real question
+
+
+def test_a_session_out_of_model_budget_gets_402_not_a_server_error(client, monkeypatch):
+    from open_apprentice.api import teach
+    from open_apprentice.api.app import app
+
+    app.state.provider = MockProvider({"hypotheses": [_cands()]})
+    monkeypatch.setattr(teach, "SESSION_TOKEN_LIMIT", 10)  # too small for even one model call
+    before = len(app.state.live)
+    r = client.post("/api/teach", json={"mode": "nemotron"})
+    assert r.status_code == 402, r.text
+    assert "budget" in r.json()["detail"]
+    assert len(app.state.live) == before  # the half-built session is not kept

@@ -154,3 +154,9 @@ def test_name_op_joins_two_strings_only():
     for bad in (B("name", "a"), B("name", "a", 3), B("name", "x" * 60, "y" * 60)):
         with pytest.raises(ProgramError):
             run_program([{"op": "return", "value": bad}], {}, {})
+
+
+def test_huge_integers_are_a_program_error_not_a_crash():
+    # math.isfinite(10**400) raises OverflowError; a model-written program must never turn that into a server error
+    with pytest.raises(ProgramError):
+        run_program([{"op": "return", "value": {"lit": 10**400}}], {}, {})

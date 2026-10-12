@@ -40,7 +40,7 @@ from open_apprentice.api.geometry import (
     view,
 )
 from open_apprentice.api.svg_export import build_svg
-from open_apprentice.budget import Ledger, Limits
+from open_apprentice.budget import BudgetExhausted, Ledger, Limits
 from open_apprentice.concepts.bindings import (
     BindingRegistry,
     NativeBudget,
@@ -299,7 +299,12 @@ def _rate_limit(request: Request, mode: str) -> None:
     hits.append(now)
 
 
-def _provider_failure(e: ProviderError) -> HTTPException:
+def _provider_failure(e: ProviderError | BudgetExhausted) -> HTTPException:
+    if isinstance(e, BudgetExhausted):
+        return HTTPException(
+            402,
+            f"this session's model budget is used up ({e}); start a new session or use the reference learner",
+        )
     if isinstance(e, ReplayMismatch):
         return HTTPException(
             409,
@@ -454,7 +459,7 @@ async def start(request: Request, body: Optional[StartIn] = None) -> dict:
     store[live.id] = live
     try:
         await sess.start({"scene": before, "after": after})
-    except ProviderError as e:
+    except (ProviderError, BudgetExhausted) as e:
         _account(request, live)
         store.pop(
             live.id, None
@@ -479,7 +484,7 @@ async def answer(request: Request, sid: str, body: AnswerIn) -> dict:
             await live.session.answer(body.query_id, body.answer, body.candidate_set_hash)
         except ValueError as e:
             raise HTTPException(409, str(e)) from e
-        except ProviderError as e:
+        except (ProviderError, BudgetExhausted) as e:
             _account(request, live)
             raise _provider_failure(e) from e
     _account(request, live)
@@ -569,7 +574,7 @@ async def run(request: Request, sid: str, body: RunIn) -> dict:
     async with live.lock:
         try:
             await _ensure_binding(request, live, body.backend)
-        except ProviderError as e:
+        except (ProviderError, BudgetExhausted) as e:
             _account(request, live)
             raise _provider_failure(e) from e
         binding = live.registry.current(CONCEPT_ID, body.backend)
@@ -678,7 +683,7 @@ async def break_it(request: Request, sid: str, body: BreakIn) -> dict:
     async with live.lock:
         try:
             await _ensure_binding(request, live, body.backend)
-        except ProviderError as e:
+        except (ProviderError, BudgetExhausted) as e:
             _account(request, live)
             raise _provider_failure(e) from e
         binding = live.registry.current(CONCEPT_ID, body.backend)
@@ -868,7 +873,7 @@ async def repair(request: Request, sid: str) -> dict:
                     "fabric",
                     origin="model",
                 )
-            except ProviderError as e:
+            except (ProviderError, BudgetExhausted) as e:
                 _account(request, live)
                 raise _provider_failure(e) from e
             _account(request, live)

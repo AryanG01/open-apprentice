@@ -35,7 +35,11 @@ def _finite(v: Any) -> Any:
     if isinstance(v, bool):
         return v
     if isinstance(v, (int, float)):
-        if not math.isfinite(v):
+        try:
+            finite = math.isfinite(v)
+        except OverflowError:  # an int too large to convert to float
+            finite = False
+        if not finite:
             raise ProgramError("non-finite number")
     elif isinstance(v, str):
         if len(v) > MAX_STR:
