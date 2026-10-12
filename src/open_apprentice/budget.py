@@ -49,6 +49,9 @@ class Ledger:
     consumed_actions: int = 0
     consumed_usd: float = 0.0
     unknown_cost_calls: int = 0
+    unknown_cost_tokens: int = (
+        0  # tokens of calls whose cost the provider did not report (charged conservatively by callers)
+    )
     by_category: dict[str, dict[str, float]] = field(default_factory=dict)
 
     def _held(self) -> tuple[int, int, float]:
@@ -98,6 +101,7 @@ class Ledger:
             c["calls"] += r.calls
             if usd is None:
                 self.unknown_cost_calls += r.calls
+                self.unknown_cost_tokens += tokens
                 c["unknown_cost_calls"] += r.calls
             else:
                 self.consumed_usd += usd
@@ -137,6 +141,7 @@ class Ledger:
                 },
                 "held": {"tokens": ht, "calls": hc, "usd": hu},
                 "unknown_cost_calls": self.unknown_cost_calls,
+                "unknown_cost_tokens": self.unknown_cost_tokens,
                 "unresolved_reservations": sum(
                     1 for r in self._res.values() if r.state == "unresolved"
                 ),

@@ -114,3 +114,25 @@ def test_a_session_out_of_model_budget_gets_402_not_a_server_error(client, monke
     assert r.status_code == 402, r.text
     assert "budget" in r.json()["detail"]
     assert len(app.state.live) == before  # the half-built session is not kept
+
+
+class UnknownCost(MockProvider):
+    """A provider that reports no cost: the server must charge it conservatively, never as free."""
+
+    async def _call(self, messages, *, max_tokens, ctx):
+        raw = await super()._call(messages, max_tokens=max_tokens, ctx=ctx)
+        raw.usd = None
+        return raw
+
+
+def test_calls_with_unknown_cost_count_against_the_cap_at_a_conservative_rate(client):
+    from open_apprentice.api import teach
+    from open_apprentice.api.app import app
+
+    app.state.provider = UnknownCost({"hypotheses": [_cands()]})
+    start_spend = app.state.spend["usd"]
+    st = client.post("/api/teach", json={"mode": "nemotron"}).json()
+    m = st["meter"]
+    assert m["unknown_cost_calls"] >= 1
+    expected = m["session_tokens"] * teach.CONSERVATIVE_USD_PER_MILLION / 1e6
+    assert app.state.spend["usd"] - start_spend == pytest.approx(expected) and expected > 0

@@ -73,8 +73,10 @@ DRIFT = {
 DEFAULT_MODEL_CAP_USD = 1.5  # global ceiling for model-mode spend on one server process
 SESSION_TOKEN_LIMIT = 120_000
 SESSION_CALL_LIMIT = 24
-CONSERVATIVE_USD_PER_MILLION = 3.0  # used only if the provider reported no cost for a call
-RESERVE_USD = 0.25  # a model session is refused unless at least this much of the cap is left
+CONSERVATIVE_USD_PER_MILLION = 4.0  # for calls with no reported cost and held reservations; top of the measured $3-4/M for output-heavy runs
+# A model session is refused unless the cap can absorb its worst case: every token of its limit at the conservative rate.
+# ponytail: checked per request, not reserved atomically; concurrent first requests can overshoot by about one session.
+RESERVE_USD = SESSION_TOKEN_LIMIT * CONSERVATIVE_USD_PER_MILLION / 1e6
 
 
 def _label(mode: str, model_id: str = "", replay: bool = False) -> dict:
@@ -224,15 +226,17 @@ def _account(request: Request, live: Live) -> None:
     """Move this session's new consumption into the process-wide total. Unknown cost is charged at a conservative rate, never zero."""
     if live.replay:
         return  # recorded output costs nothing and must not use up the live budget
-    snap = live.ledger.snapshot()["consumed"]
-    d_tokens = snap["tokens"] - live.counted_tokens
-    usd = (
-        snap["usd"]
-        if snap["usd"] is not None
-        else snap["tokens"] * CONSERVATIVE_USD_PER_MILLION / 1e6
-    )
+    full = live.ledger.snapshot()
+    snap = full["consumed"]
+    rate = CONSERVATIVE_USD_PER_MILLION / 1e6
+    # Known cost as reported, plus: calls that reported no cost, and reservations still held (a timed-out call may have been
+    # processed and billed). Both are charged at the conservative rate so the cap can only over-estimate spend, never under.
+    held_tokens = full["held"]["tokens"]
+    tokens = snap["tokens"] + held_tokens
+    usd = snap["usd"] + (full["unknown_cost_tokens"] + held_tokens) * rate
+    d_tokens = tokens - live.counted_tokens
     d_usd = usd - live.counted_usd
-    live.counted_tokens, live.counted_usd = snap["tokens"], usd
+    live.counted_tokens, live.counted_usd = tokens, usd
     sp = _spend(request)
     sp["usd"] += max(d_usd, 0.0)
     sp["tokens"] += max(d_tokens, 0)
