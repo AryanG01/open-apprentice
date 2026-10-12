@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: src:.
+      # GitHub's Ubuntu 24.04 runners commonly block Chromium's user-namespace sandbox; CI is a throwaway VM, production keeps it on.
+      OA_CHROMIUM_NO_SANDBOX: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - name: Python dependencies
+        run: uv sync --frozen
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Node dependencies
+        run: npm ci
+      - name: Chromium for the engine
+        run: npx playwright install --with-deps chromium
+
+      - name: Lint and import boundaries
+        run: |
+          uv run ruff check src tests scripts
+          uv run black --check src tests scripts
+          uv run lint-imports
+          npm run lint
+
+      - name: Build the web app
+        run: npm run build:web
+
+      - name: Engine tests (real Konva and Fabric in Chromium)
+        run: npm test
+
+      - name: Python tests, including engine-backed integration tests
+        run: OA_ENGINE_TESTS=1 uv run pytest -q tests
+
+      - name: Browser tests
+        run: npm run test:e2e
