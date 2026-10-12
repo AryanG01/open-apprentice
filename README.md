@@ -29,7 +29,7 @@ interface says so. A live meter shows tokens, calls and estimated dollars, and t
 
 **Nemotron replay (free, always available when the tape is installed).** `docs/replay/nemotron_tape.json` holds the raw output of one real Nemotron session (recorded 2026-10-12: 3 calls, 32k tokens, about $0.09).
 Choosing "Nemotron replay" runs the same teaching loop with that recorded output, against the live engine and verifier, with the model off and no cost. It is labelled REPLAY everywhere. It answers only requests identical to the recorded
-ones, so it covers the default badge position and the same teaching answers (anything else is refused, never improvised). It does not show a model repair: in the recorded run the model's procedure survived the silent tool change.
+ones, so it covers the default badge position (anything else is refused, never improvised; a different teaching answer still matches when it leads to a byte-identical model prompt, and the recorded procedure is then checked live against the rule you taught). It does not show a model repair: in the recorded run the model's procedure survived the silent tool change.
 
 | Tab | What it is | Source of what you see |
 |---|---|---|

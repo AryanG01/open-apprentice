@@ -191,6 +191,15 @@ export function TryIt() {
       void refreshModel();
     });
 
+  useEffect(() => {
+    if (!live?.concept) return;
+    try {
+      window.sessionStorage.setItem("oa.session", live.id);  // the SVG lane applies the rule from the latest sealed session
+    } catch {
+      /* storage unavailable: the lane will ask the visitor to teach a rule */
+    }
+  }, [live?.id, live?.concept]);
+
   if (ready === "checking") return <main className="page"><p role="status">Checking the live backend…</p></main>;
   if (ready === "no") {
     return (
@@ -203,15 +212,6 @@ export function TryIt() {
       </main>
     );
   }
-
-  useEffect(() => {
-    if (!live?.concept) return;
-    try {
-      window.sessionStorage.setItem("oa.session", live.id);  // the SVG lane applies the rule from the latest sealed session
-    } catch {
-      /* storage unavailable: the lane will ask the visitor to teach a rule */
-    }
-  }, [live?.id, live?.concept]);
 
   const q = live?.question;
   const concept = live?.concept;
@@ -240,7 +240,7 @@ export function TryIt() {
             Nemotron replay (recorded, free)
           </label>
           {replayInfo?.available ? (
-            <span className="muted small">REPLAY of a real Nemotron run recorded {replayInfo.recorded_at}. No model is called now; it only covers the default badge position and the answers given in the recording. The engine and verifier still run live.</span>
+            <span className="muted small">REPLAY of a real Nemotron run recorded {replayInfo.recorded_at}. No model is called now; it only answers requests identical to the recorded ones (default badge position; a different answer can still match if the model would have seen the same prompt). The engine and verifier still run live.</span>
           ) : null}
           {!modelInfo?.available ? (
             <span className="muted small">Not enabled on this server{modelInfo?.error ? `: ${modelInfo.error}` : " (start it with DEMO_MODEL_ENABLED=1 and a Nebius key)"}.</span>
