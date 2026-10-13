@@ -46,9 +46,9 @@ PROTO = {"id": "proto", "x": F(0), "y": F(0), "w": F(20), "h": F(20)}
 
 RULE_GRAMMAR_HELP = (
     "Write the rule as a few lines of text. Examples:\n"
-    "  let m = min(24, max(8, 0.08 * objects[0].w))\n"
-    "  clone objects[1] as badge at (objects[0].x + objects[0].w - m - objects[1].w, objects[0].y + m)\n"
-    "  for o in objects with i { move o to (80 + i * 40, 120) }\n"
+    "  let a = objects[0].w / 2\n"
+    "  clone objects[1] as badge at (objects[0].x + a, objects[0].y + 5)\n"
+    "  for o in objects with i { move o to (30 + i * 50, 200) }\n"
     "Operators: + - * / ( ), comparisons, and/or/not, min(...), max(...), len(objects); fields x y w h; "
     "multiply and divide by constants only; numbers are integers or exact decimals."
 )
@@ -157,7 +157,7 @@ class AskingEnv:
                 "kind": self.kind,
                 "before": _pub(d["scene"]),
                 "after": _pub(d["after"]),
-                "note": "'after' lists the objects the hidden rule created or moved, with their new geometry.",
+                "note": "'after' gives the geometry of every object once the hidden rule has been applied (new objects included).",
             },
             "tools": {
                 "ask": "Show me the true outcome on a new input. badge: {card_widths: [w]}; spacing: {card_widths: [w1, w2, ...]} (2 to 5 cards). Widths 24 to 512. At most "

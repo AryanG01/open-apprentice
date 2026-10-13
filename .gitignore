@@ -48,3 +48,10 @@ benchmarks/final/**/*.secret.json
 
 # private evaluator manifests must never be committed (CLAUDE.md)
 benchmarks/final/
+
+# self-contained Python 3.13.x for the NeMo Gym project (needs >=3.13.14; downloaded, not committed)
+gym/.python/
+gym/.venv/
+gym/outputs/
+gym/results/
+gym/.ray/

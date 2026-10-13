@@ -1,0 +1,5 @@
+# the Open Apprentice package itself is imported from ../../src (see app.py); these are what its evaluation code needs
+z3-solver==4.13.4.0
+pydantic>=2.9
+httpx
+pyyaml

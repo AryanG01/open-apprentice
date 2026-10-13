@@ -1,0 +1,26 @@
+oa_calibrated_asking_resources_server:
+  resources_servers:
+    oa_calibrated_asking:
+      entrypoint: app.py
+      domain: agent
+      verified: false
+      description: Calibrated asking. One demonstration of a hidden layout rule; the agent may ask a teacher for the true outcome on new inputs, then commits a rule or abstains. Verified by exact evaluation on held-out scenes, no LLM judge; separate reward components.
+      value: Rewards asking only when the demonstration is genuinely ambiguous (computed by the environment) and penalises confident wrong commits
+oa_calibrated_asking_simple_agent:
+  responses_api_agents:
+    simple_agent:
+      entrypoint: app.py
+      resources_server:
+        type: resources_servers
+        name: oa_calibrated_asking_resources_server
+      model_server:
+        type: responses_api_models
+        name: policy_model
+      datasets:
+      - name: example
+        type: example
+        jsonl_fpath: resources_servers/oa_calibrated_asking/data/example.jsonl
+      - name: development
+        type: validation
+        jsonl_fpath: resources_servers/oa_calibrated_asking/data/development.jsonl
+        license: MIT

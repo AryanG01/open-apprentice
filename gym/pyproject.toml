@@ -1,0 +1,17 @@
+[project]
+name = "open-apprentice-gym"
+version = "0.1.0"
+description = "Open Apprentice as a NeMo Gym environment: calibrated asking, verified by real exact evaluation (no LLM judge)."
+requires-python = ">=3.13.14"  # nemo-gym 0.6.0 requires it; the main project stays on 3.12 (see ../pyproject.toml)
+dependencies = [
+  "nemo-gym==0.6.0",
+  "z3-solver==4.13.4.0",  # same exact build as the main project: deterministic rlimit counts
+  "pydantic>=2.9",
+  "httpx",
+  "pyyaml",
+]
+# The Open Apprentice package is imported from ../src (PYTHONPATH), not installed: the main project's requires-python (<3.14) excludes
+# the interpreter nemo-gym needs, and the code under evaluation/ only needs the dependencies listed above.
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
