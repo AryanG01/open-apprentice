@@ -30,5 +30,5 @@ Optional if time allows (cut first): **Real SVG** tab (experimental, no model): 
 - Calling the repair a model repair. In every live run so far Nemotron's own repair attempt failed the checks and a labelled scripted fixture was promoted (the page says which). Do not claim Nemotron repaired the tool unless a recorded run actually shows it.
 - Reference-mode runs described as "the model". Reference mode uses no model.
 - Showing `.env`, terminals with keys, or the Nebius console.
-- A claim that a live public demo exists. As of 2026-10-12 only a static preview is deployed (its "Try it live" and "Real SVG" tabs say they are unavailable there); record from the local server unless a verified backend URL exists.
+- Claims about the public demo beyond what was checked. A live backend runs on Cloud Run (https://open-apprentice-664860383135.us-central1.run.app, verified 2026-10-13): live Nemotron under an in-memory dollar cap that resets on cold start, then the labelled recording. The static Hugging Face Space is an older preview whose "Try it live" and "Real SVG" tabs say they are unavailable. Re-check the URL and the Nebius balance right before recording.
 - Phone or other-browser claims: only desktop Chromium was tested.

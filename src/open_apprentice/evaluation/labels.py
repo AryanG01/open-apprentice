@@ -1,0 +1,258 @@
+"""Label-placement task family for the redesign experiment (evaluator side).
+
+A scene is nodes (fixed rectangles) plus labels, each attached to one node. The hidden intent moves labels relative to
+their node. Three intents, all with exact rational arithmetic:
+
+  right        every label goes right of its node, centre-aligned vertically, with gap g
+  right_else_below   right if that fits inside the canvas and overlaps nothing else, otherwise below (centre-aligned)
+  notes_only   like `right`, but only labels with role "note"; role "warning" labels never move
+
+`intended_after` is the ORACLE: plain Python, deliberately not the rule evaluator, so a rule written in the language is
+judged against an implementation that shares no code with it. `rule_for` builds the same behaviour as a rule AST for
+tests and the symbolic-free reference; it is never shown to a learner. Everything here is evaluator code: agent-visible
+modules must not import it.
+"""
+
+from __future__ import annotations
+
+import random
+from fractions import Fraction as F
+from typing import Any
+
+CANVAS = {"w": F(1200), "h": F(800)}
+INTENTS = ("right", "right_else_below", "notes_only")
+CELL_W, CELL_H = F(190), F(170)
+COLS, ROWS = 5, 4
+
+
+def _box(o: dict) -> tuple[F, F, F, F]:
+    return F(o["x"]), F(o["y"]), F(o["w"]), F(o["h"])
+
+
+def overlaps(a: tuple, b: tuple) -> bool:
+    """Strict positive-area overlap; edge contact is not overlap."""
+    ax, ay, aw, ah = a
+    bx, by, bw, bh = b
+    return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
+
+
+def inside(box: tuple, canvas: dict = CANVAS) -> bool:
+    x, y, w, h = box
+    return x >= 0 and y >= 0 and x + w <= canvas["w"] and y + h <= canvas["h"]
+
+
+def pose(side: str, anchor: dict, label: dict, gap: F) -> tuple[F, F]:
+    xa, ya, wa, ha = _box(anchor)
+    wl, hl = F(label["w"]), F(label["h"])
+    if side == "right":
+        return xa + wa + gap, ya + (ha - hl) / 2
+    if side == "below":
+        return xa + (wa - wl) / 2, ya + ha + gap
+    raise ValueError(side)
+
+
+def intended_after(intent: str, gap: F, scene: dict) -> dict[str, tuple[F, F]]:
+    """Oracle: final (x, y) of every label the intent moves. Labels not in the result must stay where they are."""
+    objs = scene["objects"]
+    byid = {o["id"]: o for o in objs}
+    out: dict[str, tuple[F, F]] = {}
+    for lab in objs:
+        if lab["kind"] != "label":
+            continue
+        if intent == "notes_only" and lab["role"] != "note":
+            continue
+        anchor = byid[lab["attached"]]
+        rx, ry = pose("right", anchor, lab, gap)
+        if intent in ("right", "notes_only"):
+            out[lab["id"]] = (rx, ry)
+            continue
+        box = (rx, ry, F(lab["w"]), F(lab["h"]))
+        blocked = not inside(box) or any(
+            overlaps(box, _box(o)) for o in objs if o["id"] not in (lab["id"], anchor["id"])
+        )
+        out[lab["id"]] = pose("below", anchor, lab, gap) if blocked else (rx, ry)
+    return out
+
+
+def _n(f: F) -> Any:
+    return int(f) if f.denominator == 1 else {"rat": f"{f.numerator}/{f.denominator}"}
+
+
+def _op(name: str, *args: Any) -> dict:
+    return {"op": name, "args": list(args)}
+
+
+def _get(o: Any, field: str) -> dict:
+    return _op("get", o, field)
+
+
+def rule_for(intent: str, gap: F) -> list:
+    """The intent written in the rule language. Test/reference use only; not shown to any learner."""
+    g = _n(gap)
+    o = {"ref": "locals.o"}
+    a = {"ref": "locals.a"}
+
+    def local(name: str) -> dict:
+        return {"ref": f"locals.{name}"}
+
+    right_x = _op("add", _op("add", _get(a, "x"), _get(a, "w")), g)
+    right_y = _op("add", _get(a, "y"), _op("div", _op("sub", _get(a, "h"), _get(o, "h")), 2))
+    below_x = _op("add", _get(a, "x"), _op("div", _op("sub", _get(a, "w"), _get(o, "w")), 2))
+    below_y = _op("add", _op("add", _get(a, "y"), _get(a, "h")), g)
+
+    def move(x: Any, y: Any) -> dict:
+        return {"op": "emit_target", "kind": "move_existing", "target": o, "x": x, "y": y}
+
+    is_label = _op("eq", _get(o, "kind"), "label")
+    anchor = {"op": "let", "name": "a", "value": _op("by_id", _get(o, "attached"))}
+    if intent == "right":
+        body = [anchor, move(right_x, right_y)]
+        return [
+            {
+                "op": "for_each",
+                "over": {"ref": "objects"},
+                "var": "o",
+                "body": [{"op": "if", "cond": is_label, "then": body}],
+            }
+        ]
+    if intent == "notes_only":
+        cond = _op("and", is_label, _op("eq", _get(o, "role"), "note"))
+        return [
+            {
+                "op": "for_each",
+                "over": {"ref": "objects"},
+                "var": "o",
+                "body": [{"op": "if", "cond": cond, "then": [anchor, move(right_x, right_y)]}],
+            }
+        ]
+    # right_else_below: scan every other object for overlap with the right-hand pose
+    hit_one = _op(
+        "and",
+        _op("ne", _get(local("p"), "id"), _get(o, "id")),
+        _op("ne", _get(local("p"), "id"), _get(a, "id")),
+        _op("lt", local("rx"), _op("add", _get(local("p"), "x"), _get(local("p"), "w"))),
+        _op("lt", _get(local("p"), "x"), _op("add", local("rx"), _get(o, "w"))),
+        _op("lt", local("ry"), _op("add", _get(local("p"), "y"), _get(local("p"), "h"))),
+        _op("lt", _get(local("p"), "y"), _op("add", local("ry"), _get(o, "h"))),
+    )
+    off_canvas = _op(
+        "or",
+        _op("lt", local("rx"), 0),
+        _op("lt", local("ry"), 0),
+        _op("gt", _op("add", local("rx"), _get(o, "w")), {"ref": "canvas.w"}),
+        _op("gt", _op("add", local("ry"), _get(o, "h")), {"ref": "canvas.h"}),
+    )
+    body = [
+        anchor,
+        {"op": "let", "name": "rx", "value": right_x},
+        {"op": "let", "name": "ry", "value": right_y},
+        {"op": "let", "name": "blocked", "value": off_canvas},
+        {
+            "op": "for_each",
+            "over": {"ref": "objects"},
+            "var": "p",
+            "body": [
+                {"op": "let", "name": "blocked", "value": _op("or", local("blocked"), hit_one)}
+            ],
+        },
+        {
+            "op": "if",
+            "cond": local("blocked"),
+            "then": [move(below_x, below_y)],
+            "else": [move(local("rx"), local("ry"))],
+        },
+    ]
+    return [
+        {
+            "op": "for_each",
+            "over": {"ref": "objects"},
+            "var": "o",
+            "body": [{"op": "if", "cond": is_label, "then": body}],
+        }
+    ]
+
+
+def make_scene(seed: int, n_nodes: int, warnings: int = 0, crowd: bool = True) -> dict:
+    """A document: nodes on a jittered grid (denser rows make the right-hand pose collide), one label per node."""
+    rng = random.Random(seed)
+    cells = [(c, r) for c in range(COLS) for r in range(ROWS)]
+    rng.shuffle(cells)
+    objs: list[dict] = []
+    for i, (c, r) in enumerate(cells[:n_nodes]):
+        w, h = rng.choice((70, 90, 100, 110)), rng.choice((40, 50, 60))
+        jx, jy = rng.randrange(0, 20), rng.randrange(0, 30)
+        x = 30 + c * (CELL_W if crowd else CELL_W + 40) + jx
+        y = 30 + r * CELL_H + jy
+        objs.append(
+            {
+                "id": f"n{i}",
+                "kind": "node",
+                "role": "",
+                "attached": "",
+                "x": int(x),
+                "y": int(y),
+                "w": w,
+                "h": h,
+            }
+        )
+    warn_ids = set(rng.sample(range(n_nodes), min(warnings, n_nodes)))
+    for i in range(n_nodes):
+        n = objs[i]
+        w, h = rng.choice((56, 80, 110)), rng.choice((16, 20))
+        objs.append(
+            {
+                "id": f"l{i}",
+                "kind": "label",
+                "role": "warning" if i in warn_ids else "note",
+                "attached": n["id"],
+                "x": n["x"],
+                "y": n["y"] + n["h"] + 4,
+                "w": w,
+                "h": h,
+            }
+        )
+    return {"objects": objs, "canvas": {"w": 1200, "h": 800}}
+
+
+def apply_oracle(scene: dict, targets: dict[str, tuple[F, F]]) -> dict:
+    new = [dict(o) for o in scene["objects"]]
+    for o in new:
+        if o["id"] in targets:
+            o["x"], o["y"] = targets[o["id"]]
+    return {"objects": new, "canvas": scene["canvas"]}
+
+
+def check_after(
+    before: dict, after: dict, expected: dict[str, tuple[F, F]], tol: F = F(1, 2)
+) -> dict:
+    """Independent outcome checks on final geometry. Axes are reported separately, never merged.
+
+    intent: every label the intent moves is within `tol` of its oracle position.
+    preservation: nothing else changed (position, size, kind, role, attachment, count) and moved labels kept their size.
+    layout: moved labels stay inside the canvas and create no overlap with any other object.
+    """
+    b = {o["id"]: o for o in before["objects"]}
+    a = {o["id"]: o for o in after["objects"]}
+    problems: dict[str, list[str]] = {"intent": [], "preservation": [], "layout": []}
+    if set(b) != set(a):
+        problems["preservation"].append("object set changed")
+        return {k: not v for k, v in problems.items()} | {"problems": problems}
+    for i, o in a.items():
+        ob = b[i]
+        static = ("kind", "role", "attached", "w", "h")
+        if any(o[k] != ob[k] for k in static):
+            problems["preservation"].append(f"{i}: non-position field changed")
+        if i in expected:
+            ex, ey = expected[i]
+            if abs(F(o["x"]) - ex) > tol or abs(F(o["y"]) - ey) > tol:
+                problems["intent"].append(f"{i}: at ({o['x']},{o['y']}), expected ({ex},{ey})")
+        elif (o["x"], o["y"]) != (ob["x"], ob["y"]):
+            problems["preservation"].append(f"{i}: moved but the intent leaves it alone")
+    for i in expected:
+        box = _box(a[i])
+        if not inside(box):
+            problems["layout"].append(f"{i}: leaves the canvas")
+        for j, other in a.items():
+            if j not in (i, a[i]["attached"]) and overlaps(box, _box(other)):
+                problems["layout"].append(f"{i}: overlaps {j}")
+    return {k: not v for k, v in problems.items()} | {"problems": problems}

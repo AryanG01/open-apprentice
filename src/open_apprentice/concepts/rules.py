@@ -10,7 +10,10 @@ Output : {key: {x,y,w,h}} for every selected object (unemitted properties keep t
 
 Statements: let | if | for_each(over objects) | emit_target.
 Expressions: int literal | {"rat":"a/b"} | {"ref":...} | {"op":..., "args":[...]}.
-Ops: add sub mul div min max lt le gt ge eq ne and or not get len.
+Ops: add sub mul div min max lt le gt ge eq ne and or not get len by_id.
+Objects may also carry `kind`, `role` and `attached` (id of the confirmed anchor); `get` reads them as strings,
+eq/ne compare two strings, `by_id` looks an object up by its id (so a label can read its anchor). The symbolic compiler
+reports all of these as Unsupported.
 The concrete evaluator accepts variable*variable (`mul`); the SYMBOLIC compiler rejects it as unsupported.
 """
 
@@ -21,8 +24,8 @@ from fractions import Fraction
 from typing import Any
 
 MAX_STATEMENTS = 64
-MAX_DEPTH = 4
-MAX_OBJECTS = 8
+MAX_DEPTH = 6  # was 4: a nested for_each (obstacle scan) inside for_each > if needs 5
+MAX_OBJECTS = 32  # was 8: label-placement documents hold up to 16 movable labels + their nodes
 MAX_EXPR_NODES = 500
 FIELDS = ("x", "y", "w", "h")
 BIN_ARITH = {"add", "sub", "mul", "div", "min", "max"}
@@ -77,9 +80,9 @@ def validate_rule(body: list) -> None:
                 raise RuleError(f"bad ref root {head!r}")
         elif "op" in e:
             op, args = e["op"], e.get("args", [])
-            if op not in BIN_ARITH | CMP | BOOL | {"get", "len"}:
+            if op not in BIN_ARITH | CMP | BOOL | {"get", "len", "by_id"}:
                 raise RuleError(f"unknown op {op!r}")
-            fixed = {"not": 1, "len": 1, "get": 2}
+            fixed = {"not": 1, "len": 1, "get": 2, "by_id": 1}
             fixed.update({o: 2 for o in (BIN_ARITH - {"min", "max"}) | CMP})
             if op in fixed and len(args) != fixed[op]:
                 raise RuleError(f"{op}: wrong arity")
@@ -159,17 +162,26 @@ class Obj:
     y: Fraction
     w: Fraction
     h: Fraction
+    kind: str = ""
+    role: str = ""
+    attached: str = ""
 
     def get(self, f: str) -> Any:
-        if f == "id":
-            return self.id
+        if f in ("id", "kind", "role", "attached"):
+            return getattr(self, f)
         if f in FIELDS:
             return getattr(self, f)
         raise RuleError(f"no field {f!r}")
 
 
 def to_obj(d: dict) -> Obj:
-    return Obj(d["id"], *(Fraction(d[k]) for k in FIELDS))
+    return Obj(
+        d["id"],
+        *(Fraction(d[k]) for k in FIELDS),
+        kind=d.get("kind", ""),
+        role=d.get("role", ""),
+        attached=d.get("attached", ""),
+    )
 
 
 def _num(v: Any) -> Fraction:
@@ -229,6 +241,12 @@ class _Run:
             if not isinstance(v, list):
                 raise RuleError("len needs the objects list")
             return Fraction(len(v))
+        if op == "by_id":
+            ident = self.ev(a[0])
+            for o in self.objects:
+                if o.id == ident:
+                    return o
+            raise RuleError(f"no object with id {ident!r}")
         if op == "get":
             o, f = self.ev(a[0]), a[1]
             if not isinstance(o, Obj) or not isinstance(f, str):
@@ -241,8 +259,10 @@ class _Run:
             return all(vals) if op == "and" else any(vals)
         x, y = self.ev(a[0]), self.ev(a[1])
         if op in CMP:
+            if op in ("eq", "ne") and isinstance(x, str) and isinstance(y, str):
+                return (x == y) if op == "eq" else (x != y)
             if op in ("eq", "ne") and not (isinstance(x, Fraction) and isinstance(y, Fraction)):
-                raise RuleError("eq/ne compare numbers")
+                raise RuleError("eq/ne compare two numbers or two strings")
             x, y = _num(x), _num(y)
             return {
                 "lt": x < y,
