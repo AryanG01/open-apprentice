@@ -35,6 +35,7 @@ Vite (apps/web), a Node/Playwright engine service driving real Konva/Fabric in a
   docs/decisions.md for the Vector-Bench asset-exclusion list enforced for the v1.3 SVG lane.
 
 # Gotchas
+- **Run the Python tests on 3.12, not only the host's 3.13.** The project and the Docker image target 3.12. A `Fraction` `+` format spec worked on 3.13 and crashed on 3.12: it hid a production HTTP 500 until GitHub CI (3.12) failed. Local check: `UV_PROJECT_ENVIRONMENT=$TMPDIR/venv312 uv sync --frozen --python 3.12`, then `OA_ENGINE_TESTS=1 PYTHONPATH=src:. $TMPDIR/venv312/bin/python -m pytest -q tests`.
 - This sandbox denies writes to any path literally named `.git` — `git init`/`git add -A` of a
   fresh `.git` dir must be run by the user directly (`! git init`), not by the agent.
 - Host Node is 25.6.0 (not an LTS line); containers pin `node:22-slim` to match spec §3.4 — don't
