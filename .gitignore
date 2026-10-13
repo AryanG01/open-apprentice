@@ -55,3 +55,6 @@ gym/.venv/
 gym/outputs/
 gym/results/
 gym/.ray/
+gym/env.yaml
+gym/resources_servers/*/data/*_metrics.json
+gym/resources_servers/*/data/*_prepare.jsonl

@@ -1,4 +1,5 @@
-# the Open Apprentice package itself is imported from ../../src (see app.py); these are what its evaluation code needs
+# the Open Apprentice package itself is imported from ../../src (see app.py); these are what the server and its evaluation code need
+nemo-gym==0.6.0
 z3-solver==4.13.4.0
 pydantic>=2.9
 httpx

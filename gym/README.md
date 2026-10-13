@@ -37,6 +37,27 @@ PYTHONPATH=../src .venv/bin/python -m pytest resources_servers/oa_calibrated_ask
 The Open Apprentice package is imported from `../src` (see `app.py`), not installed: the main project's `requires-python` (<3.14) would exclude
 the interpreter nemo-gym needs, and the evaluation code only needs `z3-solver==4.13.4.0`, `pydantic`, `httpx` and `pyyaml`.
 
+## Running rollouts
+
+```bash
+# 1) serial pre-build of each server's environment (the default parallel installs stalled; placeholders are fine, nothing is called)
+PATH="$PWD/.python/python/bin:$PATH" PYTHONPATH=../src .venv/bin/gym env prefetch --resources-server oa_calibrated_asking --search-dir . \
+  --model-type vllm_model --agent-type simple_agent ++policy_base_url=http://127.0.0.1:9/v1 ++policy_api_key=x ++policy_model_name=x
+# 2) collect rollouts (end-to-end serve: use --split, not -i); results are matched to tasks by _ng_task_index (they come back out of order)
+PATH="$PWD/.python/python/bin:$PATH" PYTHONPATH=../src .venv/bin/gym eval run --resources-server oa_calibrated_asking --search-dir . \
+  --model-type vllm_model --agent-type simple_agent --split validation --limit 8 --concurrency 2 --output results/run/rollouts.jsonl
+```
+
+Use **`vllm_model`**, not `openai_model`: `openai_model` calls the upstream *Responses* API, while Nebius Token Factory (like most OpenAI-compatible servers)
+serves *chat completions*; `vllm_model` converts Gym's Responses calls into chat-completions calls. Credentials come from `gym/env.yaml` (`policy_base_url`,
+`policy_api_key`, `policy_model_name`), which is git-ignored and mode 600; never pass the key on the command line (it would appear in the process list and in `gym/outputs/`).
+
+## Pipeline verified at zero cost
+A scripted stub (an OpenAI-compatible endpoint that asks once, commits a fixed rule, then says "done") was run through the whole Gym path on 4 tasks:
+4 of 4 rollouts completed, 0 failures, each response carried the 3 tools, and the aggregate profiled every component separately
+(`mean/correct`, `mean/asking`, ...). It asked once on every task, so `asking` was 1.0 on the two ambiguous tasks and 0.0 on the two unambiguous ones, as it should be.
+This proves the plumbing, not any model.
+
 ## Notes
 - `gym env init` and `gym list` crash on Python 3.14.8 (see above); `REVERIFY_MODE` is `UNSUPPORTED` because the episode state lives in server memory.
 - The `abstention` environment that ships in nemo-gym 0.6.0 rewards saying "I don't know" on LLM-judged factual QA. This one differs by rewarding a targeted
