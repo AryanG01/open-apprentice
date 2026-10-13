@@ -66,7 +66,9 @@ def _margin_exprs(rnd: int) -> Iterator[tuple[int, str, Any]]:
         for r in RATIOS:
             for c in SIGNED_POOL:
                 if c:
-                    yield 3, f"{r}*w{c:+}", _op("add", _op("mul", W, _lit(r)), _lit(c))
+                    # explicit sign: Fraction's "+" format spec only exists on Python 3.13+, and the project (and its Docker image) target 3.12
+                    sign = "+" if c > 0 else "-"
+                    yield 3, f"{r}*w{sign}{abs(c)}", _op("add", _op("mul", W, _lit(r)), _lit(c))
 
 
 def _badge_rule(corner: str, margin: Any) -> list:
