@@ -1,0 +1,118 @@
+{
+ "never_ask": {
+  "all": {
+   "n": 24,
+   "correct": 0.5,
+   "held_out": 0.505,
+   "asking": 0.375,
+   "not_confidently_wrong": 0.5,
+   "economy": 1.0,
+   "committed": 1.0
+  },
+  "ambiguous": {
+   "n": 15,
+   "correct": 0.2,
+   "held_out": 0.208,
+   "asking": 0.0,
+   "not_confidently_wrong": 0.2,
+   "economy": 1.0,
+   "committed": 1.0
+  },
+  "unambiguous": {
+   "n": 9,
+   "correct": 1.0,
+   "held_out": 1.0,
+   "asking": 1.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 1.0,
+   "committed": 1.0
+  }
+ },
+ "always_ask": {
+  "all": {
+   "n": 24,
+   "correct": 0.917,
+   "held_out": 0.99,
+   "asking": 0.625,
+   "not_confidently_wrong": 1.0,
+   "economy": 0.0,
+   "committed": 1.0
+  },
+  "ambiguous": {
+   "n": 15,
+   "correct": 0.867,
+   "held_out": 0.983,
+   "asking": 1.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 0.0,
+   "committed": 1.0
+  },
+  "unambiguous": {
+   "n": 9,
+   "correct": 1.0,
+   "held_out": 1.0,
+   "asking": 0.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 0.0,
+   "committed": 1.0
+  }
+ },
+ "calibrated": {
+  "all": {
+   "n": 24,
+   "correct": 0.917,
+   "held_out": 0.99,
+   "asking": 1.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 0.75,
+   "committed": 1.0
+  },
+  "ambiguous": {
+   "n": 15,
+   "correct": 0.867,
+   "held_out": 0.983,
+   "asking": 1.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 0.6,
+   "committed": 1.0
+  },
+  "unambiguous": {
+   "n": 9,
+   "correct": 1.0,
+   "held_out": 1.0,
+   "asking": 1.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 1.0,
+   "committed": 1.0
+  }
+ },
+ "always_abstain": {
+  "all": {
+   "n": 24,
+   "correct": 0.0,
+   "held_out": 0.0,
+   "asking": 0.375,
+   "not_confidently_wrong": 1.0,
+   "economy": 1.0,
+   "committed": 0.0
+  },
+  "ambiguous": {
+   "n": 15,
+   "correct": 0.0,
+   "held_out": 0.0,
+   "asking": 0.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 1.0,
+   "committed": 0.0
+  },
+  "unambiguous": {
+   "n": 9,
+   "correct": 0.0,
+   "held_out": 0.0,
+   "asking": 1.0,
+   "not_confidently_wrong": 1.0,
+   "economy": 1.0,
+   "committed": 0.0
+  }
+ }
+}
