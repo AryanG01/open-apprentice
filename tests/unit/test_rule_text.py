@@ -154,3 +154,61 @@ def test_demonstration_ids_resolve_by_position_so_the_rule_stays_positional():
     # a let/loop variable shadows an alias
     b = parse_rule_text("let card0 = 5\nmove objects[0] to (card0, 0)", ali)
     assert b[1]["x"] == {"ref": "locals.card0"}
+
+
+def test_label_rules_parse_strings_text_fields_and_object_lookup():
+    from open_apprentice.concepts.rule_text import parse_rule_text
+    from open_apprentice.concepts.rules import evaluate_rule, validate_rule
+
+    src = (
+        'for o in objects {\n  if o.kind == "label" and o.role != "warning" {\n'
+        "    let a = object(o.attached)\n    move o to (a.x + a.w + 12, a.y)\n  }\n}"
+    )
+    rule = parse_rule_text(src)
+    validate_rule(rule)
+    scene = [
+        {
+            "id": "n",
+            "kind": "node",
+            "role": "",
+            "attached": "",
+            "x": 10,
+            "y": 20,
+            "w": 100,
+            "h": 40,
+        },
+        {
+            "id": "l",
+            "kind": "label",
+            "role": "note",
+            "attached": "n",
+            "x": 0,
+            "y": 0,
+            "w": 30,
+            "h": 10,
+        },
+        {
+            "id": "m",
+            "kind": "label",
+            "role": "warning",
+            "attached": "n",
+            "x": 5,
+            "y": 5,
+            "w": 30,
+            "h": 10,
+        },
+    ]
+    out = evaluate_rule(rule, scene, {"w": 500, "h": 500})
+    assert (out["l"]["x"], out["l"]["y"]) == (122, 20) and (out["m"]["x"], out["m"]["y"]) == (5, 5)
+
+
+def test_the_symbolic_compiler_reports_text_fields_as_unsupported_not_as_a_crash():
+    import pytest
+
+    from open_apprentice.concepts.rule_text import parse_rule_text
+    from open_apprentice.concepts.symbolic import Unsupported, compile_rule, make_inputs
+
+    rule = parse_rule_text('for o in objects { if o.kind == "label" { move o to (0, 0) } }')
+    o, cv, _ = make_inputs(2)
+    with pytest.raises(Unsupported):
+        compile_rule(rule, o, cv)

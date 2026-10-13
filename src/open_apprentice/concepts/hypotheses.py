@@ -256,6 +256,7 @@ async def generate_candidates(
     max_tokens: int = 6000,
     correction_turn: bool = True,
     alternatives_to: Optional[list[Candidate]] = None,
+    prompt: pathlib.Path = PROMPT,
 ) -> GenerationReport:  # reasoning model: hidden tokens share this budget
     rep = GenerationReport(rnd)
     user: dict[str, Any] = {
@@ -271,7 +272,7 @@ async def generate_candidates(
             "all the evidence exactly but would place things differently on OTHER inputs (for example by depending on sizes "
             "differently, or by measuring differently). Do not repeat the rules above."
         )
-    msgs = [Message("system", PROMPT.read_text()), Message("user", json.dumps(user))]
+    msgs = [Message("system", prompt.read_text()), Message("user", json.dumps(user))]
     seen: set[str] = {c.hash for c in (alternatives_to or [])}
     aliases = (
         {o["id"]: i for i, o in enumerate(constraints[0].scene["objects"])} if constraints else {}

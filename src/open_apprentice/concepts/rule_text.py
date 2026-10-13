@@ -11,6 +11,8 @@ be fed back to the model.
   if objects[0].w > 150 { ... } else { ... }
   resize objects[0] to (w, h)        # also: clone ... size (w, h)
 
+Strings: "label" (double quotes); text fields .id .kind .role .attached compare with == / !=.
+object(EXPR) is the object whose id equals EXPR, e.g.  let a = object(o.attached)  then  a.x, a.w ...
 Numbers: integers and exact decimals (0.08 = 2/25). Operators: + - * / ( ) unary -, < <= > >= == !=, and or not,
 min(...) max(...), len(objects). Fields: x y w h. canvas.w / canvas.h. Multiply/divide by constants only (checked later).
 """
@@ -25,6 +27,7 @@ from open_apprentice.concepts.rules import RuleError
 
 _TOKEN = re.compile(
     r"""[ \t\r]*(?:
+    (?P<str>"[^"\n]*")|
     (?P<num>\d+\.\d+|\d+)|
     (?P<op><=|>=|==|!=|[-+*/(),.\[\]{}<>=;])|
     (?P<name>[A-Za-z_][A-Za-z_0-9]*)|
@@ -52,6 +55,7 @@ KEYWORDS = {
     "not",
 }
 FIELDS = {"x", "y", "w", "h"}
+TEXT_FIELDS = {"id", "kind", "role", "attached"}  # strings: compare with == / !=
 MAX_CHARS = 4000
 
 
@@ -268,6 +272,15 @@ class _Parser:
             return {"ref": f"locals.{n}"}
         raise self.err("expected an object: objects[K] or a loop variable")
 
+    def field_of(self, o: Any) -> Any:
+        if not self.accept("."):
+            return o
+        if self.cur.text not in FIELDS | TEXT_FIELDS:
+            raise self.err("a field must be one of x, y, w, h, id, kind, role, attached")
+        f = self.cur.text
+        self.i += 1
+        return {"op": "get", "args": [o, f]}
+
     def expr(self) -> Any:
         return self.p_or()
 
@@ -324,6 +337,14 @@ class _Parser:
         if c.kind == "num":
             self.i += 1
             return _dec(c.text)
+        if c.kind == "str":
+            self.i += 1
+            return c.text[1:-1]
+        if c.text == "object" and self.t[self.i + 1].text == "(":
+            self.i += 2
+            o = {"op": "by_id", "args": [self.expr()]}
+            self.expect(")")
+            return self.field_of(o)
         if c.text == "(":
             self.i += 1
             e = self.expr()
@@ -362,13 +383,7 @@ class _Parser:
                     raise self.err(f"unknown name {n!r}; define it with let or a for loop first")
                 else:
                     o = {"ref": f"locals.{n}"}
-            if self.accept("."):
-                if self.cur.text not in FIELDS:
-                    raise self.err("a field must be one of x, y, w, h")
-                f = self.cur.text
-                self.i += 1
-                return {"op": "get", "args": [o, f]}
-            return o
+            return self.field_of(o)
         raise self.err("expected a number, name, objects[K].field, canvas.w/h, min/max(...) or '('")
 
 

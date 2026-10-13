@@ -110,90 +110,87 @@ def _get(o: Any, field: str) -> dict:
     return _op("get", o, field)
 
 
-def rule_for(intent: str, gap: F) -> list:
-    """The intent written in the rule language. Test/reference use only; not shown to any learner."""
-    g = _n(gap)
+def rule_for_spec(spec: Spec) -> list:
+    """Any catalogue behaviour written in the rule language. Test/reference use only; never shown to a learner."""
+    g = _n(spec.gap)
     o = {"ref": "locals.o"}
     a = {"ref": "locals.a"}
 
     def local(name: str) -> dict:
         return {"ref": f"locals.{name}"}
 
-    right_x = _op("add", _op("add", _get(a, "x"), _get(a, "w")), g)
-    right_y = _op("add", _get(a, "y"), _op("div", _op("sub", _get(a, "h"), _get(o, "h")), 2))
-    below_x = _op("add", _get(a, "x"), _op("div", _op("sub", _get(a, "w"), _get(o, "w")), 2))
-    below_y = _op("add", _op("add", _get(a, "y"), _get(a, "h")), g)
+    def pose_xy(side: str) -> tuple[Any, Any]:
+        if side == "right":
+            return (
+                _op("add", _op("add", _get(a, "x"), _get(a, "w")), g),
+                _op("add", _get(a, "y"), _op("div", _op("sub", _get(a, "h"), _get(o, "h")), 2)),
+            )
+        return (
+            _op("add", _get(a, "x"), _op("div", _op("sub", _get(a, "w"), _get(o, "w")), 2)),
+            _op("add", _op("add", _get(a, "y"), _get(a, "h")), g),
+        )
 
     def move(x: Any, y: Any) -> dict:
         return {"op": "emit_target", "kind": "move_existing", "target": o, "x": x, "y": y}
 
-    is_label = _op("eq", _get(o, "kind"), "label")
-    anchor = {"op": "let", "name": "a", "value": _op("by_id", _get(o, "attached"))}
-    if intent == "right":
-        body = [anchor, move(right_x, right_y)]
-        return [
+    cond = _op("eq", _get(o, "kind"), "label")
+    if spec.scope == "notes":
+        cond = _op("and", cond, _op("eq", _get(o, "role"), "note"))
+    body: list[Any] = [{"op": "let", "name": "a", "value": _op("by_id", _get(o, "attached"))}]
+    px, py = pose_xy(spec.primary)
+    if spec.fallback is None:
+        body.append(move(px, py))
+    else:
+        fx, fy = pose_xy(spec.fallback)
+        p = local("p")
+        hit_one = _op(
+            "and",
+            _op("ne", _get(p, "id"), _get(o, "id")),
+            _op("ne", _get(p, "id"), _get(a, "id")),
+            _op("lt", local("px"), _op("add", _get(p, "x"), _get(p, "w"))),
+            _op("lt", _get(p, "x"), _op("add", local("px"), _get(o, "w"))),
+            _op("lt", local("py"), _op("add", _get(p, "y"), _get(p, "h"))),
+            _op("lt", _get(p, "y"), _op("add", local("py"), _get(o, "h"))),
+        )
+        off_canvas = _op(
+            "or",
+            _op("lt", local("px"), 0),
+            _op("lt", local("py"), 0),
+            _op("gt", _op("add", local("px"), _get(o, "w")), {"ref": "canvas.w"}),
+            _op("gt", _op("add", local("py"), _get(o, "h")), {"ref": "canvas.h"}),
+        )
+        body += [
+            {"op": "let", "name": "px", "value": px},
+            {"op": "let", "name": "py", "value": py},
+            {"op": "let", "name": "blocked", "value": off_canvas},
             {
                 "op": "for_each",
                 "over": {"ref": "objects"},
-                "var": "o",
-                "body": [{"op": "if", "cond": is_label, "then": body}],
-            }
-        ]
-    if intent == "notes_only":
-        cond = _op("and", is_label, _op("eq", _get(o, "role"), "note"))
-        return [
+                "var": "p",
+                "body": [
+                    {"op": "let", "name": "blocked", "value": _op("or", local("blocked"), hit_one)}
+                ],
+            },
             {
-                "op": "for_each",
-                "over": {"ref": "objects"},
-                "var": "o",
-                "body": [{"op": "if", "cond": cond, "then": [anchor, move(right_x, right_y)]}],
-            }
+                "op": "if",
+                "cond": local("blocked"),
+                "then": [move(fx, fy)],
+                "else": [move(local("px"), local("py"))],
+            },
         ]
-    # right_else_below: scan every other object for overlap with the right-hand pose
-    hit_one = _op(
-        "and",
-        _op("ne", _get(local("p"), "id"), _get(o, "id")),
-        _op("ne", _get(local("p"), "id"), _get(a, "id")),
-        _op("lt", local("rx"), _op("add", _get(local("p"), "x"), _get(local("p"), "w"))),
-        _op("lt", _get(local("p"), "x"), _op("add", local("rx"), _get(o, "w"))),
-        _op("lt", local("ry"), _op("add", _get(local("p"), "y"), _get(local("p"), "h"))),
-        _op("lt", _get(local("p"), "y"), _op("add", local("ry"), _get(o, "h"))),
-    )
-    off_canvas = _op(
-        "or",
-        _op("lt", local("rx"), 0),
-        _op("lt", local("ry"), 0),
-        _op("gt", _op("add", local("rx"), _get(o, "w")), {"ref": "canvas.w"}),
-        _op("gt", _op("add", local("ry"), _get(o, "h")), {"ref": "canvas.h"}),
-    )
-    body = [
-        anchor,
-        {"op": "let", "name": "rx", "value": right_x},
-        {"op": "let", "name": "ry", "value": right_y},
-        {"op": "let", "name": "blocked", "value": off_canvas},
-        {
-            "op": "for_each",
-            "over": {"ref": "objects"},
-            "var": "p",
-            "body": [
-                {"op": "let", "name": "blocked", "value": _op("or", local("blocked"), hit_one)}
-            ],
-        },
-        {
-            "op": "if",
-            "cond": local("blocked"),
-            "then": [move(below_x, below_y)],
-            "else": [move(local("rx"), local("ry"))],
-        },
-    ]
     return [
         {
             "op": "for_each",
             "over": {"ref": "objects"},
             "var": "o",
-            "body": [{"op": "if", "cond": is_label, "then": body}],
+            "body": [{"op": "if", "cond": cond, "then": body}],
         }
     ]
+
+
+def rule_for(intent: str, gap: F) -> list:
+    s = NAMED[intent]
+    return rule_for_spec(Spec(s.primary, s.fallback, s.scope, gap))
 
 
 def make_scene(seed: int, n_nodes: int, warnings: int = 0, crowd: bool = True) -> dict:

@@ -118,6 +118,10 @@ class _Sym:
         op, a = e["op"], e.get("args", [])
         if op == "len":
             return Fraction(len(self.ev(a[0])))
+        if op == "by_id":
+            raise Unsupported("lookup by id is outside the symbolic subset")
+        if op == "get" and a[1] in ("kind", "role", "attached"):
+            raise Unsupported("text fields (kind/role/attached) are outside the symbolic subset")
         if op == "get":
             o, f = self.ev(a[0]), a[1]
             if not isinstance(o, SymObj):

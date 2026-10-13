@@ -165,3 +165,18 @@ def test_checker_reports_axes_separately_and_catches_each_failure():
 def test_edge_contact_is_not_overlap():
     assert not overlaps((0, 0, 10, 10), (10, 0, 5, 5))
     assert overlaps((0, 0, 10, 10), (9, 0, 5, 5))
+
+
+def test_every_catalogue_behaviour_written_in_the_rule_language_matches_the_oracle():
+    from open_apprentice.evaluation.label_episodes import CATALOGUE
+    from open_apprentice.evaluation.labels import oracle, rule_for_spec
+
+    for spec in CATALOGUE:
+        rule = rule_for_spec(spec)
+        for seed in range(6):
+            scene = make_scene(seed + 40, 4 + seed, warnings=seed % 3)
+            state = evaluate_rule(rule, scene["objects"], scene["canvas"])
+            want = oracle(spec, scene)
+            for o in scene["objects"]:
+                got = (state[o["id"]]["x"], state[o["id"]]["y"])
+                assert got == want.get(o["id"], (o["x"], o["y"])), (spec, seed, o["id"])
