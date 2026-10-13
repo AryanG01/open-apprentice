@@ -1,0 +1,9 @@
+# Build the single-container demo (API + web + Node/Playwright engine) in Google Cloud Build and push it to Artifact Registry.
+# Usage (from the repo root):  gcloud builds submit --config deploy/cloudbuild.yaml --project <project> --region us-central1 .
+# The uploaded source follows .gitignore (no .env, no local virtualenvs).
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "docker/demo.Dockerfile", "-t", "us-central1-docker.pkg.dev/$PROJECT_ID/oa/demo:latest", "."]
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/oa/demo:latest
+timeout: 3000s
