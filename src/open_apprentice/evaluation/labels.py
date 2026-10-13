@@ -17,8 +17,10 @@ from __future__ import annotations
 
 import random
 from fractions import Fraction as F
+from dataclasses import dataclass
 from typing import Any
 
+GAP_DEFAULT = F(12)
 CANVAS = {"w": F(1200), "h": F(800)}
 INTENTS = ("right", "right_else_below", "notes_only")
 CELL_W, CELL_H = F(190), F(170)
@@ -51,27 +53,49 @@ def pose(side: str, anchor: dict, label: dict, gap: F) -> tuple[F, F]:
     raise ValueError(side)
 
 
-def intended_after(intent: str, gap: F, scene: dict) -> dict[str, tuple[F, F]]:
-    """Oracle: final (x, y) of every label the intent moves. Labels not in the result must stay where they are."""
+@dataclass(frozen=True)
+class Spec:
+    """A placement behaviour: try `primary`; if blocked (off canvas or overlapping another object) use `fallback`
+    (None = place there regardless); only labels in `scope` move ("all" or "notes")."""
+
+    primary: str = "right"
+    fallback: str | None = None
+    scope: str = "all"
+    gap: F = F(12)
+
+
+NAMED = {
+    "right": Spec("right", None, "all"),
+    "right_else_below": Spec("right", "below", "all"),
+    "notes_only": Spec("right", None, "notes"),
+}
+
+
+def _blocked(box: tuple, lab: dict, anchor: dict, objs: list[dict]) -> bool:
+    return not inside(box) or any(
+        overlaps(box, _box(o)) for o in objs if o["id"] not in (lab["id"], anchor["id"])
+    )
+
+
+def oracle(spec: Spec, scene: dict) -> dict[str, tuple[F, F]]:
+    """Final (x, y) of every label the behaviour moves. Labels not in the result must stay where they are."""
     objs = scene["objects"]
     byid = {o["id"]: o for o in objs}
     out: dict[str, tuple[F, F]] = {}
     for lab in objs:
-        if lab["kind"] != "label":
-            continue
-        if intent == "notes_only" and lab["role"] != "note":
+        if lab["kind"] != "label" or (spec.scope == "notes" and lab["role"] != "note"):
             continue
         anchor = byid[lab["attached"]]
-        rx, ry = pose("right", anchor, lab, gap)
-        if intent in ("right", "notes_only"):
-            out[lab["id"]] = (rx, ry)
-            continue
-        box = (rx, ry, F(lab["w"]), F(lab["h"]))
-        blocked = not inside(box) or any(
-            overlaps(box, _box(o)) for o in objs if o["id"] not in (lab["id"], anchor["id"])
-        )
-        out[lab["id"]] = pose("below", anchor, lab, gap) if blocked else (rx, ry)
+        px, py = pose(spec.primary, anchor, lab, spec.gap)
+        if spec.fallback and _blocked((px, py, F(lab["w"]), F(lab["h"])), lab, anchor, objs):
+            px, py = pose(spec.fallback, anchor, lab, spec.gap)
+        out[lab["id"]] = (px, py)
     return out
+
+
+def intended_after(intent: str, gap: F, scene: dict) -> dict[str, tuple[F, F]]:
+    s = NAMED[intent]
+    return oracle(Spec(s.primary, s.fallback, s.scope, gap), scene)
 
 
 def _n(f: F) -> Any:
@@ -222,6 +246,18 @@ def apply_oracle(scene: dict, targets: dict[str, tuple[F, F]]) -> dict:
     return {"objects": new, "canvas": scene["canvas"]}
 
 
+def _layout_violations(objs: dict[str, dict], moved: Any) -> list[str]:
+    out = []
+    for i in moved:
+        box = _box(objs[i])
+        if not inside(box):
+            out.append(f"{i}: leaves the canvas")
+        for j, other in objs.items():
+            if j not in (i, objs[i]["attached"]) and overlaps(box, _box(other)):
+                out.append(f"{i}: overlaps {j}")
+    return out
+
+
 def check_after(
     before: dict, after: dict, expected: dict[str, tuple[F, F]], tol: F = F(1, 2)
 ) -> dict:
@@ -229,7 +265,8 @@ def check_after(
 
     intent: every label the intent moves is within `tol` of its oracle position.
     preservation: nothing else changed (position, size, kind, role, attachment, count) and moved labels kept their size.
-    layout: moved labels stay inside the canvas and create no overlap with any other object.
+    layout: moved labels stay inside the canvas and overlap nothing, EXCEPT problems the intended behaviour itself has
+    (a behaviour that can only fit a label by overlapping is not blamed on the executor).
     """
     b = {o["id"]: o for o in before["objects"]}
     a = {o["id"]: o for o in after["objects"]}
@@ -248,11 +285,8 @@ def check_after(
                 problems["intent"].append(f"{i}: at ({o['x']},{o['y']}), expected ({ex},{ey})")
         elif (o["x"], o["y"]) != (ob["x"], ob["y"]):
             problems["preservation"].append(f"{i}: moved but the intent leaves it alone")
-    for i in expected:
-        box = _box(a[i])
-        if not inside(box):
-            problems["layout"].append(f"{i}: leaves the canvas")
-        for j, other in a.items():
-            if j not in (i, a[i]["attached"]) and overlaps(box, _box(other)):
-                problems["layout"].append(f"{i}: overlaps {j}")
+    wanted = {o["id"]: o for o in apply_oracle(before, expected)["objects"]}
+    problems["layout"] = [
+        v for v in _layout_violations(a, expected) if v not in _layout_violations(wanted, expected)
+    ]
     return {k: not v for k, v in problems.items()} | {"problems": problems}

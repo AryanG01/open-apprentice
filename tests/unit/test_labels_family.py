@@ -142,8 +142,24 @@ def test_checker_reports_axes_separately_and_catches_each_failure():
         "h": 60,
     }
     s2 = _scene([blocker])
+    # the intended behaviour itself overlaps the blocker: that is not blamed on the executor
     r2 = check_after(s2, apply_oracle(s2, want), want)
-    assert r2["intent"] and not r2["layout"]
+    assert r2["intent"] and r2["layout"]
+    # an executor that lands somewhere else AND on the blocker is blamed on both axes
+    other = {
+        "id": "c",
+        "kind": "node",
+        "role": "",
+        "attached": "",
+        "x": 400,
+        "y": 300,
+        "w": 80,
+        "h": 60,
+    }
+    s3 = _scene([blocker, other])
+    landed = apply_oracle(s3, {"l0": (410, 310)})
+    r3 = check_after(s3, landed, want)
+    assert not r3["intent"] and not r3["layout"]
 
 
 def test_edge_contact_is_not_overlap():
