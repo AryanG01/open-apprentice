@@ -1,0 +1,24 @@
+# What gcloud builds submit must NOT upload. The Dockerfile copies only what it needs; everything else stays out.
+.git
+.env
+.env.*
+!.env.example
+gym/
+node_modules/
+**/node_modules/
+.venv/
+**/.venv/
+dist/
+apps/web/dist/
+results/
+benchmarks/final/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+tests/
+.uv-cache/
+.hypothesis/
+.claude/
+.github/
