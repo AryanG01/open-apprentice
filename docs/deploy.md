@@ -15,7 +15,7 @@ docker run --rm -p 8000:8000 --env-file .env -e DEMO_MODEL_ENABLED=1 -e DEMO_MOD
 Open `http://<host>:8000`. Health: `/health/ready` reports engine and model availability and spend (never keys).
 
 ### Safety defaults
-- Model mode is **off** unless `DEMO_MODEL_ENABLED=1`; a global cap `DEMO_MODEL_MAX_USD` (default 1.5) refuses new model sessions instead of degrading silently.
+- **Public configuration: live Nemotron on Nebius Token Factory** (`DEMO_MODEL_ENABLED=1`, the hackathon requires running on Token Factory with an NVIDIA open model). The model path is **off** unless `DEMO_MODEL_ENABLED=1`; a global cap `DEMO_MODEL_MAX_USD` (default 1.5) refuses new model sessions instead of degrading silently, and the UI then offers the labelled recording. Measured cost: about $0.085 per full story (5 calls, 36k tokens), so $1.5 is about 17 stories; top up Nebius credit before judging and keep the cap at what you are willing to lose. The Nebius key goes in the host's secret store (Cloud Run: Secret Manager), never in the image or the repo.
 - Per-client limits: 60 free and 60 replay sessions/hour, 3 live model sessions/hour. Per-session ceiling 120k tokens / 24 calls (a measured full session used 32k tokens / 3 calls).
 - Security headers (CSP same-origin, no framing, no sniffing). No cookies, no accounts, no uploads except a user-chosen JSON file that is only parsed.
 - The engine child runs with a minimal environment (no API keys); the evaluator token is random per process and never leaves the server.

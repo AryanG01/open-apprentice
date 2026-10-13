@@ -21,11 +21,12 @@ uv run uvicorn open_apprentice.api.app:app --port 8000
 
 Open <http://localhost:8000>. No account, no API key and no model call is needed for the interactive demo.
 
-**Optional: let NVIDIA Nemotron drive it.** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
-`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=1.5 uv run uvicorn open_apprentice.api.app:app --port 8000`. In *Try it live*, choose "NVIDIA Nemotron". It is
-**off by default** so a public instance can never spend money by accident. Nemotron then proposes candidate rules (unioned with a bounded symbolic search so a rule the model omits can still be found; the teacher alone decides), writes the native
-procedure for each backend and writes the repair. Every output is checked on the real engine before it is accepted; if it fails, a scripted fixture is used instead and the
-interface says so. A live meter shows tokens, calls and estimated dollars, and the server refuses model sessions once the cap is reached.
+**Live NVIDIA Nemotron on Nebius Token Factory (the intended public configuration).** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
+`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=1.5 uv run uvicorn open_apprentice.api.app:app --port 8000`. *Try it live* then defaults to **Nemotron-3-Ultra called live through Nebius Token Factory**: it proposes candidate rules
+(unioned with a bounded symbolic search so a rule the model omits can still be found; the teacher alone decides), writes the native procedure for each backend and attempts the repair. Every output is checked on the real engine before it is accepted;
+if a model procedure or repair fails, a scripted fixture is used instead and the interface says so (in a real run Nemotron's own repair attempt failed the checks and a labelled fixture repair was promoted). A live meter shows tokens, calls and estimated dollars.
+Measured: one full session (teach, Konva, Fabric, tool change, repair, stress test) is about 5 model calls, 36k tokens and **$0.085** (89 s). Safety: model mode is **off unless `DEMO_MODEL_ENABLED=1`**, a global dollar cap refuses new sessions
+(never silently downgrades), each session is capped at 120k tokens and 24 calls, and each visitor gets 3 live sessions per hour. When the budget is used up the page offers the recorded run, clearly labelled as a recording.
 
 **One-click story.** In *Try it live*, "Watch the story" teaches a badge, reuses the rule on Konva and Fabric, applies the silent tool change, repairs, and stress-tests it in about 20 seconds with the free reference learner; every caption is built from what the server returned. "Watch it with recorded Nemotron" does the same with the replay below (no model call, and no repair, because the recorded procedure survived the tool change).
 
