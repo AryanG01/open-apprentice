@@ -165,6 +165,7 @@ async def main(a: argparse.Namespace) -> None:
         )
     )
     rows = []
+    streak = 0
     provider: Provider | None = None
     guard = None
     try:
@@ -200,6 +201,10 @@ async def main(a: argparse.Namespace) -> None:
                 print(
                     f"{ep.id:<30} {s:<10} {row['outcome']:<20} q={row.get('questions','-')} ${row['usd']:.3f}  run=${row['run_usd_after']:.3f}"
                 )
+                streak = streak + 1 if row["outcome"] == "error" else 0
+                if streak >= 2:
+                    print("STOPPED: two consecutive provider errors; nothing further was spent")
+                    raise SystemExit(3)
                 if guard and guard.stopped_reason:
                     print(f"STOPPED: {guard.stopped_reason}")
                     raise SystemExit(2)

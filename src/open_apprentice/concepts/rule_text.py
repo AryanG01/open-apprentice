@@ -11,7 +11,7 @@ be fed back to the model.
   if objects[0].w > 150 { ... } else { ... }
   resize objects[0] to (w, h)        # also: clone ... size (w, h)
 
-Strings: "label" (double quotes); text fields .id .kind .role .attached compare with == / !=.
+Strings: "label" (single quotes are accepted too); text fields .id .kind .role .attached compare with == / !=.
 object(EXPR) is the object whose id equals EXPR, e.g.  let a = object(o.attached)  then  a.x, a.w ...
 Numbers: integers and exact decimals (0.08 = 2/25). Operators: + - * / ( ) unary -, < <= > >= == !=, and or not,
 min(...) max(...), len(objects). Fields: x y w h. canvas.w / canvas.h. Multiply/divide by constants only (checked later).
@@ -27,7 +27,7 @@ from open_apprentice.concepts.rules import RuleError
 
 _TOKEN = re.compile(
     r"""[ \t\r]*(?:
-    (?P<str>"[^"\n]*")|
+    (?P<str>"[^"\n]*"|'[^'\n]*')|
     (?P<num>\d+\.\d+|\d+)|
     (?P<op><=|>=|==|!=|[-+*/(),.\[\]{}<>=;])|
     (?P<name>[A-Za-z_][A-Za-z_0-9]*)|

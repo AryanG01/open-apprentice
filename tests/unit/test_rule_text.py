@@ -212,3 +212,11 @@ def test_the_symbolic_compiler_reports_text_fields_as_unsupported_not_as_a_crash
     o, cv, _ = make_inputs(2)
     with pytest.raises(Unsupported):
         compile_rule(rule, o, cv)
+
+
+def test_single_quoted_strings_parse_like_double_quoted():
+    from open_apprentice.concepts.rule_text import parse_rule_text
+
+    assert parse_rule_text(
+        "for o in objects { if o.kind == 'label' { move o to (0, 0) } }"
+    ) == parse_rule_text('for o in objects { if o.kind == "label" { move o to (0, 0) } }')

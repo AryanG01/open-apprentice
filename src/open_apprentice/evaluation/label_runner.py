@@ -31,11 +31,20 @@ def score_and_row(ep: LabelEpisode, res: Any) -> dict[str, Any]:
         "model_calls": res.model_calls,
         "asked_when_expected": (len(res.questions) > 0) == (ep.kind == "ambiguous"),
     }
+    failed = [r["error"] for r in res.rounds if r.get("error")]
+    if res.status != "committed" and failed and res.model_calls == 0:
+        row["outcome"] = (
+            "error"  # the model never answered: not an abstention and not evidence about the learner
+        )
+        row["error"] = failed[0]
+        return row
     if res.status == "committed" and res.rule is not None:
         score = score_commit(ep, res.rule)
         row["axes"] = score["per_scene"]
         row["outcome"] = "correct_commit" if score["complete"] else "wrong_commit"
         row["rule_hash"] = res.rule_hash
+        row["rule"] = res.rule
+        row["summary"] = res.summary
         row["scope"] = res.scope
     else:
         row["outcome"] = "appropriate_abstain" if ep.expected == "abstain" else "abstained"

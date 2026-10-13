@@ -60,3 +60,15 @@ async def test_a_proposer_that_returns_only_wrong_but_fitting_rules_is_caught_by
     # the truth was never proposed: the loop must not commit a rule that the teacher's answer contradicts
     assert row["outcome"] != "correct_commit"
     assert row["status"] == "abstained" or row["outcome"] == "wrong_commit"
+
+
+async def test_a_model_that_never_answers_is_an_error_not_an_abstention():
+    from open_apprentice.providers.base import ProviderError
+
+    class Down(MockProvider):
+        async def _call(self, messages, *, max_tokens, ctx):
+            raise ProviderError("transport failure: ProxyError")
+
+    ep = build_manifest("development")[0]
+    row = await run_episode(Down({}), Ledger(Limits(tokens=10**7, calls=1000)), ep)
+    assert row["outcome"] == "error" and "ProxyError" in row["error"]
