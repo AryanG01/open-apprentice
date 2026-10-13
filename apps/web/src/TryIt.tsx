@@ -100,6 +100,7 @@ export function TryIt() {
   const [modelInfo, setModelInfo] = useState<ReadyInfo["model"] | null>(null);
   const [replayInfo, setReplayInfo] = useState<ReadyInfo["replay"] | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [budgetOut, setBudgetOut] = useState(false);
   const [story, setStory] = useState<{ steps: string[]; done: boolean } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   // Leaving the tab cancels whatever is in flight, so a story or a paid model call does not keep running unseen.
@@ -112,6 +113,8 @@ export function TryIt() {
         setReason(r.engine_error ?? "The graphics engine is not running on the server.");
         setModelInfo(r.model);
         setReplayInfo(r.replay);
+        // The point of the demo is Nemotron on Nebius Token Factory: use it by default whenever the server can afford a session.
+        if (r.model.available && r.model.can_start) setLearner((cur) => (cur === "reference" ? "nemotron" : cur));
       })
       .catch((e: Error) => {
         setReady("no");
@@ -132,10 +135,12 @@ export function TryIt() {
     abortRef.current = ctl;
     setBusy(true);
     setError(null);
+    setBudgetOut(false);
     try {
       await fn(ctl.signal);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
+      setBudgetOut(e instanceof ApiError && e.status === 402);
     } finally {
       abortRef.current = null;
       setBusy(false);
@@ -202,7 +207,7 @@ export function TryIt() {
     });
 
   /** One click through the whole story with the real API; every caption is built from what the server returned. */
-  const playStory = (kind: "reference" | "replay") =>
+  const playStory = (kind: "nemotron" | "reference" | "replay") =>
     guarded(async (signal) => {
       const steps: string[] = [];
       const say = async (text: string, pauseMs = 1600) => {
@@ -212,9 +217,10 @@ export function TryIt() {
       };
       setLearner(kind);
       setRun(null); setRepair(null); setStress(null); setReplay(null); setPicked(null); setBackend("konva"); setToolChange(false);
-      await say(`Teaching by example: one badge, 12 px in from the card's top-right corner (${kind === "replay" ? "recorded Nemotron session, no model is called now" : "reference learner, no model"}).`, 900);
+      await say(`Teaching by example: one badge, 12 px in from the card's top-right corner (${kind === "replay" ? "recorded Nemotron session, no model is called now" : kind === "nemotron" ? "live NVIDIA Nemotron on Nebius Token Factory, billed to the demo's capped budget" : "reference learner, no model"}).`, 900);
       let st = await api<LiveState>("/api/teach", "POST", { mode: kind, demonstration: kind === "replay" ? undefined : { width: CARD_W, height: CARD_H, inset_right: 12, inset_top: 12 } }, signal);
       setLive(st);
+      if (kind === "nemotron" && st.pool) await say(`Nemotron proposed ${st.pool.from_model} candidate rule${st.pool.from_model === 1 ? "" : "s"}; a bounded symbolic search added ${st.pool.from_search}. The teacher's answers, not either source, decide.`, 900);
       for (let i = 0; st.question && i < 6; i += 1) {
         await say(i === 0 ? `Several rules fit that one example, so it found an input where they disagree and asks which picture you meant. The story picks option ${st.question.options[0].id}; in your own session you choose.` : `Still more than one rule fits, so it asks again with a new input. The story picks option ${st.question.options[0].id}.`);
         st = await api<LiveState>(`/api/teach/${st.id}/answer`, "POST", { query_id: st.question.query_id, answer: st.question.options[0].id, candidate_set_hash: st.question.candidate_set_hash }, signal);
@@ -238,7 +244,10 @@ export function TryIt() {
         await say(`The tool changes silently underneath. The rule did not change, but Fabric's result is now off: ${verdict(r)}. Only the native procedure is at fault.`);
         const rep = await api<LiveRepair>(`/api/teach/${st.id}/repair`, "POST", undefined, signal);
         setRun(null); setRepair(rep);
-        await say(`Repair ${rep.status}. ${rep.rule_unchanged ? "The rule and its sealed hash are byte-identical; only the native procedure changed." : "The rule hash changed, so this promotion would have been refused."}`);
+        const promoted = rep.attempts.find((a) => a.failed_stage === null)?.source;
+        const modelTried = rep.attempts.some((a) => a.source === "model");
+        const who = promoted === "model" ? "Nemotron's repair passed every check." : promoted === "fixture" ? (modelTried ? "Nemotron's own repair attempt failed the checks, so a labelled scripted fixture repair was promoted instead." : "A scripted fixture repair passed the checks.") : "";
+        await say(`Repair ${rep.status}. ${who} ${rep.rule_unchanged ? "The rule and its sealed hash are byte-identical; only the native procedure changed." : "The rule hash changed, so this promotion would have been refused."}`);
         r = await runIt("fabric", true);
         setRepair(rep);
         await say(`Re-run after the repair: ${verdict(r)}.`);
@@ -288,10 +297,11 @@ export function TryIt() {
         <fieldset className="runbox">
           <legend>New here? Watch the whole story</legend>
           <div className="controls">
-            <button className="primary" onClick={() => playStory("reference")} disabled={busy}>Watch the story (about 20 s)</button>
+            {modelInfo?.available && modelInfo.can_start ? <button className="primary" onClick={() => playStory("nemotron")} disabled={busy}>Watch the story with live Nemotron</button> : null}
+            <button className={modelInfo?.available && modelInfo.can_start ? "" : "primary"} onClick={() => playStory("reference")} disabled={busy}>Watch the story with the free reference learner</button>
             {replayInfo?.available ? <button onClick={() => playStory("replay")} disabled={busy}>Watch it with recorded Nemotron</button> : null}
           </div>
-          <span className="muted small">Teach, reuse on Konva and Fabric, silent tool change, repair, stress test, all on the real engines. The recorded Nemotron version has no model call and no repair.</span>
+          <span className="muted small">Teach, reuse on Konva and Fabric, silent tool change, repair, stress test, all on the real engines. Live Nemotron calls NVIDIA Nemotron on Nebius Token Factory (about 90 s, about $0.10 of the demo's capped budget); the reference learner uses no model (about 20 s); the recorded version makes no model call now and has no repair.</span>
         </fieldset>
         <fieldset className="runbox">
           <legend>Who proposes the rules?</legend>
@@ -301,7 +311,7 @@ export function TryIt() {
           </label>
           <label className="check">
             <input type="radio" name="learner" checked={learner === "nemotron"} onChange={() => setLearner("nemotron")} disabled={busy || !modelInfo?.available} />
-            NVIDIA Nemotron (live, metered){!modelInfo?.available ? <span className="muted small"> not enabled on this server</span> : null}
+            NVIDIA Nemotron live on Nebius Token Factory{!modelInfo?.available ? <span className="muted small"> not enabled on this server</span> : !modelInfo.can_start ? <span className="muted small"> demo budget used up for now</span> : null}
           </label>
           <label className="check">
             <input type="radio" name="learner" checked={learner === "replay"} onChange={() => setLearner("replay")} disabled={busy || !replayInfo?.available} />
@@ -365,6 +375,11 @@ export function TryIt() {
         <p className="eyebrow" role="status" aria-live="polite">Live · {busy ? "working…" : live ? live.state.replace(/_/g, " ").toLowerCase() : "not started"}</p>
         <h2>{!live ? "Teach it by placing the badge" : concept ? "The rule is sealed. Now use it." : live.state === "UNRESOLVED" ? "No rule it knows fits that placement" : "Which result did you mean?"}</h2>
         {error ? <p className="callout bad" role="alert">{error}</p> : null}
+        {budgetOut && replayInfo?.available ? (
+          <p className="callout" role="note">
+            The demo's live-model budget is used up for now. <button onClick={() => playStory("replay")} disabled={busy}>Watch the recorded Nemotron run instead</button> (clearly labelled as a recording).
+          </p>
+        ) : null}
         {story ? (
           <section className={story.done ? "callout ok" : "callout"} aria-label="Story">
             <strong>{story.done ? "Done." : "Playing the story…"}</strong>

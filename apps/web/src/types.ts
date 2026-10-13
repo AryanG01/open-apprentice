@@ -254,7 +254,7 @@ export interface Meter {
 export interface ReadyInfo {
   engine: boolean;
   engine_error: string | null;
-  model: { available: boolean; id: string; spend_usd: number; cap_usd: number; error: string | null };
+  model: { available: boolean; can_start: boolean; id: string; spend_usd: number; cap_usd: number; error: string | null };
   replay: { available: boolean; recorded_at: string | null; id: string };
 }
 

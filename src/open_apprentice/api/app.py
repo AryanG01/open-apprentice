@@ -102,7 +102,7 @@ def live() -> dict[str, str]:
 @app.get("/health/ready")
 def ready() -> dict:
     """Readiness: can this server actually run the interactive demo?"""
-    from open_apprentice.api.teach import _cap_usd
+    from open_apprentice.api.teach import RESERVE_USD, _cap_usd
 
     p = app.state.provider
     engine_ok, engine_error = app.state.engine is not None, app.state.engine_error
@@ -126,6 +126,8 @@ def ready() -> dict:
         },
         "model": {
             "available": p is not None,
+            # would a NEW live model session be admitted right now (cap headroom for its worst case)?
+            "can_start": p is not None and app.state.spend["usd"] + RESERVE_USD <= _cap_usd(),
             "id": getattr(p, "requested_model", "") if p else "",
             "spend_usd": round(app.state.spend["usd"], 4),
             "cap_usd": _cap_usd(),

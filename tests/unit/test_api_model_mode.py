@@ -176,3 +176,15 @@ def test_a_running_session_is_not_refused_for_lack_of_a_whole_new_sessions_reser
         },
     )
     assert r.status_code == 200, r.text
+
+
+def test_ready_says_whether_a_new_live_session_would_be_admitted(client, monkeypatch):
+    from open_apprentice.api.app import app
+
+    app.state.provider = MockProvider({"hypotheses": [_cands()]})
+    monkeypatch.setenv("DEMO_MODEL_MAX_USD", "1.5")
+    app.state.spend["usd"] = 0.0
+    assert client.get("/health/ready").json()["model"]["can_start"] is True
+    app.state.spend["usd"] = 1.2  # within the cap, but no room for a whole new session's worst case
+    ready = client.get("/health/ready").json()["model"]
+    assert ready["available"] is True and ready["can_start"] is False
