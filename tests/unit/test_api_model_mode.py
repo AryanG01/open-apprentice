@@ -149,3 +149,30 @@ def test_a_full_store_evicts_a_free_session_before_a_paid_one(client, monkeypatc
     free = client.post("/api/teach").json()["id"]
     client.post("/api/teach")  # store is full: something must go
     assert paid in app.state.live and free not in app.state.live
+
+
+def test_a_running_session_is_not_refused_for_lack_of_a_whole_new_sessions_reserve(
+    client, monkeypatch
+):
+    """The reserve is for STARTING a session. Mid-session actions only need the session's remaining headroom, or a
+    small cap would refuse a session that has barely spent anything (seen with DEMO_MODEL_MAX_USD=0.5).
+    """
+    from open_apprentice.api.app import app
+
+    app.state.provider = Priced({"hypotheses": [_cands()]})
+    monkeypatch.setenv("DEMO_MODEL_MAX_USD", "0.5")
+    st = client.post("/api/teach", json={"mode": "nemotron"}).json()
+    assert st["state"] == "AWAITING_USER"
+    app.state.spend["usd"] = (
+        0.05  # what a real session had spent when the 402 was seen: far below the cap
+    )
+    q = st["question"]
+    r = client.post(
+        f"/api/teach/{st['id']}/answer",
+        json={
+            "query_id": q["query_id"],
+            "answer": q["options"][0]["id"],
+            "candidate_set_hash": q["candidate_set_hash"],
+        },
+    )
+    assert r.status_code == 200, r.text

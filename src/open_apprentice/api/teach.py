@@ -77,6 +77,9 @@ CONSERVATIVE_USD_PER_MILLION = 4.0  # for calls with no reported cost and held r
 # A model session is refused unless the cap can absorb its worst case: every token of its limit at the conservative rate.
 # ponytail: checked per request, not reserved atomically; concurrent first requests can overshoot by about one session.
 RESERVE_USD = SESSION_TOKEN_LIMIT * CONSERVATIVE_USD_PER_MILLION / 1e6
+ONE_CALL_RESERVE_USD = (
+    40_000 * CONSERVATIVE_USD_PER_MILLION / 1e6
+)  # one model call at the 32k completion floor, plus its prompt
 
 
 def _label(mode: str, model_id: str = "", replay: bool = False) -> dict:
@@ -276,7 +279,11 @@ def _require_model_budget(request: Request, live: Optional[Live] = None) -> None
     if live is not None and live.replay:
         return
     sp = _spend(request)
-    if sp["usd"] + RESERVE_USD > _cap_usd():
+    # STARTING a session needs the whole worst-case reserve. A session already admitted is stopped only when one more
+    # call could cross the cap, otherwise a small cap would refuse a session that has barely spent anything. The cap is
+    # therefore enforced to within about one call; the per-session token limit bounds each session separately.
+    need = RESERVE_USD if live is None else ONE_CALL_RESERVE_USD
+    if sp["usd"] + need > _cap_usd():
         raise HTTPException(
             402,
             f"the model budget for this server is used up (${sp['usd']:.2f} of ${_cap_usd():.2f}); use the reference learner instead",
