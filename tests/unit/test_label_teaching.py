@@ -1,6 +1,8 @@
 """The label-placement teaching loop with a SCRIPTED proposer (MOCK, never model evidence). It exercises the loop's logic:
 filtering on all evidence, batch-first questions, commit/abstain, and the scoring - not any language model."""
 
+import json
+
 import pytest
 
 from open_apprentice.budget import Ledger, Limits
@@ -72,3 +74,33 @@ async def test_a_model_that_never_answers_is_an_error_not_an_abstention():
     ep = build_manifest("development")[0]
     row = await run_episode(Down({}), Ledger(Limits(tokens=10**7, calls=1000)), ep)
     assert row["outcome"] == "error" and "ProxyError" in row["error"]
+
+
+async def test_survivors_that_agree_on_the_batch_trigger_a_contrastive_round_and_a_dead_end_feeds_back_the_contradiction():
+    ep = next(e for e in build_manifest("development") if e.kind == "ambiguous")
+    from open_apprentice.evaluation.label_episodes import behaviour_class
+
+    classes = consistent_classes(ep.demos)
+    truth_cls = behaviour_class(ep.truth)
+    wrong = [v[0] for k, v in classes.items() if k != truth_cls][:1]
+    calls = []
+
+    def reply(messages):
+        user = json.loads(messages[-1].content)
+        calls.append(user)
+        specs = wrong if len(calls) == 1 else [ep.truth]
+        return {
+            "candidates": [{"summary": f"c{len(calls)}", "rule": rule_for_spec(s)} for s in specs]
+        }
+
+    row = await run_episode(
+        MockProvider({}, functions={"hypotheses": reply}),
+        Ledger(Limits(tokens=10**7, calls=1000)),
+        ep,
+    )
+    assert (
+        len(calls) >= 2 and "already_fitting_rules" in calls[1]
+    )  # lone/agreeing survivors -> contrastive round
+    assert (
+        row["outcome"] == "correct_commit"
+    )  # the contrastive round supplied the truth, the batch question then chose it

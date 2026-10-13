@@ -18,7 +18,13 @@ from open_apprentice.concepts.label_teaching import TeachingResult, to_state
 from open_apprentice.concepts.rule_text import parse_rule_text
 from open_apprentice.concepts.rules import RuleError, validate_rule
 from open_apprentice.concepts.schemas import sha
-from open_apprentice.providers.base import CallContext, Message, Provider, ProviderError
+from open_apprentice.providers.base import (
+    CallContext,
+    Message,
+    ModelFormatError,
+    Provider,
+    ProviderError,
+)
 
 PROMPT = pathlib.Path(__file__).resolve().parents[3] / "prompts" / "agent_labels.md"
 MAX_TURNS = 8
@@ -71,9 +77,18 @@ async def run_agent(
         except ProviderError as e:
             failures += 1
             res.rounds.append({"error": f"{type(e).__name__}: {str(e)[:160]}"})
-            if failures >= 2:
-                res.reason = "model failed twice in a row"
+            if failures >= 3:
+                res.reason = "model failed three times in a row"
                 return res
+            if isinstance(
+                e, ModelFormatError
+            ):  # same courtesy the main learner gets: tell it what was wrong
+                msgs.append(
+                    Message(
+                        "user",
+                        '{"error": "your reply was not a valid move; reply with ONE JSON object whose "action" is ask, commit or abstain"}',
+                    )
+                )
             continue
         failures = 0
         res.model_calls += 1 + comp.schema_corrections

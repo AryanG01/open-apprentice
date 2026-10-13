@@ -58,7 +58,10 @@ class CandidateOut(BaseModel):
         return (ast, None) if (ast is not None and text is None) else (None, text)
 
 
-class HypothesisSet(StrictModel):
+class HypothesisSet(BaseModel):
+    """Lenient at the top level: an extra key (a live model added "pattern") must not discard well-formed candidates."""
+
+    model_config = {"extra": "ignore"}
     candidates: list[CandidateOut]
 
 

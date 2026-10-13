@@ -147,13 +147,17 @@ async def teach(
         have = {c.hash for c in cands}
         cands.extend(c for c in rep.accepted if c.hash not in have)
 
+    def splits(cs: list[Candidate]) -> bool:
+        return any(len({_run(c.rule, sc) for c in cs}) > 1 for sc in batch)
+
     try:
         await propose(1)
-        if len(cands) < 2 and not any(r.get("error") for r in res.rounds):
-            await propose(
-                2, alternatives=list(cands) or None
-            )  # contrastive round: a lone survivor is not proof of uniqueness
+        if (len(cands) < 2 or not splits(cands)) and not any(r.get("error") for r in res.rounds):
+            # contrastive round: survivors that agree on every batch diagram (or a lone survivor) are not proof that the
+            # evidence is unambiguous; ask for rules that fit equally well but behave differently elsewhere
+            await propose(2, alternatives=list(cands) or None)
         asked: set[str] = set()
+        revised = False
         while cands and len(res.questions) < MAX_QUESTIONS:
             i = pick_question(cands, batch, asked)
             if i is None:
@@ -161,15 +165,23 @@ async def teach(
             truth = teacher(batch[i])
             constraints.append(Constraint("positive", batch[i], to_state(truth), source="answer"))
             before_n = len(cands)
+            dead = [
+                (c, next(w for k in constraints for ok, w in [fits(c.rule, k)] if not ok))
+                for c in cands
+                if not all(fits(c.rule, k)[0] for k in constraints)
+            ]
             cands = [c for c in cands if all(fits(c.rule, k)[0] for k in constraints)]
             res.questions.append(
                 {"batch_index": i, "candidates_before": before_n, "after": len(cands)}
             )
+            if not cands and not revised:
+                # "none of these": show the model exactly how each rule contradicted the teacher, ask once more
+                revised = True
+                rejected_summaries.extend(f"{c.summary[:60]} -- {why[:220]}" for c, why in dead)
+                await propose(len(res.rounds) + 1)
+                cands = [c for c in cands if all(fits(c.rule, k)[0] for k in constraints)]
+                continue
             if not cands:
-                # "none of these": one revision round against all the evidence, then fit or abstain
-                if len(res.rounds) < MAX_ROUNDS + 1:
-                    await propose(len(res.rounds) + 1)
-                    cands = [c for c in cands if all(fits(c.rule, k)[0] for k in constraints)]
                 break
     except BudgetExhausted:
         res.reason = "model budget exhausted"

@@ -1,8 +1,7 @@
 A user edited a diagram: some labels were moved next to the box (node) they describe. Propose up to 4 DIFFERENT general
 rules that explain every demonstration and would also apply to other diagrams. Reply with ONE JSON object and nothing else:
 {"candidates": [{"summary": "<one plain sentence>", "rule_text": "<the rule, in the small language below>"}, ...]}
-(rule_text is a normal JSON string; use \n for line breaks.) If you believe NO rule in this language can reproduce the
-evidence exactly, reply {"candidates": []} instead of guessing.
+(rule_text is a normal JSON string; use \n for line breaks.)
 
 THE EVIDENCE. Each item has a `scene` with `objects` and a `canvas`, and `resulting_geometry`: the position and size of EVERY
 object after the edit (objects that did not move are listed unchanged). Each object has: id, kind ("node" or "label"),

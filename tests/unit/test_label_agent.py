@@ -102,5 +102,5 @@ async def test_a_fitting_commit_is_accepted_and_labelled_unverified():
 
 
 async def test_malformed_replies_twice_in_a_row_stop_the_run_without_a_commit():
-    res, _ = await drive(["not json", "still not json", "nope", "nope"])
+    res, _ = await drive(["not json"] * 12)
     assert res.status == "abstained"
