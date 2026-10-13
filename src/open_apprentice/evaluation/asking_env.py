@@ -173,7 +173,10 @@ class AskingEnv:
         if self.finished:
             return {"ok": False, "error": "the episode is finished"}
         if self.asks_used >= MAX_ASKS:
-            return {"ok": False, "error": f"question limit reached ({MAX_ASKS})"}
+            return {
+                "ok": False,
+                "error": f"question limit reached ({MAX_ASKS}); do not ask again: call commit with your best rule, or call abstain",
+            }
         widths = args.get("card_widths")
         lo, hi = DOM.card_min, DOM.card_max
         if not isinstance(widths, list) or not all(

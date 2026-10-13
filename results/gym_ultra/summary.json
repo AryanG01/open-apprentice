@@ -1,0 +1,142 @@
+{
+ "tasks_completed": 13,
+ "tasks_planned": 24,
+ "est_cost_usd_configured_rates": 1.025,
+ "est_cost_usd_conservative_4_per_m": 3.025,
+ "tokens": {
+  "input": 621818,
+  "output": 134349
+ },
+ "table": {
+  "nemotron_3_ultra": {
+   "all": {
+    "n": 13,
+    "correct": 0.385,
+    "held_out": 0.465,
+    "asking": 0.769,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.282
+   },
+   "ambiguous": {
+    "n": 8,
+    "correct": 0.5,
+    "held_out": 0.609,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.208
+   },
+   "unambiguous": {
+    "n": 5,
+    "correct": 0.2,
+    "held_out": 0.233,
+    "asking": 0.4,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.4
+   }
+  },
+  "never_ask": {
+   "all": {
+    "n": 13,
+    "correct": 0.615,
+    "held_out": 0.615,
+    "asking": 0.385,
+    "not_confidently_wrong": 0.615,
+    "economy": 1.0
+   },
+   "ambiguous": {
+    "n": 8,
+    "correct": 0.375,
+    "held_out": 0.375,
+    "asking": 0.0,
+    "not_confidently_wrong": 0.375,
+    "economy": 1.0
+   },
+   "unambiguous": {
+    "n": 5,
+    "correct": 1.0,
+    "held_out": 1.0,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 1.0
+   }
+  },
+  "always_ask": {
+   "all": {
+    "n": 13,
+    "correct": 0.923,
+    "held_out": 0.99,
+    "asking": 0.615,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.0
+   },
+   "ambiguous": {
+    "n": 8,
+    "correct": 0.875,
+    "held_out": 0.984,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.0
+   },
+   "unambiguous": {
+    "n": 5,
+    "correct": 1.0,
+    "held_out": 1.0,
+    "asking": 0.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.0
+   }
+  },
+  "calibrated": {
+   "all": {
+    "n": 13,
+    "correct": 0.923,
+    "held_out": 0.99,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.718
+   },
+   "ambiguous": {
+    "n": 8,
+    "correct": 0.875,
+    "held_out": 0.984,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 0.542
+   },
+   "unambiguous": {
+    "n": 5,
+    "correct": 1.0,
+    "held_out": 1.0,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 1.0
+   }
+  },
+  "always_abstain": {
+   "all": {
+    "n": 13,
+    "correct": 0.0,
+    "held_out": 0.0,
+    "asking": 0.385,
+    "not_confidently_wrong": 1.0,
+    "economy": 1.0
+   },
+   "ambiguous": {
+    "n": 8,
+    "correct": 0.0,
+    "held_out": 0.0,
+    "asking": 0.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 1.0
+   },
+   "unambiguous": {
+    "n": 5,
+    "correct": 0.0,
+    "held_out": 0.0,
+    "asking": 1.0,
+    "not_confidently_wrong": 1.0,
+    "economy": 1.0
+   }
+  }
+ }
+}

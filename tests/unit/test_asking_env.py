@@ -37,6 +37,8 @@ def test_asking_returns_the_true_outcome_and_is_counted_and_capped(ambiguous_bad
         assert env.ask({"card_widths": [200]})["ok"]
     over = env.ask({"card_widths": [100]})
     assert not over["ok"] and "limit" in over["error"] and env.asks_used == MAX_ASKS
+    # a refusal must tell the agent what to do next: a live run showed an agent repeating a refused question 23 times
+    assert "commit" in over["error"] and "abstain" in over["error"]
 
 
 def test_out_of_domain_questions_are_refused_not_answered():
