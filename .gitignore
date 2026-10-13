@@ -58,3 +58,7 @@ gym/.ray/
 gym/env.yaml
 gym/resources_servers/*/data/*_metrics.json
 gym/resources_servers/*/data/*_prepare.jsonl
+
+# paid-run spend ledger (local; budget.json stays tracked)
+results/redesign/spend.jsonl
+results/redesign/*/

@@ -18,6 +18,30 @@ from open_apprentice.evaluation.label_episodes import LabelEpisode, agent_visibl
 from open_apprentice.providers.base import Provider
 
 
+def score_and_row(ep: LabelEpisode, res: Any) -> dict[str, Any]:
+    """Turn a TeachingResult into one outcome row, scoring a commitment on the fresh documents."""
+    row: dict[str, Any] = {
+        "id": ep.id,
+        "kind": ep.kind,
+        "expected": ep.expected,
+        "status": res.status,
+        "reason": res.reason,
+        "questions": len(res.questions),
+        "rounds": res.rounds,
+        "model_calls": res.model_calls,
+        "asked_when_expected": (len(res.questions) > 0) == (ep.kind == "ambiguous"),
+    }
+    if res.status == "committed" and res.rule is not None:
+        score = score_commit(ep, res.rule)
+        row["axes"] = score["per_scene"]
+        row["outcome"] = "correct_commit" if score["complete"] else "wrong_commit"
+        row["rule_hash"] = res.rule_hash
+        row["scope"] = res.scope
+    else:
+        row["outcome"] = "appropriate_abstain" if ep.expected == "abstain" else "abstained"
+    return row
+
+
 async def run_episode(provider: Provider, ledger: Ledger, ep: LabelEpisode) -> dict[str, Any]:
     view = agent_visible(ep)
     demos = [(d["before"], d["after"]) for d in view["demonstrations"]]
@@ -32,25 +56,9 @@ async def run_episode(provider: Provider, ledger: Ledger, ep: LabelEpisode) -> d
             "outcome": "error",
             "error": f"{type(e).__name__}: {str(e)[:200]}",
         }
-    row: dict[str, Any] = {
-        "id": ep.id,
-        "kind": ep.kind,
-        "expected": ep.expected,
-        "status": res.status,
-        "reason": res.reason,
-        "questions": len(res.questions),
-        "rounds": res.rounds,
-        "model_calls": res.model_calls,
-        "usd": round(ledger.consumed_usd - spent_before[0], 6),
-        "tokens": ledger.consumed_tokens - spent_before[1],
-        "asked_when_expected": (len(res.questions) > 0) == (ep.kind == "ambiguous"),
-    }
-    if res.status == "committed" and res.rule is not None:
-        score = score_commit(ep, res.rule)
-        row["axes"] = score["per_scene"]
-        row["outcome"] = "correct_commit" if score["complete"] else "wrong_commit"
-        row["rule_hash"] = res.rule_hash
-        row["scope"] = res.scope
-    else:
-        row["outcome"] = "appropriate_abstain" if ep.expected == "abstain" else "abstained"
+    row = score_and_row(ep, res)
+    row.update(
+        usd=round(ledger.consumed_usd - spent_before[0], 6),
+        tokens=ledger.consumed_tokens - spent_before[1],
+    )
     return row

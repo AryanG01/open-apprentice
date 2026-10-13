@@ -1,0 +1,6 @@
+{
+  "authorized_total_usd": 50.0,
+  "reserve_usd": 10.0,
+  "funded_usd": 2.24,
+  "note": "authorized by the owner 2026-10-13 ($50 total, $10 reserve for the final demo and judging). funded_usd is what the Nebius balance actually holds; raise it only when the owner confirms a top-up. Live runs may spend at most min(authorized_total, funded) - reserve across ALL runs, counting retries and timeouts."
+}

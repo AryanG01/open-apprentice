@@ -100,6 +100,7 @@ async def teach(
     teacher: Callable[[dict], dict],
     *,
     max_tokens: int = 6000,
+    max_candidates: int = 4,
 ) -> TeachingResult:
     res = TeachingResult("abstained")
     constraints = [
@@ -122,6 +123,7 @@ async def teach(
                 max_tokens=max_tokens,
                 alternatives_to=alternatives,
                 prompt=PROMPT,
+                max_candidates=max_candidates,
             )
         except BudgetExhausted as e:
             res.rounds.append({"round": rnd, "error": f"budget: {e}"})

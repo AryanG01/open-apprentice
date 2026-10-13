@@ -257,6 +257,7 @@ async def generate_candidates(
     correction_turn: bool = True,
     alternatives_to: Optional[list[Candidate]] = None,
     prompt: pathlib.Path = PROMPT,
+    max_candidates: int = MAX_CANDIDATES,
 ) -> GenerationReport:  # reasoning model: hidden tokens share this budget
     rep = GenerationReport(rnd)
     user: dict[str, Any] = {
@@ -280,7 +281,7 @@ async def generate_candidates(
 
     def process(cands: list[CandidateOut], tag: str) -> list[dict]:
         problems: list[dict] = []
-        for cand in cands[:MAX_CANDIDATES]:
+        for cand in cands[:max_candidates]:
             try:
                 ast, text = cand.source()
                 if ast is None and text is None:
