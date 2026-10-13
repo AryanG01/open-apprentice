@@ -9,6 +9,20 @@ mismatch is reproduced with real numbers and **only the native procedure is repa
 
 Built for the Nebius x NVIDIA Global AI Hackathon. Models: NVIDIA Nemotron through Nebius Token Factory (live runs); everything else runs offline.
 
+## Live demo
+
+**https://open-apprentice-664860383135.us-central1.run.app** (Google Cloud Run). Open *Try it live*: the default learner is **NVIDIA Nemotron-3-Ultra called live through Nebius Token Factory**,
+and "Watch the story with live Nemotron" runs the whole flow in about 90 seconds (teach, reuse on Konva and Fabric, silent tool change, repair, stress test), all checked on real graphics engines.
+Each visitor gets a few live sessions per hour under a global dollar cap; when the cap is reached the page offers a clearly labelled recording of an earlier real run instead. The first request after the
+service has been idle can be slow while the instance starts. A free static copy (no live engine) is at https://huggingface.co/spaces/AryanG01/open-apprentice-static.
+Hosting, cost guard and a known limitation (the dollar cap resets when the instance restarts) are in `docs/deploy.md`, section 4.
+
+## Also in this repository: a NeMo Gym environment
+
+`gym/` packages a *calibrated asking* task as a [NeMo Gym](https://docs.nvidia.com/nemo/gym) environment: an agent sees one demonstration of a hidden layout rule, may ask a teacher for the true outcome on a few new inputs, then commits a
+rule or abstains. It is scored by exact evaluation on held-out scenes (no LLM judge) on separate reward components, and the environment itself decides when a question was needed. Results so far are a small development-split pilot
+(scripted policies, and Nemotron-3-Ultra on 13 of 24 tasks); see `docs/decisions.md` #53 to #55 and `gym/README.md`.
+
 ## Try it (about 2 minutes)
 
 ```bash
