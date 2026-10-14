@@ -180,3 +180,12 @@ def test_every_catalogue_behaviour_written_in_the_rule_language_matches_the_orac
             for o in scene["objects"]:
                 got = (state[o["id"]]["x"], state[o["id"]]["y"])
                 assert got == want.get(o["id"], (o["x"], o["y"])), (spec, seed, o["id"])
+
+
+def test_the_oracle_uses_the_scenes_own_canvas_not_a_constant():
+    # found on a real file: a 560-wide canvas makes the right-hand spot of a box near the right edge off-canvas
+    s = _scene()
+    s["canvas"] = {"w": 260, "h": 800}  # right pose would occupy x 212..262
+    assert intended_after("right_else_below", GAP, s)["l0"] == (125, 162)
+    s["canvas"] = {"w": 262, "h": 800}
+    assert intended_after("right_else_below", GAP, s)["l0"] == (212, 115)

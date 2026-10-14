@@ -19,7 +19,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from open_apprentice.budget import Ledger, Limits  # noqa: E402
 from open_apprentice.concepts.label_teaching import teach  # noqa: E402
 from open_apprentice.evaluation import spend  # noqa: E402
-from open_apprentice.evaluation.label_episodes import GATE_INTENTS  # noqa: E402
+from open_apprentice.evaluation.label_episodes import GATE_INTENTS, consistent_classes  # noqa: E402
 from open_apprentice.evaluation.label_reference import ReferenceProvider  # noqa: E402
 from open_apprentice.evaluation.labels import (
     apply_oracle,
@@ -34,7 +34,7 @@ from open_apprentice.svg.labels_io import (
 )  # noqa: E402
 
 SAMPLES = pathlib.Path("src/open_apprentice/svg/samples")
-FILES = ["pipeline", "crowded-services", "mixed-layout"]
+FILES = ["pipeline", "crowded-services", "mixed-layout", "tight-grid", "edge-cluster"]
 
 
 def shows(intent: str, spec, scene: dict) -> bool:
@@ -54,9 +54,9 @@ def judge(text: str, rule: list, spec) -> dict:
     after, _ = scene_from_svg(out["text"])  # round trip through the patched file
     r = check_after(before, after, oracle(spec, before))
     return {
-        "intent": r["intent"],
-        "preservation": r["preservation"],
-        "layout": r["layout"],
+        "intent_ok": r["intent"],
+        "preservation_ok": r["preservation"],
+        "layout_ok": r["layout"],
         "problems": r["problems"],
         "unrelated_byte_changes": out["result"].unrelated_byte_changes if out["result"] else 0,
         "moved": len(out["targets"]),
@@ -101,10 +101,13 @@ async def main() -> None:
                     continue
                 row = {"intent": intent, "demo": demo_file, "target": target, "status": res.status}
                 if res.status == "committed":
+                    row["exercised"] = shows(
+                        intent, spec, scenes[target]
+                    )  # does this target actually test the intention?
                     try:
                         row.update(judge(texts[target], res.rule, spec))
                         row["correct"] = (
-                            all(row[k] for k in ("intent", "preservation", "layout"))
+                            all(row[k] for k in ("intent_ok", "preservation_ok", "layout_ok"))
                             and not row["unrelated_byte_changes"]
                         )
                     except LabelsNotApplicable as e:
@@ -120,7 +123,11 @@ async def main() -> None:
     out = pathlib.Path("results/redesign") / a.run_id
     out.mkdir(parents=True, exist_ok=True)
     (out / "realfile.json").write_text(json.dumps(rows, indent=1, default=str))
-    print(f"{sum(r['correct'] for r in rows)}/{len(rows)} applications correct")
+    ex = [r for r in rows if r.get("exercised", True)]
+    print(
+        f"{sum(r['correct'] for r in rows)}/{len(rows)} applications correct; "
+        f"{sum(r['correct'] for r in ex)}/{len(ex)} on targets that actually exercise the intention"
+    )
 
 
 if __name__ == "__main__":

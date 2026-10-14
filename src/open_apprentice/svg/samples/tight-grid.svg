@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Authored for Open Apprentice (MIT). Tight grid: boxes with attached text labels sitting below their box. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="300" viewBox="0 0 520 300">
+  <title>Tight grid</title>
+  <rect id="bg" x="0" y="0" width="520" height="300" fill="#f6f6f2"/>
+  <rect id="n1" x="20" y="30" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n2" x="120" y="30" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n3" x="220" y="30" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n4" x="320" y="30" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n5" x="20" y="150" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n6" x="120" y="150" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n7" x="220" y="150" width="80" height="40" fill="#dde4d3" stroke="#7d8a6c"/>
+  <text id="l1" data-for="n1" data-role="note" x="20" y="86" font-size="12" fill="#33402a">Alpha</text>
+  <text id="l2" data-for="n2" data-role="note" x="120" y="86" font-size="12" fill="#33402a">Beta</text>
+  <text id="l3" data-for="n3" data-role="warning" x="220" y="86" font-size="12" fill="#33402a">Gamma</text>
+  <text id="l4" data-for="n4" data-role="note" x="320" y="86" font-size="12" fill="#33402a">Delta</text>
+  <text id="l5" data-for="n5" data-role="note" x="20" y="206" font-size="12" fill="#33402a">Epsilon</text>
+  <text id="l6" data-for="n6" data-role="warning" x="120" y="206" font-size="12" fill="#33402a">Zeta</text>
+  <text id="l7" data-for="n7" data-role="note" x="220" y="206" font-size="12" fill="#33402a">Eta</text>
+</svg>

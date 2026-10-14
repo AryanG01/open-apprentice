@@ -71,8 +71,8 @@ NAMED = {
 }
 
 
-def _blocked(box: tuple, lab: dict, anchor: dict, objs: list[dict]) -> bool:
-    return not inside(box) or any(
+def _blocked(box: tuple, lab: dict, anchor: dict, objs: list[dict], canvas: dict = CANVAS) -> bool:
+    return not inside(box, canvas) or any(
         overlaps(box, _box(o)) for o in objs if o["id"] not in (lab["id"], anchor["id"])
     )
 
@@ -87,7 +87,9 @@ def oracle(spec: Spec, scene: dict) -> dict[str, tuple[F, F]]:
             continue
         anchor = byid[lab["attached"]]
         px, py = pose(spec.primary, anchor, lab, spec.gap)
-        if spec.fallback and _blocked((px, py, F(lab["w"]), F(lab["h"])), lab, anchor, objs):
+        if spec.fallback and _blocked(
+            (px, py, F(lab["w"]), F(lab["h"])), lab, anchor, objs, scene["canvas"]
+        ):
             px, py = pose(spec.fallback, anchor, lab, spec.gap)
         out[lab["id"]] = (px, py)
     return out
@@ -243,11 +245,11 @@ def apply_oracle(scene: dict, targets: dict[str, tuple[F, F]]) -> dict:
     return {"objects": new, "canvas": scene["canvas"]}
 
 
-def _layout_violations(objs: dict[str, dict], moved: Any) -> list[str]:
+def _layout_violations(objs: dict[str, dict], moved: Any, canvas: dict = CANVAS) -> list[str]:
     out = []
     for i in moved:
         box = _box(objs[i])
-        if not inside(box):
+        if not inside(box, canvas):
             out.append(f"{i}: leaves the canvas")
         for j, other in objs.items():
             if j not in (i, objs[i]["attached"]) and overlaps(box, _box(other)):
@@ -284,6 +286,8 @@ def check_after(
             problems["preservation"].append(f"{i}: moved but the intent leaves it alone")
     wanted = {o["id"]: o for o in apply_oracle(before, expected)["objects"]}
     problems["layout"] = [
-        v for v in _layout_violations(a, expected) if v not in _layout_violations(wanted, expected)
+        v
+        for v in _layout_violations(a, expected, after["canvas"])
+        if v not in _layout_violations(wanted, expected, after["canvas"])
     ]
     return {k: not v for k, v in problems.items()} | {"problems": problems}
