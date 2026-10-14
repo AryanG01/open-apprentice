@@ -220,3 +220,17 @@ def test_single_quoted_strings_parse_like_double_quoted():
     assert parse_rule_text(
         "for o in objects { if o.kind == 'label' { move o to (0, 0) } }"
     ) == parse_rule_text('for o in objects { if o.kind == "label" { move o to (0, 0) } }')
+
+
+def test_runaway_nested_loops_hit_the_step_budget_instead_of_hanging():
+    import time
+
+    from open_apprentice.concepts.rules import RuleError, evaluate_rule
+
+    loops = "for a in objects {\n for b in objects {\n for c in objects {\n for d in objects {\n for e in objects {\n let z = 1\n}\n}\n}\n}\n}"
+    rule = parse_rule_text(loops)
+    objs = [{"id": f"o{i}", "x": i, "y": 0, "w": 5, "h": 5} for i in range(22)]
+    t = time.time()
+    with pytest.raises(RuleError, match="too many steps"):
+        evaluate_rule(rule, objs, {"w": 1200, "h": 800})
+    assert time.time() - t < 10

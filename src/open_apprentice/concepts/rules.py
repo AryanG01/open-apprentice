@@ -25,6 +25,9 @@ from typing import Any
 
 MAX_STATEMENTS = 64
 MAX_DEPTH = 8  # was 4: a nested for_each (obstacle scan) inside for_each > if needs 5
+MAX_STEPS = (
+    300_000  # statements executed per run: nested loops over 20+ objects otherwise never finish
+)
 MAX_OBJECTS = 32  # was 8: label-placement documents hold up to 16 movable labels + their nodes
 MAX_EXPR_NODES = 500
 FIELDS = ("x", "y", "w", "h")
@@ -201,6 +204,7 @@ class _Run:
         self.objects = objects
         self.canvas = {"w": Fraction(canvas["w"]), "h": Fraction(canvas["h"])}
         self.locals: dict[str, Any] = {}
+        self.steps = 0
         self.state: dict[str, dict[str, Fraction]] = {
             o.id: {f: getattr(o, f) for f in FIELDS} for o in objects
         }
@@ -287,6 +291,9 @@ class _Run:
 
     def block(self, stmts: list) -> None:
         for s in stmts:
+            self.steps += 1
+            if self.steps > MAX_STEPS:
+                raise RuleError("rule takes too many steps (nested loops over too many objects)")
             op = s["op"]
             if op == "let":
                 self.locals[s["name"]] = self.ev(s["value"])
