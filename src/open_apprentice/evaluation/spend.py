@@ -11,6 +11,7 @@ The guard raises BudgetExhausted rather than overshoot; callers record that as a
 
 from __future__ import annotations
 
+import asyncio
 import json
 import pathlib
 import threading
@@ -29,6 +30,7 @@ from open_apprentice.providers.base import (
 
 ROOT = pathlib.Path("results/redesign")
 CONSERVATIVE_USD_PER_MILLION = 4.0
+CALL_DEADLINE_S = 420.0  # wall-clock ceiling per model call
 
 
 def load_budget(root: pathlib.Path = ROOT) -> dict:
@@ -124,11 +126,18 @@ class SpendGuard(Provider):
             )
             messages = [first, *messages[2:]]
         try:
-            raw = await self._inner._call(messages, max_tokens=max_tokens, ctx=ctx)
-        except ProviderTimeout:
+            # httpx's read timeout is per read, not per call: a trickling or stalled connection can wait far longer
+            raw = await asyncio.wait_for(
+                self._inner._call(messages, max_tokens=max_tokens, ctx=ctx), CALL_DEADLINE_S
+            )
+        except (ProviderTimeout, asyncio.TimeoutError) as e:
+            if isinstance(e, asyncio.TimeoutError):
+                e = ProviderTimeout(
+                    f"no reply within {CALL_DEADLINE_S:.0f}s; cost unknown until reconciled"
+                )
             with self._lock:
                 self._log(worst, "timeout_worst_case", ctx, worst_tokens)
-            raise
+            raise e
         with self._lock:
             self._log(
                 self._price(raw),

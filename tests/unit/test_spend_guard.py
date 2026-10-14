@@ -149,3 +149,28 @@ async def test_merge_system_moves_instructions_into_the_user_turn(tmp_path):
         and "RULES" in seen[0][0].content
         and "DATA" in seen[0][0].content
     )
+
+
+async def test_a_stalled_call_hits_the_wall_clock_deadline_and_is_charged_worst_case(
+    tmp_path, monkeypatch
+):
+    import asyncio
+
+    import pytest
+
+    from open_apprentice.evaluation import spend
+    from open_apprentice.providers.base import Message, ProviderTimeout
+    from open_apprentice.providers.mock import MockProvider
+
+    class Stalled(MockProvider):
+        async def _call(self, messages, *, max_tokens, ctx):
+            await asyncio.sleep(30)
+
+    (tmp_path / "budget.json").write_text(
+        '{"authorized_total_usd": 50, "reserve_usd": 10, "funded_usd": 50}'
+    )
+    monkeypatch.setattr(spend, "CALL_DEADLINE_S", 0.05)
+    g = spend.SpendGuard(Stalled({}), run_id="t", run_cap_usd=1, root=tmp_path)
+    with pytest.raises(ProviderTimeout):
+        await g._call([Message("user", "x")], max_tokens=10, ctx=CTX)
+    assert "timeout_worst_case" in (tmp_path / "spend.jsonl").read_text()
