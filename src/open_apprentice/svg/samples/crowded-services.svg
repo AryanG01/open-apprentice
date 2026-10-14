@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Authored for Open Apprentice (MIT). Crowded services: boxes with attached text labels sitting below their box. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="330" viewBox="0 0 600 330">
+  <title>Crowded services</title>
+  <rect id="bg" x="0" y="0" width="600" height="330" fill="#f6f6f2"/>
+  <rect id="n1" x="30" y="30" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n2" x="150" y="30" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n3" x="270" y="30" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n4" x="30" y="150" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n5" x="150" y="150" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n6" x="270" y="150" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <rect id="n7" x="420" y="90" width="90" height="44" fill="#dde4d3" stroke="#7d8a6c"/>
+  <text id="l1" data-for="n1" data-role="note" x="30" y="90" font-size="12" fill="#33402a">Gateway</text>
+  <text id="l2" data-for="n2" data-role="note" x="150" y="90" font-size="12" fill="#33402a">Auth</text>
+  <text id="l3" data-for="n3" data-role="warning" x="270" y="90" font-size="12" fill="#33402a">Billing</text>
+  <text id="l4" data-for="n4" data-role="note" x="30" y="210" font-size="12" fill="#33402a">Orders</text>
+  <text id="l5" data-for="n5" data-role="note" x="150" y="210" font-size="12" fill="#33402a">Search</text>
+  <text id="l6" data-for="n6" data-role="note" x="270" y="210" font-size="12" fill="#33402a">Mail</text>
+  <text id="l7" data-for="n7" data-role="warning" x="420" y="150" font-size="12" fill="#33402a">Cache</text>
+</svg>

@@ -32,7 +32,10 @@ NAMED = {
     "currentColor",
 }
 _HEX = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
-WHITELIST = {"rect": {"x", "y", "width", "height", "fill", "stroke", "stroke-width", "transform"}}
+WHITELIST = {
+    "rect": {"x", "y", "width", "height", "fill", "stroke", "stroke-width", "transform"},
+    "text": {"x", "y"},  # label placement lane
+}
 
 
 class Op(BaseModel):
