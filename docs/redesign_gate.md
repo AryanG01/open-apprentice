@@ -72,8 +72,8 @@ two calls, no outcome).
 
 The wrong commit (`heldout-noisy-02`) fitted the displaced label with a special case ("warning labels on nodes in the top
 third of the canvas use a 42 px gap"). The constants guard missed it because the comparison is against a computed value
-(`canvas.h / 3`). Noisy demonstrations remain an unsolved failure mode: 4 wrong commits out of 16 noisy runs across
-development and held-out (dev-1: 1/4, dev-2: 2/4, dev-4: 2/4, dev-5: 1/4 counting the spurious pass separately, held-out: 1/4; one run each, overlapping episodes, so this is not a rate). Ambiguous held-out (8/8) is better than development (4-6/8, with abstains); one run each, so
+(`canvas.h / 3`). Noisy demonstrations remain an unsolved failure mode: 7 wrong commits in 20 noisy episode-runs (`dev-1` 1/4, `dev-2` 2/4, `dev-4` 2/4, `dev-5` 1/4, held-out 1/4; the development
+runs repeat the same 4 episodes and the learner changed between them, so this is a failure pattern, not a rate). Ambiguous held-out (8/8) is better than development (4-6/8, with abstains); one run each, so
 this is a direction, not a precise rate.
 
 ## Things that changed after the development runs (disclosed)
