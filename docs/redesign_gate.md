@@ -35,12 +35,31 @@ violation of the zero-wrong-commit bar even though it reached 12 of 15.
   and noise are measured separately on the development split, not here.
 - Behaviours outside the catalogue were not tested. Fresh documents come from the same generator family.
 
+## Repeat on the same gate set, final protocol (`gate-6` relative + `gate-7` conditional and scope)
+`gate-6` stopped early after consecutive provider errors (relative finished; conditional had a transport `ConnectError` and agent
+errors), so `gate-7` re-ran conditional and scope with the identical code and protocol. The table assembles the two runs.
+
+| Intention | Apprentice | Same-model agent |
+|---|---|---|
+| relative | 5/5 | 5/5 |
+| conditional | 5/5 (`gate-7`; `gate-6` had 4/5 plus one transport error) | 0/5 (3 abstained, 2 provider errors) |
+| scope | 5/5 | 5/5 |
+| total | **15/15**, no wrong commits | **10/15**, no wrong commits |
+
+Second independent 15/15 for the apprentice, with the same conditional weakness for the agent (0/5 here, 2/5 in `gate-3`).
+Between them the runs show large endpoint variance: `gate-2` and `gate-4` (before the compact-evidence fix below) lost many
+episodes to echoed or malformed replies, and `gate-4` was stopped at 17 of 30 runs with the apprentice at 5/8 and the agent
+at 0/9, unfinished and excluded. A fix was found after seeing failures on gate episodes (post hoc): the model was echoing the full
+after-state, so evidence is now the scene once plus the labels that moved. `gate-6`/`gate-7` use it for BOTH systems.
+
 ## Things that changed after the development runs (disclosed)
 1. Contrastive round, contradiction feedback, lenient parsing, agent format-error tolerance (after `dev-1`).
 2. Parser accepts `else if` and double-escaped newlines; nesting limit 6 to 8; one retry on transient provider errors;
    a prompt example of a blocked-spot scan on an unrelated task; constants-in-comparisons guard (after `dev-2`).
 3. Held-back validation: survivors must reproduce the teacher's answer on every batch diagram not already asked, else the
    system abstains (after `dev-3` / `dev-4`). It reads teacher answers on batch diagrams, never the fresh scoring documents.
+5. Compact evidence (`describe_compact`): scene once plus moved labels instead of the full after-state, both systems, after echoing
+   failures in `gate-2`/`gate-4` (post hoc, found on gate episodes).
 4. Live runs send instructions in the user turn: on 2026-10-14 the endpoint intermittently ignored the system turn and
    answered the evidence JSON as if it were the task (`gate-2` and a 3-episode probe, invalidated and excluded). Applies to
    both systems. The `dev-*` runs used the system turn.
@@ -80,4 +99,4 @@ regression test. The bug did not affect the synthetic development or gate result
 - Browser-measured label boxes on the real files (the current boxes are estimates); real user-exported files.
 - Two external reactions (record as unavailable if not obtained).
 - Repeated runs (the gate set at least 3 times) and a frozen held-out split.
-- Cost so far: $24.98 of $40 spendable (authorized $50, reserve $10), including discarded runs.
+- Cost so far: $30.18 of $40 spendable (authorized $50, reserve $10), including discarded runs.
