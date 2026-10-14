@@ -58,7 +58,9 @@ class SpendGuard(Provider):
         root: pathlib.Path = ROOT,
         in_per_m: Optional[float] = None,
         out_per_m: Optional[float] = None,
+        merge_system: bool = False,
     ) -> None:
+        self._merge_system = merge_system
         self._inner = inner
         self.label = inner.label
         self.requested_model = inner.requested_model
@@ -114,6 +116,13 @@ class SpendGuard(Provider):
             if self.run_usd + worst > self._cap:
                 self.stopped_reason = "run cap"
                 raise BudgetExhausted("usd", f"run cap ${self._cap:.2f}")
+        if self._merge_system and messages and messages[0].role == "system":
+            # observed 2026-10-14: the endpoint sometimes ignores the system turn and answers the evidence JSON as if it
+            # were the task. Instructions travel in the user turn instead.
+            first = Message(
+                "user", f"{messages[0].content}\n\n=== INPUT ===\n{messages[1].content}"
+            )
+            messages = [first, *messages[2:]]
         try:
             raw = await self._inner._call(messages, max_tokens=max_tokens, ctx=ctx)
         except ProviderTimeout:

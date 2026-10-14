@@ -181,6 +181,7 @@ async def main(a: argparse.Namespace) -> None:
                 make_live_provider(a.model, a.effort, a.completion_floor),
                 run_id=run_id,
                 run_cap_usd=a.cap_usd,
+                merge_system=True,
             )
             provider = guard
         for ep in eps:

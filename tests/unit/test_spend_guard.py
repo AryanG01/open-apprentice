@@ -112,3 +112,40 @@ async def test_an_unfunded_account_blocks_every_live_call(tmp_path):
     g = SpendGuard(Fake(usd=0.0), run_id="r", run_cap_usd=100, root=root(tmp_path, funded=2.24))
     with pytest.raises(BudgetExhausted):
         await g._call(MSGS, max_tokens=100, ctx=CTX)
+
+
+async def test_merge_system_moves_instructions_into_the_user_turn(tmp_path):
+    from open_apprentice.evaluation.spend import SpendGuard
+    from open_apprentice.providers.base import CallContext, Message, RawCompletion
+    from open_apprentice.providers.mock import MockProvider
+
+    seen = []
+
+    class Spy(MockProvider):
+        async def _call(self, messages, *, max_tokens, ctx):
+            seen.append(messages)
+            return RawCompletion(
+                text="{}",
+                finish_reason="stop",
+                prompt_tokens=1,
+                completion_tokens=1,
+                usd=0.0,
+                model_id="m",
+                request_id="r",
+                latency_ms=1,
+            )
+
+    (tmp_path / "budget.json").write_text(
+        '{"authorized_total_usd": 50, "reserve_usd": 10, "funded_usd": 50}'
+    )
+    g = SpendGuard(Spy({}), run_id="t", run_cap_usd=1, root=tmp_path, merge_system=True)
+    await g._call(
+        [Message("system", "RULES"), Message("user", "DATA")],
+        max_tokens=10,
+        ctx=CTX,
+    )
+    assert (
+        [m.role for m in seen[0]] == ["user"]
+        and "RULES" in seen[0][0].content
+        and "DATA" in seen[0][0].content
+    )
