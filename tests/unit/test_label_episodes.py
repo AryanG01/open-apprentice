@@ -125,3 +125,12 @@ def test_a_wrong_but_demo_consistent_commit_is_visible_on_an_ambiguous_episode(d
             seen += 1
             break
     assert seen >= 1
+
+
+def test_gate_set_is_frozen_balanced_and_each_demo_shows_its_intention():
+    from open_apprentice.evaluation.label_episodes import build_gate_set, manifest_hash
+
+    g = build_gate_set()
+    assert len(g) == 15 and manifest_hash(g) == manifest_hash(build_gate_set())
+    assert {e.id.split("-")[1] for e in g} == {"relative", "conditional", "scope"}
+    assert all(len(e.classes()) == 1 for e in g)

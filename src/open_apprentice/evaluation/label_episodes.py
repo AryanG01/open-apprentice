@@ -46,7 +46,7 @@ EXPECTED = {
     "unsupported": "abstain",
     "noisy": "abstain",
 }
-SPLIT_BASE = {"development": 10_000, "heldout": 50_000}
+SPLIT_BASE = {"development": 10_000, "heldout": 50_000, "gate": 90_000}
 N_FRESH = 3
 N_BATCH = 3
 NOISE_PX = 30
@@ -268,3 +268,62 @@ def score_commit(ep: LabelEpisode, rule: list) -> dict:
         "per_scene": rows,
         "complete": all(all(r[k] for k in ("intent", "preservation", "layout")) for r in rows),
     }
+
+
+GATE_INTENTS = {
+    "relative": Spec("right", None, "all", F(12)),
+    "conditional": Spec("right", "below", "all", F(12)),
+    "scope": Spec("right", None, "notes", F(12)),
+}
+
+
+def _gate_demos_ok(intent: str, spec: Spec, demo_scenes: list[dict]) -> bool:
+    """The demonstrations must actually SHOW the intention, or it is not learnable and the gate would be unfair:
+    conditional needs a label that the fallback moved, scope needs a warning label left in place."""
+    if intent == "conditional":
+        plain = Spec(spec.primary, None, spec.scope, spec.gap)
+        return any(oracle(spec, s) != oracle(plain, s) for s in demo_scenes)
+    if intent == "scope":
+        return any(
+            o["kind"] == "label" and o["role"] == "warning"
+            for s in demo_scenes
+            for o in s["objects"]
+        )
+    return True
+
+
+def build_gate_set(per_intent: int = 5) -> list[LabelEpisode]:
+    """Frozen day-3 gate set: `per_intent` fresh layouts for each of three intentions (relative / conditional / scope).
+    Demonstrations show the intention; the demos pin the behaviour within the catalogue (one class), so a correct learner
+    needs no question. Fresh documents are the scored applications (3 per episode)."""
+    out = []
+    for intent, spec in GATE_INTENTS.items():
+        for k in range(per_intent):
+            rng = random.Random(SPLIT_BASE["gate"] + 100 * list(GATE_INTENTS).index(intent) + k)
+            for _ in range(400):
+                scenes = _scenes(rng, 2)
+                demos = [_demo(spec, s) for s in scenes]
+                if len(consistent_classes(demos)) != 1 or not _gate_demos_ok(intent, spec, scenes):
+                    continue
+                fresh = _scenes(rng, N_FRESH)
+                if intent == "conditional" and not any(
+                    oracle(spec, f) != oracle(Spec(spec.primary, None, spec.scope, spec.gap), f)
+                    for f in fresh
+                ):
+                    continue
+                out.append(
+                    LabelEpisode(
+                        f"gate-{intent}-{k:02d}",
+                        "unambiguous",
+                        "gate",
+                        k,
+                        spec,
+                        demos,
+                        _scenes(rng, N_BATCH),
+                        fresh,
+                    )
+                )
+                break
+            else:
+                raise RuntimeError(f"no gate episode for {intent} {k}")
+    return out

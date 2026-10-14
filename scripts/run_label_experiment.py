@@ -30,6 +30,7 @@ from open_apprentice.evaluation.label_episodes import (
     KINDS,
     LabelEpisode,
     agent_visible,
+    build_gate_set,
     build_manifest,
     manifest_hash,
 )
@@ -42,7 +43,11 @@ CONSERVATIVE = spend.CONSERVATIVE_USD_PER_MILLION
 
 
 def pick(split: str, limit: int | None, kinds: list[str]) -> list[LabelEpisode]:
-    eps = [e for e in build_manifest(split) if e.kind in kinds]
+    eps = [
+        e
+        for e in (build_gate_set() if split == "gate" else build_manifest(split))
+        if e.kind in kinds
+    ]
     if limit is None:
         return eps
     out: list[LabelEpisode] = []  # round-robin over kinds so a small sample still covers them
@@ -138,7 +143,7 @@ async def main(a: argparse.Namespace) -> None:
     wc = worst_case(eps, systems, a.max_tokens, a.completion_floor)
     budget = spend.load_budget()
     print(
-        f"run {run_id}: {len(eps)} episodes x {systems}  split={a.split}  manifest={manifest_hash(build_manifest(a.split))[:12]}"
+        f"run {run_id}: {len(eps)} episodes x {systems}  split={a.split}  manifest={manifest_hash(build_gate_set() if a.split == 'gate' else build_manifest(a.split))[:12]}"
     )
     print(f"worst case (conservative $4/M, retries not included): {wc}")
     print(
