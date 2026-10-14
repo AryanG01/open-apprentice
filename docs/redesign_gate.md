@@ -52,6 +52,25 @@ episodes to echoed or malformed replies, and `gate-4` was stopped at 17 of 30 ru
 at 0/9, unfinished and excluded. A fix was found after seeing failures on gate episodes (post hoc): the model was echoing the full
 after-state, so evidence is now the scene once plus the labels that moved. `gate-6`/`gate-7` use it for BOTH systems.
 
+## Held-out split (`heldout-3`, apprentice only, 23 of 24 episodes; first complete pass over unseen seeds)
+Seed base 50000, never used for tuning. 24 episodes: 8 unambiguous, 8 ambiguous, 4 unsupported, 4 noisy. `heldout-1` and
+`heldout-2` aborted at episode 2: the rule evaluator had no step budget and a model-written rule with deeply nested loops over
+20+ objects never finished (fixed with a 300,000-statement budget and a regression test; infrastructure only, no held-out
+content used). `heldout-3` ran with the fix. Its final episode (`heldout-noisy-03`) hung twice and is reported separately below.
+
+| Kind | Outcome |
+|---|---|
+| unambiguous (8) | 8 correct commits |
+| ambiguous (8) | 8 correct commits (ask, then commit) |
+| unsupported (4) | 2 appropriate abstains, 2 errors (both: the model's replies were truncated twice, no answer) |
+| noisy (3 of 4) | 2 appropriate abstains, **1 wrong commit** |
+
+The wrong commit (`heldout-noisy-02`) fitted the displaced label with a special case ("warning labels on nodes in the top
+third of the canvas use a 42 px gap"). The constants guard missed it because the comparison is against a computed value
+(`canvas.h / 3`). Noisy demonstrations remain an unsolved failure mode: 3 wrong commits out of 12 noisy runs across
+development and held-out. Ambiguous held-out (8/8) is better than development (4-6/8, with abstains); one run each, so
+this is a direction, not a precise rate.
+
 ## Things that changed after the development runs (disclosed)
 1. Contrastive round, contradiction feedback, lenient parsing, agent format-error tolerance (after `dev-1`).
 2. Parser accepts `else if` and double-escaped newlines; nesting limit 6 to 8; one retry on transient provider errors;
@@ -99,4 +118,4 @@ regression test. The bug did not affect the synthetic development or gate result
 - Browser-measured label boxes on the real files (the current boxes are estimates); real user-exported files.
 - Two external reactions (record as unavailable if not obtained).
 - Repeated runs (the gate set at least 3 times) and a frozen held-out split.
-- Cost so far: $30.18 of $40 spendable (authorized $50, reserve $10), including discarded runs.
+- Cost so far: $32.9 of $40 spendable (authorized $50, reserve $10), including discarded runs.
