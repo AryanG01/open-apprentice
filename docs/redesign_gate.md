@@ -52,23 +52,28 @@ episodes to echoed or malformed replies, and `gate-4` was stopped at 17 of 30 ru
 at 0/9, unfinished and excluded. A fix was found after seeing failures on gate episodes (post hoc): the model was echoing the full
 after-state, so evidence is now the scene once plus the labels that moved. `gate-6`/`gate-7` use it for BOTH systems.
 
-## Held-out split (`heldout-3`, apprentice only, 23 of 24 episodes; first complete pass over unseen seeds)
+## Held-out split (`heldout-3` + `heldout-5`, apprentice only, 24 of 24 episodes)
 Seed base 50000, never used for tuning. 24 episodes: 8 unambiguous, 8 ambiguous, 4 unsupported, 4 noisy. `heldout-1` and
 `heldout-2` aborted at episode 2: the rule evaluator had no step budget and a model-written rule with deeply nested loops over
 20+ objects never finished (fixed with a 300,000-statement budget and a regression test; infrastructure only, no held-out
-content used). `heldout-3` ran with the fix. Its final episode (`heldout-noisy-03`) hung twice and is reported separately below.
+content used). `heldout-3` ran with that budget. Note: the step budget is a real hazard removal but is NOT shown to have caused the stalls; a
+stack dump of a later stall showed the process idle in the event loop waiting on a model call. The actual cause is that httpx's read
+timeout is per read, so a stalled call can wait for hours; `SpendGuard` now enforces a 420 s wall-clock deadline per call.
+`heldout-3`'s last episode (`heldout-noisy-03`) stalled that way (about 8 h) and was run alone as `heldout-5` with the deadline,
+same code and protocol. `heldout-4` was a diagnostic attempt at the same episode (killed by a stack-dump timer; it logged
+two calls, no outcome).
 
 | Kind | Outcome |
 |---|---|
 | unambiguous (8) | 8 correct commits |
 | ambiguous (8) | 8 correct commits (ask, then commit) |
 | unsupported (4) | 2 appropriate abstains, 2 errors (both: the model's replies were truncated twice, no answer) |
-| noisy (3 of 4) | 2 appropriate abstains, **1 wrong commit** |
+| noisy (4) | 3 appropriate abstains, **1 wrong commit** |
 
 The wrong commit (`heldout-noisy-02`) fitted the displaced label with a special case ("warning labels on nodes in the top
 third of the canvas use a 42 px gap"). The constants guard missed it because the comparison is against a computed value
-(`canvas.h / 3`). Noisy demonstrations remain an unsolved failure mode: 3 wrong commits out of 12 noisy runs across
-development and held-out. Ambiguous held-out (8/8) is better than development (4-6/8, with abstains); one run each, so
+(`canvas.h / 3`). Noisy demonstrations remain an unsolved failure mode: 4 wrong commits out of 16 noisy runs across
+development and held-out (dev-1: 1/4, dev-2: 2/4, dev-4: 2/4, dev-5: 1/4 counting the spurious pass separately, held-out: 1/4; one run each, overlapping episodes, so this is not a rate). Ambiguous held-out (8/8) is better than development (4-6/8, with abstains); one run each, so
 this is a direction, not a precise rate.
 
 ## Things that changed after the development runs (disclosed)
@@ -118,4 +123,4 @@ regression test. The bug did not affect the synthetic development or gate result
 - Browser-measured label boxes on the real files (the current boxes are estimates); real user-exported files.
 - Two external reactions (record as unavailable if not obtained).
 - Repeated runs (the gate set at least 3 times) and a frozen held-out split.
-- Cost so far: $32.9 of $40 spendable (authorized $50, reserve $10), including discarded runs.
+- Cost so far: $33.59 of $40 spendable (authorized $50, reserve $10), including discarded runs.
