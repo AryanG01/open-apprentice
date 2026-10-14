@@ -54,8 +54,30 @@ validation) 4 correct / 4 abstained / 0 wrong. Unsupported: no wrong commits aft
 fits the displaced label with a special-case rule (2 of 4 wrong commits in `dev-4`, 1 wrong and 1 spurious "correct" in
 `dev-5`). The catalogue reference scores 15/15 and is oracle-assisted by construction: a ceiling, not a result.
 
+## Real-file path (`realfile-2`, live Nemotron, cost about $0.7)
+Five authored SVG fixtures (boxes + `<text>` labels; NOT third-party or user-exported files, see
+`src/open_apprentice/svg/samples/NOTICE.md`). Each intention is taught from a demonstration made on ONE file (demo must pin the
+behaviour alone and, for conditional, must show the fallback), and the learned rule is applied to every OTHER file as a
+byte-exact patch of label `x`/`y` only; the patched SVG is re-parsed and judged by the checker (intent, preservation, layout).
+Label boxes are estimated from font size, not measured in a browser.
+
+| Intention | Applications | Correct | On targets that actually exercise it |
+|---|---|---|---|
+| relative | 20 | 20 | 20/20 |
+| scope | 20 | 20 | 20/20 |
+| conditional | 12 | 11 | 5/6 |
+| total | 52 | 51 | |
+
+0 unrelated byte changes in every patch. **One real failure, a layout violation:** a conditional rule taught on `tight-grid.svg`
+tested only overlap, not the canvas edge, because that demonstration (and the synthetic batch, all 1200 wide) never showed an
+off-canvas right-hand spot. Applied to the 560-wide `edge-cluster.svg` it pushed two labels off the canvas. Under the gate rule
+(zero accepted violations) this is a miss. Possible fix (untested): vary canvas sizes in the teaching batch.
+Also: the first real-file run (`realfile-1`, 14/14) is retracted. Its conditional targets never exercised the fallback, and
+building the fuller set exposed an oracle bug (a hard-coded 1200x800 canvas instead of the scene's own), now fixed with a
+regression test. The bug did not affect the synthetic development or gate results (all synthetic canvases are 1200x800).
+
 ## Still required for the gate
-- A real-file path (SVG or supported-format import/export) and a run on real files.
+- Browser-measured label boxes on the real files (the current boxes are estimates); real user-exported files.
 - Two external reactions (record as unavailable if not obtained).
 - Repeated runs (the gate set at least 3 times) and a frozen held-out split.
-- Cost so far: $24.06 of $40 spendable (authorized $50, reserve $10), including discarded runs.
+- Cost so far: $24.98 of $40 spendable (authorized $50, reserve $10), including discarded runs.
