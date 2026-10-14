@@ -23,7 +23,13 @@ from fractions import Fraction
 from typing import Any, Callable, Optional
 
 from open_apprentice.budget import BudgetExhausted, Ledger
-from open_apprentice.concepts.hypotheses import Candidate, Constraint, fits, generate_candidates
+from open_apprentice.concepts.hypotheses import (
+    Candidate,
+    Constraint,
+    fits,
+    generate_candidates,
+    neutral,
+)
 from open_apprentice.concepts.rules import FIELDS, RuleError, evaluate_rule
 from open_apprentice.concepts.schemas import sha
 from open_apprentice.providers.base import Provider
@@ -31,6 +37,29 @@ from open_apprentice.providers.base import Provider
 PROMPT = pathlib.Path(__file__).resolve().parents[3] / "prompts" / "hypotheses_labels.md"
 MAX_QUESTIONS = 3
 MAX_ROUNDS = 2
+
+
+def describe_compact(constraints: list[Constraint]) -> list[dict]:
+    """Evidence without the duplicated full after-state: the scene once, plus only the labels that MOVED (their new top-left).
+    Sizes never change in this task. (The full echo made the model repeat the input instead of answering, 2026-10-14.)
+    """
+    out = []
+    for c in constraints:
+        before = {o["id"]: o for o in c.scene["objects"]}
+        moved = {
+            k: [neutral(v["x"]), neutral(v["y"])]
+            for k, v in c.expected.items()
+            if (v["x"], v["y"]) != (Fraction(before[k]["x"]), Fraction(before[k]["y"]))
+        }
+        out.append(
+            {
+                "evidence": c.source,
+                "scene": neutral(c.scene),
+                "labels_moved_to": moved,
+                "all_other_objects": "unchanged",
+            }
+        )
+    return out
 
 
 def to_state(scene: dict) -> dict[str, dict[str, Fraction]]:
@@ -161,6 +190,7 @@ async def teach(
                     alternatives_to=alternatives,
                     prompt=PROMPT,
                     max_candidates=max_candidates,
+                    describe_fn=describe_compact,
                 )
                 break
             except BudgetExhausted as e:

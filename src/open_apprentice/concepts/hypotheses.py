@@ -261,10 +261,11 @@ async def generate_candidates(
     alternatives_to: Optional[list[Candidate]] = None,
     prompt: pathlib.Path = PROMPT,
     max_candidates: int = MAX_CANDIDATES,
+    describe_fn: Any = None,
 ) -> GenerationReport:  # reasoning model: hidden tokens share this budget
     rep = GenerationReport(rnd)
     user: dict[str, Any] = {
-        "teaching_evidence": describe(constraints),
+        "teaching_evidence": (describe_fn or describe)(constraints),
         "previously_rejected": rejected_summaries[-8:],
     }
     if alternatives_to:

@@ -3,8 +3,8 @@ rules that explain every demonstration and would also apply to other diagrams. R
 {"candidates": [{"summary": "<one plain sentence>", "rule_text": "<the rule, in the small language below>"}, ...]}
 (rule_text is a normal JSON string; use \n for line breaks.)
 
-THE EVIDENCE. Each item has a `scene` with `objects` and a `canvas`, and `resulting_geometry`: the position and size of EVERY
-object after the edit (objects that did not move are listed unchanged). Each object has: id, kind ("node" or "label"),
+THE EVIDENCE. Each item has a `scene` (the diagram BEFORE the edit, with `objects` and a `canvas`) and `labels_moved_to`: the new
+top-left (x, y) of each label that moved (sizes never change; every object not listed there stays exactly where it was). Each object has: id, kind ("node" or "label"),
 role (labels only, e.g. "note" or "warning"; empty for nodes), attached (for a label, the id of the node it describes),
 and x y w h (top-left corner, width, height). The canvas size is canvas.w and canvas.h. Several evidence items may be given;
 a rule must reproduce all of them. Rules apply to other diagrams with different numbers and arrangements of objects, so write
