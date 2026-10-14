@@ -246,15 +246,18 @@ async def teach(
     if len({tuple(_run(c.rule, s) for s in batch) for c in cands}) > 1:
         res.reason = "question budget exhausted with a disagreement unresolved"
         return res
-    # held-out check: show the chosen rule one batch diagram it was not fitted to; a rule that only matches evidence it
-    # was shaped around (overfit) fails here and we abstain. Logged apart from clarifying questions.
+    # held-out check: show the survivors every batch diagram they were not fitted to; a rule that only matches evidence
+    # it was shaped around (overfit, or fitted to a noisy demonstration) fails on one of them and we abstain. Teacher
+    # answers used here are logged apart from clarifying questions.
     asked_idx = {q["batch_index"] for q in res.questions}
-    fresh_idx = next((i for i in range(len(batch)) if i not in asked_idx), None)
-    if fresh_idx is not None:
-        truth = teacher(batch[fresh_idx])
-        check = Constraint("positive", batch[fresh_idx], to_state(truth), source="validation")
+    held = [i for i in range(len(batch)) if i not in asked_idx]
+    for i in held:
+        check = Constraint("positive", batch[i], to_state(teacher(batch[i])), source="validation")
         cands = [c for c in cands if fits(c.rule, check)[0]]
-        res.validation = {"batch_index": fresh_idx, "survivors": len(cands)}
+        if not cands:
+            break
+    if held:
+        res.validation = {"batch_indices": held, "survivors": len(cands)}
         if not cands:
             res.remaining = 0
             res.reason = "the rule failed on a held-back batch diagram (not predictive)"
