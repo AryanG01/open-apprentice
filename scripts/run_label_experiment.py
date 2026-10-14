@@ -139,6 +139,8 @@ async def main(a: argparse.Namespace) -> None:
     systems = a.system.split(",")
     kinds = a.kinds.split(",") if a.kinds else list(KINDS)
     eps = pick(a.split, a.limit, kinds)
+    if a.only:
+        eps = [e for e in eps if any(t in e.id for t in a.only.split(","))]
     run_id = a.run_id or time.strftime("%Y%m%d-%H%M%S")
     wc = worst_case(eps, systems, a.max_tokens, a.completion_floor)
     budget = spend.load_budget()
@@ -235,6 +237,9 @@ if __name__ == "__main__":
     p.add_argument("--mode", choices=["dry", "mock", "live"], default="dry")
     p.add_argument("--system", default="apprentice,agent,reference")
     p.add_argument("--split", default="development")
+    p.add_argument(
+        "--only", default="", help="comma-separated substrings; keep episodes whose id contains one"
+    )
     p.add_argument("--limit", type=int)
     p.add_argument("--kinds")
     p.add_argument("--cap-usd", type=float, default=0.0)
