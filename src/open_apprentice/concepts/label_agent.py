@@ -13,8 +13,8 @@ from typing import Callable, Literal, Optional
 from pydantic import BaseModel
 
 from open_apprentice.budget import BudgetExhausted, Ledger
-from open_apprentice.concepts.hypotheses import Constraint, describe, fits
-from open_apprentice.concepts.label_teaching import TeachingResult, to_state
+from open_apprentice.concepts.hypotheses import Constraint, fits
+from open_apprentice.concepts.label_teaching import describe_compact, TeachingResult, to_state
 from open_apprentice.concepts.rule_text import parse_rule_text
 from open_apprentice.concepts.rules import RuleError, validate_rule
 from open_apprentice.concepts.schemas import sha
@@ -52,7 +52,7 @@ async def run_agent(
     res = TeachingResult("abstained")
     constraints = [Constraint("positive", b, to_state(a), source="demonstration") for b, a in demos]
     first = {
-        "teaching_evidence": describe(constraints),
+        "teaching_evidence": describe_compact(constraints),
         "batch": [{"index": i, "scene": s} for i, s in enumerate(batch)],
         "asks_left": MAX_ASKS,
         "commit_attempts_left": MAX_COMMITS,

@@ -3,7 +3,7 @@ describe. You will later be judged on NEW diagrams, so the rule you commit must 
 that fits the examples. Do not commit to a guess when the examples leave the rule open: ask the teacher first.
 
 THE EVIDENCE has `scene` objects (id, kind "node" or "label", role, attached = the id of the node a label describes, and
-x y w h = top-left corner, width, height) and the resulting geometry of EVERY object after the edit. BATCH lists further
+x y w h = top-left corner, width, height) and `labels_moved_to` (the new top-left of each label that moved; sizes never change and every other object stays where it was). BATCH lists further
 diagrams, each with an index, that your rule will be applied to; they are shown WITHOUT the result.
 
 YOUR MOVES. Reply with ONE JSON object and nothing else, with "action" set to one of:
