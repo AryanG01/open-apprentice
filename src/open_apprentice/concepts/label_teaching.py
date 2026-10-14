@@ -55,6 +55,37 @@ def _size(c: Candidate) -> int:
     return len(json.dumps(c.rule))
 
 
+CMP = {"lt", "le", "gt", "ge", "eq", "ne"}
+
+
+def magic_condition(node: Any) -> bool:
+    """True if the rule compares an object's raw geometry or id with a non-zero constant (e.g. `w == 80`, `x < 50`,
+    `id == "n3"`). Such rules memorise the demonstrations (noise included) instead of generalising; comparisons with 0
+    (off-canvas checks) and between two computed values are fine."""
+    if isinstance(node, list):
+        return any(magic_condition(n) for n in node)
+    if not isinstance(node, dict):
+        return False
+    if node.get("op") in CMP:
+        a = node.get("args", [])
+        has_get = any(
+            isinstance(x, dict)
+            and x.get("op") == "get"
+            and x["args"][1] in ("x", "y", "w", "h", "id")
+            for x in a
+        )
+        has_const = any(
+            (isinstance(x, (int, dict)) and not isinstance(x, bool) and x not in (0, {"rat": "0"}))
+            and not (isinstance(x, dict) and "op" in x or isinstance(x, dict) and "ref" in x)
+            for x in a
+        ) or any(
+            isinstance(x, str) and x not in ("label", "node", "note", "warning", "") for x in a
+        )
+        if has_get and has_const:
+            return True
+    return any(magic_condition(v) for v in node.values())
+
+
 @dataclass
 class TeachingResult:
     status: str  # committed | abstained
@@ -112,26 +143,37 @@ async def teach(
     counts = sorted({len(b["objects"]) for b, _ in demos})
 
     async def propose(rnd: int, alternatives: Optional[list[Candidate]] = None) -> None:
-        try:
-            rep = await generate_candidates(
-                provider,
-                ledger,
-                constraints,
-                rnd=rnd,
-                rejected_summaries=rejected_summaries,
-                object_counts=counts,
-                max_tokens=max_tokens,
-                alternatives_to=alternatives,
-                prompt=PROMPT,
-                max_candidates=max_candidates,
-            )
-        except BudgetExhausted as e:
-            res.rounds.append({"round": rnd, "error": f"budget: {e}"})
-            raise
-        except (
-            Exception
-        ) as e:  # truncation / provider failure: recorded, never silently turned into success
-            res.rounds.append({"round": rnd, "error": f"{type(e).__name__}: {str(e)[:160]}"})
+        rep = None
+        for attempt in (
+            1,
+            2,
+        ):  # one retry: truncation / timeout / transport failures are often transient
+            try:
+                rep = await generate_candidates(
+                    provider,
+                    ledger,
+                    constraints,
+                    rnd=rnd,
+                    rejected_summaries=rejected_summaries,
+                    object_counts=counts,
+                    max_tokens=max_tokens,
+                    alternatives_to=alternatives,
+                    prompt=PROMPT,
+                    max_candidates=max_candidates,
+                )
+                break
+            except BudgetExhausted as e:
+                res.rounds.append({"round": rnd, "error": f"budget: {e}"})
+                raise
+            except Exception as e:  # recorded, never silently turned into success
+                res.rounds.append(
+                    {
+                        "round": rnd,
+                        "attempt": attempt,
+                        "error": f"{type(e).__name__}: {str(e)[:160]}",
+                    }
+                )
+        if rep is None:
             return
         res.model_calls += rep.model_calls
         for k in ("prompt_tokens", "completion_tokens"):
@@ -145,7 +187,15 @@ async def teach(
         )
         rejected_summaries.extend(r["summary"] for r in rep.rejected)
         have = {c.hash for c in cands}
-        cands.extend(c for c in rep.accepted if c.hash not in have)
+        for c in rep.accepted:
+            if magic_condition(c.rule):
+                rejected_summaries.append(
+                    f"{c.summary[:60]} -- compares a position, size or id with a constant: that memorises the "
+                    "demonstrations; use relations between objects instead"
+                )
+                res.rounds[-1]["magic_rejected"] = res.rounds[-1].get("magic_rejected", 0) + 1
+            elif c.hash not in have:
+                cands.append(c)
 
     def splits(cs: list[Candidate]) -> bool:
         return any(len({_run(c.rule, sc) for c in cs}) > 1 for sc in batch)

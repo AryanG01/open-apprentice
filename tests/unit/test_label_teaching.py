@@ -104,3 +104,22 @@ async def test_survivors_that_agree_on_the_batch_trigger_a_contrastive_round_and
     assert (
         row["outcome"] == "correct_commit"
     )  # the contrastive round supplied the truth, the batch question then chose it
+
+
+def test_magic_condition_guard_and_else_if_parse():
+    from open_apprentice.concepts.label_teaching import magic_condition
+    from open_apprentice.concepts.rule_text import parse_rule_text
+
+    bad = parse_rule_text("for o in objects {\n if o.w == 80 {\n move o to (o.x, o.y)\n }\n}")
+    bad2 = parse_rule_text('for o in objects {\n if o.id == "n3" {\n move o to (o.x, o.y)\n }\n}')
+    ok = parse_rule_text(
+        'for o in objects {\n if o.kind == "label" and o.x < 0 {\n move o to (o.x, o.y)\n }\n'
+        " if o.x + o.w > canvas.w {\n move o to (o.x, o.y)\n }\n}"
+    )
+    assert magic_condition(bad) and magic_condition(bad2) and not magic_condition(ok)
+    chain = parse_rule_text(
+        "for o in objects {\n if o.w > o.h {\n move o to (1, 1)\n } else if o.w < o.h {\n"
+        " move o to (2, 2)\n } else {\n move o to (3, 3)\n }\n}"
+    )
+    assert chain  # `else if` and double-escaped newlines are accepted
+    assert parse_rule_text("for o in objects {\\n move o to (1, 1)\\n}")

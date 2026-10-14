@@ -94,7 +94,9 @@ def _lex(src: str) -> list[_Tok]:
         raise RuleSyntaxError("rule text too long")
     toks: list[_Tok] = []
     pos, line, depth = 0, 1, 0
-    src = src.replace("\r\n", "\n")
+    src = src.replace("\r\n", "\n").replace(
+        "\\n", "\n"
+    )  # models sometimes double-escape line breaks
     while pos < len(src):
         m = _TOKEN.match(src, pos)
         if not m or m.end() == pos:
@@ -248,7 +250,7 @@ class _Parser:
             els = []
             self.skip_nl()
             if self.accept("else"):
-                els = self.braces()
+                els = [self.stmt()] if self.cur.text == "if" else self.braces()
             return {"op": "if", "cond": cond, "then": then, "else": els}
         raise self.err("expected a statement (let / move / resize / clone / for / if)")
 

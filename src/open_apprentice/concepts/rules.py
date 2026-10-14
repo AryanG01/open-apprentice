@@ -24,7 +24,7 @@ from fractions import Fraction
 from typing import Any
 
 MAX_STATEMENTS = 64
-MAX_DEPTH = 6  # was 4: a nested for_each (obstacle scan) inside for_each > if needs 5
+MAX_DEPTH = 8  # was 4: a nested for_each (obstacle scan) inside for_each > if needs 5
 MAX_OBJECTS = 32  # was 8: label-placement documents hold up to 16 movable labels + their nodes
 MAX_EXPR_NODES = 500
 FIELDS = ("x", "y", "w", "h")

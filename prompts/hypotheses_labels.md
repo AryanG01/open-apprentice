@@ -28,6 +28,26 @@ for o in objects {
   }
 }
 
+EXAMPLE of a "blocked" test on another unrelated task (a badge goes to the right of its box unless another box is in the way,
+then it goes above the box). Scan the other objects with a nested loop and remember the result in a flag:
+for b in objects {
+  if b.kind == "badge" {
+    let t = object(b.attached)
+    let blocked = 0
+    for p in objects {
+      if p.id != b.id and p.id != t.id and t.x + t.w + 5 < p.x + p.w and p.x < t.x + t.w + 5 + b.w and t.y < p.y + p.h and p.y < t.y + b.h {
+        let blocked = 1
+      }
+    }
+    if blocked == 1 {
+      move b to (t.x, t.y - b.h - 5)
+    } else {
+      move b to (t.x + t.w + 5, t.y)
+    }
+  }
+}
+Compare positions with OTHER objects' positions, never with fixed numbers such as `w == 80` or `x < 50`, and never test ids.
+
 HOW TO CHOOSE DIFFERENT CANDIDATES. A few demonstrations rarely pin the rule down. Things the evidence may leave open: which side
 of the node the label goes on; how far (a fixed gap, or related to sizes); how it is aligned with the node; what happens when
 the preferred spot is blocked (it would overlap another object or leave the canvas) and where the label goes instead; and WHICH
