@@ -23,6 +23,23 @@ Hosting, cost guard and a known limitation (the dollar cap resets when the insta
 rule or abstains. It is scored by exact evaluation on held-out scenes (no LLM judge) on separate reward components, and the environment itself decides when a question was needed. Results so far are a small development-split pilot
 (scripted policies, and Nemotron-3-Ultra on 13 of 24 tasks); see `docs/decisions.md` #53 to #55 and `gym/README.md`.
 
+## Research result: teaching compound conditional edit programs (label placement; not yet in the live demo)
+
+A second line of work asks whether the same teach-ask-commit loop can learn a *compound* program, not one rule: place an attached label to the right of its box, move it below when that spot is blocked or off-canvas, and
+leave warning labels alone. Nemotron-3-Ultra (live, Nebius Token Factory) proposes programs in a small exact-arithmetic language; an independent oracle and checker (intent, preservation and layout kept separate) judge them on documents the learner never saw.
+Everything here is one model, small samples and single runs; the full evidence, every failure and every retraction are in `docs/redesign_gate.md`, `docs/claims_and_limitations.md` and `docs/PROJECT_RECORD.md`.
+
+- **Frozen gate set (15 episodes: relative, conditional, scope; 5 fresh layouts each):** the apprentice got 15/15 in two assembled runs with no wrong commits. A same-model agent given the same evidence, tools and language help got conditional 2/5 and 1/5 in two valid runs (no wrong commits in the last).
+- **Held-out split (24 episodes, never tuned on, one run):** 8/8 unambiguous, 8/8 ambiguous (asked, then committed). Unsupported: 2 correct abstains and 2 provider errors. Noisy demonstrations: 3 correct abstains and **1 wrong commit**; fitting a displaced demonstration with a special case is an unsolved failure.
+- **Real SVG files:** learned rules are applied as byte-exact patches of label `x`/`y` only (0 unrelated bytes changed). 52/52 on five authored fixtures in the last run, but that run followed fixes made after seeing a failure on those same fixtures, so it is not independent evidence; label boxes are estimated from font size, not measured in a browser.
+- **Not shown:** external user reactions, other models or task families, a held-out run of the baseline.
+
+```bash
+uv run python scripts/run_label_experiment.py --mode mock --system reference --split gate --run-id gate-mock   # free, oracle-assisted reference (a ceiling, not a result)
+uv run python scripts/run_realfile_check.py --reference --run-id realfile-ref                                  # free, same for SVG files
+uv run python scripts/run_label_experiment.py --mode live --system apprentice,agent --split gate --cap-usd 6 --run-id gate-N   # live, needs .env; costs about $3
+```
+
 ## Try it (about 2 minutes)
 
 ```bash
@@ -76,7 +93,7 @@ We hold ourselves to the claims we can back with a command.
 - Reproduced native mismatch when a tool changes silently while the abstract model still passes, and binding-only repair with retained-case replay (a hard-coded "fix" is rejected).
 - Exact-arithmetic rule language, an AST-to-Z3 compiler with property-tested agreement, and typed witness search (`witness_found` / `no_witness_in_model` / `incomplete` / ...).
 - Four evidence axes (intent, symbolic, native, held-out) are kept separate everywhere; there is no combined score and no single "Verified" badge.
-- 280+ tests, including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
+- 470+ tests (472 in the offline unit, evaluation and contract suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
 
 **Measured with a live NVIDIA model (development split, small samples):** the model alone committed to a wrong rule 15 of 34 times (44%); an extra "audit" round did not help; unioning the model's proposals with a
 bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that alone does not show the model adds value. On six rules *outside* the search's grammar it does: search alone got 0 of 12 right, the model alone 5 of 12 (with 2 confident-wrong commits), and the hybrid committed 5 rules, all correct. Tiny samples, development split.
