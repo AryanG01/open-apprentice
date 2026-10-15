@@ -32,7 +32,7 @@ from open_apprentice.svg.labels_io import (
     scene_from_svg,
 )  # noqa: E402
 
-SAMPLES = pathlib.Path("src/open_apprentice/svg/samples")
+SAMPLES = pathlib.Path("src/open_apprentice/svg/label_samples")
 FILES = ["pipeline", "crowded-services", "mixed-layout", "tight-grid", "edge-cluster"]
 
 

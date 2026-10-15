@@ -80,7 +80,7 @@ fits the displaced label with a special-case rule (2 of 4 wrong commits in `dev-
 
 ## Real-file path (`realfile-2`, live Nemotron, cost about $0.7)
 Five authored SVG fixtures (boxes + `<text>` labels; NOT third-party or user-exported files, see
-`src/open_apprentice/svg/samples/NOTICE.md`). Each intention is taught from a demonstration made on ONE file (for conditional, the demo
+`src/open_apprentice/svg/label_samples/NOTICE.md`). Each intention is taught from a demonstration made on ONE file (for conditional, the demo
 must show the fallback; for scope, contain a warning label. Demonstrations were NOT required to pin one catalogue behaviour: a
 filter meant to do that was never applied in `realfile-1..4`, a silent script-edit miss found by lint on 15 Oct and now only
 the opt-in `--require-pinned` flag. Some demos may therefore be ambiguous within the catalogue), and the learned rule is applied to every OTHER file as a

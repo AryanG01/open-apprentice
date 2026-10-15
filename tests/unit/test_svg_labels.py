@@ -8,7 +8,7 @@ import pytest
 from open_apprentice.evaluation.labels import Spec, check_after, oracle, rule_for_spec
 from open_apprentice.svg.labels_io import LabelsNotApplicable, apply_rule_to_svg, scene_from_svg
 
-D = pathlib.Path("src/open_apprentice/svg/samples")
+D = pathlib.Path("src/open_apprentice/svg/label_samples")
 FILES = ["pipeline", "crowded-services", "mixed-layout"]
 SPECS = [
     Spec("right", None, "all", F(12)),
