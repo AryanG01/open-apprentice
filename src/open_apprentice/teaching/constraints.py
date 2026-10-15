@@ -47,16 +47,32 @@ class Evidence:
     approved: dict[str, Output] = field(default_factory=dict)
     preview_approved: dict[str, Output] = field(default_factory=dict)
     rejected: dict[str, list[Output]] = field(default_factory=dict)
+    items: list = field(default_factory=list)  # list[EvidenceItem], ids "<event_id>:<k>"
 
     @property
     def batch(self) -> list[str]:
         return [s for s, r in self.roles.items() if r == "batch"]
 
 
-def _positive(e: Evidence, sid: str, out: Output, source: str) -> None:
+def _positive(e: Evidence, sid: str, out: Output, source: str, item_id: str) -> None:
+    from open_apprentice.teaching.evidence import (
+        EvidenceItem,
+    )  # local: evidence imports this module
+
     sc = e.scenes[sid]
     e.positives.append(Constraint("positive", sc, to_state(apply_output(sc, out)), source=source))
     e.approved[sid] = out
+    e.items.append(EvidenceItem(item_id, "full", sid, sc, output=out, source=source))
+
+
+def _excludes(e: Evidence, sid: str, outs: list[Output], source: str, item_id: str) -> None:
+    from open_apprentice.teaching.evidence import EvidenceItem
+
+    sc = e.scenes[sid]
+    excl = tuple(to_state(apply_output(sc, o)) for o in outs)
+    e.negatives.append(Constraint("excludes", sc, excluded=excl, source=source))
+    e.rejected.setdefault(sid, []).extend(outs)
+    e.items.append(EvidenceItem(item_id, "excludes", sid, sc, excluded=tuple(outs), source=source))
 
 
 TEACHER_ORIGINS = frozenset({"human", "simulator"})
@@ -78,7 +94,9 @@ def derive(events: list[Event]) -> Evidence:
             e.scene_hashes[p["scene_id"]] = p["scene_hash"]
             e.roles[p["scene_id"]] = p["role"]
         elif ev.type == "DemonstrationRecorded":
-            _positive(e, p["scene_id"], _parse_out(p["output"]), "demonstration")
+            _positive(
+                e, p["scene_id"], _parse_out(p["output"]), "demonstration", f"{ev.event_id}:0"
+            )
         elif ev.type == "RequestIssued":
             req = request_from_json(p["request"])
             requests[req.request_id] = req
@@ -89,26 +107,25 @@ def derive(events: list[Event]) -> Evidence:
             responded.add(r.request_id)
             req = requests.get(r.request_id)
             if isinstance(req, ChooseOutput):
-                sc = e.scenes[req.scene_id]
                 if r.kind == "choose" and r.selected is not None:
-                    _positive(e, req.scene_id, dict(req.alternatives)[r.selected], "answer")
+                    _positive(
+                        e,
+                        req.scene_id,
+                        dict(req.alternatives)[r.selected],
+                        "answer",
+                        f"{ev.event_id}:0",
+                    )
                 elif r.kind == "none":
-                    excl = tuple(to_state(apply_output(sc, o)) for _, o in req.alternatives)
-                    e.negatives.append(Constraint("excludes", sc, excluded=excl, source="neither"))
-                    e.rejected.setdefault(req.scene_id, []).extend(o for _, o in req.alternatives)
+                    shown = [o for _, o in req.alternatives]
+                    _excludes(e, req.scene_id, shown, "neither", f"{ev.event_id}:0")
             elif isinstance(req, ConfirmPreview):
                 verdicts = dict(r.per_item)
-                for item_id, sid, _, out in req.items:
+                for k, (item_id, sid, _, out) in enumerate(req.items):
                     if verdicts.get(item_id) == "approve":
-                        _positive(e, sid, out, "preview")
+                        _positive(e, sid, out, "preview", f"{ev.event_id}:{k}")
                         e.preview_approved[sid] = out
                     elif verdicts.get(item_id) == "reject":
-                        sc = e.scenes[sid]
-                        bad = (to_state(apply_output(sc, out)),)
-                        e.negatives.append(
-                            Constraint("excludes", sc, excluded=bad, source="preview_reject")
-                        )
-                        e.rejected.setdefault(sid, []).append(out)
+                        _excludes(e, sid, [out], "preview_reject", f"{ev.event_id}:{k}")
             elif isinstance(req, RequestDemonstration) and r.kind == "demonstrate" and r.output:
-                _positive(e, req.scene_id, r.output, "requested_demonstration")
+                _positive(e, req.scene_id, r.output, "requested_demonstration", f"{ev.event_id}:0")
     return e
