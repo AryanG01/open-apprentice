@@ -16,7 +16,9 @@ def pages(path: str) -> tuple[list[ET.Element], list[bool]]:
     for d in root.findall("diagram"):
         m = d.find("mxGraphModel")
         if m is None:  # compressed page: base64 -> raw inflate -> URL-decode
-            xml = urllib.parse.unquote(zlib.decompress(base64.b64decode(d.text.strip()), -15).decode("utf-8"))
+            xml = urllib.parse.unquote(
+                zlib.decompress(base64.b64decode(d.text.strip()), -15).decode("utf-8")
+            )
             m = ET.fromstring(xml)
             compressed.append(True)
         else:
@@ -34,13 +36,19 @@ def check(path: str, spec: dict) -> list[str]:
         problems.append(f"compressed: file {compressed} vs design {bool(spec.get('compressed'))}")
     for m, pg in zip(models, spec["pages"]):
         if (m.get("pageWidth"), m.get("pageHeight")) != tuple(str(v) for v in spec["page"]):
-            problems.append(f"page size {m.get('pageWidth')}x{m.get('pageHeight')} != {spec['page']}")
+            problems.append(
+                f"page size {m.get('pageWidth')}x{m.get('pageHeight')} != {spec['page']}"
+            )
         cells = m.find("root").findall("mxCell")
         by_value = {}
         for c in cells:
             if c.get("vertex") == "1":
                 g = c.find("mxGeometry")
-                by_value[c.get("value")] = (c.get("id"), [float(g.get(k, "0")) for k in ("x", "y", "width", "height")], c.get("style", ""))
+                by_value[c.get("value")] = (
+                    c.get("id"),
+                    [float(g.get(k, "0")) for k in ("x", "y", "width", "height")],
+                    c.get("style", ""),
+                )
         for x, y, w, h, text in pg["nodes"]:
             got = by_value.get(text)
             if not got or got[1] != [x, y, w, h]:
@@ -54,7 +62,9 @@ def check(path: str, spec: dict) -> list[str]:
         for a, b in pg["edges"]:
             if (ids.get(pg["nodes"][a][4]), ids.get(pg["nodes"][b][4])) not in edges:
                 problems.append(f"edge {pg['nodes'][a][4]} -> {pg['nodes'][b][4]} missing")
-        extra = len([c for c in cells if c.get("vertex") == "1"]) - len(pg["nodes"]) - len(pg["labels"])
+        extra = (
+            len([c for c in cells if c.get("vertex") == "1"]) - len(pg["nodes"]) - len(pg["labels"])
+        )
         if extra:
             problems.append(f"{extra} unexpected vertices")
     return problems

@@ -13,7 +13,12 @@ def geometry_span(raw: bytes, cell_id: str) -> tuple[int, int, dict[str, str]]:
     p = xml.parsers.expat.ParserCreate()
 
     def start(name: str, attrs: dict[str, str]) -> None:
-        if name == "mxGeometry" and stack and stack[-1] == cell_id and attrs.get("as") == "geometry":
+        if (
+            name == "mxGeometry"
+            and stack
+            and stack[-1] == cell_id
+            and attrs.get("as") == "geometry"
+        ):
             s = p.CurrentByteIndex
             e = raw.index(b">", s) + 1
             found.append((s, e, attrs))
