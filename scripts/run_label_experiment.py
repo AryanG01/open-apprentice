@@ -35,7 +35,7 @@ from open_apprentice.evaluation.label_episodes import (
     manifest_hash,
 )
 from open_apprentice.evaluation.label_reference import ReferenceProvider
-from open_apprentice.evaluation.label_runner import run_episode, score_and_row
+from open_apprentice.evaluation.label_runner import score_and_row
 from open_apprentice.providers.base import Provider, estimate_tokens
 
 DEFAULT_MODEL = "nvidia/Nemotron-3-Ultra-550b-a55b"

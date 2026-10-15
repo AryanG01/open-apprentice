@@ -9,7 +9,6 @@ Edits touch only the `x`/`y` of label <text> start tags, byte-exactly (svg/patch
 
 from __future__ import annotations
 
-import re
 from fractions import Fraction
 
 from open_apprentice.concepts.rules import RuleError, evaluate_rule
@@ -95,14 +94,14 @@ def scene_from_svg(text: str) -> tuple[dict, dict]:
                 f"label {lab['id']!r} is attached to {lab['attached']!r}, which is not a box in this file"
             )
     scene = {
-        "objects": nodes + [{k: v for k, v in l.items() if k != "_fs"} for l in labels],
+        "objects": nodes + [{k: v for k, v in lab.items() if k != "_fs"} for lab in labels],
         "canvas": canvas,
     }
     return scene, {
         "nodes": len(nodes),
         "labels": len(labels),
         "not_editable": skipped,
-        "font_sizes": {l["id"]: l["_fs"] for l in labels},
+        "font_sizes": {lab["id"]: lab["_fs"] for lab in labels},
     }
 
 

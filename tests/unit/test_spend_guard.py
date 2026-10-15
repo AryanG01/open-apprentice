@@ -116,7 +116,7 @@ async def test_an_unfunded_account_blocks_every_live_call(tmp_path):
 
 async def test_merge_system_moves_instructions_into_the_user_turn(tmp_path):
     from open_apprentice.evaluation.spend import SpendGuard
-    from open_apprentice.providers.base import CallContext, Message, RawCompletion
+    from open_apprentice.providers.base import Message, RawCompletion
     from open_apprentice.providers.mock import MockProvider
 
     seen = []

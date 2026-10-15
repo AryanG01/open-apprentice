@@ -125,7 +125,9 @@ def test_magic_condition_guard_and_else_if_parse():
     assert parse_rule_text("for o in objects {\\n move o to (1, 1)\\n}")
 
 
-async def test_a_rule_that_fits_the_demonstrations_but_not_a_held_back_diagram_is_not_committed(dev):
+async def test_a_rule_that_fits_the_demonstrations_but_not_a_held_back_diagram_is_not_committed(
+    dev,
+):
     from open_apprentice.evaluation.label_episodes import behaviour_class
 
     ep = next(e for e in dev if e.kind == "ambiguous")
@@ -139,4 +141,6 @@ async def test_a_rule_that_fits_the_demonstrations_but_not_a_held_back_diagram_i
         ep,
     )
     assert row["outcome"] != "correct_commit"
-    assert row["outcome"] != "wrong_commit" or row.get("scope")  # a commit is only possible if it passed validation
+    assert row["outcome"] != "wrong_commit" or row.get(
+        "scope"
+    )  # a commit is only possible if it passed validation

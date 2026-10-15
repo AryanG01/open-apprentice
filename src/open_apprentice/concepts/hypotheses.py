@@ -20,7 +20,7 @@ from open_apprentice.concepts.symbolic import Unsupported, compile_rule, make_in
 from pydantic import BaseModel
 
 from open_apprentice.concepts.rule_text import parse_rule_text
-from open_apprentice.providers.base import CallContext, Message, Provider, StrictModel
+from open_apprentice.providers.base import CallContext, Message, Provider
 
 import pathlib
 

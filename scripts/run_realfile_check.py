@@ -13,7 +13,6 @@ import asyncio
 import json
 import pathlib
 import sys
-from fractions import Fraction as F
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from open_apprentice.budget import Ledger, Limits  # noqa: E402
@@ -68,6 +67,11 @@ async def main() -> None:
     ap.add_argument("--reference", action="store_true")
     ap.add_argument("--cap-usd", type=float, default=0)
     ap.add_argument("--run-id", default="realfile-1")
+    ap.add_argument(
+        "--require-pinned",
+        action="store_true",
+        help="skip demonstrations that do not pin one catalogue behaviour (NOT used for realfile-1..4)",
+    )
     a = ap.parse_args()
     texts = {f: (SAMPLES / f"{f}.svg").read_text() for f in FILES}
     scenes = {f: scene_from_svg(t)[0] for f, t in texts.items()}
@@ -92,6 +96,8 @@ async def main() -> None:
                 scenes[demo_file],
                 apply_oracle(scenes[demo_file], oracle(spec, scenes[demo_file])),
             )
+            if a.require_pinned and len(consistent_classes([demo])) != 1:
+                continue
             # batch diagrams of different widths, as real files differ: the right-hand spot can leave a narrow canvas
             batch = [
                 make_scene(70_000 + i, 4 + i, warnings=i % 3, canvas_w=w)
