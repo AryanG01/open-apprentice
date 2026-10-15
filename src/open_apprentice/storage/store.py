@@ -76,8 +76,12 @@ class LocalStore:
                     f"{key}: expected {if_generation}, found {current and current.generation}"
                 )
             new_gen = 1 if current is None else current.generation + 1
+            gen_tmp = p.with_name(p.name + ".gen.tmp")
+            gen_tmp.write_text(str(new_gen))
             tmp = p.with_name(p.name + ".tmp")
             tmp.write_bytes(data)
             os.replace(tmp, p)
-            p.with_name(p.name + ".gen").write_text(str(new_gen))
+            os.replace(
+                gen_tmp, p.with_name(p.name + ".gen")
+            )  # atomic: readers never see a partial value
             return new_gen

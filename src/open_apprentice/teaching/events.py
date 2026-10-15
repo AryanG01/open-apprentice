@@ -69,6 +69,22 @@ class SessionLog:
         caused_by: Optional[str] = None,
         expected_revision: Optional[int] = None,
     ) -> Event:
+        for _ in range(20):
+            try:
+                return self._append_once(type, origin, payload, caused_by, expected_revision)
+            except Conflict:
+                if expected_revision is not None:
+                    raise
+        raise Conflict("too many concurrent writers")
+
+    def _append_once(
+        self,
+        type: str,
+        origin: str,
+        payload: dict,
+        caused_by: Optional[str],
+        expected_revision: Optional[int],
+    ) -> Event:
         b = self.store.get(self._mkey)
         if b is None:
             raise KeyError(f"no session {self.sid}")

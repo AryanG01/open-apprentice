@@ -13,6 +13,11 @@ def install_learner_guard(forbidden_prefix: str = "open_apprentice.evaluation") 
     global _installed
     if _installed:
         return
+    loaded = [
+        m for m in sys.modules if m == forbidden_prefix or m.startswith(forbidden_prefix + ".")
+    ]
+    if loaded:
+        raise RuntimeError(f"learner guard: evaluator modules already loaded: {sorted(loaded)[:3]}")
 
     def hook(event: str, args: tuple[Any, ...]) -> None:
         if (

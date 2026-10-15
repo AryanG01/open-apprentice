@@ -31,7 +31,7 @@ Updated at the end of Plan 1 (branch `p1-foundations`).
 | 5 | Corrections, drafts, scope, supersession, retention, activation | — | planned (Plan 2) | — |
 | 6 | draw.io import, mapping, measurement, patching | — | planned (Plan 3) | — |
 | 7 | Simulator teacher in a separate process | `evaluation/teacher_sim.py`, `teaching/teacher.SubprocessTeacher` | implemented | `test_teacher_sim.py::test_subprocess_teacher_round_trip` |
-| 7 | Learner-process isolation (audit hook) | `teaching/isolation.py` | implemented | `test_isolation.py` |
+| 7 | Learner-process isolation (audit hook) | `teaching/isolation.py` (refuses to install if evaluator modules are already loaded) | implemented as a guard; **not yet called** by any learner entry point — wired into the learner runner in Plan 5 | `test_isolation.py`, `test_review_fixes.py::test_guard_refuses_when_evaluator_already_loaded` |
 | 7 | Baselines B/C/D, manifests, battery | — | planned (Plan 5) | — |
 | 7 | Real-file corpus authored in draw.io, final three frozen | — | planned (Task 1 of Plan 1, needs the owner's download approval) | — |
 | 8 | API and UI | — | planned (Plan 4) | — |

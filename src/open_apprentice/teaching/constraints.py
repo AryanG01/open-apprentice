@@ -45,6 +45,7 @@ class Evidence:
     positives: list[Constraint] = field(default_factory=list)
     negatives: list[Constraint] = field(default_factory=list)
     approved: dict[str, Output] = field(default_factory=dict)
+    preview_approved: dict[str, Output] = field(default_factory=dict)
     rejected: dict[str, list[Output]] = field(default_factory=dict)
 
     @property
@@ -58,11 +59,20 @@ def _positive(e: Evidence, sid: str, out: Output, source: str) -> None:
     e.approved[sid] = out
 
 
+TEACHER_ORIGINS = frozenset({"human", "simulator"})
+
+
 def derive(events: list[Event]) -> Evidence:
     e = Evidence()
     requests: dict[str, Request] = {}
+    responded: set[str] = set()
     for ev in events:
         p = ev.payload
+        if (
+            ev.type in ("DemonstrationRecorded", "ResponseRecorded")
+            and ev.origin not in TEACHER_ORIGINS
+        ):
+            continue  # only the teacher creates intent
         if ev.type == "SceneRegistered":
             e.scenes[p["scene_id"]] = scene_from_payload(p["scene"])
             e.scene_hashes[p["scene_id"]] = p["scene_hash"]
@@ -74,6 +84,9 @@ def derive(events: list[Event]) -> Evidence:
             requests[req.request_id] = req
         elif ev.type == "ResponseRecorded":
             r = response_from_json(p["response"])
+            if r.request_id in responded:
+                continue  # one request, one response: later duplicates carry no evidence
+            responded.add(r.request_id)
             req = requests.get(r.request_id)
             if isinstance(req, ChooseOutput):
                 sc = e.scenes[req.scene_id]
@@ -88,6 +101,7 @@ def derive(events: list[Event]) -> Evidence:
                 for item_id, sid, _, out in req.items:
                     if verdicts.get(item_id) == "approve":
                         _positive(e, sid, out, "preview")
+                        e.preview_approved[sid] = out
                     elif verdicts.get(item_id) == "reject":
                         sc = e.scenes[sid]
                         bad = (to_state(apply_output(sc, out)),)

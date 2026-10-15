@@ -207,6 +207,8 @@ def step(events: list[Event], config: StepConfig) -> Action:
     rounds: list[str] = []
     attempts = 0
     stored = False
+    if any(e.type in ("Abstained", "Errored") for e in events):
+        return WaitForResult("terminal")
     for e in events:
         if e.type == "ActionIssued":
             issued[e.payload["action_id"]] = e.payload
@@ -224,8 +226,6 @@ def step(events: list[Event], config: StepConfig) -> Action:
             return Error(_aid(events, "Error"), f"provider: {e.payload['reason']}")
         if e.type == "VersionStored":
             stored = True
-        if e.type in ("Abstained", "Errored"):
-            return WaitForResult("terminal")
 
     requests = {
         request_from_json(e.payload["request"]).request_id: e.payload["action_id"]
@@ -292,6 +292,8 @@ def step(events: list[Event], config: StepConfig) -> Action:
         aid = _aid(events, "AskTeacher")
         return AskTeacher(aid, ChooseOutput(f"q-{aid}", sid, ev.scene_hashes[sid], alts))
     if disagreement_found:
+        if "contrastive" not in rounds and attempts < config.max_attempts:
+            return RequestModelProposal(_aid(events, "RequestModelProposal"), "contrastive")
         return Abstain(_aid(events, "Abstain"), "unresolved disagreement")
 
     # rule 4: one program, or no disagreement found: one contrastive round per cycle
@@ -303,7 +305,8 @@ def step(events: list[Event], config: StepConfig) -> Action:
     approvals = [
         sid
         for sid in ev.batch
-        if sid in ev.approved and run_output(sel["rule"], ev.scenes[sid]) == ev.approved[sid]
+        if sid in ev.preview_approved
+        and run_output(sel["rule"], ev.scenes[sid]) == ev.preview_approved[sid]
     ]
     unresolved_reject = any(
         run_output(sel["rule"], ev.scenes[s]) in outs for s, outs in ev.rejected.items()

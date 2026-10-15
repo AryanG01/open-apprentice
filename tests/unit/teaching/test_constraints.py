@@ -30,7 +30,8 @@ SCENE = {
 
 
 def ev(i, t, payload):
-    return Event(f"e{i}", f"e{i-1}" if i > 1 else None, i, t, "system", payload)
+    origin = "human" if t in ("DemonstrationRecorded", "ResponseRecorded") else "system"
+    return Event(f"e{i}", f"e{i-1}" if i > 1 else None, i, t, origin, payload)
 
 
 def reg(i, sid, role):
