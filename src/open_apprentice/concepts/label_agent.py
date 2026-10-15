@@ -115,7 +115,7 @@ async def run_agent(
                 res.questions.append({"batch_index": i})
                 reply = {
                     "teacher_shows_for_batch_index": i,
-                    "resulting_geometry": describe(constraints[-1:])[0]["resulting_geometry"],
+                    "labels_moved_to": describe_compact(constraints[-1:])[0]["labels_moved_to"],
                     "asks_left": MAX_ASKS - len(asked),
                 }
             msgs.append(Message("user", json.dumps(reply, default=str)))
