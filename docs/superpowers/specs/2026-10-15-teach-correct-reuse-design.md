@@ -353,7 +353,7 @@ scoring documents per learning episode; corrections scored on changed scope and 
 **Real-file corpus.** Six diagrams authored by Claude in the actual draw.io editor (app.diagrams.net through browser automation, saved as
 `.drawio`); if a specific editor step is impossible from this environment, the owner is asked for that concrete step early. Provenance per
 file: author, editor version, steps, file hash, date. All six are authored on 16 Oct (WP0), before any import code exists. Three are development files; the three final files are hashed
-and moved the same day to `benchmarks/final/drawio/` (git-ignored, evaluator-only, already excluded by the import-boundary contract) and are
+and moved the same day to `benchmarks/final/drawio/` (git-ignored via `.gitignore`; evaluator-only; the learner-process audit hook and environment of section 7 keep it unreadable during runs) and are
 not opened by any development code or by Claude until the WP5 frozen run; their hashes and provenance are committed. No tuning on the frozen three; results described as within-family generalization unless crossing sources or generators. Synthetic
 parser fixtures are separate.
 
