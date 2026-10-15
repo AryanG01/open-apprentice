@@ -5,8 +5,8 @@ experiments, and understand every decision, setback and caveat. Everything numer
 (`results/`, the spend ledger, `git log`) when this file was generated; the generator script is described in section 12.
 Where something is a guess or unverified it says so. If this file and the repository disagree, trust the repository and fix this file.
 
-Repository: `/Users/aryanganju/Desktop/Code/Nvidia` (branch `master`, private GitHub repo `AryanG01/open-apprentice`; nothing from the redesign work
-has been pushed). Owner: Aryan Ganju (solo; NUS CS: AI + DB Systems). Deadline: Devpost 30 Oct 2026 17:00 UTC = 31 Oct 2026 01:00 SGT.
+Repository: `/Users/aryanganju/Desktop/Code/Nvidia` (branch `master`, private GitHub repo `AryanG01/open-apprentice`; everything through commit `2a193d9` was pushed on 2026-10-15
+after a clean secret scan, see section 9). Owner: Aryan Ganju (solo; NUS CS: AI + DB Systems). Deadline: Devpost 30 Oct 2026 17:00 UTC = 31 Oct 2026 01:00 SGT.
 
 ---
 
@@ -52,7 +52,7 @@ $1/M input, $3/M output (owner-entered, unverified); conservative guard rate $4/
 
 **Owner's standing instructions (global CLAUDE.md + project `.claude/CLAUDE.md`):** push back when the owner is wrong; never say "done/works" unless it was run;
 verify that packages/APIs exist; Python with black + type hints; conventional commits; never commit secrets, `.env` or build artefacts; commit/push only when asked
-(the owner asked for commits throughout Era 2; nothing was pushed); the Nebius key lives only in `.env` (Secret Manager for the deployment), never printed;
+(the owner asked for commits throughout Era 2 and, on 15 Oct, for the push after a secret scan); the Nebius key lives only in `.env` (Secret Manager for the deployment), never printed;
 chat style is terse ("caveman" hook) but code, commits and docs are written normally.
 
 **Repo rules (enforced).**
@@ -354,8 +354,11 @@ after a failed validation): **52/52, conditional 12/12, 0 violations, 0 unrelate
 
 ## 9. Current state (what is true now)
 
-**Code.** Branch `master`, working tree clean except for this record (check `git status`). Tests: 472 passing in `tests/unit tests/evaluation tests/contracts` on Python 3.13.5 (the CI target 3.12 was last
-verified for Era 1; run `OA_ENGINE_TESTS=1 PYTHONPATH=src:. $TMPDIR/venv312/bin/python -m pytest -q tests` before any release). `lint-imports`: 1 contract kept, 0 broken (it printed "Could not find package" once when run without
+**Code.** Branch `master`, pushed to `origin` (head `2a193d9` at the push; this record was updated after it). Tests: 472 passing in `tests/unit tests/evaluation tests/contracts` on **both Python 3.13.5 and Python 3.12** (a fresh 3.12 venv built with
+`UV_PROJECT_ENVIRONMENT=<dir> uv sync --frozen --python 3.12` on 15 Oct); the engine-backed and browser suites were NOT re-run in Era 2 (run `OA_ENGINE_TESTS=1 PYTHONPATH=src:. <py312>/bin/python -m pytest -q tests` and `npm run test:e2e` before any release).
+`ruff check` and `black --check` over `src tests scripts` are clean.
+
+**Secret scan before the push (15 Oct).** Every secret-like value in the local `.env` (6 keys: Nebius, LangSmith, Tavily, Tendem, Postgres password, session secret) was searched for in the whole git history (`git log --all -S`) and in `HEAD`: 0 hits each. Generic key patterns (`nvapi-`, `AIza`, `sk-`, `ghp_`, `hf_`, JWTs, private-key headers) over `HEAD` and every commit: 0 hits. No `.env`, credential or `.pem` file is tracked; `.env` and `results/redesign/spend.jsonl` are git-ignored; nothing under `benchmarks/final/` is tracked. The scan checks the values at that time; it does not cover secrets added later. `lint-imports`: 1 contract kept, 0 broken (it printed "Could not find package" once when run without
 the project path; run it from the repo root through uv or with `PYTHONPATH=src`).
 
 **Results (single runs unless stated).** See section 0 and Appendix A. In short: gate set apprentice 15/15 twice, agent conditional 2/5 and 1/5, held-out 8/8 + 8/8 on unambiguous and ambiguous with the unsolved noisy failure
@@ -418,7 +421,7 @@ Typical cost per episode-system about $0.06-0.17; a conditional episode with que
 2. Solve noisy demonstrations (leave-one-out: if a simple rule explains all but one demonstrated object, flag that object and ask the teacher about it instead of committing a special case).
 3. Held-out baseline (about $4) and repeats, only if the owner approves more spend.
 4. Integrate the label-placement flow into the product (API, UI "teach a label rule", immutable skill versions, a retention report that re-applies earlier skills after a correction), plus a deterministic Konva adapter and engine checks.
-5. Era 1 open items: refresh the static HF Space; time the Cloud Run cold start; durable spend cap; rerun the Gym with the fixed refusal message; make the repo public after a secret scan; the owner records the video (<= 3 minutes).
+5. Era 1 open items: refresh the static HF Space; time the Cloud Run cold start; durable spend cap; rerun the Gym with the fixed refusal message; make the repo public (the secret scan was clean on 15 Oct; repeat it first, `gh repo edit AryanG01/open-apprentice --visibility public --accept-visibility-change-consequences`); the owner records the video (<= 3 minutes).
 6. Keep `docs/claims_and_limitations.md` and the README in line with the evidence; do not cite `realfile-4` as generalisation; do not call the apprentice a general method.
 
 ---
@@ -614,11 +617,11 @@ rules would behave differently.
      144 scripts/run_realfile_check.py
      106 tests/unit/test_label_agent.py
      136 tests/unit/test_label_episodes.py
-     142 tests/unit/test_label_teaching.py
+     146 tests/unit/test_label_teaching.py
      201 tests/unit/test_labels_family.py
       63 tests/unit/test_svg_labels.py
      176 tests/unit/test_spend_guard.py
-    3467 total
+    3471 total
 ```
 
 
@@ -726,6 +729,7 @@ fcffc31 2026-10-15 fix: same-model agent prompt gets the same language help (blo
 ff7343d 2026-10-15 docs: project record (full history, design, decisions, setbacks, reproduction), redesign brief copy, dev-6 regression result
 028aa11 2026-10-15 docs: tighten dev-6 wording and final spend in the project record
 d16587d 2026-10-15 docs: README section for the label-placement research result with its limits
+2a193d9 2026-10-15 chore: lint and format clean; correct the real-file docs (the demo-pinning filter was never applied; opt-in --require-pinned flag added)
 ```
 
 
