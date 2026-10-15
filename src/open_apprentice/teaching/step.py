@@ -214,7 +214,12 @@ def step(events: list[Event], config: StepConfig) -> Action:
                 rounds.append(e.payload.get("round_kind", "initial"))
                 attempts += 1
         elif e.type in RESULT_TYPES and e.payload.get("action_id"):
-            resolved.add(e.payload["action_id"])
+            if e.type == "ModelCallFailed" and not e.payload.get("terminal"):
+                attempts += (
+                    1  # a retried attempt counts against the budget; the action is still open
+                )
+            else:
+                resolved.add(e.payload["action_id"])
         if e.type == "ModelCallFailed" and e.payload.get("terminal"):
             return Error(_aid(events, "Error"), f"provider: {e.payload['reason']}")
         if e.type == "VersionStored":
