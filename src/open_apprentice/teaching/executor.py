@@ -10,11 +10,13 @@ from typing import Optional, Protocol
 
 from open_apprentice.concepts.label_teaching import describe_compact
 from open_apprentice.providers.base import ProviderTimeout, TruncatedOutput
+from open_apprentice.skills.versions import SkillStore
 from open_apprentice.storage.store import Store
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.accounting import Ledger, OverBudget
 from open_apprentice.teaching.constraints import derive
 from open_apprentice.teaching.events import Conflict, Event, SessionLog
+from open_apprentice.teaching.evidence import item_to_json
 from open_apprentice.teaching.step import (
     Abstain,
     Action,
@@ -77,9 +79,11 @@ class Executor:
         ledger: Ledger,
         config: StepConfig,
         worst_usd: Fraction = Fraction(1, 5),
+        skill_id: str = "skill",
     ) -> None:
         self.store, self.log, self.proposer, self.teacher = store, log, proposer, teacher
         self.ledger, self.config, self.worst = ledger, config, worst_usd
+        self.skill_id = skill_id
 
     def _claim(self, action_id: str) -> bool:
         return self.store.create(f"claims/{action_id}.json", codec.dumps({"action_id": action_id}))
@@ -267,12 +271,31 @@ class Executor:
             self._ask(action)
         elif isinstance(action, CommitVersion):
             self._issue(action.action_id, "CommitVersion")
-            record = {"rule": action.rule, "summary": action.summary, "claim": action.claim}
-            self.store.create(f"programs/{action.program_hash}.json", codec.dumps(record))
+            items = derive(self.log.events()).items
+            artifact = {
+                "skill_id": self.skill_id,
+                "program": {
+                    "rule": action.rule,
+                    "hash": action.program_hash,
+                    "summary": action.summary,
+                    "claim": action.claim,
+                },
+                "evidence": [item_to_json(i) for i in items],
+                "superseded": {},
+                "retention_report": {},
+                "parent_version": None,
+                "created_by_session": self.log.sid,
+            }
+            version = SkillStore(self.store).store_version(self.skill_id, artifact)
             self.log.append(
                 "VersionStored",
                 "system",
-                {"action_id": action.action_id, "program_hash": action.program_hash},
+                {
+                    "action_id": action.action_id,
+                    "skill_id": self.skill_id,
+                    "version": version,
+                    "program_hash": action.program_hash,
+                },
             )
         elif isinstance(action, Abstain):
             self.log.append(
