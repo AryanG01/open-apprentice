@@ -4,6 +4,7 @@ never re-performs an action whose claim exists. Failures are recorded as events,
 
 from __future__ import annotations
 
+import time
 import uuid
 from fractions import Fraction
 from typing import Optional, Protocol
@@ -11,7 +12,7 @@ from typing import Optional, Protocol
 from open_apprentice.concepts.label_teaching import describe_compact
 from open_apprentice.providers.base import ProviderTimeout, TruncatedOutput
 from open_apprentice.skills.versions import SkillStore
-from open_apprentice.storage.store import Store
+from open_apprentice.storage.store import PreconditionFailed, Store
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.accounting import Ledger, OverBudget
 from open_apprentice.teaching.constraints import derive
@@ -44,6 +45,71 @@ from open_apprentice.teaching.teacher import (
 
 MAX_TRIES = 2  # one retry for a transient provider failure (spec 3.7)
 TRANSIENT = ("truncation", "timeout", "transport")
+CLAIM_LEASE_S = 600  # a claim with no recorded effect after this long belongs to a worker that died
+
+
+def claim(store: Store, key: str) -> bool:
+    """Claim an action by creating its key. A claim older than the lease (or unreadable) was left by a worker that died
+    before recording anything (step() only re-offers an action whose decision point is still the log head), so it is
+    taken over by compare-and-set; a live claim is left alone."""
+    body = codec.dumps({"at": int(time.time()), "nonce": uuid.uuid4().hex})
+    if store.create(key, body):
+        return True
+    held = store.get(key)
+    if held is None:
+        return False
+    try:
+        at = int(codec.loads(held.data)["at"])
+    except (KeyError, TypeError, ValueError):
+        at = 0
+    if time.time() - at < CLAIM_LEASE_S:
+        return False
+    try:
+        store.put(key, body, if_generation=held.generation)
+    except PreconditionFailed:
+        return False
+    return True
+
+
+def submit_response(log: SessionLog, resp: Response) -> bool:
+    """Accept a teacher response only if its request is outstanding, committing against the exact log revision that
+    was checked (a concurrent answer makes this re-check, not double-record). Returns False and records nothing
+    otherwise."""
+    for _ in range(20):
+        m, _ = log.manifest()
+        evs = log.events()
+        if (evs[-1].event_id if evs else None) != m["head_event_id"]:
+            continue  # the log moved between the two reads
+        try:
+            return _submit_checked(log, resp, evs, m["manifest_revision"])
+        except Conflict:
+            continue
+    return False
+
+
+def _submit_checked(log: SessionLog, resp: Response, evs: list[Event], revision: int) -> bool:
+    reqs = {
+        request_from_json(e.payload["request"]).request_id: request_from_json(e.payload["request"])
+        for e in evs
+        if e.type == "RequestIssued"
+    }
+    answered = {
+        response_from_json(e.payload["response"]).request_id
+        for e in evs
+        if e.type == "ResponseRecorded"
+    }
+    req = reqs.get(resp.request_id)
+    if req is None or resp.request_id in answered:
+        return False
+    try:
+        validate_response(req, resp)
+    except ProtocolError:
+        return False
+    origin = "simulator" if resp.source in ("simulator", "deterministic_simulator") else "human"
+    log.append(
+        "ResponseRecorded", origin, {"response": response_to_json(resp)}, expected_revision=revision
+    )
+    return True
 
 
 def failure_kind(e: BaseException) -> str:
@@ -86,7 +152,7 @@ class Executor:
         self.skill_id = skill_id
 
     def _claim(self, action_id: str) -> bool:
-        return self.store.create(f"claims/{action_id}.json", codec.dumps({"action_id": action_id}))
+        return claim(self.store, f"claims/{action_id}.json")
 
     def _issue(self, action_id: str, kind: str, extra: Optional[dict] = None) -> None:
         self.log.append(
@@ -95,48 +161,7 @@ class Executor:
 
     # ---- teacher responses
     def submit_response(self, resp: Response) -> bool:
-        """Accept a teacher response only if its request is outstanding, committing against the exact log
-        revision that was checked (a concurrent answer makes this re-check, not double-record). Returns False and
-        records nothing otherwise."""
-        for _ in range(20):
-            m, _ = self.log.manifest()
-            evs = self.log.events()
-            if (evs[-1].event_id if evs else None) != m["head_event_id"]:
-                continue  # the log moved between the two reads
-            try:
-                return self._submit_checked(resp, evs, m["manifest_revision"])
-            except Conflict:
-                continue
-        return False
-
-    def _submit_checked(self, resp: Response, evs: list[Event], revision: int) -> bool:
-        reqs = {
-            request_from_json(e.payload["request"]).request_id: request_from_json(
-                e.payload["request"]
-            )
-            for e in evs
-            if e.type == "RequestIssued"
-        }
-        answered = {
-            response_from_json(e.payload["response"]).request_id
-            for e in evs
-            if e.type == "ResponseRecorded"
-        }
-        req = reqs.get(resp.request_id)
-        if req is None or resp.request_id in answered:
-            return False
-        try:
-            validate_response(req, resp)
-        except ProtocolError:
-            return False
-        origin = "simulator" if resp.source in ("simulator", "deterministic_simulator") else "human"
-        self.log.append(
-            "ResponseRecorded",
-            origin,
-            {"response": response_to_json(resp)},
-            expected_revision=revision,
-        )
-        return True
+        return submit_response(self.log, resp)
 
     # ---- actions
     def _attempts_used(self) -> int:
@@ -205,7 +230,8 @@ class Executor:
                 {"action_id": f"teacher-{request.request_id}", "reason": f"protocol: {e}"},
             )
             return
-        self.submit_response(resp)
+        if resp is not None:  # None: delivered to a person, who answers later via submit_response
+            self.submit_response(resp)
 
     def _ask(self, action: AskTeacher | PresentPreview) -> None:
         try:

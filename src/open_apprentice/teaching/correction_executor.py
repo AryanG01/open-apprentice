@@ -21,7 +21,13 @@ from open_apprentice.teaching.correction_step import (
 )
 from open_apprentice.teaching.corrections import derive_draft
 from open_apprentice.teaching.events import Conflict, SessionLog
-from open_apprentice.teaching.executor import MAX_TRIES, TRANSIENT, failure_kind
+from open_apprentice.teaching.executor import (
+    MAX_TRIES,
+    TRANSIENT,
+    claim,
+    failure_kind,
+    submit_response,
+)
 from open_apprentice.teaching.step import (
     Abstain,
     AskTeacher,
@@ -33,15 +39,14 @@ from open_apprentice.teaching.step import (
 from open_apprentice.teaching.teacher import (
     Output,
     ProtocolError,
+    Request,
     Response,
     Teacher,
     _out_json,
     request_from_json,
     request_to_json,
     response_from_json,
-    response_to_json,
     validate_request,
-    validate_response,
 )
 
 
@@ -120,7 +125,7 @@ class CorrectionExecutor:
         self.ledger, self.config, self.worst = ledger, config, worst_usd
 
     def _claim(self, action_id: str) -> bool:
-        return self.store.create(f"claims/{self.log.sid}/{action_id}.json", b"{}")
+        return claim(self.store, f"claims/{self.log.sid}/{action_id}.json")
 
     def _status(self) -> Optional[str]:
         types = {e.type for e in self.log.events()}
@@ -136,26 +141,69 @@ class CorrectionExecutor:
                 return s
         return None
 
-    def _submit(self, resp: Response) -> None:
-        evs = self.log.events()
-        reqs = {
-            request_from_json(e.payload["request"]).request_id: request_from_json(
-                e.payload["request"]
+    def submit_response(self, resp: Response) -> bool:
+        return submit_response(self.log, resp)
+
+    def abandon(self) -> None:
+        """The person abandons the correction: nothing stored changes (spec 5). No effect once it has ended."""
+        if self._status() is None and not any(e.type == "VersionStored" for e in self.log.events()):
+            self.log.append("CorrectionAbandoned", "human", {})
+
+    def _deliver(self, request: Request, action_id: str) -> None:
+        try:
+            resp = self.teacher.ask(request)
+        except ProtocolError as e:
+            self.log.append(
+                "Errored", "system", {"action_id": action_id, "reason": f"protocol: {e}"}
             )
+            return
+        if resp is not None:  # None: delivered to a person, who answers later via submit_response
+            self.submit_response(resp)
+
+    def _recover(self) -> None:
+        """Single-process recovery after a crash, mirroring the learning executor: a stored version whose activation
+        was never recorded is activated (or reconciled) against the starting generation; a model call with no result
+        was interrupted and is a terminal failure; an unanswered request is asked again with the same request id.
+        """
+        evs = self.log.events()
+        if self._status() is not None:
+            return
+        stored = next((e for e in evs if e.type == "VersionStored"), None)
+        if stored is not None:
+            self._activate(stored.payload["action_id"], stored.payload["version"])
+            return
+        resolved = {
+            e.payload.get("action_id")
             for e in evs
-            if e.type == "RequestIssued"
+            if e.type in ("ModelProposalReturned", "ModelCallFailed")
         }
+        for e in evs:
+            if (
+                e.type == "ActionIssued"
+                and e.payload.get("kind") == "RequestModelProposal"
+                and e.payload["action_id"] not in resolved
+            ):
+                self.log.append(
+                    "ModelCallFailed",
+                    "system",
+                    {
+                        "action_id": e.payload["action_id"],
+                        "reason": "interrupted",
+                        "terminal": True,
+                    },
+                )
+                return
         answered = {
             response_from_json(e.payload["response"]).request_id
             for e in evs
             if e.type == "ResponseRecorded"
         }
-        req = reqs.get(resp.request_id)
-        if req is None or resp.request_id in answered:
-            return
-        validate_response(req, resp)
-        origin = "simulator" if resp.source in ("simulator", "deterministic_simulator") else "human"
-        self.log.append("ResponseRecorded", origin, {"response": response_to_json(resp)})
+        for e in evs:
+            if e.type == "RequestIssued":
+                req = request_from_json(e.payload["request"])
+                if req.request_id not in answered:
+                    self._deliver(req, e.payload["action_id"])
+                    return
 
     def _propose(self, action: RequestModelProposal) -> None:
         self.log.append(
@@ -174,6 +222,16 @@ class CorrectionExecutor:
             "corrected_labels": list(d.corrective.mask),
         }
         for attempt_no in range(1, MAX_TRIES + 1):
+            if (
+                attempt_no > 1
+                and derive_draft(self.log.events()).attempts >= self.config.max_attempts
+            ):
+                self.log.append(
+                    "ModelCallFailed",
+                    "system",
+                    {"action_id": action.action_id, "reason": "attempt budget", "terminal": True},
+                )
+                return
             attempt = uuid.uuid4().hex
             try:
                 self.ledger.reserve(attempt, action.action_id, self.worst)
@@ -236,49 +294,51 @@ class CorrectionExecutor:
             "system",
             {"request": request_to_json(action.request), "action_id": action.action_id},
         )
-        try:
-            self._submit(self.teacher.ask(action.request))
-        except ProtocolError as e:
-            self.log.append(
-                "Errored", "system", {"action_id": action.action_id, "reason": f"protocol: {e}"}
-            )
+        self._deliver(action.request, action.action_id)
 
     def _commit(self, action: CommitCorrection) -> None:
-        start = self.log.events()[0].payload
-        skills = SkillStore(self.store)
-        version = skills.store_version(start["skill_id"], action.artifact)
+        skill_id = self.log.events()[0].payload["skill_id"]
+        version = SkillStore(self.store).store_version(skill_id, action.artifact)
         self.log.append(
             "VersionStored",
             "system",
-            {"action_id": action.action_id, "skill_id": start["skill_id"], "version": version},
+            {"action_id": action.action_id, "skill_id": skill_id, "version": version},
         )
+        self._activate(action.action_id, version)
+
+    def _activate(self, action_id: str, version: int) -> None:
+        """Move the pointer from the generation captured at the start, once. If the pointer already carries this
+        operation (a crash after the move, before logging), record that instead of retrying."""
+        start = self.log.events()[0].payload
+        skills, skill_id = SkillStore(self.store), start["skill_id"]
+        current, rid, _ = skills.active(skill_id)
+        if rid is not None:
+            rec = codec.loads(self.store.get(f"skills/{skill_id}/activations/{rid}.json").data)
+            if rec["operation_id"] == action_id:
+                self._activated(action_id, start["base_version"], current, rid)
+                return
         try:
             rid = skills.activate(
-                start["skill_id"],
-                version,
-                start["base_pointer_generation"],
-                action.action_id,
-                self.log.sid,
+                skill_id, version, start["base_pointer_generation"], action_id, self.log.sid
             )
         except ActivationRejected as e:
             self.log.append(
                 "ActivationRejected",
                 "system",
-                {"action_id": action.action_id, "reason": str(e), "stored_version": version},
+                {"action_id": action_id, "reason": str(e), "stored_version": version},
             )
             return
+        self._activated(action_id, start["base_version"], version, rid)
+
+    def _activated(self, action_id: str, frm: int, to: int, rid: str) -> None:
         self.log.append(
             "VersionActivated",
             "system",
-            {
-                "operation_id": action.action_id,
-                "from": start["base_version"],
-                "to": version,
-                "record_id": rid,
-            },
+            {"operation_id": action_id, "from": frm, "to": to, "record_id": rid},
         )
 
     def run(self, max_steps: int = 50) -> str:
+        self._recover()
         for _ in range(max_steps):
             status = self._status()
             if status:

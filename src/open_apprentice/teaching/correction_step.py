@@ -9,7 +9,7 @@ from open_apprentice.concepts.rules import RuleError, validate_rule
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.corrections import Draft, derive_draft, draft_items
 from open_apprentice.teaching.events import Event
-from open_apprentice.teaching.evidence import item_fits, item_to_json
+from open_apprentice.teaching.evidence import EvidenceItem, item_fits, item_to_json
 from open_apprentice.teaching.retention import behaviour_diff, retention_report
 from open_apprentice.teaching.scope import SelectorError, members, parse_selector
 from open_apprentice.teaching.step import (
@@ -92,6 +92,15 @@ def _candidates(events: list[Event]) -> list[dict]:
     return list(seen.values())
 
 
+def _exceptions(c: dict, items: list[EvidenceItem]) -> frozenset[tuple[str, str]]:
+    """Per-label exceptions a conflict set would need: only the labels whose approved output the candidate changes."""
+    out = set()
+    for i in items:
+        new = run_output(c["rule"], i.scene) or {}
+        out |= {(i.scene_id, k) for k, v in (i.output or {}).items() if new.get(k) != v}
+    return frozenset(out)
+
+
 def _admissible(c: dict, d: Draft) -> Optional[dict]:
     """The candidate with its conflict set, or None when it must never be shown to the user."""
     try:
@@ -102,9 +111,7 @@ def _admissible(c: dict, d: Draft) -> Optional[dict]:
         if not item_fits(c["rule"], d.corrective)[0]:
             return None
         conflicts = [i.id for i in d.base_items if not item_fits(c["rule"], i)[0]]
-        exceptions = frozenset(
-            (i.scene_id, lid) for i in d.base_items if i.id in conflicts for lid in (i.output or {})
-        )
+        exceptions = _exceptions(c, [i for i in d.base_items if i.id in conflicts])
         diff = behaviour_diff(
             d.base["program"]["rule"], c["rule"], d.scenes, c["selector"], exceptions
         )
@@ -125,6 +132,10 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
     for e in events:
         if e.type == "ModelCallFailed" and e.payload.get("terminal"):
             return Error(_aid(events, "Error"), f"provider: {e.payload['reason']}")
+    if any(e.type == "CorrectionAbandoned" for e in events):
+        return Abstain(
+            _aid(events, "Abstain"), "correction abandoned; the active version is unchanged"
+        )
     issued = [e.payload["action_id"] for e in events if e.type == "ActionIssued"]
     done = {
         e.payload.get("action_id")
@@ -240,8 +251,14 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
     items_all = draft_items(d)
     misses = [i.id for i in items_all if not item_fits(sel["rule"], i)[0]]
     active_after = [i for i in d.base_items if i.id not in d.superseded]
+    approved = frozenset(
+        (v["scene_id"], lid) for v in d.superseded.values() for lid in v["changed_labels"]
+    )
+    diff = behaviour_diff(
+        d.base["program"]["rule"], sel["rule"], d.scenes, sel["selector"], approved
+    )
     report = retention_report(
-        sel["rule"], active_after, d.superseded, d.replacements, sel["diff"], len(d.scenes)
+        sel["rule"], active_after, d.superseded, d.replacements, diff, len(d.scenes)
     )
     if not d.preview_items:
         return Abstain(

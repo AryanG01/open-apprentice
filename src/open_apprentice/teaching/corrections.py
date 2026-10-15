@@ -88,6 +88,8 @@ def derive_draft(events: list[Event]) -> Draft:
             d.attempts += 1
         elif ev.type == "ModelCallFailed" and not q.get("terminal"):
             d.attempts += 1
+        elif ev.type == "CorrectionAbandoned" and ev.origin in TEACHER_ORIGINS:
+            d.cancelled = True
         elif ev.type == "RequestIssued":
             req = request_from_json(q["request"])
             requests[req.request_id] = req
@@ -137,7 +139,17 @@ def _apply_response(d: Draft, req: Request, r: Response, event_id: str) -> None:
                 # affected-example items are named after the base item they would replace
                 if v == "approve":
                     d.replacements.append(new)
-                    d.superseded[item_id] = {"by": new.id, "approved_by": event_id}
+                    old = next((i for i in d.base_items if i.id == item_id), None)
+                    before = (old.output or {}) if old else {}
+                    changed = sorted(
+                        k for k in set(before) | set(out) if before.get(k) != out.get(k)
+                    )
+                    d.superseded[item_id] = {
+                        "by": new.id,
+                        "approved_by": event_id,
+                        "scene_id": sid,
+                        "changed_labels": changed,
+                    }
                 else:
                     d.kept_against_supersession.add(item_id)
             elif v == "approve":

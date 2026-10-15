@@ -29,11 +29,18 @@ class GcsStore:
             return None
         return Blob(data, int(b.generation))
 
+    def _landed(self, key: str, data: bytes) -> Optional[int]:
+        """After a precondition failure: the client retries a conditional upload whose response was lost, and the retry
+        then fails against our own write. If the object holds exactly our bytes, that write landed; callers write
+        unique content (record ids, claim nonces) where telling writers apart matters."""
+        cur = self.get(key)
+        return cur.generation if cur is not None and cur.data == data else None
+
     def create(self, key: str, data: bytes) -> bool:
         try:
             self._blob(key).upload_from_string(data, if_generation_match=0)
         except GcsPreconditionFailed:
-            return False
+            return self._landed(key, data) is not None
         return True
 
     def put(self, key: str, data: bytes, if_generation: Optional[int]) -> int:
@@ -43,5 +50,8 @@ class GcsStore:
                 data, if_generation_match=0 if if_generation is None else if_generation
             )
         except GcsPreconditionFailed as e:
+            landed = self._landed(key, data)
+            if landed is not None:
+                return landed
             raise PreconditionFailed(f"{key}: generation precondition failed") from e
         return int(b.generation)

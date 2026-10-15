@@ -73,7 +73,8 @@ class Response:
 
 
 class Teacher(Protocol):
-    def ask(self, req: Request) -> Response: ...
+    def ask(self, req: Request) -> Optional[Response]:
+        """A response now, or None when the request was handed to a person who answers later."""
 
 
 def max_error(a: Output, b: Output) -> Optional[Fraction]:

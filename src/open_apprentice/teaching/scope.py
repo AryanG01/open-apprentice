@@ -11,7 +11,7 @@ from open_apprentice.concepts.rules import RuleError
 from open_apprentice.teaching.step import run_output
 
 MAX_LEN = 300
-FORBIDDEN = re.compile(r"[{}\n\r;]|\b(objects|for|let|move|resize|clone)\b")
+FORBIDDEN = re.compile(r"[{}\n\r;\\]|\b(objects|for|let|move|resize|clone)\b")
 MARK = 1  # members are moved by one unit in the marker program
 
 
