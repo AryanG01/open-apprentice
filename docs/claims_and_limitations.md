@@ -15,8 +15,9 @@ What Open Apprentice can be said to do, with the evidence behind each statement.
    rule evaluator; intent, preservation and layout are separate axes.
 5. **Real SVG files, byte-exact edits.** Learned rules become typed patches that change only the `x`/`y` of label `<text>` tags;
    every patch showed 0 unrelated byte changes.
-6. **A same-model baseline exists and is weaker on the conditional intention** (0/5 and 2/5 in two runs, vs the apprentice 5/5
-   both times), with no wrong commits. Both receive identical evidence and a comparable retry allowance.
+6. **A same-model baseline exists and is weaker on the conditional intention** in the two valid runs (2/5 in `gate-3`, 1/5 in
+   `gate-9`, vs the apprentice 5/5 both times), with no wrong commits in `gate-9`. Both receive identical evidence and the same
+   language help in the final protocol. (An earlier "0/5" was a harness bug of ours and is retracted in the gate doc.)
 
 ## Limits we must state with those claims
 - **Small n, one model, one run each.** 5 per intention cell. Same-model variance is real: the same episode flipped between

@@ -35,46 +35,27 @@ violation of the zero-wrong-commit bar even though it reached 12 of 15.
   and noise are measured separately on the development split, not here.
 - Behaviours outside the catalogue were not tested. Fresh documents come from the same generator family.
 
-## Repeat on the same gate set, final protocol (`gate-6` relative + `gate-7` conditional and scope)
-`gate-6` stopped early after consecutive provider errors (relative finished; conditional had a transport `ConnectError` and agent
-errors), so `gate-7` re-ran conditional and scope with the identical code and protocol. The table assembles the two runs.
+## Repeat on the same gate set, final protocol, and a correction to the agent figures
+`gate-6` stopped early after consecutive provider errors (relative finished), so `gate-7` re-ran conditional and scope with the
+identical code and protocol. Apprentice results, assembled: relative 5/5, conditional 5/5 (`gate-7`; `gate-6` had 4/5 plus one
+transport error), scope 5/5 = **15/15, no wrong commits** (second independent 15/15 after `gate-3`).
 
-| Intention | Apprentice | Same-model agent |
-|---|---|---|
-| relative | 5/5 | 5/5 |
-| conditional | 5/5 (`gate-7`; `gate-6` had 4/5 plus one transport error) | 0/5 (3 abstained, 2 provider errors) |
-| scope | 5/5 | 5/5 |
-| total | **15/15**, no wrong commits | **10/15**, no wrong commits |
+**Retraction.** The agent conditional rows in `gate-6` and `gate-7` (and the "10/15" and "0/5" figures an earlier version of this
+file reported) are INVALID: when the agent was given the compact evidence I removed an import it still used, so every agent
+"ask" raised a `NameError` and was recorded as an error or abstain. Fixed (commit `42918df`, test added). `gate-8` reran the agent
+on conditional after that fix and still got 0/5 (4 abstained, 1 error) because its prompt lacked the blocked-spot example and the
+guidance on open dimensions that the apprentice prompt has; that was a handicap on the baseline, not a finding.
+`gate-9` reran the agent on the 5 conditional episodes with the SAME language help as the apprentice (commit `fcffc31`): **1 correct,
+4 abstained, 0 wrong** (the abstains are rules written in pseudo-English that the parser rejects, for example `for each label`,
+quotes or colons; three commit attempts with exact feedback were allowed). Valid agent figures:
+relative 5/5 and scope 5/5 (`gate-6`, `gate-7`, `gate-3`), conditional 2/5 (`gate-3`, system-turn protocol, old prompt) and
+1/5 (`gate-9`, final protocol and equal prompt). So the conditional weakness of the same-model agent shows up in two valid runs,
+at n=5 each, with no wrong commits. It is a direction, not a significant difference.
 
-Second independent 15/15 for the apprentice, with the same conditional weakness for the agent (0/5 here, 2/5 in `gate-3`).
 Between them the runs show large endpoint variance: `gate-2` and `gate-4` (before the compact-evidence fix below) lost many
-episodes to echoed or malformed replies, and `gate-4` was stopped at 17 of 30 runs with the apprentice at 5/8 and the agent
-at 0/9, unfinished and excluded. A fix was found after seeing failures on gate episodes (post hoc): the model was echoing the full
-after-state, so evidence is now the scene once plus the labels that moved. `gate-6`/`gate-7` use it for BOTH systems.
-
-## Held-out split (`heldout-3` + `heldout-5`, apprentice only, 24 of 24 episodes)
-Seed base 50000, never used for tuning. 24 episodes: 8 unambiguous, 8 ambiguous, 4 unsupported, 4 noisy. `heldout-1` and
-`heldout-2` aborted at episode 2: the rule evaluator had no step budget and a model-written rule with deeply nested loops over
-20+ objects never finished (fixed with a 300,000-statement budget and a regression test; infrastructure only, no held-out
-content used). `heldout-3` ran with that budget. Note: the step budget is a real hazard removal but is NOT shown to have caused the stalls; a
-stack dump of a later stall showed the process idle in the event loop waiting on a model call. The actual cause is that httpx's read
-timeout is per read, so a stalled call can wait for hours; `SpendGuard` now enforces a 420 s wall-clock deadline per call.
-`heldout-3`'s last episode (`heldout-noisy-03`) stalled that way (about 8 h) and was run alone as `heldout-5` with the deadline,
-same code and protocol. `heldout-4` was a diagnostic attempt at the same episode (killed by a stack-dump timer; it logged
-two calls, no outcome).
-
-| Kind | Outcome |
-|---|---|
-| unambiguous (8) | 8 correct commits |
-| ambiguous (8) | 8 correct commits (ask, then commit) |
-| unsupported (4) | 2 appropriate abstains, 2 errors (both: the model's replies were truncated twice, no answer) |
-| noisy (4) | 3 appropriate abstains, **1 wrong commit** |
-
-The wrong commit (`heldout-noisy-02`) fitted the displaced label with a special case ("warning labels on nodes in the top
-third of the canvas use a 42 px gap"). The constants guard missed it because the comparison is against a computed value
-(`canvas.h / 3`). Noisy demonstrations remain an unsolved failure mode: 7 wrong commits in 20 noisy episode-runs (`dev-1` 1/4, `dev-2` 2/4, `dev-4` 2/4, `dev-5` 1/4, held-out 1/4; the development
-runs repeat the same 4 episodes and the learner changed between them, so this is a failure pattern, not a rate). Ambiguous held-out (8/8) is better than development (4-6/8, with abstains); one run each, so
-this is a direction, not a precise rate.
+episodes to echoed or malformed replies, and `gate-4` was stopped at 17 of 30 runs, unfinished and excluded. A fix was found after
+seeing failures on gate episodes (post hoc): the model was echoing the full after-state, so evidence is now the scene once plus
+the labels that moved, for BOTH systems.
 
 ## Things that changed after the development runs (disclosed)
 1. Contrastive round, contradiction feedback, lenient parsing, agent format-error tolerance (after `dev-1`).
