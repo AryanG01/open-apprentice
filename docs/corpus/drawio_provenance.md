@@ -2,8 +2,8 @@
 
 Six technical diagrams authored by Claude (Claude Code) in the **draw.io web editor at app.diagrams.net**, with the owner's approval
 (2026-10-15) to draw them there and save them through the browser. They are internally authored editor
-files, **not** independent user files. Positions and texts were chosen by Claude; the editor supplied cell ids, default styles, text
-autosizing and serialization.
+files, **not** independent user files. Positions and texts were chosen by Claude; the editor supplied cell ids, default styles and
+serialization (label widths were set by hand to one line, not by the editor's autosize).
 
 ## Design (written before drawing)
 
