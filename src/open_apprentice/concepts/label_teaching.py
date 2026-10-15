@@ -281,9 +281,22 @@ async def teach(
     # answers used here are logged apart from clarifying questions.
     asked_idx = {q["batch_index"] for q in res.questions}
     held = [i for i in range(len(batch)) if i not in asked_idx]
+    revised_v = False
     for i in held:
         check = Constraint("positive", batch[i], to_state(teacher(batch[i])), source="validation")
+        constraints.append(check)  # the teacher's answer is evidence from now on
+        dead = [(c, fits(c.rule, check)[1]) for c in cands if not fits(c.rule, check)[0]]
         cands = [c for c in cands if fits(c.rule, check)[0]]
+        if not cands and not revised_v:
+            # a failed validation is evidence too: show the model what the rule got wrong and ask once more
+            revised_v = True
+            rejected_summaries.extend(f"{c.summary[:60]} -- {why[:220]}" for c, why in dead)
+            try:
+                await propose(len(res.rounds) + 1)
+            except BudgetExhausted:
+                res.reason = "model budget exhausted"
+                return res
+            cands = [c for c in cands if all(fits(c.rule, k)[0] for k in constraints)]
         if not cands:
             break
     if held:

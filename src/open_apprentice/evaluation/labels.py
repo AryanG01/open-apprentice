@@ -201,7 +201,9 @@ def make_scene(
     """A document: nodes on a jittered grid (denser rows make the right-hand pose collide), one label per node."""
     rng = random.Random(seed)
     cols = COLS if canvas_w >= 1200 else 3
-    cell_w = CELL_W if canvas_w >= 1200 else F(canvas_w - 190, 2)  # narrow canvas: last column ends near the right edge
+    cell_w = (
+        CELL_W if canvas_w >= 1200 else F(canvas_w - 190, 2)
+    )  # narrow canvas: last column ends near the right edge
     cells = [(c, r) for c in range(cols) for r in range(ROWS)]
     n_nodes = min(n_nodes, len(cells))
     rng.shuffle(cells)
