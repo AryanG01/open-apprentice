@@ -189,3 +189,13 @@ def test_the_oracle_uses_the_scenes_own_canvas_not_a_constant():
     assert intended_after("right_else_below", GAP, s)["l0"] == (125, 162)
     s["canvas"] = {"w": 262, "h": 800}
     assert intended_after("right_else_below", GAP, s)["l0"] == (212, 115)
+
+
+def test_narrow_canvas_scenes_reach_the_right_edge_and_trigger_the_off_canvas_fallback():
+    from open_apprentice.evaluation.labels import Spec, oracle
+
+    s = make_scene(70_000, 6, canvas_w=600)
+    assert s["canvas"]["w"] == 600 and max(o["x"] + o["w"] for o in s["objects"]) <= 600
+    plain, cond = Spec("right", None, "all", GAP), Spec("right", "below", "all", GAP)
+    a, b = oracle(plain, s), oracle(cond, s)
+    assert any(a[k] != b[k] for k in a)

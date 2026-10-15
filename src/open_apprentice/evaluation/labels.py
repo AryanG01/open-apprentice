@@ -195,16 +195,21 @@ def rule_for(intent: str, gap: F) -> list:
     return rule_for_spec(Spec(s.primary, s.fallback, s.scope, gap))
 
 
-def make_scene(seed: int, n_nodes: int, warnings: int = 0, crowd: bool = True) -> dict:
+def make_scene(
+    seed: int, n_nodes: int, warnings: int = 0, crowd: bool = True, canvas_w: int = 1200
+) -> dict:
     """A document: nodes on a jittered grid (denser rows make the right-hand pose collide), one label per node."""
     rng = random.Random(seed)
-    cells = [(c, r) for c in range(COLS) for r in range(ROWS)]
+    cols = COLS if canvas_w >= 1200 else 3
+    cell_w = CELL_W if canvas_w >= 1200 else F(canvas_w - 190, 2)  # narrow canvas: last column ends near the right edge
+    cells = [(c, r) for c in range(cols) for r in range(ROWS)]
+    n_nodes = min(n_nodes, len(cells))
     rng.shuffle(cells)
     objs: list[dict] = []
     for i, (c, r) in enumerate(cells[:n_nodes]):
         w, h = rng.choice((70, 90, 100, 110)), rng.choice((40, 50, 60))
         jx, jy = rng.randrange(0, 20), rng.randrange(0, 30)
-        x = 30 + c * (CELL_W if crowd else CELL_W + 40) + jx
+        x = 30 + c * (cell_w if crowd else cell_w + 40) + jx
         y = 30 + r * CELL_H + jy
         objs.append(
             {
@@ -234,7 +239,7 @@ def make_scene(seed: int, n_nodes: int, warnings: int = 0, crowd: bool = True) -
                 "h": h,
             }
         )
-    return {"objects": objs, "canvas": {"w": 1200, "h": 800}}
+    return {"objects": objs, "canvas": {"w": canvas_w, "h": 800}}
 
 
 def apply_oracle(scene: dict, targets: dict[str, tuple[F, F]]) -> dict:

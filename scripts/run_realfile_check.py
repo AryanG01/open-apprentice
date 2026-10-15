@@ -92,7 +92,11 @@ async def main() -> None:
                 scenes[demo_file],
                 apply_oracle(scenes[demo_file], oracle(spec, scenes[demo_file])),
             )
-            batch = [make_scene(70_000 + i, 4 + i, warnings=i % 3) for i in range(3)]
+            # batch diagrams of different widths, as real files differ: the right-hand spot can leave a narrow canvas
+            batch = [
+                make_scene(70_000 + i, 4 + i, warnings=i % 3, canvas_w=w)
+                for i, w in enumerate((600, 800, 1200))
+            ]
             teacher = lambda sc, s=spec: apply_oracle(sc, oracle(s, sc))  # noqa: E731
             p = ReferenceProvider() if a.reference else prov
             res = await teach(p, Ledger(Limits(tokens=10**7, calls=1000)), [demo], batch, teacher)
