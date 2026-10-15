@@ -108,8 +108,13 @@ regression test. The bug did not affect the synthetic development or gate result
 - Caveat: both changes were made after seeing this failure on these five fixtures, so `realfile-4` is NOT independent evidence.
   A fresh set of fixtures (ideally exported from a real tool) is required before this is cited as generalisation.
 
+### Regression check after the validation-revision round (`dev-6`, development noisy + unsupported, one run)
+0 wrong commits in 8 (unsupported: 2 appropriate abstains + 2 truncation errors; noisy: 3 appropriate abstains + 1 spurious "correct"
+commit whose rule contains a special-case clause the fresh documents did not trigger). So the revision round did not bring wrong commits back
+here, but n is small and a revised rule only has to pass the remaining held-back documents, a weaker check.
+
 ## Still required for the gate
 - Browser-measured label boxes on the real files (the current boxes are estimates); real user-exported files.
 - Two external reactions (record as unavailable if not obtained).
 - Repeated runs (the gate set at least 3 times) and a frozen held-out split.
-- Cost so far: about $37 of $40 spendable (authorized $50, reserve $10), including discarded runs.
+- Cost so far: $38.60 (the last paid run; no more experiments without the owner's approval) of $40 spendable (authorized $50, reserve $10), including discarded runs.
