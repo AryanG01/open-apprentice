@@ -1,0 +1,327 @@
+"""Runs a correction cycle: same claim/record discipline as the learning executor; a commit stores an immutable version
+and activates it only by compare-and-set against the pointer generation captured when the correction started."""
+
+from __future__ import annotations
+
+import uuid
+from fractions import Fraction
+from typing import Optional, Protocol
+
+from open_apprentice.skills.versions import ActivationRejected, SkillStore
+from open_apprentice.storage.store import Store
+from open_apprentice.teaching import codec
+from open_apprentice.teaching.accounting import Ledger, OverBudget
+from open_apprentice.teaching.constraints import scene_from_payload
+from open_apprentice.teaching.correction_step import (
+    CommitCorrection,
+    CorrectionConfig,
+    Dismiss,
+    RecordOverride,
+    correction_step,
+)
+from open_apprentice.teaching.corrections import derive_draft
+from open_apprentice.teaching.events import Conflict, SessionLog
+from open_apprentice.teaching.executor import MAX_TRIES, TRANSIENT, failure_kind
+from open_apprentice.teaching.step import (
+    Abstain,
+    AskTeacher,
+    Error,
+    PresentPreview,
+    RequestModelProposal,
+    WaitForResult,
+)
+from open_apprentice.teaching.teacher import (
+    Output,
+    ProtocolError,
+    Response,
+    Teacher,
+    _out_json,
+    request_from_json,
+    request_to_json,
+    response_from_json,
+    response_to_json,
+    validate_request,
+    validate_response,
+)
+
+
+class ScopeProposer(Protocol):
+    def propose_scope(
+        self, evidence_json: dict, round_kind: str
+    ) -> tuple[list[dict], dict, Fraction]: ...
+
+
+def start_correction(
+    store: Store,
+    sid: str,
+    skill_id: str,
+    scene_id: str,
+    scene: dict,
+    corrected_output: Output,
+    mask: list[str],
+    extra_scenes: dict[str, dict],
+    full_approval: bool = False,
+    owner: str = "o",
+) -> SessionLog:
+    """Open a correction session against the ACTIVE version, capturing the pointer generation it started from."""
+    skills = SkillStore(store)
+    version, _, generation = skills.active(skill_id)
+    if version is None:
+        raise ValueError(f"{skill_id} has no active version to correct")
+    base = skills.version(skill_id, version)
+    log = SessionLog(store, sid)
+    log.create(owner=owner)
+    log.append(
+        "CorrectionStarted",
+        "human",
+        {
+            "skill_id": skill_id,
+            "base_version": version,
+            "base_pointer_generation": generation,
+            "base_artifact": base,
+            "scene_id": scene_id,
+            "scene": codec.loads(codec.dumps(scene)),
+            "scene_hash": codec.digest(scene_from_payload(codec.loads(codec.dumps(scene)))),
+            "corrected_output": _out_json(corrected_output),
+            "mask": list(mask),
+            "full_approval": full_approval,
+        },
+    )
+    scenes = {i["scene_id"]: i["scene"] for i in base["evidence"]}
+    scenes.update({k: codec.loads(codec.dumps(v)) for k, v in extra_scenes.items()})
+    for k in sorted(scenes):
+        if k == scene_id:
+            continue
+        log.append(
+            "SceneRegistered",
+            "system",
+            {
+                "scene_id": k,
+                "scene_hash": codec.digest(scene_from_payload(scenes[k])),
+                "scene": scenes[k],
+                "role": "batch",
+            },
+        )
+    return log
+
+
+class CorrectionExecutor:
+    def __init__(
+        self,
+        store: Store,
+        log: SessionLog,
+        proposer: ScopeProposer,
+        teacher: Teacher,
+        ledger: Ledger,
+        config: CorrectionConfig = CorrectionConfig(),
+        worst_usd: Fraction = Fraction(1, 5),
+    ) -> None:
+        self.store, self.log, self.proposer, self.teacher = store, log, proposer, teacher
+        self.ledger, self.config, self.worst = ledger, config, worst_usd
+
+    def _claim(self, action_id: str) -> bool:
+        return self.store.create(f"claims/{self.log.sid}/{action_id}.json", b"{}")
+
+    def _status(self) -> Optional[str]:
+        types = {e.type for e in self.log.events()}
+        for t, s in (
+            ("VersionActivated", "activated"),
+            ("ActivationRejected", "activation_rejected"),
+            ("OverrideRecorded", "override"),
+            ("CorrectionDismissed", "dismissed"),
+            ("Abstained", "abstained"),
+            ("Errored", "error"),
+        ):
+            if t in types:
+                return s
+        return None
+
+    def _submit(self, resp: Response) -> None:
+        evs = self.log.events()
+        reqs = {
+            request_from_json(e.payload["request"]).request_id: request_from_json(
+                e.payload["request"]
+            )
+            for e in evs
+            if e.type == "RequestIssued"
+        }
+        answered = {
+            response_from_json(e.payload["response"]).request_id
+            for e in evs
+            if e.type == "ResponseRecorded"
+        }
+        req = reqs.get(resp.request_id)
+        if req is None or resp.request_id in answered:
+            return
+        validate_response(req, resp)
+        origin = "simulator" if resp.source in ("simulator", "deterministic_simulator") else "human"
+        self.log.append("ResponseRecorded", origin, {"response": response_to_json(resp)})
+
+    def _propose(self, action: RequestModelProposal) -> None:
+        self.log.append(
+            "ActionIssued",
+            "system",
+            {
+                "action_id": action.action_id,
+                "kind": "RequestModelProposal",
+                "round_kind": action.round_kind,
+            },
+        )
+        d = derive_draft(self.log.events())
+        evidence = {
+            "base_program": d.base["program"],
+            "corrected_scene": d.corrective.scene_id,
+            "corrected_labels": list(d.corrective.mask),
+        }
+        for attempt_no in range(1, MAX_TRIES + 1):
+            attempt = uuid.uuid4().hex
+            try:
+                self.ledger.reserve(attempt, action.action_id, self.worst)
+            except OverBudget as e:
+                self.log.append(
+                    "ModelCallFailed",
+                    "system",
+                    {"action_id": action.action_id, "reason": f"budget: {e}", "terminal": True},
+                )
+                return
+            self.ledger.dispatched(attempt)
+            try:
+                cands, usage, cost = self.proposer.propose_scope(evidence, action.round_kind)
+            except Exception as e:  # provider failure: cost unknown, kept at worst case
+                self.ledger.mark_unknown(attempt)
+                kind = failure_kind(e)
+                terminal = attempt_no == MAX_TRIES or kind not in TRANSIENT
+                self.log.append(
+                    "ModelCallFailed",
+                    "system",
+                    {"action_id": action.action_id, "reason": kind, "terminal": terminal},
+                )
+                if terminal:
+                    return
+                continue
+            self.ledger.settle(attempt, cost)
+            kept = [
+                c
+                for c in cands
+                if isinstance(c, dict)
+                and isinstance(c.get("rule"), list)
+                and isinstance(c.get("selector"), str)
+            ]
+            self.log.append(
+                "ModelProposalReturned",
+                "model",
+                {
+                    "action_id": action.action_id,
+                    "candidates": kept,
+                    "malformed": len(cands) - len(kept),
+                    "usage": usage,
+                },
+            )
+            return
+
+    def _ask(self, action: AskTeacher | PresentPreview) -> None:
+        d = derive_draft(self.log.events())
+        try:
+            validate_request(action.request, d.scene_hashes)
+        except ProtocolError as e:
+            self.log.append(
+                "Errored", "system", {"action_id": action.action_id, "reason": f"protocol: {e}"}
+            )
+            return
+        self.log.append(
+            "ActionIssued", "system", {"action_id": action.action_id, "kind": type(action).__name__}
+        )
+        self.log.append(
+            "RequestIssued",
+            "system",
+            {"request": request_to_json(action.request), "action_id": action.action_id},
+        )
+        try:
+            self._submit(self.teacher.ask(action.request))
+        except ProtocolError as e:
+            self.log.append(
+                "Errored", "system", {"action_id": action.action_id, "reason": f"protocol: {e}"}
+            )
+
+    def _commit(self, action: CommitCorrection) -> None:
+        start = self.log.events()[0].payload
+        skills = SkillStore(self.store)
+        version = skills.store_version(start["skill_id"], action.artifact)
+        self.log.append(
+            "VersionStored",
+            "system",
+            {"action_id": action.action_id, "skill_id": start["skill_id"], "version": version},
+        )
+        try:
+            rid = skills.activate(
+                start["skill_id"],
+                version,
+                start["base_pointer_generation"],
+                action.action_id,
+                self.log.sid,
+            )
+        except ActivationRejected as e:
+            self.log.append(
+                "ActivationRejected",
+                "system",
+                {"action_id": action.action_id, "reason": str(e), "stored_version": version},
+            )
+            return
+        self.log.append(
+            "VersionActivated",
+            "system",
+            {
+                "operation_id": action.action_id,
+                "from": start["base_version"],
+                "to": version,
+                "record_id": rid,
+            },
+        )
+
+    def run(self, max_steps: int = 50) -> str:
+        for _ in range(max_steps):
+            status = self._status()
+            if status:
+                return status
+            action = correction_step(self.log.events(), self.config)
+            if isinstance(action, WaitForResult):
+                return self._status() or "waiting"
+            if not self._claim(action.action_id):
+                continue
+            try:
+                if isinstance(action, RequestModelProposal):
+                    self._propose(action)
+                elif isinstance(action, (AskTeacher, PresentPreview)):
+                    self._ask(action)
+                elif isinstance(action, CommitCorrection):
+                    self._commit(action)
+                elif isinstance(action, RecordOverride):
+                    start = self.log.events()[0].payload
+                    self.log.append(
+                        "OverrideRecorded",
+                        "system",
+                        {
+                            "action_id": action.action_id,
+                            "scene_id": start["scene_id"],
+                            "output": start["corrected_output"],
+                        },
+                    )
+                elif isinstance(action, Dismiss):
+                    self.log.append(
+                        "CorrectionDismissed", "system", {"action_id": action.action_id}
+                    )
+                elif isinstance(action, Abstain):
+                    self.log.append(
+                        "Abstained",
+                        "system",
+                        {"action_id": action.action_id, "reason": action.reason},
+                    )
+                elif isinstance(action, Error):
+                    self.log.append(
+                        "Errored",
+                        "system",
+                        {"action_id": action.action_id, "reason": action.reason},
+                    )
+            except Conflict:
+                continue
+        return "waiting"

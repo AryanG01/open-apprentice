@@ -85,6 +85,10 @@ class SimTeacher:
             return Response(req.request_id, "none", source=SOURCE)
         raise ProtocolError(f"unsupported request {type(req).__name__}")
 
+    def ask(self, req: Request) -> Response:
+        """The Teacher protocol: lets the in-process simulator stand in where a subprocess teacher would be used."""
+        return self.answer(req)
+
     def _means(self, interp: Interpretation, intent: dict) -> bool:
         """Bounded meaning check: same members as the intended selector on every diagnostic scene, and every shown
         consequence matches the intended new behaviour within tolerance."""
