@@ -7,13 +7,17 @@ from __future__ import annotations
 import json
 import sys
 from fractions import Fraction
+from typing import Optional
 
 from open_apprentice.evaluation.labels import Spec, oracle
 from open_apprentice.teaching.constraints import scene_from_payload
+from open_apprentice.teaching.scope import members
 from open_apprentice.teaching.teacher import (
     TOL,
     ChooseOutput,
+    ConfirmCorrectionScope,
     ConfirmPreview,
+    Interpretation,
     Output,
     ProtocolError,
     Request,
@@ -28,8 +32,10 @@ SOURCE = "deterministic_simulator"
 
 
 class SimTeacher:
-    def __init__(self, spec: Spec, scenes: dict[str, dict]) -> None:
-        self.spec, self.scenes = spec, scenes
+    def __init__(
+        self, spec: Spec, scenes: dict[str, dict], scope_intent: Optional[dict] = None
+    ) -> None:
+        self.spec, self.scenes, self.scope_intent = spec, scenes, scope_intent
 
     def _truth(self, scene_id: str) -> Output:
         scene = self.scenes[scene_id]
@@ -62,7 +68,35 @@ class SimTeacher:
             return Response(
                 req.request_id, "demonstrate", output=self._truth(req.scene_id), source=SOURCE
             )
+        if isinstance(req, ConfirmCorrectionScope):
+            intent = self.scope_intent or {}
+            if intent.get("kind") in ("override", "accidental"):
+                hits = [i.interp_id for i in req.interpretations if i.kind == intent["kind"]]
+            else:
+                hits = [
+                    i.interp_id
+                    for i in req.interpretations
+                    if i.kind == "revise" and self._means(i, intent)
+                ]
+            if len(hits) > 1:
+                raise ProtocolError("more than one interpretation matches the intended change")
+            if hits:
+                return Response(req.request_id, "select", selected=hits[0], source=SOURCE)
+            return Response(req.request_id, "none", source=SOURCE)
         raise ProtocolError(f"unsupported request {type(req).__name__}")
+
+    def _means(self, interp: Interpretation, intent: dict) -> bool:
+        """Bounded meaning check: same members as the intended selector on every diagnostic scene, and every shown
+        consequence matches the intended new behaviour within tolerance."""
+        if not intent or interp.selector is None:
+            return False
+        for sid in intent["diagnostic_scenes"]:
+            if members(interp.selector, self.scenes[sid]) != members(
+                intent["selector"], self.scenes[sid]
+            ):
+                return False
+        new = SimTeacher(intent["new_spec"], self.scenes)
+        return all(new._matches(out, sid) for sid, _, out in interp.consequences)
 
 
 def main() -> None:

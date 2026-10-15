@@ -44,7 +44,22 @@ class RequestDemonstration:
     scene_hash: str
 
 
-Request = Union[ChooseOutput, ConfirmPreview, RequestDemonstration]
+@dataclass(frozen=True)
+class Interpretation:
+    interp_id: str
+    kind: str  # revise | override | accidental
+    selector: Optional[str]
+    summary: str
+    consequences: tuple[tuple[str, str, Output], ...]
+
+
+@dataclass(frozen=True)
+class ConfirmCorrectionScope:
+    request_id: str
+    interpretations: tuple[Interpretation, ...]
+
+
+Request = Union[ChooseOutput, ConfirmPreview, RequestDemonstration, ConfirmCorrectionScope]
 
 
 @dataclass(frozen=True)
@@ -104,6 +119,23 @@ def validate_request(req: Request, registered: dict[str, str]) -> None:
             _scene_ok(sid, sh, registered)
     elif isinstance(req, RequestDemonstration):
         _scene_ok(req.scene_id, req.scene_hash, registered)
+    elif isinstance(req, ConfirmCorrectionScope):
+        its = req.interpretations
+        if not 2 <= len(its) <= 4:
+            raise ProtocolError("ConfirmCorrectionScope needs 2-4 interpretations")
+        if len({i.interp_id for i in its}) != len(its):
+            raise ProtocolError("duplicate interpretation ids")
+        keys = [
+            (i.kind, i.selector, tuple((s, tuple(sorted(o.items()))) for s, _, o in i.consequences))
+            for i in its
+        ]
+        if len(set(keys)) != len(keys):
+            raise ProtocolError("two interpretations are identical")
+        for i in its:
+            if i.kind not in ("revise", "override", "accidental"):
+                raise ProtocolError(f"unknown interpretation kind {i.kind}")
+            for sid, sh, _ in i.consequences:
+                _scene_ok(sid, sh, registered)
     else:
         raise ProtocolError(f"unknown request type {type(req).__name__}")
 
@@ -123,6 +155,13 @@ def validate_response(req: Request, resp: Response) -> None:
             raise ProtocolError("preview needs exactly one verdict per item")
         if any(v not in ("approve", "reject", "unsure") for _, v in resp.per_item):
             raise ProtocolError("preview verdicts are approve/reject/unsure")
+    elif isinstance(req, ConfirmCorrectionScope):
+        if resp.kind not in ("select", "none", "unsure", "cancel"):
+            raise ProtocolError(f"bad scope response {resp.kind}")
+        if resp.kind == "select" and resp.selected not in {
+            i.interp_id for i in req.interpretations
+        }:
+            raise ProtocolError("selection names an interpretation that was not shown")
     elif isinstance(req, RequestDemonstration):
         if resp.kind not in ("demonstrate", "decline") or (
             resp.kind == "demonstrate" and not resp.output
@@ -143,6 +182,21 @@ def _out_parse(d: dict) -> Output:
 
 
 def request_to_json(req: Request) -> dict:
+    if isinstance(req, ConfirmCorrectionScope):
+        return {
+            "type": "ConfirmCorrectionScope",
+            "request_id": req.request_id,
+            "interpretations": [
+                {
+                    "interp_id": i.interp_id,
+                    "kind": i.kind,
+                    "selector": i.selector,
+                    "summary": i.summary,
+                    "consequences": [[s, h, _out_json(o)] for s, h, o in i.consequences],
+                }
+                for i in req.interpretations
+            ],
+        }
     if isinstance(req, ChooseOutput):
         return {
             "type": "ChooseOutput",
@@ -179,6 +233,20 @@ def request_from_json(d: dict) -> Request:
             d["request_id"],
             d["purpose"],
             tuple((i, s, h, _out_parse(o)) for i, s, h, o in d["items"]),
+        )
+    if d["type"] == "ConfirmCorrectionScope":
+        return ConfirmCorrectionScope(
+            d["request_id"],
+            tuple(
+                Interpretation(
+                    i["interp_id"],
+                    i["kind"],
+                    i["selector"],
+                    i["summary"],
+                    tuple((s, h, _out_parse(o)) for s, h, o in i["consequences"]),
+                )
+                for i in d["interpretations"]
+            ),
         )
     if d["type"] == "RequestDemonstration":
         return RequestDemonstration(d["request_id"], d["scene_id"], d["scene_hash"])
