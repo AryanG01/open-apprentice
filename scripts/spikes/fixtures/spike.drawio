@@ -1,0 +1,17 @@
+<mxfile host="Electron" version="32.4.1">
+  <diagram id="p1" name="Page-1">
+    <mxGraphModel dx="800" dy="600" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="600" pageHeight="300" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="n1" value="API" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="40" y="40" width="100" height="50" as="geometry"/></mxCell>
+        <mxCell id="n2" value="Queue" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="240" y="40" width="100" height="50" as="geometry"/></mxCell>
+        <mxCell id="n3" value="Worker" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1"><mxGeometry x="440" y="40" width="100" height="50" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" parent="1" source="n1" target="n2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="l1" value="rate limited" style="text;html=1;align=left;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="40" y="100" width="90" height="20" as="geometry"/></mxCell>
+        <mxCell id="l2" value="retries" style="text;html=1;align=center;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="240" y="100" width="60" height="20" as="geometry"/></mxCell>
+        <mxCell id="l3" value="drains nightly" style="text;html=1;align=right;verticalAlign=middle;" vertex="1" parent="1"><mxGeometry x="440" y="100" width="100" height="20" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

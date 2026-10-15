@@ -299,8 +299,9 @@ environments may differ by up to Δ (measured)". The drift report needs the draw
 uploads in the deployed service the receipt says the drift is "not measured". Font normalization is out of release 1.
 
 **Scene, targets and arithmetic.** A label's scene box is its measured box; offset `d = box − geometry` stored; target geometry =
-`target_box − d`. Values kept separately: exact rational target, serialized coordinate (nearest 1/64, ties to even; error ≤ 1/128 added to
-the conformance tolerance), measured result.
+`target_box − d`. Values kept separately: exact rational target, serialized coordinate (**whole document units**, half rounds up, because the
+round-trip spike showed draw.io renders HTML labels at whole units — `docs/spikes/2026-10-16-drawio-roundtrip.md`; the rounding error ≤ 0.5 is added
+to the conformance tolerance), measured result.
 
 **Patching and publication.** Validate source hash, page, mapping and every `expected_old`; locate `<mxGeometry>` structurally; byte-span
 replace or insert from the end backwards; write a **new artifact**; parse, render, measure, check; publish only if every check passes.
