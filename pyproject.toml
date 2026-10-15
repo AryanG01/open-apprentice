@@ -81,4 +81,20 @@ source_modules = [
 forbidden_modules = [
   "open_apprentice.evaluation.verifier",
   "open_apprentice.evaluation.episodes",
+  "open_apprentice.evaluation.labels",
+  "open_apprentice.evaluation.label_episodes",
+  "open_apprentice.evaluation.label_runner",
+  "open_apprentice.evaluation.label_reference",
+  "open_apprentice.evaluation.teacher_sim",
+]
+
+[[tool.importlinter.contracts]]
+name = "New learning-core packages never import the evaluator"
+type = "forbidden"
+source_modules = [
+  "open_apprentice.teaching",
+  "open_apprentice.storage",
+]
+forbidden_modules = [
+  "open_apprentice.evaluation",
 ]
