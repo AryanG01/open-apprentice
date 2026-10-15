@@ -18,8 +18,8 @@ NVIDIA Nemotron-3-Ultra on Nebius Token Factory proposes and revises programs; d
 checks evidence, renders and measures. Validation is internal (deterministic simulated teacher, matched baselines, browser tests, owner
 walkthroughs). No recruited users, interviews or demand claims.
 
-**Decisions made with the owner (15 Oct):** money and time are not constraints (but every paid run still needs a written manifest and
-approval); the native format is **`.drawio` only**; held-back validation is replaced by a **budgeted preview confirmation**; durable state
+**Decisions made with the owner (15 Oct):** substantial development availability, and budget available subject to approval (every paid run needs a written manifest and
+approval); the submission deadline (30 Oct 2026 17:00 UTC) is a hard constraint; the native format is **`.drawio` only**; held-back validation is replaced by a **budgeted preview confirmation**; durable state
 lives in **Google Cloud Storage** (local-folder backend for development); the new flow **becomes the product** and the badge demo moves to an
 "Earlier prototype" tab, unchanged and deployed throughout; architecture is **event-sourced sessions with a pure step function**.
 
@@ -75,15 +75,19 @@ sessions/<sid>/manifest.json            authoritative mutable session manifest:
                                         {manifest_revision, intent_revision, head_event_id, status, documents, skill_ref, owner}
 calls/<action_id>/<attempt_id>.json     reserved -> dispatched -> completed | failed | outcome_unknown
 skills/<skill_id>/v<n>.json             immutable version (program, evidence set, retention report, hashes)
-skills/<skill_id>/active.json           pointer {version, generation}; compare-and-set
+skills/<skill_id>/activations/<record_id>.json  immutable {record_id, operation_id, session_id, from_version, to_version, prev_record_id}
+skills/<skill_id>/active.json           pointer {version, record_id, generation}; compare-and-set
 ledger/manifest.json                    budget state; compare-and-set
 documents/<doc_id>/..., runs/<run_id>/...  immutable artifacts + small manifests
 ```
 Event write = write immutable event, then compare-and-set the manifest's `head_event_id` (GCS generation precondition). The event is committed
 only if that update succeeds; losing writes are unreachable objects. Replay walks `head_event_id → prev_event_id`, never lists directories.
-No multi-object transaction is assumed anywhere. **Authority:** for activation the pointer object is authoritative; the session appends
-`VersionActivated` only after the pointer compare-and-set succeeded, and on load any pointer/log mismatch (crash between the two) is
-reconciled by appending the missing event from the pointer state, never by moving the pointer. `VersionStored` is appended only after the
+No multi-object transaction is assumed anywhere. **Authority:** for activation the pointer object is authoritative. An activation first writes an
+immutable activation record (operation ID, originating session, from/to versions, predecessor record), then compare-and-sets the pointer
+to reference it; records from failed compare-and-sets stay unreachable. The committed history is the record chain reached from the pointer.
+Sessions append `VersionActivated` only after the pointer update succeeds; on load, reconciliation walks the committed record chain and
+idempotently appends any missing `VersionActivated` events to the originating sessions, never moving the pointer. **Acceptance test:** two
+successful activations (one a rollback) with crashes before logging both recover the full, correct history without changing the pointer. `VersionStored` is appended only after the
 immutable version object exists.
 
 ### 3.2 Two revisions and result acceptance
@@ -103,18 +107,20 @@ Housekeeping: `StaleResultIgnored`, `Cancelled`, `ConflictDetected{event_a, even
 | Request | Content | Responses |
 |---|---|---|
 | `ChooseOutput` | one registered scene, 2–4 alternatives | choose(X) / none / unsure / cancel |
-| `ConfirmPreview` | 1–3 identified document outputs | approve / reject / unsure, **per document** |
-| `ConfirmCorrectionScope` | explicit interpretations, each with rendered consequences | select(i) / none / unsure / cancel |
+| `ConfirmPreview` | `purpose ∈ {learning_preview, affected_examples, revision_preview}`; 1–3 identified outputs (affected examples: the displayed replacement outputs, ≤ 6 items) | approve / reject / unsure, **per item** |
+| `ConfirmCorrectionScope` | 2–4 explicit interpretations, each with rendered consequences | select(i) / none / unsure / cancel |
 | `RequestDemonstration` | one scene to edit | demonstrated output / decline |
-A scene must be registered in the session and match its recorded hash (generated probes included once registered). Malformed requests
-(fewer than 2 or more than 4 alternatives, alternatives not separated per 3.6, unregistered scene) are protocol errors raised before the
+A scene must be registered in the session and match its recorded hash (generated probes included once registered). Malformed requests are protocol errors
+(`ChooseOutput`: fewer than 2 or more than 4 alternatives or alternatives not separated per 3.6; `ConfirmCorrectionScope`: fewer than 2
+or more than 4 interpretations, or two with identical selectors and programs; `ConfirmPreview`: item count outside its purpose's range;
+any request: an unregistered scene or hash mismatch); they are raised before the
 teacher sees them; never counted as abstention. Every request and response is logged; `source ∈ {human, deterministic_simulator}`.
 
 ### 3.5 Constraint semantics (derived from committed events only)
 | Event | Constraint |
 |---|---|
 | initial demonstration | positive: complete before/after on that document; recorded only when the user explicitly confirms "this whole document is right" after editing (untouched labels are then approved as they stand) |
-| corrective edit (partial, default) | positive only for masked (moved) labels; untouched labels keep preservation constraints, not approval |
+| corrective edit (partial, default) | positive only for masked (moved) labels. Untouched labels receive **no new intent approval**; existing evidence about them stays active unless explicitly superseded; structural preservation (no resize, no text/style/attachment change) still applies, while their coordinates may change only as governed by the authorized scope and approved exceptions |
 | choose(X) | positive: X's complete output on that scene (one labelled scene) |
 | none | excludes every displayed alternative on that scene; no coordinates delivered |
 | unsure / cancel | nothing |
@@ -125,7 +131,8 @@ teacher sees them; never counted as abstention. Every request and response is lo
 Mechanical feedback (parse, runtime, measured collision) is never intent.
 
 ### 3.6 Tolerance and separation
-Answers match by maximum coordinate error over identical object identities, tolerance 0.5 document units. Any two alternatives must differ by
+Answers match by maximum coordinate error over identical object identities, tolerance 0.5 document units. The separation rule applies to
+`ChooseOutput` only: any two alternatives must differ by
 more than 1.0 in at least one corresponding coordinate, so at most one can match. Exact output equality (never tolerance) is used for
 grouping. The simulator raises a protocol error on any violation rather than choosing.
 
@@ -133,8 +140,9 @@ grouping. The simulator raises a protocol error on any violation rather than cho
 Interaction budgets (identical for every system, enforced by `step` and re-checked by the executor):
 - **Initial learning cycle:** ≤ 3 `ChooseOutput` interactions (any response), ≤ 1 `RequestDemonstration`, ≤ 1 `ConfirmPreview` of ≤ 3
   documents (documents and labels inspected reported), ≤ **8** provider attempts.
-- **Each correction cycle:** the triggering edit is its one corrective demonstration; ≤ 2 `ConfirmCorrectionScope`, ≤ 1 affected-examples
-  confirmation, ≤ 1 revision preview of ≤ 3 documents, ≤ **4** further provider attempts. Benchmark acquisition-plus-first-correction episode:
+- **Each correction cycle:** the triggering edit is its one corrective demonstration; ≤ **2 clarification interactions in total**, shared
+  between `ConfirmCorrectionScope` and `ChooseOutput` (output disambiguation inside the authorized scope); ≤ 1 `ConfirmPreview(affected_examples)`;
+  ≤ 1 `ConfirmPreview(revision_preview)` of ≤ 3 documents; ≤ **4** further provider attempts. Benchmark acquisition-plus-first-correction episode:
   ≤ 12 attempts in total.
 - Retries count; at most 1 retry per call, only for truncation/timeout/transport. Duplicate responses (same request ID) are idempotent.
 Paid attempts: `reserved → dispatched → completed | failed | outcome_unknown`; a retry is a new `attempt_id`. Budget exposure is exactly
@@ -165,10 +173,24 @@ active constraint → forbidden effects (only mapped label x/y change) → admis
 4. One program, or search found nothing → contrastive round if unused this cycle, re-filter, repeat 3; otherwise go to 6 with the search
    outcome recorded: `completed_no_disagreement | budget_exhausted | candidates_failed_on_inputs` (the last two are never "one behaviour").
 5. Disagreement found, question budget exhausted → `Abstain("unresolved disagreement")`.
-6. If the commit predicate fails only for lack of approval and the preview is unused → `PresentPreview` (≤ 3 unlabelled batch documents
-   chosen to exercise different branches); else abstain with reason.
+6. Final decision:
+   ```python
+   if can_commit:                                   return CommitVersion(selected)
+   if approval_is_only_missing_condition and preview_unused: return PresentPreview(selected, docs)  # ≤ 3 unlabelled batch docs, different branches
+   return Abstain(reason)
+   ```
+   `selected` is chosen deterministically among the surviving programs that are indistinguishable on the searched scenes: smallest
+   canonical AST (node count), then lexicographically smallest canonical hash. **Acceptance test:** an approved preview yields exactly one
+   `VersionStored`; replaying the log stores nothing further.
 
-**Commit predicate.**
+**Two layers of commit checks.** *Shared checks* (every system, enforced by the executor): valid program, consistent with all active
+evidence, required approvals present (≥ 1 approved preview item, no unresolved rejection), dependencies current, preservation and layout
+checks pass, and for corrections the correction authorization of section 5. *Apprentice policy* (A, C and D only): the bounded
+disagreement search must have completed without finding a distinguishing question. B chooses its own questions and stopping behaviour
+within the shared budgets and commits whenever the shared checks pass; any wrong commitment is exposed by held-out scoring.
+**Acceptance test:** B can legally commit an approved, compliant program without invoking A's question-selection policy.
+
+**Commit predicate (A, C, D).**
 ```python
 can_commit = (selected_valid and fits_all_active_constraints
               and search_outcome == "completed_no_disagreement"
@@ -204,11 +226,17 @@ Partial correction (default) uses a label mask; a complete demonstration require
 
 **Scope.** Selectors are rule-language expressions over **role, attachment and original-input geometry**, evaluated on the original input
 with the fixed mapping (never influenced by the candidate). Branch information is explanatory only; no `fallback_taken` language feature.
+Clarification inside a correction uses the shared budget of two interactions (scope selection and, if programs still disagree inside the
+authorized scope, one `ChooseOutput`). **Acceptance test:** scope selection → output disambiguation → affected-example approval → revision
+preview completes within budget, and each response creates only its intended evidence (scope authorization never approves predicted outputs).
 Interpretations: revised skill with selector (model-proposed, checked); one-document override (sidecar pin, no skill change); accidental
 edit (dismissed). Only "revised skill" counts as learning. Each model interpretation must fit the corrective evidence and all active
 constraints except its exactly computed conflict set (its proposed supersessions).
 
-**Affected examples.** Stored per approval: scene, mapping, changed label IDs, proposed outputs and hashes, approving event. A label may
+**Acceptance test (untouched labels):** correcting one warning label can update another warning label inside the approved scope, while an
+unrelated note stays unchanged.
+
+**Affected examples.** Reviewed with one `ConfirmPreview(affected_examples)`. Stored per approval: scene, mapping, changed label IDs, proposed outputs and hashes, approving event. A label may
 change only if inside the authorized selector or covered by an explicitly approved per-label exception; anything else is a scope violation
 and blocks. Approvals create **replacement positive constraints**; old constraints are marked superseded in the draft pointing to their
 replacement; supersession requires a teacher event (never a model suggestion). Approval covers displayed outputs only.
@@ -302,7 +330,7 @@ the episode ends.
 
 **Systems (same model, budgets, filters, grammar documentation and examples).**
 - **A** apprentice.
-- **B** same-model agent with the same request types as tools: `register_probe(scene)` (same domain, limits, validation, render-match),
+- **B** same-model agent (shared commit checks only, section 4) with the same request types as tools: `register_probe(scene)` (same domain, limits, validation, render-match),
   `ask_choose(scene_id, programs[2..4])` (separation enforced), `preview(doc_ids ≤ 3, program)`, `request_demo(scene_id)`,
   `propose_scope(selector, program)`, affected-example approval, revision preview and commit through the same safety checks; all of A's
   mechanical feedback.
@@ -324,8 +352,9 @@ scoring documents per learning episode; corrections scored on changed scope and 
 
 **Real-file corpus.** Six diagrams authored by Claude in the actual draw.io editor (app.diagrams.net through browser automation, saved as
 `.drawio`); if a specific editor step is impossible from this environment, the owner is asked for that concrete step early. Provenance per
-file: author, editor version, steps, file hash, date. Three development files, three frozen final files named and hashed before any import
-work; no tuning on the frozen three; results described as within-family generalization unless crossing sources or generators. Synthetic
+file: author, editor version, steps, file hash, date. All six are authored on 16 Oct (WP0), before any import code exists. Three are development files; the three final files are hashed
+and moved the same day to `benchmarks/final/drawio/` (git-ignored, evaluator-only, already excluded by the import-boundary contract) and are
+not opened by any development code or by Claude until the WP5 frozen run; their hashes and provenance are committed. No tuning on the frozen three; results described as within-family generalization unless crossing sources or generators. Synthetic
 parser fixtures are separate.
 
 **Manifests.** Private manifest: episode IDs, generator version and seeds, spec hashes, category marks, evaluator paths, code commit, prompt
@@ -440,9 +469,9 @@ session; never a silent swap). The badge flow stays under "Earlier prototype", u
 
 | Dates | Work package |
 |---|---|
-| 15–16 Oct | WP0: implementation audit; round-trip test (gate 2.3); event store (local backend); step skeleton; teacher protocol; boundary tests; hidden validation removed |
+| 15–16 Oct | WP0: implementation audit; real-file corpus authored in draw.io (final three frozen); round-trip test (gate 2.3); event store (local backend); step skeleton; teacher protocol; boundary tests; hidden validation removed |
 | 17–18 Oct | WP1: versions, drafts, supersession, rollback; GCS backend; stateful tests; staging proposal |
-| 19–20 Oct | WP2: draw.io import, mapping, measurement, patching, matrix; `/api/v2` core; teach/apply/export screens; real-file corpus authored; staging integration |
+| 19–20 Oct | WP2: draw.io import, mapping, measurement, patching, matrix; `/api/v2` core; teach/apply/export screens; staging integration |
 | 21–22 Oct | WP3: clarify UI and probes; correction and review UI; Cloud Tasks; durable ledger |
 | 23–24 Oct | WP4: journey tests; owner walkthroughs; calibration (approval); protocol and manifests frozen |
 | 25–26 Oct | WP5: final battery at the approved tier; frozen real-file tests |
