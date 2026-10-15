@@ -119,8 +119,16 @@ Also: the first real-file run (`realfile-1`, 14/14) is retracted. Its conditiona
 building the fuller set exposed an oracle bug (a hard-coded 1200x800 canvas instead of the scene's own), now fixed with a
 regression test. The bug did not affect the synthetic development or gate results (all synthetic canvases are 1200x800).
 
+### Real-file reruns after the off-canvas failure (post hoc, tuned on these same fixtures)
+- `realfile-3` (teaching batches now include narrow canvases): 44/52 correct, 8 abstained (all conditional, "failed on a
+  held-back batch diagram"), 0 violations. The old violation became a safe abstain.
+- `realfile-4` (plus one revision round when validation rejects every survivor, the failed diagram becomes evidence):
+  **52/52 correct**, conditional 12/12 (6/6 on targets that exercise the fallback), 0 abstained, 0 violations, 0 unrelated bytes.
+- Caveat: both changes were made after seeing this failure on these five fixtures, so `realfile-4` is NOT independent evidence.
+  A fresh set of fixtures (ideally exported from a real tool) is required before this is cited as generalisation.
+
 ## Still required for the gate
 - Browser-measured label boxes on the real files (the current boxes are estimates); real user-exported files.
 - Two external reactions (record as unavailable if not obtained).
 - Repeated runs (the gate set at least 3 times) and a frozen held-out split.
-- Cost so far: $33.59 of $40 spendable (authorized $50, reserve $10), including discarded runs.
+- Cost so far: about $37 of $40 spendable (authorized $50, reserve $10), including discarded runs.
