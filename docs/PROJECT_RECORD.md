@@ -36,7 +36,7 @@ written in a small exact-arithmetic rule language; only a restricted AST interpr
   so it is not independent evidence.
 - Gate as a whole: **capability criteria met on the synthetic gate set; NOT fully met** (no external reactions, estimated label boxes not browser-measured,
   fixtures authored not exported). See `docs/redesign_gate.md` and `docs/claims_and_limitations.md`.
-- Money: about $37-38.5 spent of the owner's $40 spendable (authorised $50 total, $10 reserve for the final demo). Nothing may exceed that without asking.
+- Money: $38.60 spent of the owner's $40 spendable (authorised $50 total, $10 reserve for the final demo). Nothing may exceed that without asking.
 
 ---
 
@@ -305,7 +305,7 @@ after a failed validation): **52/52, conditional 12/12, 0 violations, 0 unrelate
 `heldout-5` ran it alone with the new 420 s call deadline (appropriate abstain). Result (apprentice only, one run): unambiguous 8/8 correct; ambiguous 8/8 correct (asked, then committed); unsupported 2 appropriate abstains + 2 errors
 (truncations, no answer); noisy 3 appropriate abstains + 1 wrong commit (a "42 px gap for warning labels in the top third of the canvas" special case; the constants guard missed it because it compares against `canvas.h / 3`).
 
-**`dev-6` (regression check, noisy + unsupported development episodes, apprentice, with the validation-revision round).** Result ($1.70, run `dev-6`, 8 episodes): unsupported 2 appropriate abstains + 2 errors (both truncated replies, no answer; `unsupported-00` truncates in every run); noisy 3 appropriate abstains + 1 `correct_commit`, **0 wrong commits** in 8. The one noisy "correct" commit is the same spurious pass seen in `dev-5` (a rule with a special-case clause that the 3 fresh documents did not trigger), so it is not evidence that noisy demonstrations are solved. Conclusion: the validation-revision round did not bring wrong commits back on these 8 episodes (one run each; the revised rule need only pass the remaining held-back documents, which is a weaker check, and this run is too small to rule out the weakening). This was the last paid run: the ledger stood at $38.60 of $40.
+**`dev-6` (regression check, noisy + unsupported development episodes, apprentice, with the validation-revision round).** Result ($1.70, run `dev-6`, 8 episodes): unsupported 2 appropriate abstains + 2 errors (both truncated replies, no answer; `unsupported-00` also truncated in `dev-4` and the held-out run); noisy 3 appropriate abstains + 1 `correct_commit`, **0 wrong commits** in 8. The one noisy "correct" commit is of the kind seen in `dev-5` (a committed rule that scored correct on the 3 fresh documents; the rule text was not inspected for special-case clauses in this run), so it is not evidence that noisy demonstrations are solved. Conclusion: the validation-revision round did not bring wrong commits back on these 8 episodes (one run each; the revised rule need only pass the remaining held-back documents, which is a weaker check, and this run is too small to rule out the weakening). This was the last paid run: the ledger stood at $38.60 of $40.
 
 ---
 
@@ -365,7 +365,7 @@ and two unsupported provider errors, real-file 52/52 after post-hoc fixes.
 the held-out split; a UI/API integration of the label-placement flow (the live demo is still the Era 1 badge flow); immutable skill versions with a correction + retention report (proposed as the centrepiece, not built); a
 deterministic Konva adapter and engine checks for this family; the Gym rerun with the fixed refusal message; cold-start timing and a durable spend cap on Cloud Run; making the repo public; the video (the owner records it).
 
-**Money.** About $37-38.5 of the $40 spendable. Authorised $50, reserve $10 for the final demo. Ask before any further paid run.
+**Money.** $38.60 of the $40 spendable (ledger total, including discarded runs). Authorised $50, reserve $10 for the final demo. Ask before any further paid run.
 
 ---
 
@@ -723,6 +723,7 @@ d53e0ec 2026-10-15 docs: correct noisy wrong-commit tally
 fcffc31 2026-10-15 fix: same-model agent prompt gets the same language help (blocked-scan idiom, open dimensions) as the apprentice, for a fair baseline
 81ee8e5 2026-10-15 docs: realfile-3/4 (52/52 after post-hoc fixes, not independent)
 2dd6563 2026-10-15 docs: correct agent baseline figures (gate-6/7 invalid, gate-9 valid: conditional 1/5, 0 wrong)
+ff7343d 2026-10-15 docs: project record (full history, design, decisions, setbacks, reproduction), redesign brief copy, dev-6 regression result
 ```
 
 
