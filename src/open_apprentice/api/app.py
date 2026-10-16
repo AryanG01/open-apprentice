@@ -15,6 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from open_apprentice import __version__
 from open_apprentice.api.svg import router as svg_router
 from open_apprentice.api.teach import replay_router, router as teach_router
+from open_apprentice.api.v2 import routes as v2_routes
+from open_apprentice.api.v2.context import make_v2
 from open_apprentice.config import load_settings
 from open_apprentice.providers.factory import MissingCredential, make_provider
 from open_apprentice.providers.replay import RecordingProvider, load_tape
@@ -68,6 +70,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 app.state.engine = stack.enter_context(local_engine(str(ROOT)))
             except Exception as e:  # noqa: BLE001 - report, don't crash the API
                 app.state.engine_error = str(e)[:200]
+        app.state.v2 = make_v2(app.state.engine[0] if app.state.engine else None)
+        stack.callback(app.state.v2.dispatcher.close)
         yield
 
 
@@ -91,6 +95,7 @@ async def security_headers(request, call_next):
 app.include_router(teach_router)
 app.include_router(replay_router)
 app.include_router(svg_router)
+v2_routes.install(app)
 
 
 @app.get("/health/live")

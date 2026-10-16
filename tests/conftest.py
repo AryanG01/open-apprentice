@@ -8,6 +8,13 @@ def _hermetic_provider_env(monkeypatch):
         monkeypatch.delenv(k, raising=False)
 
 
+@pytest.fixture(autouse=True)
+def _hermetic_store(monkeypatch, tmp_path):
+    """The /api/v2 store never lands in the working tree during tests."""
+    monkeypatch.delenv("OA_STORE", raising=False)
+    monkeypatch.setenv("OA_STORE_DIR", str(tmp_path / "oa-store"))
+
+
 from hypothesis import settings  # noqa: E402
 
 settings.register_profile("ci", max_examples=200, derandomize=True, deadline=None)
