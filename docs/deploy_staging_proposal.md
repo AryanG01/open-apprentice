@@ -10,7 +10,11 @@ is one `oa staging-check` invocation run inside the staging image (Cloud Run job
 3. **Restart survival:** `oa staging-check --only survival --phase write`, then force a new revision
    (`gcloud run jobs update … --update-env-vars OA_RESTART=<n>`), then `--only survival --phase read` (commands below).
 
-The authenticated Cloud Tasks dispatch (formerly check 3) moves to Plan 4, which builds the worker endpoint it needs.
+4. **Authenticated Cloud Tasks dispatch:** with the service in Cloud Tasks mode, `oa staging-check --only tasks` (run as the job
+   below, same env) enqueues a `ping` job; Cloud Tasks delivers it to `POST /internal/tasks/{id}` on the staging service with an
+   OIDC token for `oa-staging-worker`; the route verifies audience and service account, runs the job, and the check sees the
+   `staging/ping-…` object appear in the bucket (≤ 60 s). A request without that token is refused with 403 (unit-tested; checked
+   once by hand with `curl` against the staging URL).
 
 ## Resources (project `oa-demo-1013-19737`, region `us-central1`)
 
@@ -37,11 +41,18 @@ gcloud tasks queues create oa-staging --project $P --location $R --max-dispatche
 gcloud run deploy open-apprentice-staging --project $P --region $R --image us-central1-docker.pkg.dev/$P/oa/demo:latest \
   --service-account oa-staging-worker@$P.iam.gserviceaccount.com --min-instances 0 --max-instances 1 --memory 1Gi \
   --no-allow-unauthenticated --set-env-vars OA_STORE=gcs,OA_BUCKET=$B,PROVIDER_MODE=mock
+URL=$(gcloud run services describe open-apprentice-staging --project $P --region $R --format 'value(status.url)')
+SA=oa-staging-worker@$P.iam.gserviceaccount.com
+TASKS="OA_DISPATCH=cloudtasks,OA_TASKS_QUEUE=projects/$P/locations/$R/queues/oa-staging,OA_TASKS_SERVICE_URL=$URL,OA_TASKS_SERVICE_ACCOUNT=$SA"
+gcloud run services update open-apprentice-staging --project $P --region $R --update-env-vars "$TASKS"
+gcloud tasks queues add-iam-policy-binding oa-staging --project $P --location $R --member serviceAccount:$SA --role roles/cloudtasks.enqueuer
+gcloud iam service-accounts add-iam-policy-binding $SA --project $P --member serviceAccount:$SA --role roles/iam.serviceAccountUser  # mint OIDC tokens for itself
 gcloud run jobs create oa-staging-check --project $P --region $R --image us-central1-docker.pkg.dev/$P/oa/demo:latest \
   --service-account oa-staging-worker@$P.iam.gserviceaccount.com --max-retries 0 --memory 1Gi --command sh \
   --args=-c,'node services/engine/src/server.js & sleep 5; exec oa staging-check --file samples/drawio/d1.drawio' \
   --set-env-vars OA_STORE=gcs,OA_BUCKET=$B,PROVIDER_MODE=mock,ENGINE_URL=http://127.0.0.1:8090
-gcloud run jobs execute oa-staging-check --project $P --region $R --wait   # race + survival(write) + render
+gcloud run jobs update oa-staging-check --project $P --region $R --update-env-vars "$TASKS"
+gcloud run jobs execute oa-staging-check --project $P --region $R --wait   # race + survival(write) + tasks + render
 # then force a new revision and read the marker back:
 gcloud run jobs update oa-staging-check --project $P --region $R --update-env-vars OA_RESTART=1 \
   --args=-c,'exec oa staging-check --only survival --phase read'

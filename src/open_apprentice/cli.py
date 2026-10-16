@@ -10,6 +10,7 @@ work from the first commit, and lets scripts/tests probe "is this wired up" inde
 from __future__ import annotations
 
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -848,7 +849,7 @@ def drawio_check(file: Path, page: int = 0) -> None:
 @app.command("staging-check")
 def staging_check(
     file: Optional[Path] = None,
-    only: str = typer.Option("all", help="all | race | survival | render"),
+    only: str = typer.Option("all", help="all | race | survival | render | tasks"),
     phase: str = typer.Option(
         "write", help="survival phase: write (before a restart) or read (after)"
     ),
@@ -893,6 +894,28 @@ def staging_check(
             ok = b is not None and b.data == b"alive"
             typer.echo(json.dumps({"check": "survival", "phase": "read", "ok": ok}))
             failed = failed or not ok
+    if only in ("all", "tasks"):
+        # spec 10: one dispatch through the configured dispatcher (Cloud Tasks when OA_DISPATCH=cloudtasks)
+        import time
+
+        from open_apprentice.api.v2.context import make_v2
+        from open_apprentice.api.v2.tasks import Job
+
+        v = make_v2(os.environ.get("ENGINE_URL"))
+        ping_id = uuid.uuid4().hex
+        start = time.monotonic()
+        v.dispatcher.submit(Job("ping", f"staging:{ping_id}", {"id": ping_id}))
+        ok = False
+        while time.monotonic() - start < 60:
+            if v.store.get(f"staging/ping-{ping_id}") is not None:
+                ok = True
+                break
+            time.sleep(0.25)
+        v.dispatcher.close()
+        typer.echo(
+            json.dumps({"check": "tasks", "ok": ok, "seconds": round(time.monotonic() - start, 2)})
+        )
+        failed = failed or not ok
     if only in ("all", "render") and file is not None:
         drawio_check(file)
     if failed:

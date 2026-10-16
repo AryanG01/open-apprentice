@@ -38,3 +38,12 @@ def test_staging_check_survival_reads_back_what_it_wrote(tmp_path, monkeypatch):
         runner.invoke(app, ["staging-check", "--only", "survival", "--phase", "read"]).exit_code
         == 0
     )
+
+
+def test_staging_check_tasks_runs_a_ping_through_the_dispatcher(tmp_path, monkeypatch):
+    monkeypatch.setenv("OA_STORE", "local")
+    monkeypatch.setenv("OA_STORE_DIR", str(tmp_path))
+    monkeypatch.delenv("OA_DISPATCH", raising=False)
+    r = CliRunner().invoke(app, ["staging-check", "--only", "tasks"])
+    line = json.loads(r.output.strip().splitlines()[-1])
+    assert r.exit_code == 0 and line["check"] == "tasks" and line["ok"] is True
