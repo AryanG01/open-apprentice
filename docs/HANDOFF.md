@@ -1,3 +1,31 @@
+# CURRENT STATE — 2026-10-16 (read this section first; the rest of the file is the 2026-10-13 snapshot)
+
+**Direction (since 15 Oct):** the product is the teach → clarify → correct → reuse flow on real `.drawio` files, validated internally.
+Spec: `docs/superpowers/specs/2026-10-15-teach-correct-reuse-design.md`. Roadmap: `docs/superpowers/plans/2026-10-15-roadmap.md`.
+Owner workflow: plans written with superpowers:writing-plans, executed natively with superpowers:executing-plans (TDD, a ledger,
+one opus whole-branch review, one fix pass, then "merge locally / PR / keep"). Push only when asked, after a secret scan.
+
+**Done and merged to master (all reviewed, tests green on 3.13 and 3.12, CI green):** Plan 1 foundations, Plan 2 versions and
+corrections, Plan 3 draw.io adapter and engine route, Plan 4A `/api/v2`, Plan 4C screens + browser journey (Apprentice tab;
+badge demo under "Earlier prototype"), Plan 4B generated probes + Cloud Tasks with OIDC. Suite: 836 Python, 38 engine, 11 browser.
+
+**Staging (approved, created and checked 2026-10-16):** `docs/staging_results.md` — render, GCS race, Cloud Tasks OIDC dispatch,
+restart survival, forged-call refusal all pass. Resources stay up (scale to zero; bucket objects expire after 7 days); teardown in
+`docs/deploy_staging_proposal.md`. Production service `open-apprentice` untouched (still the older badge build).
+
+**In progress: Plan 5 evaluation** — plan `docs/superpowers/plans/2026-10-16-p5-evaluation.md`, branch `p5-evaluation`,
+ledger `.superpowers/sdd/2026-10-16-p5-evaluation/progress.md` (git-ignored; resume at the first task without a `complete`
+line; trust the ledger and `git log`). Task 1 had just started (nothing implemented yet). master has 2 unpushed commits
+(`.gcloudignore` fix, staging results).
+
+**Money:** `results/redesign/budget.json` = $50 authorized, $10 reserve; about $38.60 already spent → about **$1.40 spendable**.
+Plan 5 is built offline and stops at a priced calibration manifest; no paid run without the owner's approval and a top-up.
+
+**Local quirk:** the macOS hidden flag reappears on `.venv/.../_editable_impl_open_apprentice.pth`; run lint-imports as
+`PYTHONPATH=src uv run lint-imports` (CI sets PYTHONPATH).
+
+---
+
 # HANDOFF — read this first (written 2026-10-12; rewritten 2026-10-13 after the improvement plan, the live deployment and the NeMo Gym work)
 
 You are continuing **Open Apprentice**, a solo project for the **Nebius x NVIDIA Global AI Hackathon**. **Deadline: 31 Oct 2026 01:00 SGT** (about 18 days from this note).
