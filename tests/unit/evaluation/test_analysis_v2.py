@@ -100,3 +100,13 @@ def test_token_estimate_reads_attempts_from_the_kept_outcomes(tmp_path):
     assert est["per_system"]["B"]["tokens_per_episode"] == 2 * (1000 + COMPLETION_ASSUMED)
     assert est["per_system"]["A"]["attempts_mean"] == 1
     assert est["per_system"]["A"]["tokens_per_episode"] > COMPLETION_ASSUMED
+
+
+def test_report_says_b_corrections_ran_a_policy(tmp_path):
+    rows = _pairs(1, 0, 0) + [_row("s1", "A", "correct_complete", stratum="sequential"),
+                              _row("s1", "B", "correct_complete", stratum="sequential", correction_policy="A")]  # fmt: skip
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"run_id": "x", "split": "dev", "mode": "mock"})
+    )
+    assert "not a comparison of correction policies" in report(tmp_path)

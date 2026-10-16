@@ -64,6 +64,7 @@ class RowV2(Row):
     release_blocking: list = field(default_factory=list)
     model: str = "Fixture"
     reason: Optional[str] = None
+    correction_policy: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------------------------------- scoring
@@ -367,6 +368,7 @@ def run_episode(
         release_blocking=s["release_blocking"],
         model=model,
         reason=outcome.get("reason"),
+        correction_policy=outcome.get("correction_policy"),
     )
 
 

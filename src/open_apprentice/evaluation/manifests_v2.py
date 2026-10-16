@@ -1,7 +1,9 @@
 """Priced run manifests and the paid-run gate (spec 7 "Paid-run gating"; evaluator side).
 
-A live run needs a manifest the owner approved in chat, copied to docs/evaluation/approved/<id>.json; its id is the
-hash of its content, so an edited approval no longer matches. The gate runs before any provider is built: no manifest,
+A live run needs a manifest the owner approved in chat, copied to docs/evaluation/approved/<id>.json with
+approved/approved_by/approved_at added; its id is the hash of its terms, so an edited copy no longer matches, and the
+run's split, systems, episodes and repeats must be exactly the manifest's. (The approval file is a record, not an
+access control: whoever writes it must be acting on the owner's word in chat.) The gate runs before any provider is built: no manifest,
 an unapproved or edited one, a cap above its ceiling, or a cap that would reach into the protected reserve refuses.
 """
 
@@ -36,8 +38,12 @@ class GateRefused(Exception):
     pass
 
 
+APPROVAL_FIELDS = ("manifest_id", "approved", "approved_by", "approved_at")
+
+
 def manifest_id(m: dict) -> str:
-    return codec.digest({k: v for k, v in m.items() if k != "manifest_id"})[:16]
+    """Hash of the manifest's terms; the approval fields the owner's copy adds are not part of them."""
+    return codec.digest({k: v for k, v in m.items() if k not in APPROVAL_FIELDS})[:16]
 
 
 def _per_attempt_worst() -> float:
@@ -145,6 +151,7 @@ def funded_manifest(n_final: int, n_clarify: int, tokens: dict, repeats: int = 3
 def check_live_gate(
     mid: Optional[str],
     cap_usd: float,
+    run: dict,
     approved_dir: Path = APPROVED,
     budget_root: Path = BUDGET_ROOT,
 ) -> dict:
@@ -158,6 +165,21 @@ def check_live_gate(
         raise GateRefused(
             f"approved file {f.name} does not match its manifest id (edited after approval?)"
         )
+    if m.get("approved") is not True or not m.get("approved_by") or not m.get("approved_at"):
+        raise GateRefused(
+            f"{f.name} lacks the owner's approval fields (approved, approved_by, approved_at)"
+        )
+    want = {
+        "split": m["split"],
+        "systems": m["systems"],
+        "episodes": m["task_ids"],
+        "repeats": m["repeats"],
+    }
+    got = {k: run.get(k) for k in want}
+    if got != want:
+        raise GateRefused(f"this run {got} is not the approved manifest's run {want}")
+    if not cap_usd > 0:
+        raise GateRefused("--cap-usd must be positive")
     if cap_usd > m["ceiling_usd"]:
         raise GateRefused(f"--cap-usd {cap_usd} is above the manifest ceiling {m['ceiling_usd']}")
     budget = load_budget(Path(budget_root))
@@ -180,10 +202,11 @@ def run_live(
     mid: Optional[str],
     cap_usd: float,
     provider_factory: Callable[[], Any],
+    run: dict,
     approved_dir: Path = APPROVED,
     budget_root: Path = BUDGET_ROOT,
     runner: Callable[[dict, float, Callable[[], Any]], Any] = _not_wired,
 ) -> Any:
     """Gate first; the provider factory is handed on only after every check passed."""
-    manifest = check_live_gate(mid, cap_usd, approved_dir, budget_root)
+    manifest = check_live_gate(mid, cap_usd, run, approved_dir, budget_root)
     return runner(manifest, cap_usd, provider_factory)

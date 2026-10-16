@@ -225,6 +225,9 @@ def system_b(ctx: Context) -> None:
 
     mock = MockProvider({}, functions={"agent_b": scripted_policy})
     ctx.result["policy"] = "scripted_fixture"
+    ctx.result["correction_policy"] = (
+        "A"  # B's corrections run the shared executor (ledger ruling, review I4)
+    )
     log = open_learning_log(ctx)
     status = run_agent_b(lambda: mock, log, ctx.teacher, ctx.ledger, AgentBudgets(), ctx.worst)
     ctx.result["status"] = status

@@ -139,6 +139,13 @@ def report(run_dir: Path) -> str:
             out.append(f"- {s}: {ok}/{len(sel)} runs")
         out += [f"- {_paired_line(paired(rows, a, b, strata))}" for a, b in pairs]
         out.append("")
+    if any(r.get("correction_policy") == "A" for r in seq):
+        out += [
+            "Note: system B's correction cycle runs A's correction policy (the shared correction executor and scope "
+            "proposer), so the correction endpoint for A − B reflects acquisition only; it is not a comparison of "
+            "correction policies.",
+            "",
+        ]
     out.append("Correction success given acquisition (denominator = runs that acquired the rule):")
     for s in systems:
         acq = [r for r in seq if r["method"] == s and (r.get("correction") or {}).get("acquired")]

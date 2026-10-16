@@ -897,7 +897,10 @@ def eval_run(
             return make_provider(load_settings())
 
         try:
-            run_live(manifest, cap_usd, factory)
+            names = [x.strip() for x in systems.split(",") if x.strip()]
+            eps = [e for e in (episodes or "").split(",") if e]
+            run = {"split": split, "systems": names, "episodes": eps, "repeats": repeats}
+            run_live(manifest, cap_usd, factory, run)
         except GateRefused as e:
             typer.echo(f"oa eval run --mode live: refused before any provider call: {e}", err=True)
             raise typer.Exit(2)
