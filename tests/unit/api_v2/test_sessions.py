@@ -71,11 +71,11 @@ def test_live_requested_when_unavailable_is_refused_with_spec_wording(
 
 
 def test_concurrent_advances_keep_one_chain(client, v2, doc_bytes, batch_bytes):
-    from open_apprentice.api.v2 import service
+    from open_apprentice.api.v2.tasks import Job
 
     sid = start(client, v2, doc_bytes, RIGHT_12, batch=batch_bytes).json()["session_id"]
     for _ in range(5):
-        v2.dispatcher.submit(sid, lambda: service.advance(v2, sid))
+        v2.dispatcher.submit(Job("advance", sid, {"sid": sid}))
     v2.dispatcher.drain()
     evs = SessionLog(v2.store, sid).events()
     assert [e.seq for e in evs] == list(range(1, len(evs) + 1))

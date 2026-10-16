@@ -23,14 +23,25 @@ PNG_1X1 = base64.b64decode(
 
 
 def render_with_png(page):
-    return dataclasses.replace(fake_render(page), png=PNG_1X1)
+    """The fake renderer classifies the page, which refuses content off the page; the real engine renders it anyway (an
+    alternative may place a label off the page), so measure such pages on an unbounded copy."""
+    from open_apprentice.drawio.parse import DrawioRefused
+
+    try:
+        r = fake_render(page)
+    except DrawioRefused:
+        big = dataclasses.replace(
+            page, model={**page.model, "pageWidth": "100000", "pageHeight": "100000"}
+        )
+        r = fake_render(big)
+    return dataclasses.replace(r, png=PNG_1X1)
 
 
 @pytest.fixture
 def v2(tmp_path):
     store = LocalStore(tmp_path)
     d = LocalDispatcher()
-    yield V2(
+    v = V2(
         store=store,
         render=render_with_png,
         proposer=LabelEnumerator(),
@@ -42,6 +53,10 @@ def v2(tmp_path):
         dispatcher=d,
         secret=b"t" * 32,
     )
+    from open_apprentice.api.v2 import service
+
+    d.bind(lambda job: service.run_job(v, job))
+    yield v
     d.close()
 
 

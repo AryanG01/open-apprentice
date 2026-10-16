@@ -7,11 +7,14 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 
-from open_apprentice.api.v2 import identity, records, service
+import threading
+
+from open_apprentice.api.v2 import identity, records, service, tasks
 from open_apprentice.api.v2.context import V2
 from open_apprentice.drawio.parse import MAX_UPLOAD, DrawioRefused
 
 router = APIRouter(prefix="/api/v2")
+router_internal = APIRouter()
 
 
 class V2Unavailable(Exception):
@@ -110,6 +113,7 @@ def _error(status: int, code: str, message: str) -> JSONResponse:
 def install(app: FastAPI) -> None:
     """Add the router and its error mapping to an app (the real app, or a bare one in tests)."""
     app.include_router(router)
+    app.include_router(router_internal)
     app.add_middleware(BodyLimit)
 
     @app.exception_handler(RateLimited)
@@ -339,3 +343,63 @@ def get_item_png(
 @router.get("/config")
 def get_config(request: Request) -> dict:
     return service.config(_v2(request))
+
+
+# ---- Cloud Tasks delivery -----------------------------------------------------------------------------------------------
+
+_task_locks: dict[str, threading.Lock] = {}
+_task_locks_guard = threading.Lock()
+
+
+def _key_lock(key: str) -> threading.Lock:
+    with _task_locks_guard:
+        return _task_locks.setdefault(key, threading.Lock())
+
+
+@router_internal.post("/internal/tasks/{task_id}")
+def post_internal_task(
+    task_id: str, request: Request, body: dict = Body(default={})
+) -> JSONResponse:
+    v = getattr(request.app.state, "v2", None)
+    auth = getattr(v, "internal_tasks", None)
+    if v is None or auth is None:
+        return _error(404, "NOT_FOUND", "not found")
+    try:
+        auth.verify(request.headers.get("authorization"))
+    except tasks.Forbidden as e:
+        return _error(403, "FORBIDDEN", str(e))
+    if not task_id.isalnum() or len(task_id) > 64:
+        return _error(400, "BAD_REQUEST", "bad task id")
+    key = f"tasks/{task_id}.json"
+    try:
+        job = tasks.job_from_json(body)
+    except ValueError as e:
+        return _error(400, "BAD_REQUEST", str(e))
+    if not v.store.create(key, records.dumps({"state": "running"})):
+        return JSONResponse(_task_state(v, key))  # duplicate delivery: report, never re-run
+    with _key_lock(job.key):
+        try:
+            service.run_job(v, job)
+            state: dict = {"state": "done"}
+        except (
+            Exception
+        ) as e:  # recorded, so Cloud Tasks does not retry a job whose failure is known
+            state = {"state": "failed", "reason": f"{type(e).__name__}: {e}"[:300]}
+    b = v.store.get(key)
+    v.store.put(key, records.dumps(state), if_generation=b.generation if b else None)
+    return JSONResponse(state)
+
+
+def _task_state(v: V2, key: str) -> dict:
+    import json
+    import time
+
+    for _ in range(
+        600
+    ):  # a concurrent first delivery is still running: wait for its outcome (≤ 60 s)
+        b = v.store.get(key)
+        d = json.loads(b.data) if b else {"state": "unknown"}
+        if d.get("state") != "running":
+            return d
+        time.sleep(0.1)
+    return {"state": "running"}

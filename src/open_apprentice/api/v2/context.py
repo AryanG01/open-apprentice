@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from fractions import Fraction
 from typing import Any, Callable, Optional, Protocol
 
+from open_apprentice.api.v2.tasks import CloudTasksDispatcher, Job, TasksAuth
 from open_apprentice.drawio.parse import Page
 from open_apprentice.drawio.render import Rendered, render_page
 from open_apprentice.storage.factory import store_from_env
@@ -25,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 class Dispatcher(Protocol):
-    def submit(self, key: str, fn: Callable[[], None]) -> None: ...
+    def submit(self, job: Job) -> None: ...
 
 
 @dataclass
@@ -40,6 +41,9 @@ class V2:
     worst_usd: Fraction  # reserved per model attempt; 0 for the offline enumerator
     dispatcher: Dispatcher
     secret: bytes
+    internal_tasks: Optional[TasksAuth] = (
+        None  # set only in Cloud Tasks mode: who may call /internal/tasks
+    )
     render_svg: Optional[Callable[[Page], Optional[str]]] = (
         None  # SVG export from the same engine; None = unavailable
     )
@@ -76,6 +80,9 @@ class LocalDispatcher:
     (submits coalesce), so session progress never runs two executors on one log at once."""
 
     def __init__(self, workers: int = 4) -> None:
+        self.runner: Optional[Callable[[Job], None]] = (
+            None  # bound to service.run_job once the context exists
+        )
         self._pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="oa-v2")
         self._lock = threading.Lock()
         self._idle = threading.Condition(self._lock)
@@ -83,7 +90,18 @@ class LocalDispatcher:
         self._again: dict[str, Callable[[], None]] = {}
         self.errors: dict[str, str] = {}
 
-    def submit(self, key: str, fn: Callable[[], None]) -> None:
+    def bind(self, runner: Callable[[Job], None]) -> None:
+        self.runner = runner
+
+    def submit(self, job: Job) -> None:
+        runner = self.runner
+        if runner is None:
+            raise RuntimeError("the dispatcher has no runner; call bind() first")
+        key = job.key
+
+        def fn() -> None:
+            runner(job)
+
         with self._lock:
             if key in self._running:
                 self._again[key] = fn
@@ -173,7 +191,17 @@ def make_v2(engine_url: Optional[str]) -> V2:
         except Exception as e:  # misconfigured live mode stays offline, visibly
             log.warning("live mode unavailable, staying offline: %s", e)
     ledger = Ledger(store, cap)
-    return V2(
+    dispatcher: Any = LocalDispatcher()
+    internal: Optional[TasksAuth] = None
+    if os.environ.get("OA_DISPATCH") == "cloudtasks":
+        from google.cloud import tasks_v2
+
+        url, sa = os.environ["OA_TASKS_SERVICE_URL"], os.environ["OA_TASKS_SERVICE_ACCOUNT"]
+        dispatcher = CloudTasksDispatcher(
+            tasks_v2.CloudTasksClient(), os.environ["OA_TASKS_QUEUE"], url, sa
+        )
+        internal = TasksAuth(url.rstrip("/"), sa)
+    v = V2(
         store=store,
         render=render,
         proposer=proposer,
@@ -182,11 +210,17 @@ def make_v2(engine_url: Optional[str]) -> V2:
         live_available=lambda: model == "Live" and ledger.exposure()["total"] + worst <= cap,
         ledger=ledger,
         worst_usd=worst,
-        dispatcher=LocalDispatcher(),
+        dispatcher=dispatcher,
         secret=_secret(store),
+        internal_tasks=internal,
         render_svg=(
             (lambda page: render_page(page, engine_url, png=False, svg=True).svg)
             if engine_url
             else None
         ),
     )
+    if isinstance(dispatcher, LocalDispatcher):
+        from open_apprentice.api.v2 import service
+
+        dispatcher.bind(lambda job: service.run_job(v, job))
+    return v

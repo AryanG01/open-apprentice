@@ -10,6 +10,7 @@ from typing import Any, Optional
 
 from open_apprentice.api.v2 import records
 from open_apprentice.api.v2.context import V2
+from open_apprentice.api.v2.tasks import Job
 from open_apprentice.drawio import mapping as mp
 from open_apprentice.drawio.classify import Classified, classify
 from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, load_drawio
@@ -78,7 +79,7 @@ def import_document(v: V2, owner: str, name: str, raw: bytes) -> dict:
         "render": "pending",
     }
     records.put_new(v.store, _doc_key(doc_id), owner, body)
-    v.dispatcher.submit(f"render:{doc_id}", lambda: render_document(v, owner, doc_id))
+    v.dispatcher.submit(Job("render", f"render:{doc_id}", {"owner": owner, "doc_id": doc_id}))
     return body
 
 
@@ -389,7 +390,7 @@ def _create_session(
         "live": live,
     }
     records.put_new(v.store, _meta_key(sid), owner, meta)
-    v.dispatcher.submit(sid, lambda: advance(v, sid))
+    v.dispatcher.submit(Job("advance", sid, {"sid": sid}))
     return {"session_id": sid, "operation": "advance", "status_url": f"/api/v2/sessions/{sid}"}
 
 
@@ -671,7 +672,7 @@ def submit_answer(v: V2, owner: str, sid: str, body: dict) -> dict:
         raise Conflict(
             "INVALID_ANSWER", "the answer does not fit the question (or it was answered meanwhile)"
         )
-    v.dispatcher.submit(sid, lambda: advance(v, sid))
+    v.dispatcher.submit(Job("advance", sid, {"sid": sid}))
     return {"accepted": True, "duplicate": False}
 
 
@@ -746,7 +747,7 @@ def apply_version(
             {**body, "run_id": run_id, "status": "running", "results": {},
              "provenance": provenance},
         )  # fmt: skip
-        v.dispatcher.submit(f"run:{run_id}", lambda: run_apply(v, owner, run_id))
+        v.dispatcher.submit(Job("apply", f"run:{run_id}", {"owner": owner, "run_id": run_id}))
         return {"run_id": run_id, "status_url": f"/api/v2/runs/{run_id}"}
 
     return records.idempotent(v.store, owner, f"apply:{idempotency_key}", _digest(body), produce)
@@ -959,7 +960,7 @@ def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
     meta = {"sid": sid, "kind": "correction", "skill_id": skill_id, "run_id": run["run_id"],
             "model": "Fixture", "teacher": "You", "live": False, "skill_provenance": provenance}  # fmt: skip
     records.put_new(v.store, _meta_key(sid), owner, meta)
-    v.dispatcher.submit(sid, lambda: advance(v, sid))
+    v.dispatcher.submit(Job("advance", sid, {"sid": sid}))
     return {"session_id": sid, "operation": "advance", "status_url": f"/api/v2/sessions/{sid}"}
 
 
@@ -1234,3 +1235,21 @@ def _import_probe_document(
         if_generation=_stored_mapping(v, doc_id, page.id)[1],
     )
     return doc_id
+
+
+# ---- background jobs ----------------------------------------------------------------------------------------------------
+
+
+def run_job(v: V2, job: Job) -> None:
+    """Run one background job, locally or delivered by Cloud Tasks (spec 8 /internal/tasks)."""
+    a = job.args
+    if job.kind == "render":
+        render_document(v, a["owner"], a["doc_id"])
+    elif job.kind == "advance":
+        advance(v, a["sid"])
+    elif job.kind == "apply":
+        run_apply(v, a["owner"], a["run_id"])
+    elif job.kind == "ping":
+        v.store.create(f"staging/ping-{a['id']}", b"ok")
+    else:
+        raise ValueError(f"unknown job kind {job.kind!r}")
