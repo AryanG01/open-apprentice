@@ -166,3 +166,27 @@ def crowded_bytes():
     return drawio(
         model([node("n1", 40, 40, 100, 50), node("x", 150, 50, 40, 30), label("l1", 50, 100)])
     )
+
+
+@pytest.fixture
+def full_flow(client, v2, doc_bytes, batch_bytes, fresh_bytes):
+    """One owner ran import → session → commit → apply; returns the client (with that owner's cookie) and every id."""
+    sid = start_session(client, v2, doc_bytes, batch_bytes, key="flow")
+    s = answer_until_done(client, v2, sid)
+    assert s["state"] == "committed", s
+    skill = s["result"]["skill_id"]
+    ref = import_and_confirm(client, v2, fresh_bytes, "fresh.drawio")
+    run = client.post(
+        f"/api/v2/skills/{skill}/versions/1/apply",
+        json={"documents": [ref], "idempotency_key": "flow"},
+    )
+    v2.dispatcher.drain()
+    ids = {
+        "doc": ref["doc_id"],
+        "page": ref["page_id"],
+        "sid": sid,
+        "run": run.json()["run_id"],
+        "skill": skill,
+        "docref": ref,
+    }
+    return client, ids
