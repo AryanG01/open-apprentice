@@ -10,18 +10,14 @@ work from the first commit, and lets scripts/tests probe "is this wired up" inde
 from __future__ import annotations
 
 import json
-import os
 import sys
 import uuid
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 import typer
 
 from open_apprentice.cli_exit import ExitState, NotImplementedExit
-
-if TYPE_CHECKING:
-    from open_apprentice.storage.store import Store
 
 app = typer.Typer(
     name="oa",
@@ -849,18 +845,6 @@ def drawio_check(file: Path, page: int = 0) -> None:
     )
 
 
-def _store_from_env() -> Store:
-    from open_apprentice.storage.store import LocalStore
-
-    if os.environ.get("OA_STORE") == "gcs":
-        from google.cloud import storage
-
-        from open_apprentice.storage.gcs import GcsStore
-
-        return GcsStore(storage.Client().bucket(os.environ["OA_BUCKET"]))
-    return LocalStore(os.environ.get("OA_STORE_DIR", ".oa-store"))
-
-
 @app.command("staging-check")
 def staging_check(
     file: Optional[Path] = None,
@@ -873,7 +857,9 @@ def staging_check(
     against whatever OA_STORE points at; it creates no cloud resources."""
     from open_apprentice.storage.store import PreconditionFailed
 
-    store = _store_from_env()
+    from open_apprentice.storage.factory import store_from_env
+
+    store = store_from_env()
     failed = False
     if only in ("all", "race"):
         key = f"staging/race-{uuid.uuid4().hex}"
