@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
+import { MAX_XML, PROFILE_BASE, RENDER_TIMEOUT_MS, openFontPage, renderPage } from "./drawio.js";
 
 const require = createRequire(import.meta.url);
 const KONVA_PATH = require.resolve("konva/konva.min.js");
@@ -17,6 +18,7 @@ const BACKENDS = {
 const MAX_SESSIONS = 4;          // spec 19.2 parallel browser contexts
 const ACTION_DEADLINE_MS = 5000; // per-action deadline (spec 6.5)
 const MEASURE_TIMEOUT_MS = 10000; // an SVG measurement that hangs is abandoned and its context closed
+const MAX_RENDERS = 2;          // concurrent draw.io renders (each a fresh browser context)
 const SESSION_IDLE_MS = 10 * 60 * 1000; // a session nobody has touched for this long is reclaimed (abandoned visitors must not exhaust the cap)
 
 // PUBLIC tool contract. Identical across drift variants by construction: it is a constant,
@@ -42,6 +44,7 @@ export class Engine {
   #idleMs;
   #healthy = false;
   #onDisconnect = null;
+  #renders = 0;
 
   constructor({ idleMs = SESSION_IDLE_MS } = {}) {
     this.#idleMs = idleMs;
@@ -175,6 +178,43 @@ export class Engine {
       return await Promise.race([work, timeout]);
     } finally {
       clearTimeout(timer);
+      await context.close();
+    }
+  }
+
+  // Render and measure one draw.io page (product route). The API refuses hostile files before calling this; the context
+  // is fresh, network-blocked and closed afterwards whatever happens.
+  async renderDrawio(xml, { wantPng = true, wantSvg = false } = {}) {
+    if (typeof xml !== "string" || xml.length > MAX_XML || !xml.startsWith("<mxfile")) {
+      throw Object.assign(new Error("invalid draw.io page"), { code: "INVALID_ARGUMENT" });
+    }
+    if (this.#renders >= MAX_RENDERS) throw Object.assign(new Error("render limit"), { code: "LIMIT" });
+    this.#renders += 1;
+    let timer;
+    try {
+      const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(Object.assign(new Error("render timed out"), { code: "TIMEOUT" })), RENDER_TIMEOUT_MS);
+      });
+      const out = await Promise.race([renderPage(this.#browser, xml, { wantPng, wantSvg }), timeout]);
+      return { ...out, profile: { ...PROFILE_BASE, chromium: this.#browser.version() } };
+    } catch (e) {
+      if (e.code) throw e;
+      throw Object.assign(new Error(String(e.message).split("\n")[0].slice(0, 200)), { code: "RENDER_FAILED" });
+    } finally {
+      clearTimeout(timer);
+      this.#renders -= 1;
+    }
+  }
+
+  async textWidthForTest(family, text) {
+    const { context, page } = await openFontPage(this.#browser);
+    try {
+      return await page.evaluate(([f, t]) => {
+        const c = document.createElement("canvas").getContext("2d");
+        c.font = `12px "${f}"`;
+        return c.measureText(t).width;
+      }, [family, text]);
+    } finally {
       await context.close();
     }
   }

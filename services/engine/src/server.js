@@ -42,6 +42,12 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
     try { await engine.destroyOwned(req.params.id, req.query.owner); return { ok: true }; } catch (e) { return fail(reply, e); }
   });
 
+  // Product route: renders an already-validated page; the context is fresh and network-blocked.
+  app.post("/drawio/render", { bodyLimit: 8 * 1024 * 1024 }, async (req, reply) => {
+    const { xml, want_png, want_svg } = req.body ?? {};
+    try { return await engine.renderDrawio(xml, { wantPng: want_png !== false, wantSvg: want_svg === true }); } catch (e) { return fail(reply, e); }
+  });
+
   app.post("/internal/sessions", async (req, reply) => {
     if (!guard(req, reply)) return;
     const { scene, owner, private_config, backend } = req.body ?? {};
