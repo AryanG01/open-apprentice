@@ -8,7 +8,8 @@ export const SAFETY_LINE =
   "Previews are displayed in image context; uploaded content is separately validated and rendered in the locked engine.";
 
 type Positions = Record<string, Point>;
-type Draft = { png: string | null; image_offset: { x: string; y: string } };
+type Draft = { png: string | null; image_offset: { x: string; y: string }; boxes: Record<string, { x: string; y: string }> };
+type Landing = { seq: number; positions: Positions; offset: Point; measured: Draft["boxes"] };
 
 type Props = {
   docId: string;
@@ -37,7 +38,8 @@ export function DocumentView({ docId, pageId, mappingHash, editable, title, star
   const img = useRef<HTMLImageElement | null>(null);
   const drag = useRef<{ id: string; x0: number; y0: number; p0: Point } | null>(null);
   const draftSeq = useRef(0);
-  const awaitingLoad = useRef<number | null>(null);
+  const landing = useRef<Landing | null>(null); // a draft whose image is loading; applied together on load
+  const srcRef = useRef<string>("");
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const startRef = useRef(start);
   const onChangeRef = useRef(onChange);
@@ -72,22 +74,46 @@ export function DocumentView({ docId, pageId, mappingHash, editable, title, star
     return () => ro.disconnect();
   }, [scene]);
 
+  // image, offset and geometry of a draft are applied together, only once its image is on screen (spec 8)
+  const land = useCallback((l: Landing) => {
+    setOffset(l.offset);
+    const measured: Positions = {};
+    for (const [k, b] of Object.entries(l.measured)) if (k in l.positions) measured[k] = { x: snap64(parseNum(b.x)), y: snap64(parseNum(b.y)) };
+    const shownNow = { ...l.positions, ...measured };
+    setPos((old) => ({ ...old, ...shownNow }));
+    setMoved(shownNow);
+    setPending(false);
+    onChangeRef.current?.(shownNow, true);
+  }, []);
+
   const requestDraft = useCallback(
     (next: Positions) => {
       if (timer.current) clearTimeout(timer.current);
+      const seq = ++draftSeq.current; // every edit supersedes any render still in flight
+      landing.current = null;
       setPending(true);
       onChangeRef.current?.(next, false);
       timer.current = setTimeout(async () => {
-        const seq = ++draftSeq.current;
+        if (seq !== draftSeq.current) return;
         const boxes: Record<string, [string, string]> = {};
         for (const [k, p] of Object.entries(next)) boxes[k] = [fmt(p.x), fmt(p.y)];
         try {
           const d = await post<Draft>(`/documents/${docId}/draft`, { page_id: pageId, mapping_hash: mappingHash, boxes });
           if (seq !== draftSeq.current) return; // a newer edit superseded this render
-          awaitingLoad.current = seq;
-          setOffset({ x: parseNum(d.image_offset.x), y: parseNum(d.image_offset.y) });
-          if (d.png) setSrc(`data:image/png;base64,${d.png}`);
+          if (!d.png) {
+            setPending(false);
+            setError("The engine returned no image for this edit; move the label again to retry.");
+            return;
+          }
           setError(null);
+          const l: Landing = { seq, positions: next, offset: { x: parseNum(d.image_offset.x), y: parseNum(d.image_offset.y) }, measured: d.boxes };
+          const nextSrc = `data:image/png;base64,${d.png}`;
+          if (nextSrc === srcRef.current) {
+            land(l); // the same image is already on screen: nothing new to load
+          } else {
+            landing.current = l;
+            setSrc(nextSrc);
+          }
         } catch (e) {
           if (seq === draftSeq.current) {
             setPending(false);
@@ -96,7 +122,7 @@ export function DocumentView({ docId, pageId, mappingHash, editable, title, star
         }
       }, 300);
     },
-    [docId, pageId, mappingHash],
+    [docId, pageId, mappingHash, land],
   );
 
   // a start position (e.g. a run's output) is rendered once so the user sees it before editing
@@ -109,12 +135,13 @@ export function DocumentView({ docId, pageId, mappingHash, editable, title, star
   const onImageLoad = () => {
     const el = img.current;
     if (!el) return;
+    srcRef.current = el.getAttribute("src") ?? "";
     setNatural(el.naturalWidth);
     setShown(el.clientWidth);
-    if (awaitingLoad.current !== null && awaitingLoad.current === draftSeq.current) {
-      awaitingLoad.current = null;
-      setPending(false);
-      onChangeRef.current?.(moved, true);
+    const l = landing.current;
+    if (l !== null && l.seq === draftSeq.current) {
+      landing.current = null;
+      land(l);
     }
   };
 

@@ -20,17 +20,29 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
   const [error, setError] = useState<string | null>(null);
   const key = useRef(newKey());
 
+  const [skillTick, setSkillTick] = useState(0);
   useEffect(() => {
-    get<SkillInfo>(`/skills/${skillId}`).then(setSkill).catch((e) => setError(e instanceof ApiError ? e.message : String(e)));
-  }, [skillId, run?.status]);
+    get<SkillInfo>(`/skills/${skillId}`)
+      .then((sk) => {
+        setSkill(sk);
+        // a just-committed skill is activated a moment after it is stored: look again until a version is active
+        if (sk.active.version === null) setTimeout(() => setSkillTick((n) => n + 1), 1000);
+      })
+      .catch((e) => {
+        setError(e instanceof ApiError ? e.message : String(e));
+        setTimeout(() => setSkillTick((n) => n + 1), 2000);
+      });
+  }, [skillId, run?.status, skillTick]);
 
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
     if (!run || run.status !== "running") return;
     const t = setTimeout(() => {
-      get<RunInfo>(`/runs/${run.run_id}`).then(setRun).catch(() => undefined);
+      // a failed poll is retried; it must never leave "Run running." on screen for good
+      get<RunInfo>(`/runs/${run.run_id}`).then(setRun).catch(() => setRetry((n) => n + 1));
     }, 1000);
     return () => clearTimeout(t);
-  }, [run]);
+  }, [run, retry]);
 
   const ready = docs.filter((d) => refOf(d));
   const apply = async () => {
@@ -40,7 +52,9 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
     try {
       const documents = ready.filter((d) => picked[d.doc_id]).map((d) => refOf(d) as DocRef);
       const r = await post<{ run_id: string }>(`/skills/${skillId}/versions/${skill.active.version}/apply`, { documents, idempotency_key: key.current });
-      setRun(await get<RunInfo>(`/runs/${r.run_id}`));
+      // the run exists now: track it at once and let polling (which retries) fill in its results
+      setRun({ run_id: r.run_id, skill_id: skillId, version: skill.active.version, status: "running", documents, results: {},
+        provenance: skill.provenance ?? { model: "Fixture", teacher: "You" } });
     } catch (e) {
       setError(e instanceof ApiError ? e.message : String(e));
     } finally {
@@ -53,11 +67,13 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
   return (
     <section className="v2-step" aria-labelledby="h-reuse">
       <h2 id="h-reuse">3 · Reuse and export</h2>
-      {skill ? (
+      {skill?.active.version ? (
         <p>
           Skill version {skill.active.version} is active. {skill.provenance ? provenanceLine(skill.provenance) : null}
         </p>
-      ) : null}
+      ) : (
+        <p role="status">Activating the new skill…</p>
+      )}
       <fieldset>
         <legend>Apply to</legend>
         {ready.map((d) => (
@@ -67,7 +83,7 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
           </label>
         ))}
       </fieldset>
-      <button type="button" disabled={busy || !Object.values(picked).some(Boolean)} onClick={() => void apply()}>Apply</button>
+      <button type="button" disabled={busy || !skill?.active.version || !Object.values(picked).some(Boolean)} onClick={() => void apply()}>Apply</button>
       {error ? <p className="err" role="alert">{error}</p> : null}
       {run ? (
         <div className="results" data-run={run.run_id}>

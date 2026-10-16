@@ -158,3 +158,31 @@ def test_hand_placed_positions_within_tolerance_are_explained():
     }
     cands, _, _ = LabelEnumerator().propose(ev, "initial", ())
     assert any("a.y + a.h + 8" in c["text"] for c in cands), [c["summary"] for c in cands]
+
+
+def test_near_identical_gaps_collapse_to_the_whole_unit_one():
+    # measured positions are a hair off whole units; "gap 7.984375" and "gap 8" must not both survive (no question can
+    # separate them, so the learner would stop with "unresolved disagreement")
+    def obj(i, kind, attached, x, y, w, h):
+        return {"id": i, "kind": kind, "role": "note" if kind == "label" else "", "attached": attached,
+                "x": x, "y": y, "w": w, "h": h}  # fmt: skip
+
+    scene = {
+        "objects": [
+            obj("n1", "node", "", 40, 57.5, 60, 50),
+            obj("l1", "label", "n1", 0, 0, 30, 14),
+            obj("n2", "node", "", 40, 207.5, 60, 50),
+            obj("l2", "label", "n2", 0, 300, 30, 14),
+        ],
+        "canvas": {"w": 600, "h": 400},
+    }
+    # gap 8 puts l1 at (55, 115.5) and l2 at (55, 265.5); the measured positions are 1/64 off
+    moves = {"l1": ["3521/64", "7391/64"], "l2": ["3521/64", "16991/64"]}
+    ev = {
+        "teaching_evidence": [
+            {"evidence": "demonstration", "scene": scene, "labels_moved_to": moves}
+        ]
+    }
+    cands, _, _ = LabelEnumerator().propose(ev, "initial", ())
+    below = [c for c in cands if "a.y + a.h +" in c["text"] and "o.role" not in c["text"]]
+    assert len(below) == 1 and "a.y + a.h + 8" in below[0]["text"], [c["summary"] for c in cands]

@@ -128,7 +128,7 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     const problems = [];
     page.on("pageerror", (e) => problems.push(`pageerror: ${e.message.slice(0, 160)}`));
     page.on("response", (r) => {
-      if (r.status() >= 400) problems.push(`HTTP ${r.status()} ${r.url()}`);
+      if (r.status() >= 400 && !(r.status() === 503 && /\/api\/v2\/runs\//.test(r.url()))) problems.push(`HTTP ${r.status()} ${r.url()}`);
     });
     const sessions = [];
     const bodies = [];
@@ -204,11 +204,28 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
       assert.equal(page.url().match(/s\/([0-9a-f]+)/)[1], sid);
     }
 
+    // preview cards name their document (not an id prefix)
+    if (await page.locator("fieldset[data-item] legend").count()) {
+      assert.match(await page.locator("fieldset[data-item] legend").first().innerText(), /\.drawio/);
+      assert.match(await page.locator("fieldset[data-item] img").first().getAttribute("alt"), /\.drawio/);
+    }
+
     // 4. answer through the preview until committed
     const taught = await answerUntilDone(page);
     const sstate = await (await page.request.get(`${API}/api/v2/sessions/${sid}`)).json();
     assert.equal(taught, "committed", JSON.stringify({ result: sstate.result, budgets: sstate.budgets, sent: bodies[0] }));
     assert.match(await page.locator(".prov").innerText(), /Model: Fixture · Teacher: You/);
+
+    // the first skill read lands before activation finishes: Reuse must wait for the active version, not silently no-op
+    let skillReads = 0;
+    await page.route(/\/api\/v2\/skills\/[^/]+$/, async (route) => {
+      if (skillReads++ === 0) {
+        const real = await (await route.fetch()).json();
+        return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...real, active: { version: null, generation: null } }) });
+      }
+      return route.continue();
+    });
+    await page.reload({ waitUntil: "networkidle" });
 
     // 5. reuse on d2 and d3
     await page.getByLabel("Add .drawio files").setInputFiles([path.join(CORPUS, "d3.drawio")]);
@@ -217,8 +234,24 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === 3, "three confirmed mappings");
     await page.locator("label.pick", { hasText: "d2.drawio" }).locator("input").check();
     await page.locator("label.pick", { hasText: "d3.drawio" }).locator("input").check();
+    // a transient failure while polling the run must not freeze the results (the first poll gets a 503)
+    let failedOnce = false;
+    await page.route(/\/api\/v2\/runs\/[0-9a-f]+$/, async (route) => {
+      if (!failedOnce && route.request().method() === "GET") {
+        failedOnce = true;
+        return route.fulfill({ status: 503, contentType: "application/json", body: '{"error":{"code":"TEMPORARY","message":"try again"}}' });
+      }
+      return route.continue();
+    });
     await page.getByRole("button", { name: "Apply" }).click();
-    await until(async () => (await page.locator("article.result").count()) === 2 && !(await page.getByText("Run running").count()), "two results", 150_000);
+    try {
+      await until(async () => (await page.locator("article.result").count()) === 2 && !(await page.getByText("Run running").count()), "two results", 150_000);
+    } catch (e) {
+      const runId = await page.locator("[data-run]").getAttribute("data-run").catch(() => null);
+      const run = runId ? await (await page.request.get(`${API}/api/v2/runs/${runId}`)).json() : null;
+      throw new Error(`${e.message}: run ${JSON.stringify(run)?.slice(0, 800)}; screen ${(await page.locator("#h-reuse").locator("..").innerText()).slice(0, 600)}`);
+    }
+
     const d2 = page.locator('article.result[data-result="d2.drawio"]');
     assert.match(await d2.locator("h3").innerText(), /Published/);
     assert.equal(await d2.locator(".checks li").count(), 3);
@@ -273,6 +306,75 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     assert.ok((await page.locator("body").innerText()).length > 500);
 
     assert.deepEqual(problems, []);
+    await ctx.close();
+  });
+
+  test("draft renders gate the confirm button and keep the overlay aligned", async () => {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
+    const page = await ctx.newPage();
+    await page.goto(`${API}/#apprentice`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: "networkidle" });
+    await page.getByLabel("Add .drawio files").setInputFiles([path.join(CORPUS, "d1.drawio"), path.join(CORPUS, "d2.drawio")]);
+    await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "two rendered documents");
+    for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Confirm mapping" }).first().click(), await page.waitForTimeout(400);
+    await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === 2, "two confirmed mappings");
+    await page.getByLabel("Document to edit").selectOption({ label: "d1.drawio" });
+    await page.waitForSelector("button[data-label]");
+    const confirm = page.getByRole("button", { name: "This whole document is right" });
+    const label = page.locator("button[data-label]").first();
+
+    // Important 1: a slow render of edit A must not mark edit B as seen
+    let release, fetched;
+    const held = new Promise((r) => (release = r));
+    const ready = new Promise((r) => (fetched = r));
+    let first = true;
+    await page.route("**/api/v2/documents/*/draft", async (route) => {
+      if (!first) return route.continue();
+      first = false;
+      const response = await route.fetch(); // A's render is done on the server…
+      fetched();
+      await held; // …but delivered only after edit B has been made
+      await route.fulfill({ response });
+    });
+    await label.focus();
+    await page.keyboard.press("ArrowRight"); // edit A
+    await ready; // A's draft has been rendered and is being held
+    await page.keyboard.press("ArrowRight"); // edit B: its 300 ms timer has not fired yet
+    release(); // A's image arrives at once, before B's request is even sent
+    await page.waitForTimeout(150);
+    assert.ok(await confirm.isDisabled(), "B's positions must not count as seen while A's image is shown");
+    await until(async () => confirm.isEnabled(), "B's render to be seen", 30_000);
+    await page.unroute("**/api/v2/documents/*/draft");
+
+    // Important 2: a net-zero edit (same positions, same PNG) must not leave the button locked
+    await label.focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowLeft");
+    await until(async () => confirm.isEnabled(), "the unchanged render to count as seen", 15_000);
+
+    // Important 4: after a draft that changes the image offset, the overlay follows the measured geometry
+    const id = await label.getAttribute("data-label");
+    await label.click();
+    const [resp] = await Promise.all([
+      page.waitForResponse((r) => /\/draft$/.test(r.url()) && r.request().method() === "POST"),
+      page.getByLabel(`x of ${id}`).fill("-40"), // past the page's left edge: the rendered bounds and offset change
+    ]);
+    const draft = await resp.json();
+    await until(async () => confirm.isEnabled(), "the off-page render to be seen", 15_000);
+    const geo = await page.evaluate(() => {
+      const img = document.querySelector(".docview-stage img");
+      const r = img.getBoundingClientRect();
+      return { scale: img.clientWidth / img.naturalWidth, ix: r.left, iy: r.top,
+               labels: [...document.querySelectorAll(".docview-stage button[data-label]")].map((b) => ({ id: b.dataset.label, x: b.getBoundingClientRect().left, y: b.getBoundingClientRect().top })) };
+    });
+    const ox = n(draft.image_offset.x), oy = n(draft.image_offset.y);
+    for (const l of geo.labels) {
+      const b = draft.boxes[l.id];
+      if (!b) continue;
+      assert.ok(Math.abs(l.x - geo.ix - (n(b.x) + ox) * geo.scale) < 1.5, `x of ${l.id} after the draft`);
+      assert.ok(Math.abs(l.y - geo.iy - (n(b.y) + oy) * geo.scale) < 1.5, `y of ${l.id} after the draft`);
+    }
     await ctx.close();
   });
 });

@@ -108,6 +108,19 @@ def _fits(out: Optional[dict], objs: list[dict], moves: dict, all_others_fixed: 
     return True
 
 
+def _prefer_whole_gaps(cands: list[dict]) -> list[dict]:
+    """A hand-placed edit makes "gap 7.984375" and "gap 8" both fit within tolerance. No question can separate outputs
+    that close, so keep the whole-unit gap the person meant whenever it fits too."""
+    keys = {c["_k"] for c in cands}
+    kept = []
+    for c in cands:
+        scope, side, gap = c.pop("_k")
+        if gap.denominator != 1 and (scope, side, Fraction(round(gap))) in keys:
+            continue
+        kept.append(c)
+    return kept
+
+
 def _parse(text: str) -> Optional[list]:
     try:
         rule = parse_rule_text(text)
@@ -148,7 +161,10 @@ class LabelEnumerator:
                 continue
             seen.add(key)
             summary = f"labels{'' if scope is None else ' with ' + scope} go {side} of their node, gap {_num(gap)}"
-            fitting.append({"rule": rule, "summary": summary, "text": text})
+            fitting.append(
+                {"rule": rule, "summary": summary, "text": text, "_k": (scope, side, gap)}
+            )
+        fitting = _prefer_whole_gaps(fitting)
         fitting.sort(key=lambda c: (len(c["text"]), c["text"]))
         start = 0 if round_kind == "initial" else PER_ROUND
         usage = {"source": "label_enumerative", "evaluated": evaluated}

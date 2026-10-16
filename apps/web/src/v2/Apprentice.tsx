@@ -122,7 +122,8 @@ export function Apprentice() {
               <p className="prov">{provenanceLine(state.provenance)}</p>
               <p role="status" data-state={state.state}>State: {STATE_TEXT[state.state] ?? state.state}</p>
               {state.result.reason ? <p className="err">{state.result.reason}</p> : null}
-              {state.outstanding ? <Question key={state.outstanding.request_id} sid={state.session_id} q={state.outstanding} onAnswered={refresh} /> : null}
+              {state.outstanding ? <Question key={state.outstanding.request_id} sid={state.session_id} q={state.outstanding} onAnswered={refresh}
+                  names={Object.fromEntries(docs.map((d) => [d.doc_id, d.name]))} /> : null}
               {["teaching", "waiting_for_model", "draft"].includes(state.state) ? <p role="status">Working…</p> : null}
               <details>
                 <summary>Evidence</summary>

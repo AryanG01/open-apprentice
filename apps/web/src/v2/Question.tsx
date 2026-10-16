@@ -3,16 +3,18 @@ import { ApiError, post, url } from "./api";
 import { SAFETY_LINE } from "./DocumentView";
 import type { Outstanding } from "./types";
 
-type Props = { sid: string; q: Outstanding; onAnswered: () => void };
-
-const docName = (sceneId: string) => sceneId.split(":")[0].slice(0, 8);
+type Props = { sid: string; q: Outstanding; onAnswered: () => void; names?: Record<string, string> };
 
 function ItemImage({ sid, q, item, alt }: { sid: string; q: Outstanding; item: string; alt: string }) {
   return <img className="item" src={url(`/sessions/${sid}/requests/${q.request_id}/items/${encodeURIComponent(item)}.png`)} alt={alt} />;
 }
 
 /** Renders the open question by type and submits one answer per click (spec 8 Clarify, Preview, Review revision). */
-export function Question({ sid, q, onAnswered }: Props) {
+export function Question({ sid, q, onAnswered, names = {} }: Props) {
+  const docName = (sceneId: string): string => {
+    const id = sceneId.split(":")[0];
+    return names[id] ?? id.slice(0, 8);
+  };
   const [choice, setChoice] = useState<string>("");
   const [verdicts, setVerdicts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
