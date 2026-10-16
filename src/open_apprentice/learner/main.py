@@ -25,7 +25,7 @@ from open_apprentice.teaching import codec  # noqa: E402
 from open_apprentice.teaching.accounting import Ledger  # noqa: E402
 from open_apprentice.teaching.constraints import scene_from_payload  # noqa: E402
 from open_apprentice.teaching.events import SessionLog  # noqa: E402
-from open_apprentice.teaching.probes import Probe, ProbeResult  # noqa: E402
+from open_apprentice.learner import synthetic_render  # noqa: E402
 from open_apprentice.teaching.teacher import (  # noqa: E402
     Request,
     Response,
@@ -89,11 +89,6 @@ class Context:
     worst: Fraction = Fraction(0)
     logs: dict[str, SessionLog] = field(default_factory=dict)
     result: dict[str, Any] = field(default_factory=dict)
-
-
-def synthetic_render(probe: Probe) -> ProbeResult:
-    """Battery scenes are exact rational geometry: the probe's selection geometry is what is shown."""
-    return ProbeResult(ok=True, scene_id=probe.probe_id, scene=probe.scene)
 
 
 def _unsupported(episode: dict) -> Optional[str]:
@@ -215,7 +210,27 @@ def system_d(ctx: Context) -> None:
     system_a(ctx, config=StepConfig(probes=True, question_selection="uniform", seed=ctx.seed))
 
 
-SYSTEMS: dict[str, Callable[[Context], None]] = {"A": system_a, "C": system_c, "D": system_d}
+def system_b(ctx: Context) -> None:
+    from open_apprentice.learner.agent_b import AgentBudgets, run_agent_b, scripted_policy
+    from open_apprentice.providers.mock import MockProvider
+
+    mock = MockProvider({}, functions={"agent_b": scripted_policy})
+    ctx.result["policy"] = "scripted_fixture"
+    log = open_learning_log(ctx)
+    status = run_agent_b(lambda: mock, log, ctx.teacher, ctx.ledger, AgentBudgets(), ctx.worst)
+    ctx.result["status"] = status
+    if status == "committed":
+        _activate(ctx, log)
+        if ctx.episode.get("correction"):
+            run_correction(ctx, _offline_proposer())
+
+
+SYSTEMS: dict[str, Callable[[Context], None]] = {
+    "A": system_a,
+    "B": system_b,
+    "C": system_c,
+    "D": system_d,
+}
 
 
 def _terminal_reason(ctx: Context) -> Optional[str]:
@@ -230,7 +245,7 @@ def _usage(ctx: Context) -> dict:
     total: dict[str, int] = {}
     for log in ctx.logs.values():
         for e in log.events():
-            if e.type == "ModelProposalReturned":
+            if e.type in ("ModelProposalReturned", "AgentTurn"):
                 for k, v in (e.payload.get("usage") or {}).items():
                     if isinstance(v, int) and not isinstance(v, bool):
                         total[k] = total.get(k, 0) + v

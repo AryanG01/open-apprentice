@@ -48,7 +48,7 @@ def _rule(text: str) -> Optional[list]:
 
 def _call(
     factory: Callable[[], Provider],
-    prompt: pathlib.Path,
+    prompt: pathlib.Path | str,
     role: str,
     user: dict,
     schema: type[BaseModel],
@@ -56,7 +56,8 @@ def _call(
 ) -> tuple[ValidatedCompletion, dict, Fraction]:
     """One call on a fresh provider inside one event loop: pooled HTTP clients are bound to the loop that opened them,
     and every asyncio.run is a new loop."""
-    msgs = [Message("system", prompt.read_text()), Message("user", json.dumps(user))]
+    system = prompt.read_text() if isinstance(prompt, pathlib.Path) else prompt
+    msgs = [Message("system", system), Message("user", json.dumps(user))]
 
     async def go() -> ValidatedCompletion:
         provider = factory()

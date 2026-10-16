@@ -124,3 +124,14 @@ def test_system_d_runs_a_policy_with_uniform_questions(tmp_path):
         r.stderr[-1500:],
     )
     assert o["question_selection"] == "uniform"
+
+
+def test_system_b_runs_offline_with_the_scripted_fixture_policy(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue" and not e.clarification_required)
+    o, r = run_learner(tmp_path, ep, system="B")
+    assert o["system"] == "B" and o["status"] in ("committed", "abstained"), (
+        o["reason"],
+        r.stderr[-1500:],
+    )
+    assert o["policy"] == "scripted_fixture"
+    assert any(e["type"] == "AgentTurn" for e in o["events"])
