@@ -1,5 +1,5 @@
 // Spike: render one .drawio page with the locally served viewer in a network-blocked Chromium and measure labels.
-// Usage: node scripts/spikes/drawio_roundtrip.mjs <file.drawio> <viewer.js> > out.json
+// Usage: node scripts/spikes/drawio_roundtrip.mjs <file.drawio> services/engine/vendor/drawio/viewer-static.min.js > out.json
 import { chromium } from "playwright";
 import { readFileSync } from "node:fs";
 

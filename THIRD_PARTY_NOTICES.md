@@ -38,6 +38,15 @@ here before any such copy is made:
   20 scenic illustrations are explicitly excluded from this project and from any public demo per
   the dataset's own NOTICE.md (see docs/decisions.md for the enforcement mechanism).
 
+## Vendored in the engine (`services/engine/vendor/`, hashes in `MANIFEST.json`)
+
+- draw.io viewer `viewer-static.min.js`, jgraph/drawio tag v32.4.1 — Apache-2.0
+  (https://github.com/jgraph/drawio). Unmodified; renders `.drawio` pages for measurement.
+- Liberation Sans 2.1.5 Regular and Bold (`LiberationSans-*.ttf`) — SIL Open Font License 1.1
+  (https://github.com/liberationfonts/liberation-fonts). Unmodified; licence text in
+  `services/engine/vendor/fonts/LICENSE-LiberationSans.txt`. Mapped onto `Helvetica` inside the
+  render page only; the font files are not renamed.
+
 ## Third-party design assets in the public demo
 
 Only owner-authored or independently provenance-verified assets are bundled or shown in the public

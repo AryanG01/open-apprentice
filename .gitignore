@@ -62,4 +62,3 @@ gym/resources_servers/*/data/*_prepare.jsonl
 # paid-run spend ledger (local; budget.json stays tracked)
 results/redesign/spend.jsonl
 results/redesign/*/
-scripts/spikes/vendor/*.js
