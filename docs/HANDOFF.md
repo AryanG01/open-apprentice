@@ -13,10 +13,17 @@ badge demo under "Earlier prototype"), Plan 4B generated probes + Cloud Tasks wi
 restart survival, forged-call refusal all pass. Resources stay up (scale to zero; bucket objects expire after 7 days); teardown in
 `docs/deploy_staging_proposal.md`. Production service `open-apprentice` untouched (still the older badge build).
 
-**In progress: Plan 5 evaluation** — plan `docs/superpowers/plans/2026-10-16-p5-evaluation.md`, branch `p5-evaluation`,
-ledger `.superpowers/sdd/2026-10-16-p5-evaluation/progress.md` (git-ignored; resume at the first task without a `complete`
-line; trust the ledger and `git log`). Task 1 had just started (nothing implemented yet). master has 2 unpushed commits
-(`.gcloudignore` fix, staging results).
+**Plan 5 evaluation: built offline, reviewed, on branch `p5-evaluation` (not merged, not pushed).** Plan
+`docs/superpowers/plans/2026-10-16-p5-evaluation.md`; rulings and review outcomes `docs/evaluation/plan5_rulings.md`.
+Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-ignored `benchmarks/final/battery/`, hashes in
+`docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
+systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offline dry run
+(`results/eval_v2/dryrun-20261016/report.md`, not a model result), and the paid-run gate. Suite 945 on 3.13 and 3.12.
+**Waiting on the owner:** approve calibration manifest `76d79b2849370613` (`docs/evaluation/calibration_manifest.md`,
+≈$0.51, cap $1.05 of $1.40 remaining) and decide on a top-up. Before live runs: wire the provider + SpendGuard into the
+learner process; before the funded tier: B's own correction tools, the real-file final episodes, seeded A/B
+interleaving. Known product gap: no system refuses a demonstrated forced-overlap convention.
+master has 2 unpushed commits (`.gcloudignore` fix, staging results).
 
 **Money:** `results/redesign/budget.json` = $50 authorized, $10 reserve; about $38.60 already spent → about **$1.40 spendable**.
 Plan 5 is built offline and stops at a priced calibration manifest; no paid run without the owner's approval and a top-up.
