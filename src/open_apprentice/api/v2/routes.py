@@ -153,3 +153,48 @@ def post_response(
 @router.post("/sessions/{sid}/cancel")
 def post_cancel(sid: str, request: Request, who: str = Depends(owner)) -> dict:
     return service.cancel_session(_v2(request), who, sid)
+
+
+# ---- runs and export -----------------------------------------------------------------------------------------------------
+
+
+@router.post("/skills/{skill_id}/versions/{version}/apply", status_code=202)
+def post_apply(
+    skill_id: str,
+    version: int,
+    request: Request,
+    body: dict = Body(default={}),
+    who: str = Depends(owner),
+) -> dict:
+    v = _v2(request)
+    service._skill_owner(v, who, skill_id)
+    return service.apply_version(
+        v,
+        who,
+        skill_id,
+        version,
+        _field(body, "documents", list),
+        _field(body, "idempotency_key", str),
+    )
+
+
+@router.get("/runs/{run_id}")
+def get_run(run_id: str, request: Request, who: str = Depends(owner)) -> dict:
+    return service.get_run(_v2(request), who, run_id)
+
+
+@router.post("/runs/{run_id}/cancel")
+def post_run_cancel(run_id: str, request: Request, who: str = Depends(owner)) -> dict:
+    return service.cancel_run(_v2(request), who, run_id)
+
+
+@router.get("/runs/{run_id}/export")
+def get_export(
+    run_id: str, request: Request, doc_id: str = "", page_id: str = "", format: str = "drawio",
+    who: str = Depends(owner),
+) -> Response:  # fmt: skip
+    data, media = service.export(_v2(request), who, run_id, doc_id, page_id, format)
+    name = f"{doc_id[:8]}-{page_id}.{ {'drawio': 'drawio', 'svg': 'svg', 'receipt': 'json'}.get(format, 'bin') }"
+    return Response(
+        data, media_type=media, headers={"content-disposition": f'attachment; filename="{name}"'}
+    )

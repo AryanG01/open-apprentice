@@ -127,3 +127,42 @@ def two_docs_session(client, v2, doc_bytes, batch_bytes):
     s = client.get(f"/api/v2/sessions/{sid}").json()
     assert s["outstanding"], s
     return sid, s
+
+
+def answer_until_done(client, v2, sid, rounds=8):
+    s = client.get(f"/api/v2/sessions/{sid}").json()
+    for _ in range(rounds):
+        if s["outstanding"] is None:
+            break
+        req = s["outstanding"]
+        body = {
+            "request_id": req["request_id"],
+            "intent_revision": req["intent_revision"],
+            **req["approve_all_answer"],
+        }
+        client.post(f"/api/v2/sessions/{sid}/responses", json=body)
+        v2.dispatcher.drain()
+        s = client.get(f"/api/v2/sessions/{sid}").json()
+    return s
+
+
+@pytest.fixture
+def committed_skill(client, v2, doc_bytes, batch_bytes):
+    s = answer_until_done(
+        client, v2, start_session(client, v2, doc_bytes, batch_bytes, key="commit")
+    )
+    assert s["state"] == "committed", s
+    return s["result"]["skill_id"]
+
+
+@pytest.fixture
+def fresh_bytes():
+    return drawio(model([node("p1", 100, 150, 90, 40), label("q1", 110, 220)]))
+
+
+@pytest.fixture
+def crowded_bytes():
+    # a node sits exactly where "right of the node, gap 12" puts the label
+    return drawio(
+        model([node("n1", 40, 40, 100, 50), node("x", 150, 50, 40, 30), label("l1", 50, 100)])
+    )

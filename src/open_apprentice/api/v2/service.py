@@ -419,7 +419,10 @@ def advance(v: V2, sid: str) -> None:
     version = next(e.payload["version"] for e in evs if e.type == "VersionStored")
     try:
         records.put_new(
-            v.store, f"skills/{meta['skill_id']}/owner.json", log.manifest()[0]["owner"], {}
+            v.store,
+            f"skills/{meta['skill_id']}/owner.json",
+            log.manifest()[0]["owner"],
+            {"provenance": {"model": meta["model"], "teacher": meta["teacher"]}, "session_id": sid},
         )
     except FileExistsError:
         pass
@@ -659,3 +662,156 @@ def cancel_session(v: V2, owner: str, sid: str) -> dict:
         except LogConflict:
             continue  # the session moved; look again
     raise Conflict("BUSY", "the session is busy; try again")
+
+
+# ---- apply runs and export -----------------------------------------------------------------------------------------------
+
+
+def _run_key(run_id: str) -> str:
+    return f"runs/{run_id}.json"
+
+
+def _skill_owner(v: V2, owner: str, skill_id: str) -> dict:
+    return records.load(v.store, f"skills/{skill_id}/owner.json", owner)[0]
+
+
+def _version(v: V2, skill_id: str, version: int) -> dict:
+    from open_apprentice.skills.versions import SkillStore
+
+    try:
+        return SkillStore(v.store).version(skill_id, version)
+    except KeyError as e:
+        raise records.NotFound(f"{skill_id} v{version}") from e
+
+
+def apply_version(
+    v: V2, owner: str, skill_id: str, version: int, documents: list[dict], idempotency_key: str
+) -> dict:
+    provenance = _skill_owner(v, owner, skill_id).get(
+        "provenance", {"model": "Fixture", "teacher": "You"}
+    )
+    _version(v, skill_id, version)
+    body = {"skill_id": skill_id, "version": version, "documents": documents}
+
+    def produce() -> dict:
+        run_id = uuid.uuid4().hex
+        records.put_new(
+            v.store,
+            _run_key(run_id),
+            owner,
+            {**body, "run_id": run_id, "status": "running", "results": {},
+             "provenance": provenance},
+        )  # fmt: skip
+        v.dispatcher.submit(f"run:{run_id}", lambda: run_apply(v, owner, run_id))
+        return {"run_id": run_id, "status_url": f"/api/v2/runs/{run_id}"}
+
+    return records.idempotent(v.store, owner, f"apply:{idempotency_key}", _digest(body), produce)
+
+
+def _reasons(rec: Any) -> list[str]:
+    out = [f"label {k}: measured {r['measured']} vs target {r['exact']} (tolerance {r['tolerance']})"
+           for k, r in rec.conformance["labels"].items() if not r["ok"]]  # fmt: skip
+    out += rec.preservation["differences"]
+    out += [f"{c} would lie outside the page" for c in rec.layout["outside"]]
+    out += [f"{a} would overlap {b}" for a, b in rec.layout["overlaps"]]
+    return out
+
+
+def _apply_one(v: V2, owner: str, run: dict, ref: dict, rule: list) -> dict:
+    import dataclasses
+
+    from open_apprentice.drawio.publish import publish
+    from open_apprentice.teaching.step import run_output
+
+    try:
+        f, idx, _, scene = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+        out = run_output(rule, scene.scene)
+        if out is None:
+            return {
+                "status": "failed",
+                "reasons": ["the skill's rule could not run on this document"],
+            }
+        now = {o["id"]: (o["x"], o["y"]) for o in scene.scene["objects"]}
+        targets = {k: p for k, p in out.items() if k in scene.movable and p != now[k]}
+        if not targets:
+            return {"status": "unchanged", "reasons": []}
+        edits = plan_edits(f.pages[idx], scene.offsets, targets)
+        key = f"runs/{run['run_id']}/{ref['doc_id']}-{ref['page_id']}.drawio"
+        rec = publish(
+            v.store, key, f, idx, edits, targets, scene, v.render,
+            intent={"source": "approved examples of the skill", "skill": run["skill_id"], "version": run["version"]},
+        )  # fmt: skip
+        receipt = dataclasses.asdict(rec)
+        if rec.published:
+            return {"status": "published", "key": key, "receipt": receipt, "reasons": []}
+        return {"status": "blocked", "receipt": receipt, "reasons": _reasons(rec)}
+    except (DrawioRefused, Conflict) as e:
+        return {"status": "blocked", "reasons": [str(e)]}
+
+
+def run_apply(v: V2, owner: str, run_id: str) -> None:
+    run, _ = records.load(v.store, _run_key(run_id), owner)
+    rule = _version(v, run["skill_id"], run["version"])["program"]["rule"]
+    for ref in run["documents"]:
+        k = f"{ref['doc_id']}:{ref['page_id']}"
+        if records.load(v.store, _run_key(run_id), owner)[0]["status"] == "cancelled":
+            return
+        result = _apply_one(v, owner, run, ref, rule)
+        records.update(
+            v.store,
+            _run_key(run_id),
+            owner,
+            lambda d: {**d, "results": {**d["results"], k: result}},
+        )
+    records.update(
+        v.store, _run_key(run_id), owner,
+        lambda d: d if d["status"] == "cancelled" else {**d, "status": "done"},
+    )  # fmt: skip
+
+
+def get_run(v: V2, owner: str, run_id: str) -> dict:
+    return {
+        k: x for k, x in records.load(v.store, _run_key(run_id), owner)[0].items() if k != "owner"
+    }
+
+
+def cancel_run(v: V2, owner: str, run_id: str) -> dict:
+    d = records.update(
+        v.store, _run_key(run_id), owner,
+        lambda d: {**d, "status": "cancelled"} if d["status"] == "running" else d,
+    )  # fmt: skip
+    return {"status": d["status"]}
+
+
+def export(
+    v: V2, owner: str, run_id: str, doc_id: str, page_id: str, fmt: str
+) -> tuple[bytes, str]:
+    run, _ = records.load(v.store, _run_key(run_id), owner)
+    res = run["results"].get(f"{doc_id}:{page_id}")
+    if res is None:
+        raise records.NotFound(f"{doc_id}:{page_id}")
+    if fmt == "receipt":
+        if "receipt" not in res:
+            raise Conflict(
+                "NO_RECEIPT", "this document has no receipt: " + "; ".join(res["reasons"])
+            )
+        return json.dumps(res["receipt"], indent=1).encode(), "application/json"
+    if res["status"] != "published":
+        raise Conflict(
+            "NOT_PUBLISHED", "nothing was published for this document: " + "; ".join(res["reasons"])
+        )
+    data = v.store.get(res["key"])
+    if data is None:
+        raise records.NotFound(res["key"])
+    if fmt == "drawio":
+        return data.data, "application/vnd.jgraph.mxfile"
+    if fmt == "svg":
+        if v.render_svg is None:
+            raise Conflict("SVG_UNAVAILABLE", "SVG export is not available on this server")
+        doc = load_drawio(data.data)
+        page = next(p for p in doc.pages if p.id == page_id)
+        svg = v.render_svg(page)
+        if svg is None:
+            raise Conflict("SVG_UNAVAILABLE", "the renderer returned no SVG")
+        return svg.encode(), "image/svg+xml"
+    raise Conflict("BAD_FORMAT", "format must be drawio, svg or receipt")

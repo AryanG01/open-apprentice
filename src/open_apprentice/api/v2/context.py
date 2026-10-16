@@ -39,6 +39,9 @@ class V2:
     worst_usd: Fraction  # reserved per model attempt; 0 for the offline enumerator
     dispatcher: Dispatcher
     secret: bytes
+    render_svg: Optional[Callable[[Page], Optional[str]]] = (
+        None  # SVG export from the same engine; None = unavailable
+    )
 
 
 class LocalDispatcher:
@@ -142,4 +145,9 @@ def make_v2(engine_url: Optional[str]) -> V2:
         worst_usd=worst,
         dispatcher=LocalDispatcher(),
         secret=_secret(),
+        render_svg=(
+            (lambda page: render_page(page, engine_url, png=False, svg=True).svg)
+            if engine_url
+            else None
+        ),
     )
