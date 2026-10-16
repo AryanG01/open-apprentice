@@ -200,3 +200,23 @@ def search(probes: list[Probe], cands: list[dict], budget: int) -> ProbeSearch:
     return ProbeSearch(
         None, [], used, "candidates_failed_on_inputs" if failed else "completed_no_disagreement"
     )
+
+
+def probe_to_json(p: Probe) -> dict:
+    return {
+        "probe_id": p.probe_id,
+        "source_scene_id": p.source_scene_id,
+        "family": p.family,
+        "edits": [[cid, [list(kv) for kv in attrs]] for cid, attrs in p.edits],
+        "canvas_w": p.canvas_w,
+        "scene": codec.loads(codec.dumps(p.scene)),
+        "changed_attrs": p.changed_attrs,
+    }
+
+
+def probe_from_json(d: dict) -> Probe:
+    from open_apprentice.teaching.constraints import scene_from_payload
+
+    edits = tuple((cid, tuple((k, v) for k, v in attrs)) for cid, attrs in d["edits"])
+    return Probe(d["probe_id"], d["source_scene_id"], d["family"], edits, d["canvas_w"], scene_from_payload(d["scene"]),
+                 d["changed_attrs"])  # fmt: skip

@@ -7,7 +7,7 @@ from __future__ import annotations
 import time
 import uuid
 from fractions import Fraction
-from typing import Optional, Protocol
+from typing import Callable, Optional, Protocol
 
 from open_apprentice.concepts.label_teaching import describe_compact
 from open_apprentice.providers.base import ProviderTimeout, TruncatedOutput
@@ -18,6 +18,7 @@ from open_apprentice.teaching.accounting import Ledger, OverBudget
 from open_apprentice.teaching.constraints import derive
 from open_apprentice.teaching.events import Conflict, Event, SessionLog
 from open_apprentice.teaching.evidence import item_to_json
+from open_apprentice.teaching.probes import Probe, ProbeResult, probe_from_json, probe_to_json
 from open_apprentice.teaching.step import (
     Abstain,
     Action,
@@ -25,6 +26,7 @@ from open_apprentice.teaching.step import (
     CommitVersion,
     Error,
     PresentPreview,
+    RenderProbe,
     RequestModelProposal,
     StepConfig,
     WaitForResult,
@@ -162,10 +164,12 @@ class Executor:
         config: StepConfig,
         worst_usd: Fraction = Fraction(1, 5),
         skill_id: str = "skill",
+        probe_renderer: Optional[Callable[[Probe], ProbeResult]] = None,
     ) -> None:
         self.store, self.log, self.proposer, self.teacher = store, log, proposer, teacher
         self.ledger, self.config, self.worst = ledger, config, worst_usd
         self.skill_id = skill_id
+        self.probe_renderer = probe_renderer
 
     def _claim(self, action_id: str) -> bool:
         return claim(self.store, f"claims/{action_id}.json")
@@ -265,6 +269,33 @@ class Executor:
         )
         self._deliver(action.request)
 
+    def _render_probe(self, action_id: str, probe: Probe) -> None:
+        """Render a probe in the engine (through the injected renderer) and record the outcome; only an accepted probe is
+        registered as a scene the step policy may ask about."""
+        if self.probe_renderer is None:
+            result = ProbeResult(False, reason="no renderer for generated probes")
+        else:
+            try:
+                result = self.probe_renderer(probe)
+            except Exception as e:  # the engine failing is an outcome, not a crash
+                result = ProbeResult(False, reason=f"render failed: {type(e).__name__}: {e}"[:200])
+        base = {"action_id": action_id, "probe_id": probe.probe_id}
+        if result.ok and result.scene is not None and result.scene_id:
+            scene = codec.loads(codec.dumps(result.scene))
+            self.log.append(
+                "SceneRegistered",
+                "system",
+                {"scene_id": result.scene_id, "scene_hash": codec.digest(result.scene), "scene": scene,
+                 "role": "probe", "probe_id": probe.probe_id},
+            )  # fmt: skip
+            self.log.append(
+                "ProbeRendered", "system", {**base, "ok": True, "scene_id": result.scene_id}
+            )
+        else:
+            self.log.append(
+                "ProbeRendered", "system", {**base, "ok": False, "reason": result.reason}
+            )
+
     def _recover(self) -> None:
         """Single-process recovery after a crash: a model action with no result was interrupted (its cost stays in
         the ledger) and is recorded as a terminal failure; a teacher request with no response is asked again with the
@@ -272,6 +303,17 @@ class Executor:
         evs = self.log.events()
         if any(e.type in ("VersionStored", "Abstained", "Errored") for e in evs):
             return
+        rendered = {e.payload.get("action_id") for e in evs if e.type == "ProbeRendered"}
+        for e in evs:
+            if (
+                e.type == "ActionIssued"
+                and e.payload.get("kind") == "RenderProbe"
+                and e.payload["action_id"] not in rendered
+            ):
+                self._render_probe(
+                    e.payload["action_id"], probe_from_json(e.payload["probe"])
+                )  # rendering is idempotent
+                return
         resolved = {
             e.payload.get("action_id")
             for e in evs
@@ -311,6 +353,9 @@ class Executor:
             self._propose(action)
         elif isinstance(action, (AskTeacher, PresentPreview)):
             self._ask(action)
+        elif isinstance(action, RenderProbe):
+            self._issue(action.action_id, "RenderProbe", {"probe": probe_to_json(action.probe)})
+            self._render_probe(action.action_id, action.probe)
         elif isinstance(action, CommitVersion):
             self._issue(action.action_id, "CommitVersion")
             items = derive(self.log.events()).items
