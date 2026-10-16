@@ -92,7 +92,11 @@ class Ledger:
         b = self.store.get(KEY)
         doc = codec.loads(b.data) if b else {"attempts": {}}
         if action_ids is not None:
-            doc = {"attempts": {k: a for k, a in doc["attempts"].items() if a["action_id"] in action_ids}}
+            doc = {
+                "attempts": {
+                    k: a for k, a in doc["attempts"].items() if a["action_id"] in action_ids
+                }
+            }
         return self._sum(doc)
 
     def state(self, attempt_id: str) -> Optional[str]:

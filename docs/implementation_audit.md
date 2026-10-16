@@ -2,7 +2,7 @@
 
 Spec: `docs/superpowers/specs/2026-10-15-teach-correct-reuse-design.md`. Plans: `docs/superpowers/plans/`. Status values:
 **implemented** (code + test in this repository), **planned** (named plan), **deviation** (recorded difference from the spec).
-Updated at the end of Plan 3 (branch `p3-drawio-adapter`).
+Updated at the end of Plan 4A (branch `p4a-api-v2`).
 
 | Spec § | Requirement | Code | Status | Evidence |
 |---|---|---|---|---|
@@ -26,7 +26,7 @@ Updated at the end of Plan 3 (branch `p3-drawio-adapter`).
 | 3.7 | One retry for transient provider failures; retries count | `teaching/executor.py:_propose`, `step.py` attempt counting | implemented | `test_executor.py::test_one_transient_failure_is_retried_and_stays_in_the_accounting` |
 | 3.7 | Exposure accounting, one state per attempt | `teaching/accounting.py` | implemented | `test_accounting.py` |
 | 4 | Step policy rules 0–6, commit predicate, deterministic selection | `teaching/step.py` | implemented (batch documents only) | `test_step.py` |
-| 4 | Generated probes, aggregate evaluation budget | — | planned (Plan 4; `StepConfig.max_evaluations` declared) | — |
+| 4 | Generated probes, aggregate evaluation budget | — | planned (Plan 4B; `StepConfig.max_evaluations` declared) | — |
 | 4 | Error vs abstain accounting | `step.py` (`Error` on terminal provider failure) | implemented | `test_step.py::test_provider_failure_terminal_is_error_not_abstain` |
 | 5 | Corrections, drafts, scope, supersession, retention, activation | `teaching/scope.py`, `retention.py`, `corrections.py`, `correction_step.py`, `correction_executor.py` | implemented (explicit ConflictDetected event: Plan 5; generated probes in corrections: Plan 4) | `test_scope.py`, `test_retention.py` (untouched-label acceptance), `test_correction_step.py` (scope→affected→revision within budget; scope-violating interpretation never shown; cancel leaves base untouched; override/accidental not learning), `test_correction_executor.py` (activation; concurrent second correction rejected; failure leaves the pointer) |
 | 6 | Hardened import: expat, no DTD/entities, 2 MB upload, 4 MB decoded, UTF-8, unique IDs/valid parents, label-HTML allowlist | `drawio/parse.py` | implemented | `tests/unit/drawio/test_parse.py` |
@@ -42,7 +42,18 @@ Updated at the end of Plan 3 (branch `p3-drawio-adapter`).
 | 7 | Learner-process isolation (audit hook) | `teaching/isolation.py` (refuses to install if evaluator modules are already loaded) | implemented as a guard; **not yet called** by any learner entry point — wired into the learner runner in Plan 5 | `test_isolation.py`, `test_review_fixes.py::test_guard_refuses_when_evaluator_already_loaded` |
 | 7 | Baselines B/C/D, manifests, battery | — | planned (Plan 5) | — |
 | 7 | Real-file corpus authored in draw.io, final three frozen | `tests/fixtures/drawio_corpus/dev/`, `benchmarks/final/drawio/` (git-ignored) | implemented (Plan 1) | `docs/corpus/drawio_provenance.md` |
-| 8 | API and UI | — | planned (Plan 4) | — |
+| 8 | Anonymous owner: signed `HttpOnly` cookie; every resource owner-checked (other owners get 404) | `api/v2/identity.py`, `api/v2/records.py` | implemented | `tests/unit/api_v2/test_identity_records.py`, `test_guards.py` (mutation-checked) |
+| 8 | `POST /documents`, preview PNG, `POST /documents/{id}/mapping` (→ `mapping_hash`), draft render | `api/v2/service.py`, `routes.py` | implemented | `tests/unit/api_v2/test_documents.py` |
+| 8 | `POST /sessions`, `GET /sessions/{id}` (derived state, outstanding request + intent revision, budgets, recorded/reserved/uncertain spend, manifest revision, provenance) | `api/v2/service.py` | implemented | `test_sessions.py` |
+| 8 | `POST /sessions/{id}/responses` (outstanding + current intent revision only; identical repeats idempotent), `POST /sessions/{id}/cancel` | `api/v2/service.py` | implemented | `test_responses.py` |
+| 8 | `POST /skills/{id}/versions/{v}/apply`, `GET /runs/{id}`, `POST /runs/{id}/cancel`, `GET /runs/{id}/export` (.drawio / SVG / receipt) | `api/v2/service.py` | implemented | `test_runs.py`, `tests/integration/test_api_v2_engine.py` |
+| 8 | `POST /skills/{id}/corrections`, `POST /skills/{id}/activate`, `GET /skills/{id}` | `api/v2/service.py` | implemented (request names doc/page + run instead of `output_artifact_hash`) | `test_corrections.py` |
+| 8 | Paid mode server-side only; durable global cap; "Live inference is unavailable…" refusal, never a silent swap | `api/v2/context.make_v2`, `service.LiveUnavailable`; live proposers `providers/teaching_adapter.py` | implemented (no paid call made) | `test_sessions.py::test_live_requested_when_unavailable_is_refused_with_spec_wording`, `tests/unit/test_teaching_adapter.py` |
+| 8 | Provenance Model × Teacher on sessions, runs, skills | `api/v2/service.py` | implemented (offline enumerator reported as Fixture) | `test_sessions.py`, `test_runs.py` |
+| 8 | Offline learner for PROVIDER_MODE=mock and journeys | `concepts/label_enumerative.py` | implemented | `tests/unit/test_label_enumerative.py` |
+| 8 | `POST /internal/tasks/{action_id}` (Cloud Tasks, OIDC) | — | planned (Plan 4B; `LocalDispatcher` behind the same `Dispatcher` protocol today) | — |
+| 8 | Preview shows blocked documents with reasons | — | planned (Plan 4C; found in Plan 4A: a previewed output can later fail layout) | — |
+| 8 | Screens, overlays, keyboard nudges, journey test | — | planned (Plan 4C) | — |
 | 9 B | Property and state-sequence tests | `tests/unit/teaching/test_stateful.py` (event log, ledger, versions; Hypothesis `ci` profile, derandomized) | implemented | mutation check: removing the activation generation check fails `TestVersions` |
 | 10 | Staging and release deployment | `storage/gcs.py` (store contract over GCS, fake-bucket contract test); `docs/deploy_staging_proposal.md`, `oa staging-check` | staging: **proposed, not created** (needs owner approval); release: Plan 6 | `tests/unit/storage/test_store_contract.py`, `tests/unit/drawio/test_cli.py` |
 
