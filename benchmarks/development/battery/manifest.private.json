@@ -1,5 +1,5 @@
 {
- "code_commit": "76e3e43f69fa6a234175e081cd3209f7b3858176",
+ "code_commit": "34cff58899ee40e582ffd49642a3947379903011",
  "episodes": [
   {
    "clarification_required": true,
@@ -153,17 +153,17 @@
   "episodes/e5a01549872.private.json": "1a55f860d20c3bf9bfab39a338d6641c9b57a94bcc5ac772a6f8fec0ddc4237a",
   "episodes/e5b3fceadac.private.json": "321e8bb695001bc71cbf83f1e8e7546a1cab492ef9e125892a83a29f2a337aae",
   "episodes/e620cde0c3e.private.json": "4d9c73e005bc469e1a9fc9772c94df35f2d83c2f6cf84051e0bbda2ae8fa0c95",
-  "episodes/e6ab691b80f.private.json": "714afa95b28074d446df599965fac8f6f4d2f5afe0c5c58a77d6a77e58c9c936",
+  "episodes/e6ab691b80f.private.json": "5fd3946f7728400b31137124d3f1b6938506fe94940ebc506a79a661faa06c99",
   "episodes/e79c145bad5.private.json": "3198e74e08f23c4aeee2a1122dbd36cf62b161507a0694ae736fd3d4385390de",
   "episodes/e7b523e24fc.private.json": "f9d8f0d4855c0c01fddaa7bc537807374e340bf07aee12f78bb5be56df21dfe9",
   "episodes/e7cd70b2ba8.private.json": "c1a500e76df839d940a2186c94c82e3ddd6a107841ba4b024e212ce736cb7ca0",
   "episodes/e88727066d3.private.json": "ce0e7c0f03958737a8d363eb73b8e1611a37fd25fbc021cb821a8bdda478ac1e",
-  "episodes/e9bacad414c.private.json": "3bc22dda38d4a8a370d854b6623e3c6f8a76de150b7e2ab0402f3c1bae5400ab",
+  "episodes/e9bacad414c.private.json": "ef9419ad121681a1712ec618195bf0eff09ee4a26e674360246a277b52c1ece4",
   "episodes/ea5432e5dee.private.json": "f01dbebc409ea1c1a25459c68429e747920f05a61d723a5e18187bf28f5cea21",
-  "episodes/ea9778a73fb.private.json": "8436f741fbeb36bd581b3ab1a9d1a861ccd3af71b95cfe964a048c48bef8e891",
+  "episodes/ea9778a73fb.private.json": "82898e96e084ab33e576896ffc2b4b395cb7a21970b9be03f158d61412c68440",
   "episodes/eb33f9716f9.private.json": "8bdea015537f86b2d2467c7c3b3f2e4155ba4e13911bba89eb5d4741ec959224",
   "episodes/ee519fbf496.private.json": "c6d3eb19f615bcabd354e9670cbb6454b8427d274373becb4ec438cc0a9cd323",
-  "episodes/ee894d854af.private.json": "2bf86e895a334c57873ea0e89b5c9ee2f4dfbe4d82b0dab5ec8d541e20482113",
+  "episodes/ee894d854af.private.json": "e6cbe930c4351fe3f4e8dc00ef7333fecc0a81161ad0baf1a6b6f5a09489ded8",
   "episodes/ef3c47b95b1.private.json": "181d6ee36571b5508b7b69219ea9d0756b8f64883203e3014220b69e177bc530",
   "learner/e0119c547d5.json": "e7a669e68e6abf90704f7d5a011cd4791d3adb2213575800a5798d9ca7705735",
   "learner/e3593b0aec5.json": "583add33a2d6a1a28499e3f4b67c5336a4628ede4895dd44ba307cbcbf2d36a8",
@@ -184,7 +184,7 @@
   "learner/ee894d854af.json": "61a0e1cb99b7c86ad5323245eab73700b17f512a4cce004edc9a975fd21c48e8",
   "learner/ef3c47b95b1.json": "77defb5c60fc0e085dd572209995a5f071e44948ec064238a9daceb8b17f9520"
  },
- "generator_version": "battery-v2.1",
+ "generator_version": "battery-v2.2",
  "real_files": [],
  "scoring_version": "score-v2.1",
  "seed_base": 110000,
