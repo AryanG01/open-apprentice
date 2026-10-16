@@ -24,7 +24,7 @@ from open_apprentice.teaching import codec
 from open_apprentice.teaching.constraints import scene_from_payload
 from open_apprentice.teaching.scope import members
 
-GENERATOR_VERSION = "battery-v2.2"
+GENERATOR_VERSION = "battery-v2.3"
 SCORING_VERSION = "score-v2.1"
 TOLERANCE = F(1, 2)
 SEED_BASE = {
@@ -187,7 +187,8 @@ class _Gen:
 
     def scene(self, stratum: Optional[str] = None) -> dict:
         self.k += 1
-        stratum = stratum or STRATA[(self.seed + self.k) % len(STRATA)]
+        # the attempt shifts the layout rotation, so no seed is stuck with strata that cannot satisfy its episode
+        stratum = stratum or STRATA[(self.seed + self.k + self.attempt) % len(STRATA)]
         return scene_v(stratum, (self.seed * 10_000 + self.attempt) * 100 + self.k)
 
     def scenes(self, n: int, stratum: Optional[str] = None) -> list[dict]:
