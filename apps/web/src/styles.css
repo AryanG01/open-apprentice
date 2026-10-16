@@ -388,3 +388,8 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .err { color: #a40000; }
 .ok { color: #1a6b1a; }
 .prov { font-weight: 600; }
+.question .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+.question .option { display: block; border: 1px solid var(--line, #ccc); padding: 0.5rem; }
+.question .option.blocked { border-color: #a40000; background: #fff5f5; }
+.question img.item { display: block; max-width: 100%; margin: 0.4rem 0; border: 1px solid var(--line, #ddd); }
+.question .actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
