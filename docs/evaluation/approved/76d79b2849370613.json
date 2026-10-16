@@ -1,0 +1,51 @@
+{
+ "approved": true,
+ "approved_at": "2026-10-16",
+ "approved_by": "owner (chat, 2026-10-16)",
+ "attempt_ceilings": {
+  "A": 12,
+  "B": 12
+ },
+ "budget_at_writing": {
+  "ceiling_fits": true,
+  "remaining_usd": 1.3981,
+  "spendable_usd": 40.0,
+  "spent_usd": 38.6019
+ },
+ "ceiling_usd": 1.05,
+ "establishes": "prompt and parse viability for A and B and the cost per episode on development episodes; not an A-versus-B result",
+ "estimate_basis": "dry-run token estimate per episode x $3.5/M; completion tokens assumed 2000 per attempt",
+ "estimate_tokens": 145360,
+ "estimate_usd": 0.5088,
+ "kind": "calibration",
+ "manifest_id": "76d79b2849370613",
+ "protected_reserve_usd": 10.0,
+ "repeats": 1,
+ "runs": 10,
+ "split": "dev",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "SpendGuard stops the run when the next call's worst case would pass --cap-usd"
+ },
+ "systems": [
+  "A",
+  "B"
+ ],
+ "task_ids": [
+  "e88727066d3",
+  "e5a01549872",
+  "e7b523e24fc",
+  "ea5432e5dee",
+  "e9bacad414c"
+ ],
+ "task_strata": [
+  "catalogue",
+  "beyond",
+  "inconsistent",
+  "unsupported",
+  "sequential"
+ ],
+ "worst_case_per_attempt_usd": 0.088,
+ "worst_case_total_usd": 10.56
+}
