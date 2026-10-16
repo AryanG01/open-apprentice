@@ -175,3 +175,65 @@ def report(run_dir: Path) -> str:
         out.append(f"- {s}: " + ", ".join(rates))
     out += ["", "Intervals describe this task collection only.", ""]
     return "\n".join(out)
+
+
+COMPLETION_ASSUMED = 2000  # tokens per live attempt: an ASSUMPTION until the calibration run measures it
+PROMPTS = Path(__file__).resolve().parents[3] / "prompts"
+
+
+def token_estimate(run_dir: Path) -> dict:
+    """Per-episode tokens for pricing, from a dry run's kept outcomes. Prompt sizes are real (B: the mock provider's
+    estimate of each prompt it received; A: the system prompt plus the episode's demonstrations as sent); completion
+    tokens are assumed (COMPLETION_ASSUMED per attempt) and are what the calibration run is for."""
+    from open_apprentice.providers.base import estimate_tokens
+
+    run_dir = Path(run_dir)
+    sys_prompt = {
+        "learn": estimate_tokens((PROMPTS / "hypotheses_labels.md").read_text()),
+        "correct": estimate_tokens((PROMPTS / "correction_scope.md").read_text()),
+    }
+    rows = [json.loads(x) for x in (run_dir / "rows.jsonl").read_text().splitlines() if x.strip()]
+    per: dict[str, list[tuple[int, int]]] = defaultdict(list)
+    for r in rows:
+        f = run_dir / "episodes" / f"{r['episode']}-{r['method']}-r{r['rep']}" / "outcome.json"
+        evs = json.loads(f.read_text()).get("events", []) if f.exists() else []
+        evidence = {
+            log: estimate_tokens(
+                json.dumps(
+                    [
+                        e["payload"]
+                        for e in evs
+                        if e.get("log", "learn") == log
+                        and (
+                            e["type"] in ("DemonstrationRecorded", "CorrectionStarted")
+                            or (e["type"] == "SceneRegistered" and e["payload"].get("role") == "demo")
+                        )
+                    ]
+                )
+            )
+            for log in ("learn", "correct")
+        }
+        attempts = tokens = 0
+        for e in evs:
+            if e["type"] == "AgentTurn":
+                tokens += int((e["payload"].get("usage") or {}).get("prompt_tokens", 0))
+                tokens += COMPLETION_ASSUMED
+            elif e["type"] == "ActionIssued" and e["payload"].get("kind") == "AgentTurn":
+                attempts += 1
+            elif e["type"] == "ActionIssued" and e["payload"].get("kind") == "RequestModelProposal":
+                log = e.get("log", "learn")
+                attempts += 1
+                tokens += sys_prompt[log] + evidence[log] + COMPLETION_ASSUMED
+        per[r["method"]].append((attempts, tokens))
+    return {
+        "per_system": {
+            s: {
+                "episodes": len(v),
+                "attempts_mean": mean(a for a, _ in v),
+                "tokens_per_episode": round(mean(t for _, t in v)),
+                "tokens_per_episode_max": max(t for _, t in v),
+            }
+            for s, v in sorted(per.items())
+        },
+        "completion_assumed_per_attempt": COMPLETION_ASSUMED,
+    }

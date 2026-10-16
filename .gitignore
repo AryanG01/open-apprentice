@@ -65,3 +65,4 @@ results/redesign/*/
 
 # local /api/v2 store (OA_STORE_DIR default)
 .oa-store/
+results/eval_v2/*/episodes/

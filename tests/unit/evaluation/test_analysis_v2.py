@@ -81,3 +81,22 @@ def test_cli_report_writes_report_md(tmp_path):
     r = CliRunner().invoke(app, ["eval", "report", "--run-dir", str(tmp_path)])
     assert r.exit_code == 0, r.output
     assert (tmp_path / "report.md").read_text().startswith("# Evaluation report")
+
+
+def test_token_estimate_reads_attempts_from_the_kept_outcomes(tmp_path):
+    from open_apprentice.evaluation.analysis_v2 import COMPLETION_ASSUMED, token_estimate
+
+    rows = [_row("e1", "B", "correct_complete"), _row("e1", "A", "correct_complete")]
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    turn = {"type": "AgentTurn", "payload": {"usage": {"prompt_tokens": 1000}}}
+    issued = {"type": "ActionIssued", "payload": {"kind": "AgentTurn"}}
+    prop = {"log": "learn", "type": "ActionIssued", "payload": {"kind": "RequestModelProposal"}}
+    for name, events in (("e1-B-r0", [issued, turn, issued, turn]), ("e1-A-r0", [prop])):
+        d = tmp_path / "episodes" / name
+        d.mkdir(parents=True)
+        (d / "outcome.json").write_text(json.dumps({"events": events}))
+    est = token_estimate(tmp_path)
+    assert est["per_system"]["B"]["attempts_mean"] == 2
+    assert est["per_system"]["B"]["tokens_per_episode"] == 2 * (1000 + COMPLETION_ASSUMED)
+    assert est["per_system"]["A"]["attempts_mean"] == 1
+    assert est["per_system"]["A"]["tokens_per_episode"] > COMPLETION_ASSUMED
