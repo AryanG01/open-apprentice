@@ -897,6 +897,16 @@ def eval_run(
     typer.echo(json.dumps({"run_dir": str(run_dir)}))
 
 
+@eval_app.command("report")
+def eval_report(run_dir: Path = typer.Option(..., "--run-dir")) -> None:
+    """Write <run-dir>/report.md: release-blocking checks first, both primary endpoints, per-stratum tables."""
+    from open_apprentice.evaluation.analysis_v2 import report
+
+    md = report(run_dir)
+    (run_dir / "report.md").write_text(md)
+    typer.echo(md)
+
+
 @app.command("staging-check")
 def staging_check(
     file: Optional[Path] = None,
