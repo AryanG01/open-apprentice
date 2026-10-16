@@ -378,3 +378,13 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .docview .fields input { width: 7rem; }
 .docview figcaption { margin-top: 0.4rem; }
 .docview .safety { display: block; color: var(--muted, #666); }
+.areas { padding: 0.5rem 1rem 0; }
+.apprentice { padding: 1rem; }
+.v2-step { margin: 1.5rem 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+.card.doc .thumb { max-width: 100%; border: 1px solid var(--line, #ccc); }
+.mapping { border-collapse: collapse; margin: 0.5rem 0; }
+.mapping th, .mapping td { padding: 0.2rem 0.5rem; text-align: left; }
+.err { color: #a40000; }
+.ok { color: #1a6b1a; }
+.prov { font-weight: 600; }

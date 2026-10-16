@@ -5,6 +5,7 @@ import { Scene, frameOf, zoomFrame } from "./Scene";
 import { Home } from "./Home";
 import { SvgLane } from "./SvgLane";
 import { TryIt } from "./TryIt";
+import { Apprentice } from "./v2/Apprentice";
 import type { Demo, Evidence, Step } from "./types";
 
 type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live" | "Real SVG";
@@ -128,7 +129,7 @@ function StepBody({ step }: { step: Step }) {
   );
 }
 
-export function App() {
+function Prototype() {
   const [demo, setDemo] = useState<Demo | null>(null);
   const [evidence, setEvidence] = useState<Evidence | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -206,21 +207,6 @@ export function App() {
 
   return (
     <div className="app">
-      <a
-        className="skip"
-        href="#stage"
-        onClick={(e) => {
-          // the hash router would treat "#stage" as a tab name and jump to Home; move focus instead
-          e.preventDefault();
-          const stage = document.getElementById("stage");
-          if (stage) {
-            if (!stage.hasAttribute("tabindex")) stage.setAttribute("tabindex", "-1");
-            stage.focus();
-          }
-        }}
-      >
-        Skip to the canvas
-      </a>
       <header className="top">
         <div className="brand">
           <h1>Open Apprentice</h1>
@@ -334,5 +320,58 @@ export function App() {
         </p>
       </footer>
     </div>
+  );
+}
+
+
+type Area = "apprentice" | "prototype";
+
+const areaFromHash = (): Area => (window.location.hash === "" || window.location.hash.startsWith("#apprentice") ? "apprentice" : "prototype");
+
+/** The new teach → correct → reuse flow is the product; the badge demo stays, unchanged, under "Earlier prototype". */
+export function App() {
+  const [area, setArea] = useState<Area>(areaFromHash());
+  useEffect(() => {
+    const onHash = () => setArea(areaFromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+  const pick = (a: Area) => {
+    window.location.hash = a === "apprentice" ? "apprentice" : "home";
+    setArea(a);
+  };
+  return (
+    <>
+      <a
+        className="skip"
+        href="#stage"
+        onClick={(e) => {
+          // the hash router would treat "#stage" as a tab name; move focus instead
+          e.preventDefault();
+          const stage = document.getElementById("stage");
+          if (stage) {
+            if (!stage.hasAttribute("tabindex")) stage.setAttribute("tabindex", "-1");
+            stage.focus();
+          }
+        }}
+      >
+        {area === "apprentice" ? "Skip to the content" : "Skip to the canvas"}
+      </a>
+      <nav aria-label="Areas" className="areas">
+        <ul className="tabs" role="tablist">
+          <li>
+            <button role="tab" aria-selected={area === "apprentice"} className={area === "apprentice" ? "tab on" : "tab"} onClick={() => pick("apprentice")}>
+              Apprentice
+            </button>
+          </li>
+          <li>
+            <button role="tab" aria-selected={area === "prototype"} className={area === "prototype" ? "tab on" : "tab"} onClick={() => pick("prototype")}>
+              Earlier prototype
+            </button>
+          </li>
+        </ul>
+      </nav>
+      {area === "apprentice" ? <Apprentice /> : <Prototype />}
+    </>
   );
 }
