@@ -87,9 +87,13 @@ class Ledger:
     def mark_unknown(self, attempt_id: str) -> None:
         self._transition(attempt_id, ("dispatched",), "outcome_unknown")
 
-    def exposure(self) -> dict[str, Fraction]:
+    def exposure(self, action_ids: Optional[set[str]] = None) -> dict[str, Fraction]:
+        """Global exposure, or only the attempts made for the given actions (one session's spend)."""
         b = self.store.get(KEY)
-        return self._sum(codec.loads(b.data) if b else {"attempts": {}})
+        doc = codec.loads(b.data) if b else {"attempts": {}}
+        if action_ids is not None:
+            doc = {"attempts": {k: a for k, a in doc["attempts"].items() if a["action_id"] in action_ids}}
+        return self._sum(doc)
 
     def state(self, attempt_id: str) -> Optional[str]:
         b = self.store.get(KEY)

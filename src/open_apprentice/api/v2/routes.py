@@ -119,3 +119,25 @@ def post_draft(
         _field(body, "mapping_hash", str),
         _field(body, "boxes", dict, {}),
     )
+
+
+# ---- sessions ------------------------------------------------------------------------------------------------------------
+
+
+@router.post("/sessions", status_code=202)
+def post_session(
+    request: Request, body: dict = Body(default={}), who: str = Depends(owner)
+) -> dict:
+    return service.create_session(
+        _v2(request),
+        who,
+        _field(body, "documents", list),
+        _field(body, "demonstrations", list),
+        bool(body.get("live", False)),
+        _field(body, "idempotency_key", str),
+    )
+
+
+@router.get("/sessions/{sid}")
+def get_session(sid: str, request: Request, who: str = Depends(owner)) -> dict:
+    return service.session_state(_v2(request), who, sid)

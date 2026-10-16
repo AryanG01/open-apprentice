@@ -68,6 +68,20 @@ def doc_bytes():
     )
 
 
+@pytest.fixture
+def batch_bytes():
+    return drawio(
+        model(
+            [
+                node("m1", 60, 200, 120, 60),
+                node("m2", 330, 120, 80, 40),
+                label("k1", 70, 280),
+                label("k2", 340, 200),
+            ]
+        )
+    )
+
+
 OCTET = {"content-type": "application/octet-stream"}
 
 

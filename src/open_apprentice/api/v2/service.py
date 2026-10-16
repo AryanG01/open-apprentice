@@ -6,7 +6,7 @@ import base64
 import json
 import uuid
 from fractions import Fraction
-from typing import Any
+from typing import Any, Optional
 
 from open_apprentice.api.v2 import records
 from open_apprentice.api.v2.context import V2
@@ -265,3 +265,305 @@ def draft_render(
             for k, (b, _) in r.labels.items()
         },
     }
+
+
+# ---- teaching sessions ---------------------------------------------------------------------------------------------------
+
+LIVE_UNAVAILABLE = "Live inference is unavailable. Open the recorded example."
+
+
+class LiveUnavailable(Conflict):
+    def __init__(self) -> None:
+        super().__init__("LIVE_UNAVAILABLE", LIVE_UNAVAILABLE)
+
+
+class _Deferred:
+    """The teacher for API sessions: a person answers later through POST /responses."""
+
+    def ask(self, req: Any) -> None:
+        return None
+
+
+def _meta_key(sid: str) -> str:
+    return f"sessions/{sid}/meta.json"
+
+
+def _digest(body: dict) -> str:
+    return codec.digest(body)
+
+
+def _scene_id(ref: dict) -> str:
+    return f"{ref['doc_id']}:{ref['page_id']}"
+
+
+def create_session(
+    v: V2,
+    owner: str,
+    documents: list[dict],
+    demonstrations: list[dict],
+    live: bool,
+    idempotency_key: str,
+) -> dict:
+    body = {"documents": documents, "demonstrations": demonstrations, "live": live}
+    return records.idempotent(
+        v.store,
+        owner,
+        f"session:{idempotency_key}",
+        _digest(body),
+        lambda: _create_session(v, owner, documents, demonstrations, live),
+    )
+
+
+def _create_session(
+    v: V2, owner: str, documents: list[dict], demonstrations: list[dict], live: bool
+) -> dict:
+    from open_apprentice.teaching.events import SessionLog
+
+    if live and not v.live_available():
+        raise LiveUnavailable()
+    if not documents or not demonstrations:
+        raise Conflict("BAD_REQUEST", "a session needs at least one document and one demonstration")
+    scenes = []
+    for ref in documents:
+        _, _, _, sc = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+        scenes.append(sc)
+    demo_outputs: dict[int, dict] = {}
+    for d in demonstrations:
+        i = d.get("document_ref")
+        if not isinstance(i, int) or not 0 <= i < len(scenes):
+            raise Conflict("BAD_REQUEST", "document_ref must index the documents list")
+        sc = scenes[i]
+        if d.get("before_scene_hash") != scene_digest(sc.scene):
+            raise Conflict(
+                "STALE", "the document changed since this demonstration was made; reload it"
+            )
+        boxes = _boxes(d.get("boxes", {}))
+        unknown = sorted(set(boxes) - set(sc.movable))
+        if unknown:
+            raise Conflict("NOT_MOVABLE", f"these labels cannot be moved: {unknown}")
+        labels = {o["id"]: (o["x"], o["y"]) for o in sc.scene["objects"] if o["id"] in sc.movable}
+        demo_outputs[i] = {**labels, **boxes}  # the whole document is approved as shown
+    if len(demo_outputs) == len(scenes):
+        # the step policy only commits after a preview on a document the user did not demonstrate (spec 4 rule 6)
+        raise Conflict(
+            "NEED_BATCH",
+            "add at least one more document that you did not edit, so the learned rule can be previewed on it",
+        )
+    sid = uuid.uuid4().hex
+    log = SessionLog(v.store, sid)
+    log.create(owner=owner)
+    for i, (ref, sc) in enumerate(zip(documents, scenes)):
+        log.append(
+            "SceneRegistered",
+            "system",
+            {
+                "scene_id": _scene_id(ref),
+                "scene_hash": scene_digest(sc.scene),
+                "scene": codec.loads(codec.dumps(sc.scene)),
+                "role": "demo" if i in demo_outputs else "batch",
+            },
+        )
+        log.append(
+            "MappingRecorded", "human", {k: ref[k] for k in ("doc_id", "page_id", "mapping_hash")}
+        )
+    for i, out in demo_outputs.items():
+        log.append(
+            "DemonstrationRecorded",
+            "human",
+            {
+                "scene_id": _scene_id(documents[i]),
+                "output": codec.loads(codec.dumps({k: list(p) for k, p in out.items()})),
+            },
+        )
+    meta = {
+        "sid": sid,
+        "kind": "teaching",
+        "skill_id": f"sk-{uuid.uuid4().hex}",
+        "documents": documents,
+        "model": v.model if live else "Fixture",
+        "teacher": "You",
+        "live": live,
+    }
+    records.put_new(v.store, _meta_key(sid), owner, meta)
+    v.dispatcher.submit(sid, lambda: advance(v, sid))
+    return {"session_id": sid, "operation": "advance", "status_url": f"/api/v2/sessions/{sid}"}
+
+
+def _raw_meta(v: V2, sid: str) -> dict:
+    b = v.store.get(_meta_key(sid))
+    if b is None:
+        raise records.NotFound(sid)
+    return json.loads(b.data)
+
+
+def advance(v: V2, sid: str) -> None:
+    """Run the session's executor until it needs a person, a result, or ends; activate a new skill's first version."""
+    from open_apprentice.skills.versions import ActivationRejected, SkillStore
+    from open_apprentice.teaching.events import SessionLog
+    from open_apprentice.teaching.executor import Executor
+    from open_apprentice.teaching.step import StepConfig
+
+    meta = _raw_meta(v, sid)
+    log = SessionLog(v.store, sid)
+    if meta["kind"] != "teaching":
+        return advance_correction(v, sid)
+    status = Executor(
+        v.store, log, v.proposer if meta["live"] else _offline(v), _Deferred(), v.ledger,
+        StepConfig(), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
+    ).run()  # fmt: skip
+    if status != "committed":
+        return
+    evs = log.events()
+    if any(e.type in ("VersionActivated", "ActivationRejected") for e in evs):
+        return
+    version = next(e.payload["version"] for e in evs if e.type == "VersionStored")
+    try:
+        records.put_new(
+            v.store, f"skills/{meta['skill_id']}/owner.json", log.manifest()[0]["owner"], {}
+        )
+    except FileExistsError:
+        pass
+    try:
+        rid = SkillStore(v.store).activate(meta["skill_id"], version, None, sid, sid)
+    except ActivationRejected as e:
+        log.append(
+            "ActivationRejected",
+            "system",
+            {"action_id": sid, "reason": str(e), "stored_version": version},
+        )
+        return
+    log.append(
+        "VersionActivated",
+        "system",
+        {"operation_id": sid, "from": None, "to": version, "record_id": rid},
+    )
+
+
+def _offline(v: V2) -> Any:
+    from open_apprentice.concepts.label_enumerative import LabelEnumerator
+
+    return v.proposer if v.model == "Fixture" else LabelEnumerator()
+
+
+def advance_correction(v: V2, sid: str) -> None:  # completed in Task 8
+    raise NotImplementedError
+
+
+def _open_request(evs: list) -> tuple[Optional[dict], Optional[str]]:
+    from open_apprentice.teaching.teacher import response_from_json
+
+    answered = {
+        response_from_json(e.payload["response"]).request_id
+        for e in evs
+        if e.type == "ResponseRecorded"
+    }
+    for e in evs:
+        if e.type == "RequestIssued" and e.payload["request"]["request_id"] not in answered:
+            return e.payload["request"], e.payload["action_id"]
+    return None, None
+
+
+def _approve_all(req: dict) -> dict:
+    t = req["type"]
+    if t == "ChooseOutput":
+        return {"kind": "choose", "selected": req["alternatives"][0][0]}
+    if t == "ConfirmPreview":
+        return {"kind": "items", "per_item": [[it[0], "approve"] for it in req["items"]]}
+    if t == "ConfirmCorrectionScope":
+        first = next(
+            (i["interp_id"] for i in req["interpretations"] if i["kind"] == "revise"), "ov"
+        )
+        return {"kind": "select", "selected": first}
+    return {"kind": "cancel"}
+
+
+def session_state(v: V2, owner: str, sid: str) -> dict:
+    from open_apprentice.teaching.events import SessionLog
+
+    meta, _ = records.load(v.store, _meta_key(sid), owner)
+    log = SessionLog(v.store, sid)
+    manifest, _ = log.manifest()
+    evs = log.events()
+    types = [e.type for e in evs]
+    req, _ = _open_request(evs)
+    issued = {
+        e.payload["action_id"]
+        for e in evs
+        if e.type == "ActionIssued" and e.payload.get("kind") == "RequestModelProposal"
+    }
+    resolved = {
+        e.payload.get("action_id")
+        for e in evs
+        if e.type in ("ModelProposalReturned", "ModelCallFailed")
+    }
+    abstain = next((e.payload for e in evs if e.type == "Abstained"), None)
+    error = next((e.payload for e in evs if e.type == "Errored"), None)
+    result: dict[str, Any] = {}
+    if meta["kind"] == "correction":
+        state = _correction_state(types, req, issued - resolved, abstain, error)
+    elif abstain is not None:
+        state = "cancelled" if abstain.get("reason") == CANCELLED else "failed"
+        result = {"reason": abstain.get("reason")}
+    elif error is not None:
+        state, result = "failed", {"reason": error.get("reason")}
+    elif "VersionStored" in types:
+        state = "committed"
+        stored = next(e.payload for e in evs if e.type == "VersionStored")
+        result = {
+            "skill_id": meta["skill_id"],
+            "version": stored["version"],
+            "activated": "VersionActivated" in types,
+        }
+    elif req is not None:
+        state = "preview_ready" if req["type"] == "ConfirmPreview" else "waiting_for_answer"
+    elif issued - resolved:
+        state = "waiting_for_model"
+    else:
+        state = "teaching"
+    action_ids = {e.payload["action_id"] for e in evs if e.type == "ActionIssued"}
+    spend = v.ledger.exposure(action_ids)
+    outstanding = None
+    if req is not None and state in ("waiting_for_answer", "preview_ready", "review"):
+        outstanding = {
+            "request_id": req["request_id"],
+            "intent_revision": manifest["intent_revision"],
+            "request": req,
+            "approve_all_answer": _approve_all(req),
+        }
+    return {
+        "session_id": sid,
+        "kind": meta["kind"],
+        "state": state,
+        "outstanding": outstanding,
+        "budgets": {
+            "choose_used": sum(
+                1
+                for e in evs
+                if e.type == "RequestIssued" and e.payload["request"]["type"] == "ChooseOutput"
+            ),
+            "previews_used": sum(
+                1
+                for e in evs
+                if e.type == "RequestIssued" and e.payload["request"]["type"] == "ConfirmPreview"
+            ),
+            "attempts_used": len(issued)
+            + sum(1 for e in evs if e.type == "ModelCallFailed" and not e.payload.get("terminal")),
+        },
+        "spend": {
+            "recorded": _s(spend["settled"]),
+            "reserved": _s(spend["reserved"]),
+            "uncertain": _s(spend["uncertain"]),
+        },
+        "manifest_revision": manifest["manifest_revision"],
+        "provenance": {"model": meta["model"], "teacher": meta["teacher"]},
+        "result": result,
+    }
+
+
+CANCELLED = "cancelled by the user"
+
+
+def _correction_state(
+    types: list, req: Optional[dict], waiting_model: set, abstain: Any, error: Any
+) -> str:  # Task 8
+    return "draft"
