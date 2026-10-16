@@ -13,7 +13,7 @@ badge demo under "Earlier prototype"), Plan 4B generated probes + Cloud Tasks wi
 restart survival, forged-call refusal all pass. Resources stay up (scale to zero; bucket objects expire after 7 days); teardown in
 `docs/deploy_staging_proposal.md`. Production service `open-apprentice` untouched (still the older badge build).
 
-**Plan 5 evaluation: built offline, reviewed, on branch `p5-evaluation` (not merged, not pushed).** Plan
+**Plan 5 evaluation: built offline, reviewed, merged to master 2026-10-16 (not pushed).** Plan
 `docs/superpowers/plans/2026-10-16-p5-evaluation.md`; rulings and review outcomes `docs/evaluation/plan5_rulings.md`.
 Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-ignored `benchmarks/final/battery/`, hashes in
 `docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
@@ -23,7 +23,7 @@ systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offli
 ≈$0.51, cap $1.05 of $1.40 remaining) and decide on a top-up. Before live runs: wire the provider + SpendGuard into the
 learner process; before the funded tier: B's own correction tools, the real-file final episodes, seeded A/B
 interleaving. Known product gap: no system refuses a demonstrated forced-overlap convention.
-master has 2 unpushed commits (`.gcloudignore` fix, staging results).
+master is 26 commits ahead of origin (not pushed).
 
 **Money:** `results/redesign/budget.json` = $50 authorized, $10 reserve; about $38.60 already spent → about **$1.40 spendable**.
 Plan 5 is built offline and stops at a priced calibration manifest; no paid run without the owner's approval and a top-up.
