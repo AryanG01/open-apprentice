@@ -18,6 +18,7 @@ from open_apprentice.concepts.rules import (
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.constraints import Evidence, derive
 from open_apprentice.teaching.events import Event
+from open_apprentice.teaching.probes import Probe, candidate_probes, search
 from open_apprentice.teaching.teacher import (
     SEPARATION,
     ChooseOutput,
@@ -37,6 +38,8 @@ class StepConfig:
     max_preview_items: int = 3
     max_attempts: int = 8
     max_evaluations: int = 5_000_000
+    probes: bool = False  # generated probes need a renderer; the API turns them on
+    max_probes: int = 128
 
 
 @dataclass(frozen=True)
@@ -85,10 +88,32 @@ class Error:
     reason: str
 
 
+@dataclass(frozen=True)
+class RenderProbe:
+    """Render a generated probe in the engine and check it matches its selection geometry before it can be shown."""
+
+    action_id: str
+    probe: Probe
+
+
 Action = Union[
-    WaitForResult, RequestModelProposal, AskTeacher, PresentPreview, CommitVersion, Abstain, Error
+    WaitForResult,
+    RequestModelProposal,
+    AskTeacher,
+    PresentPreview,
+    RenderProbe,
+    CommitVersion,
+    Abstain,
+    Error,
 ]
-RESULT_TYPES = {"ModelProposalReturned", "ModelCallFailed", "VersionStored", "Abstained", "Errored"}
+RESULT_TYPES = {
+    "ModelProposalReturned",
+    "ModelCallFailed",
+    "VersionStored",
+    "Abstained",
+    "Errored",
+    "ProbeRendered",
+}
 
 
 def _aid(events: list[Event], kind: str) -> str:
@@ -284,7 +309,10 @@ def step(events: list[Event], config: StepConfig) -> Action:
     best: Optional[tuple[tuple[int, int], str, list[tuple[Output, list[dict]]]]] = None
     disagreement_found = False
     if len(cands) >= 2:
-        for i, sid in enumerate(sorted(ev.batch)):
+        probe_scenes = sorted(sid for sid, r in ev.roles.items() if r == "probe")
+        for i, sid in enumerate(
+            sorted(ev.batch) + probe_scenes
+        ):  # batch documents first (tie-break)
             if sid in ev.approved:
                 continue
             groups = _groups(cands, ev.scenes[sid])
@@ -302,6 +330,20 @@ def step(events: list[Event], config: StepConfig) -> Action:
         alts = tuple((chr(65 + k), out) for k, (out, _) in enumerate(groups))
         aid = _aid(events, "AskTeacher")
         return AskTeacher(aid, ChooseOutput(f"q-{aid}", sid, ev.scene_hashes[sid], alts))
+    # rule 3, generated probes: when no registered document separates the rules (spec 4)
+    if len(cands) >= 2 and config.probes and len(chooses) < config.max_choose:
+        tried = {e.payload["probe_id"] for e in events if e.type == "ProbeRendered"}
+        fresh = [
+            p
+            for p in candidate_probes(ev.scenes, ev.roles, cands, config.max_probes)
+            if p.probe_id not in tried
+        ]
+        found = search(fresh, cands, config.max_evaluations)
+        if found.best is not None:
+            return RenderProbe(_aid(events, "RenderProbe"), found.best)
+        if found.outcome in ("budget_exhausted", "candidates_failed_on_inputs"):
+            # never "one behaviour": the search did not complete, so nothing may be committed
+            return Abstain(_aid(events, "Abstain"), f"search did not complete ({found.outcome})")
     if disagreement_found:
         if "contrastive" not in rounds and attempts < config.max_attempts:
             return RequestModelProposal(_aid(events, "RequestModelProposal"), "contrastive")
@@ -331,6 +373,11 @@ def step(events: list[Event], config: StepConfig) -> Action:
         claim = (
             f"consistent with all evidence; approved on {len(approvals)} previewed document(s); "
             f"no distinguishing alternative found over {len(ev.batch)} searched document(s)"
+            + (
+                f" and {n_probes} generated probe(s)"
+                if (n_probes := sum(1 for r in ev.roles.values() if r == "probe"))
+                else ""
+            )
         )
         return CommitVersion(
             _aid(events, "CommitVersion"), sel["hash"], sel["rule"], sel["summary"], claim
