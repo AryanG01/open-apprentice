@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { ImportMap } from "./ImportMap";
 import { Question } from "./Question";
 import { Teach } from "./Teach";
-import { get } from "./api";
+import { get, post } from "./api";
 import { useSession } from "./useSession";
 import { Correct } from "./Correct";
 import { provenanceLine } from "./provenance";
 import { Reuse } from "./Reuse";
-import type { DocRef, DocumentInfo, RunInfo, RunResult } from "./types";
+import { TERMINAL, type DocRef, type DocumentInfo, type RunInfo, type RunResult } from "./types";
 
 const DOCS_KEY = "oa.v2.docs";
 const SKILL_KEY = "oa.v2.skill";
@@ -132,6 +132,9 @@ export function Apprentice() {
           ) : (
             <p role="status">Loading…</p>
           )}
+          {state && !TERMINAL.has(state.state) ? (
+            <button type="button" onClick={() => void post(`/sessions/${sid}/cancel`).then(refresh)}>Cancel session</button>
+          ) : null}
           <button type="button" onClick={() => { window.location.hash = "apprentice"; setSid(null); }}>Start over with these documents</button>
         </section>
       ) : null}

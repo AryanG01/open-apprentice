@@ -43,9 +43,9 @@ export function Question({ sid, q, onAnswered }: Props) {
       {req.type === "ChooseOutput" ? (
         <>
           <h3>Which result did you mean?</h3>
-          <div className="options">
+          <div className="v2-options">
             {req.alternatives.map(([id]) => (
-              <label key={id} className="option">
+              <label key={id} className="v2-option">
                 <input type="radio" name="alt" value={id} checked={choice === id} onChange={() => setChoice(id)} /> Option {id}
                 <ItemImage sid={sid} q={q} item={id} alt={`Option ${id} on document ${docName(req.scene_id)}`} />
               </label>
@@ -60,12 +60,12 @@ export function Question({ sid, q, onAnswered }: Props) {
         <>
           <h3>{req.purpose === "affected_examples" ? "Affected examples" : req.purpose === "revision_preview" ? "Revision preview" : "Preview"}</h3>
           <p>Check each document. Approving says this output is right; nothing is kept until every check passes.</p>
-          <div className="options">
+          <div className="v2-options">
             {req.items.map(([id, sceneId]) => {
               const check = q.checks[id] ?? { ok: true, reasons: [] };
               const v = verdicts[id] ?? "";
               return (
-                <fieldset key={id} className={`option${check.ok ? "" : " blocked"}`} data-item={id}>
+                <fieldset key={id} className={`v2-option${check.ok ? "" : " blocked"}`} data-item={id}>
                   <legend>Document {docName(sceneId)}</legend>
                   <ItemImage sid={sid} q={q} item={id} alt={`Proposed output on document ${docName(sceneId)}`} />
                   {check.ok ? null : (
@@ -94,9 +94,9 @@ export function Question({ sid, q, onAnswered }: Props) {
       ) : req.type === "ConfirmCorrectionScope" ? (
         <>
           <h3>How should your correction be kept?</h3>
-          <div className="options">
+          <div className="v2-options">
             {req.interpretations.map((it) => (
-              <label key={it.interp_id} className="option">
+              <label key={it.interp_id} className="v2-option">
                 <input type="radio" name="interp" value={it.interp_id} checked={choice === it.interp_id} onChange={() => setChoice(it.interp_id)} />{" "}
                 {it.kind === "revise" ? (
                   <>

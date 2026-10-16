@@ -11,6 +11,7 @@ from fractions import Fraction
 from itertools import product
 from typing import Any, Optional
 
+from open_apprentice.concepts.hypotheses import FIT_TOL
 from open_apprentice.concepts.rule_text import parse_rule_text
 from open_apprentice.concepts.rules import RuleError, evaluate_rule, validate_rule
 
@@ -68,8 +69,10 @@ def _gaps(objs: list[dict], moves: dict[str, tuple[Fraction, Fraction]]) -> list
             y - (a["y"] + a["h"]),
             a["y"] - (y + o["h"]),
         ):
-            if 0 <= g <= MAX_GAP and (g * 64).denominator == 1:
-                found.add(g)
+            # people drag approximately: also try the whole-unit gap they probably meant
+            for cand in (g, Fraction(round(g))):
+                if 0 <= cand <= MAX_GAP and (cand * 64).denominator == 1:
+                    found.add(cand)
     return sorted(found)
 
 
@@ -83,14 +86,24 @@ def _out(
     return {k: (v["x"], v["y"]) for k, v in res.items()}
 
 
+def _close(a: tuple[Fraction, Fraction], b: tuple[Fraction, Fraction]) -> bool:
+    return (
+        max(abs(a[0] - b[0]), abs(a[1] - b[1])) <= FIT_TOL
+    )  # spec 3.6: the same tolerance the fit check uses
+
+
 def _fits(out: Optional[dict], objs: list[dict], moves: dict, all_others_fixed: bool) -> bool:
     if out is None:
         return False
-    if any(out.get(k) != v for k, v in moves.items()):
+    if any(k not in out or not _close(out[k], v) for k, v in moves.items()):
         return False
     if all_others_fixed:
         for o in objs:
-            if o["id"] not in moves and o["id"] in out and out[o["id"]] != (o["x"], o["y"]):
+            if (
+                o["id"] not in moves
+                and o["id"] in out
+                and not _close(out[o["id"]], (o["x"], o["y"]))
+            ):
                 return False
     return True
 
