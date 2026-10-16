@@ -28,3 +28,13 @@ test("nudge steps, 1/64 snapping and exact parsing", () => {
   assert.equal(parseNum("12"), 12);
   assert.equal(fmt(52.5 + 1 / 64), "52.515625");
 });
+
+import { accept } from "../../apps/web/src/v2/session.ts";
+
+test("a stale poll never replaces newer session state", () => {
+  const s = (rev, state, sid = "s1") => ({ session_id: sid, manifest_revision: rev, state });
+  assert.equal(accept(s(5, "committed"), s(4, "waiting_for_answer")).manifest_revision, 5);
+  assert.equal(accept(s(4, "waiting_for_answer"), s(5, "committed")).state, "committed");
+  assert.equal(accept(null, s(1, "teaching")).manifest_revision, 1);
+  assert.equal(accept(s(9, "committed"), s(1, "teaching", "s2")).session_id, "s2"); // a different session always wins
+});
