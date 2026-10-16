@@ -198,3 +198,35 @@ def get_export(
     return Response(
         data, media_type=media, headers={"content-disposition": f'attachment; filename="{name}"'}
     )
+
+
+# ---- skills, corrections, activation -------------------------------------------------------------------------------------
+
+
+@router.get("/skills/{skill_id}")
+def get_skill(skill_id: str, request: Request, who: str = Depends(owner)) -> dict:
+    return service.skill_status(_v2(request), who, skill_id)
+
+
+@router.post("/skills/{skill_id}/corrections", status_code=202)
+def post_correction(
+    skill_id: str, request: Request, body: dict = Body(default={}), who: str = Depends(owner)
+) -> dict:
+    v = _v2(request)
+    service._skill_owner(v, who, skill_id)
+    _field(body, "idempotency_key", str)
+    return service.start_correction_session(v, who, skill_id, body)
+
+
+@router.post("/skills/{skill_id}/activate")
+def post_activate(
+    skill_id: str, request: Request, body: dict = Body(default={}), who: str = Depends(owner)
+) -> dict:
+    v = _v2(request)
+    service._skill_owner(v, who, skill_id)
+    gen = body.get("expected_generation")
+    if gen is not None and not isinstance(gen, int):
+        raise service.Conflict("BAD_REQUEST", "'expected_generation' must be an integer or null")
+    return service.activate(
+        v, who, skill_id, _field(body, "version", int), gen, _field(body, "idempotency_key", str)
+    )

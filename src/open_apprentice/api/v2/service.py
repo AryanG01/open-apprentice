@@ -448,10 +448,6 @@ def _offline(v: V2) -> Any:
     return v.proposer if v.model == "Fixture" else LabelEnumerator()
 
 
-def advance_correction(v: V2, sid: str) -> None:  # completed in Task 8
-    raise NotImplementedError
-
-
 def _open_request(evs: list) -> tuple[Optional[dict], Optional[str]]:
     from open_apprentice.teaching.teacher import response_from_json
 
@@ -568,7 +564,27 @@ CANCELLED = "cancelled by the user"
 
 def _correction_state(
     types: list, req: Optional[dict], waiting_model: set, abstain: Any, error: Any
-) -> str:  # Task 8
+) -> str:
+    """Spec 8 correction states: draft → (waiting_for_model | waiting_for_answer)* → review → stored → activated |
+    activation_rejected | failed; override / dismissed are the non-learning outcomes; cancellation is terminal.
+    """
+    for t, state in (
+        ("VersionActivated", "activated"),
+        ("ActivationRejected", "activation_rejected"),
+        ("OverrideRecorded", "override"),
+        ("CorrectionDismissed", "dismissed"),
+        ("CorrectionAbandoned", "cancelled"),
+    ):
+        if t in types:
+            return state
+    if abstain is not None or error is not None:
+        return "failed"
+    if "VersionStored" in types:
+        return "stored"
+    if req is not None:
+        return "review" if req["type"] == "ConfirmPreview" else "waiting_for_answer"
+    if waiting_model:
+        return "waiting_for_model"
     return "draft"
 
 
@@ -815,3 +831,139 @@ def export(
             raise Conflict("SVG_UNAVAILABLE", "the renderer returned no SVG")
         return svg.encode(), "image/svg+xml"
     raise Conflict("BAD_FORMAT", "format must be drawio, svg or receipt")
+
+
+# ---- corrections and activation ------------------------------------------------------------------------------------------
+
+
+def start_correction_session(v: V2, owner: str, skill_id: str, body: dict) -> dict:
+    keys = (
+        "base_version",
+        "base_pointer_generation",
+        "run_id",
+        "doc_id",
+        "page_id",
+        "boxes",
+        "mask",
+        "full_approval",
+    )
+    req = {k: body.get(k) for k in keys}
+    return records.idempotent(
+        v.store,
+        owner,
+        f"correction:{body.get('idempotency_key', '')}",
+        _digest(req),
+        lambda: _start_correction(v, owner, skill_id, req),
+    )
+
+
+def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
+    from open_apprentice.skills.versions import SkillStore
+    from open_apprentice.teaching.correction_executor import start_correction
+    from open_apprentice.teaching.step import run_output
+
+    provenance = _skill_owner(v, owner, skill_id).get(
+        "provenance", {"model": "Fixture", "teacher": "You"}
+    )
+    version, _, generation = SkillStore(v.store).active(skill_id)
+    if (version, generation) != (req["base_version"], req["base_pointer_generation"]):
+        raise Conflict(
+            "STALE_BASE", "the skill changed since this run; reload and correct the current version"
+        )
+    run, _ = records.load(v.store, _run_key(req["run_id"]), owner)
+    if run["skill_id"] != skill_id:
+        raise Conflict("BAD_REQUEST", "this run did not use this skill")
+    refs = {(d["doc_id"], d["page_id"]): d for d in run["documents"]}
+    ref = refs.get((req["doc_id"], req["page_id"]))
+    if ref is None:
+        raise records.NotFound(f"{req['doc_id']}:{req['page_id']}")
+    _, _, _, scene = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+    rule = _version(v, skill_id, version)["program"]["rule"]
+    produced = run_output(rule, scene.scene) or {}
+    boxes = _boxes(req["boxes"] or {})
+    mask = [str(m) for m in (req["mask"] or [])]
+    if not mask or set(mask) - set(boxes) or set(boxes) - set(scene.movable):
+        raise Conflict("BAD_REQUEST", "the corrected labels must be movable labels with positions")
+    now = {o["id"]: (o["x"], o["y"]) for o in scene.scene["objects"] if o["id"] in scene.movable}
+    corrected = {**now, **{k: p for k, p in produced.items() if k in now}, **boxes}
+    extra = {}
+    for d in run["documents"]:
+        if (d["doc_id"], d["page_id"]) != (ref["doc_id"], ref["page_id"]):
+            try:
+                extra[_scene_id(d)] = page_scene(
+                    v, owner, d["doc_id"], d["page_id"], d["mapping_hash"]
+                )[3].scene
+            except (Conflict, DrawioRefused, records.NotFound):
+                continue  # a document that can no longer be read is left out of the checks
+    sid = uuid.uuid4().hex
+    start_correction(
+        v.store, sid, skill_id, _scene_id(ref), scene.scene, corrected, mask, extra,
+        full_approval=bool(req["full_approval"]), owner=owner,
+    )  # fmt: skip
+    meta = {"sid": sid, "kind": "correction", "skill_id": skill_id, "run_id": run["run_id"],
+            "model": "Fixture", "teacher": "You", "live": False, "skill_provenance": provenance}  # fmt: skip
+    records.put_new(v.store, _meta_key(sid), owner, meta)
+    v.dispatcher.submit(sid, lambda: advance(v, sid))
+    return {"session_id": sid, "operation": "advance", "status_url": f"/api/v2/sessions/{sid}"}
+
+
+def advance_correction(v: V2, sid: str) -> None:
+    from open_apprentice.teaching.correction_executor import CorrectionExecutor
+    from open_apprentice.teaching.events import SessionLog
+
+    meta = _raw_meta(v, sid)
+    scope = v.scope_proposer if meta["live"] else _offline(v)
+    worst = v.worst_usd if meta["live"] else Fraction(0)
+    CorrectionExecutor(
+        v.store, SessionLog(v.store, sid), scope, _Deferred(), v.ledger, worst_usd=worst
+    ).run()
+
+
+def skill_status(v: V2, owner: str, skill_id: str) -> dict:
+    from open_apprentice.skills.versions import SkillStore
+
+    rec = _skill_owner(v, owner, skill_id)
+    skills = SkillStore(v.store)
+    version, _, generation = skills.active(skill_id)
+    versions, n = [], 1
+    while True:
+        try:
+            art = skills.version(skill_id, n)
+        except KeyError:
+            break
+        versions.append({"version": n, "parent_version": art.get("parent_version"),
+                         "summary": art.get("program", {}).get("summary", "")})  # fmt: skip
+        n += 1
+    return {
+        "skill_id": skill_id,
+        "active": {"version": version, "generation": generation},
+        "versions": versions,
+        "history": skills.history(skill_id),
+        "provenance": rec.get("provenance"),
+    }
+
+
+def activate(
+    v: V2, owner: str, skill_id: str, version: int, expected_generation: Optional[int], key: str
+) -> dict:
+    from open_apprentice.skills.versions import ActivationRejected, SkillStore
+
+    _skill_owner(v, owner, skill_id)
+    _version(v, skill_id, version)
+
+    def produce() -> dict:
+        try:
+            rid = SkillStore(v.store).activate(
+                skill_id, version, expected_generation, f"activate-{key}", "api"
+            )
+        except ActivationRejected as e:
+            raise Conflict("ACTIVATION_REJECTED", str(e)) from e
+        return {"activated": version, "record_id": rid}
+
+    return records.idempotent(
+        v.store,
+        owner,
+        f"activate:{key}",
+        _digest({"skill": skill_id, "v": version, "g": expected_generation}),
+        produce,
+    )
