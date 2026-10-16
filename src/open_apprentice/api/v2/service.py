@@ -160,6 +160,8 @@ def get_document(v: V2, owner: str, doc_id: str) -> dict:
     out = {k: doc[k] for k in ("doc_id", "name", "doc_hash", "render")}
     if "render_error" in doc:
         out["render_error"] = doc["render_error"]
+    if "probe_of" in doc:
+        out["probe_of"] = doc["probe_of"]
     pages = []
     for entry in doc["pages"]:
         p = dict(entry)
@@ -409,9 +411,11 @@ def advance(v: V2, sid: str) -> None:
     log = SessionLog(v.store, sid)
     if meta["kind"] != "teaching":
         return advance_correction(v, sid)
+    owner = log.manifest()[0]["owner"]
     status = Executor(
         v.store, log, v.proposer if meta["live"] else _offline(v), _Deferred(), v.ledger,
-        StepConfig(), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
+        StepConfig(probes=True), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
+        probe_renderer=make_probe_renderer(v, owner, sid),
     ).run()  # fmt: skip
     if status != "committed":
         return
@@ -1101,9 +1105,10 @@ def item_checks(evs: list, req: dict) -> dict[str, dict]:
 
 
 def _ref_for_scene(v: V2, owner: str, meta: dict, scene_id: str) -> dict:
-    refs = meta.get("documents") or []
+    refs = list(meta.get("documents") or [])
     if meta["kind"] == "correction":
-        refs = records.load(v.store, _run_key(meta["run_id"]), owner)[0]["documents"]
+        refs = list(records.load(v.store, _run_key(meta["run_id"]), owner)[0]["documents"])
+    refs += meta.get("probe_refs") or []
     ref = next((r for r in refs if isinstance(r, dict) and _scene_id(r) == scene_id), None)
     if ref is None:
         raise records.NotFound(scene_id)
@@ -1149,3 +1154,83 @@ def config(v: V2) -> dict:
         "model": v.model,
         "max_upload_bytes": MAX_UPLOAD,
     }
+
+
+# ---- generated probes ---------------------------------------------------------------------------------------------------
+
+PROBE_TOLERANCE = Fraction(1, 2)
+
+
+def make_probe_renderer(v: V2, owner: str, sid: str) -> Any:
+    """Turn a generated probe into a real document: patch the source .drawio, render it in the locked engine, and accept it
+    only if every measured box matches the probe's selection geometry within 0.5 (spec 4 rule 3)."""
+    from open_apprentice.drawio.patch import apply_geometry
+    from open_apprentice.teaching.probes import Probe, ProbeResult
+
+    def render(probe: Probe) -> ProbeResult:
+        meta = _raw_meta(v, sid)
+        try:
+            ref = _ref_for_scene(v, owner, meta, probe.source_scene_id)
+            f = _source(v, ref["doc_id"])
+            idx = next(p.index for p in f.pages if p.id == ref["page_id"])
+            cells = {cid: {k: Fraction(val) for k, val in attrs} for cid, attrs in probe.edits}
+            width = Fraction(probe.canvas_w) if probe.canvas_w is not None else None
+            raw, _ = apply_geometry(f, idx, cells, width, f.doc_hash)
+            pid = _import_probe_document(v, owner, sid, probe.probe_id, ref, raw)
+            m, _ = _stored_mapping(v, pid, ref["page_id"])
+            _, _, _, scene = page_scene(v, owner, pid, ref["page_id"], mp.digest(m))
+        except (DrawioRefused, Conflict, records.NotFound, StopIteration) as e:
+            return ProbeResult(False, reason=f"the probe document could not be built: {e}"[:200])
+        want = {o["id"]: o for o in probe.scene["objects"]}
+        worst = Fraction(0)
+        for o in scene.scene["objects"]:
+            w = want.get(o["id"])
+            if w is None:
+                return ProbeResult(
+                    False, reason=f"the rendered probe has an unexpected object {o['id']}"
+                )
+            for k in ("x", "y", "w", "h"):
+                worst = max(worst, abs(Fraction(o[k]) - Fraction(w[k])))
+        if worst > PROBE_TOLERANCE:
+            return ProbeResult(
+                False,
+                reason=f"measured geometry differs by {float(worst):.2f} from the selected probe",
+            )
+        new_ref = {"doc_id": pid, "page_id": ref["page_id"], "mapping_hash": mp.digest(m)}
+        records.update(
+            v.store,
+            _meta_key(sid),
+            owner,
+            lambda d: {**d, "probe_refs": [*d.get("probe_refs", []), new_ref]},
+        )
+        return ProbeResult(True, _scene_id(new_ref), scene.scene)
+
+    return render
+
+
+def _import_probe_document(
+    v: V2, owner: str, sid: str, probe_id: str, src: dict, raw: bytes
+) -> str:
+    """A probe document: owned by the session owner, rendered now, its mapping copied from the source and confirmed."""
+    f = load_drawio(raw)
+    doc_id = uuid.uuid4().hex
+    page = next(p for p in f.pages if p.id == src["page_id"])
+    c = classify(page)
+    v.store.create(f"documents/{doc_id}/source.drawio", raw)
+    entry = {"page_id": page.id, "index": page.index, "name": page.name, "status": "ok",
+             "movable": list(c.movable), "fixed": list(c.fixed), "reasons": c.reasons}  # fmt: skip
+    body = {"doc_id": doc_id, "name": f"probe {probe_id[:8]}", "doc_hash": f.doc_hash, "pages": [entry],
+            "render": "pending", "probe_of": {"sid": sid, "probe_id": probe_id}}  # fmt: skip
+    records.put_new(v.store, _doc_key(doc_id), owner, body)
+    render_document(v, owner, doc_id)
+    source_map, _ = _stored_mapping(v, src["doc_id"], src["page_id"])
+    m = mp.confirm(
+        mp.Mapping(f.doc_hash, page.id, dict(source_map.labels), frozenset(), None),
+        f"probe-{probe_id}",
+    )
+    v.store.put(
+        _page_key(doc_id, page.id, "mapping.json"),
+        records.dumps(mp.to_json(m)),
+        if_generation=_stored_mapping(v, doc_id, page.id)[1],
+    )
+    return doc_id
