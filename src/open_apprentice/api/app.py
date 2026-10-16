@@ -70,8 +70,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 app.state.engine = stack.enter_context(local_engine(str(ROOT)))
             except Exception as e:  # noqa: BLE001 - report, don't crash the API
                 app.state.engine_error = str(e)[:200]
-        app.state.v2 = make_v2(app.state.engine[0] if app.state.engine else None)
-        stack.callback(app.state.v2.dispatcher.close)
+        app.state.v2, app.state.v2_error = None, None
+        try:
+            app.state.v2 = make_v2(app.state.engine[0] if app.state.engine else None)
+            stack.callback(app.state.v2.dispatcher.close)
+        except Exception as e:  # noqa: BLE001 - v2 setup must not take down the rest of the demo
+            app.state.v2_error = f"{type(e).__name__}: {e}"[:200]
         yield
 
 

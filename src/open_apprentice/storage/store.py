@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import fcntl
 import os
+import uuid
 import pathlib
 from dataclasses import dataclass
 from typing import Optional, Protocol
@@ -52,15 +53,24 @@ class LocalStore:
     def create(self, key: str, data: bytes) -> bool:
         p = self._path(key)
         p.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            fd = os.open(p, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
-        except FileExistsError:
+        if p.exists():
             return False
-        with os.fdopen(fd, "wb") as f:
-            f.write(data)
-            f.flush()
-            os.fsync(f.fileno())
-        return True
+        # write a private temp file, then hard-link it into place: atomic, fails if the key exists, and readers never see
+        # a created-but-unwritten file
+        tmp = p.with_name(f"{p.name}.{uuid.uuid4().hex}.new")
+        fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(data)
+                f.flush()
+                os.fsync(f.fileno())
+            try:
+                os.link(tmp, p)
+            except FileExistsError:
+                return False
+            return True
+        finally:
+            tmp.unlink(missing_ok=True)
 
     def put(self, key: str, data: bytes, if_generation: Optional[int]) -> int:
         p = self._path(key)

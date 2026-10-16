@@ -7,7 +7,8 @@ COPY --from=ghcr.io/astral-sh/uv:0.7.13 /uv /usr/local/bin/uv
 WORKDIR /app
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
     UV_PROJECT_ENVIRONMENT=/opt/venv UV_CACHE_DIR=/tmp/uv-cache UV_PYTHON_INSTALL_DIR=/opt/python \
-    PATH="/opt/venv/bin:$PATH" HOME=/tmp/home OA_CHROMIUM_NO_SANDBOX=1
+    PATH="/opt/venv/bin:$PATH" HOME=/tmp/home OA_CHROMIUM_NO_SANDBOX=1 \
+    OA_STORE_DIR=/tmp/home/oa-store
 
 COPY package.json package-lock.json ./
 COPY apps/web/package.json apps/web/

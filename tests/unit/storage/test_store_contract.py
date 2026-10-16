@@ -79,3 +79,22 @@ def test_one_winner_under_contention(store):
     [t.start() for t in ts]
     [t.join() for t in ts]
     assert len(wins) == 1
+
+
+def test_local_create_is_never_seen_half_written(tmp_path, monkeypatch):
+    import os
+
+    from open_apprentice.storage.store import LocalStore
+
+    s = LocalStore(tmp_path)
+    real = os.fdopen
+    peeks = []
+
+    def fdopen(fd, *a, **k):  # the moment create() has a file but has not written it yet
+        peeks.append(s.get("k"))
+        return real(fd, *a, **k)
+
+    monkeypatch.setattr(os, "fdopen", fdopen)
+    assert s.create("k", b"x" * 1000)
+    assert peeks and all(p is None or p.data == b"x" * 1000 for p in peeks)
+    assert s.get("k").data == b"x" * 1000 and not s.create("k", b"y")

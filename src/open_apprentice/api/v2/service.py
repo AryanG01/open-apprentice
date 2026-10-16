@@ -449,7 +449,11 @@ def _offline(v: V2) -> Any:
 
 
 def _open_request(evs: list) -> tuple[Optional[dict], Optional[str]]:
+    from open_apprentice.teaching.executor import ENDED
     from open_apprentice.teaching.teacher import response_from_json
+
+    if any(e.type in ENDED for e in evs):
+        return None, None
 
     answered = {
         response_from_json(e.payload["response"]).request_id
@@ -767,12 +771,34 @@ def _apply_one(v: V2, owner: str, run: dict, ref: dict, rule: list) -> dict:
 
 def run_apply(v: V2, owner: str, run_id: str) -> None:
     run, _ = records.load(v.store, _run_key(run_id), owner)
+    try:
+        _run_documents(v, owner, run_id, run)
+    except Exception as e:  # never leave a run "running" forever
+        reason = f"{type(e).__name__}: {e}"[:200]
+        records.update(
+            v.store, _run_key(run_id), owner, lambda d: {**d, "status": "failed", "error": reason}
+        )
+        raise
+
+
+def _run_documents(v: V2, owner: str, run_id: str, run: dict) -> None:
     rule = _version(v, run["skill_id"], run["version"])["program"]["rule"]
-    for ref in run["documents"]:
-        k = f"{ref['doc_id']}:{ref['page_id']}"
+    for i, ref in enumerate(run["documents"]):
         if records.load(v.store, _run_key(run_id), owner)[0]["status"] == "cancelled":
             return
-        result = _apply_one(v, owner, run, ref, rule)
+        if not isinstance(ref, dict) or not all(
+            isinstance(ref.get(x), str) for x in ("doc_id", "page_id", "mapping_hash")
+        ):
+            k, result = f"invalid:{i}", {
+                "status": "failed",
+                "reasons": ["not a document reference (doc_id, page_id, mapping_hash)"],
+            }
+        else:
+            k = f"{ref['doc_id']}:{ref['page_id']}"
+            try:
+                result = _apply_one(v, owner, run, ref, rule)
+            except records.NotFound:
+                result = {"status": "failed", "reasons": ["no such document"]}
         records.update(
             v.store,
             _run_key(run_id),
@@ -873,6 +899,12 @@ def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
     run, _ = records.load(v.store, _run_key(req["run_id"]), owner)
     if run["skill_id"] != skill_id:
         raise Conflict("BAD_REQUEST", "this run did not use this skill")
+    if run["version"] != req["base_version"]:
+        raise Conflict(
+            "STALE_BASE",
+            f"this run used version {run['version']}; corrections apply to the output you saw, so apply the current "
+            "version again and correct that",
+        )
     refs = {(d["doc_id"], d["page_id"]): d for d in run["documents"]}
     ref = refs.get((req["doc_id"], req["page_id"]))
     if ref is None:

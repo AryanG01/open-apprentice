@@ -14,8 +14,77 @@ from open_apprentice.drawio.parse import MAX_UPLOAD, DrawioRefused
 router = APIRouter(prefix="/api/v2")
 
 
+class V2Unavailable(Exception):
+    pass
+
+
+class RateLimited(Exception):
+    pass
+
+
+JSON_LIMIT = 256 * 1024
+
+
+class BodyLimit:
+    """ASGI middleware: /api/v2 request bodies are capped (2 MB uploads, 256 KB JSON) without ever buffering more than the
+    cap, whether or not the client sends Content-Length."""
+
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    async def __call__(self, scope: dict, receive: Any, send: Any) -> None:
+        if (
+            scope["type"] != "http"
+            or not scope["path"].startswith("/api/v2/")
+            or scope["method"] != "POST"
+        ):
+            return await self.app(scope, receive, send)
+        limit = MAX_UPLOAD if scope["path"] == "/api/v2/documents" else JSON_LIMIT
+        declared = dict(scope.get("headers") or []).get(b"content-length")
+        if declared is not None and declared.isdigit() and int(declared) > limit:
+            return await _too_large(send, limit)
+        body, more = b"", True
+        while more:
+            msg = await receive()
+            body += msg.get("body", b"")
+            more = msg.get("more_body", False)
+            if len(body) > limit:
+                return await _too_large(send, limit)
+        sent = False
+
+        async def replay() -> dict:
+            nonlocal sent
+            if not sent:
+                sent = True
+                return {"type": "http.request", "body": body, "more_body": False}
+            return await receive()
+
+        await self.app(scope, replay, send)
+
+
+async def _too_large(send: Any, limit: int) -> None:
+    import json
+
+    payload = json.dumps(
+        {"error": {"code": "TOO_LARGE", "message": f"the request body exceeds {limit} bytes"}}
+    ).encode()
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 413,
+            "headers": [(b"content-type", b"application/json")],
+        }
+    )
+    await send({"type": "http.response.body", "body": payload})
+
+
 def _v2(request: Request) -> V2:
-    return request.app.state.v2
+    v = getattr(request.app.state, "v2", None)
+    if v is None:
+        raise V2Unavailable(
+            getattr(request.app.state, "v2_error", None) or "the v2 service is not configured"
+        )
+    return v
 
 
 def owner(request: Request, response: Response) -> str:
@@ -41,6 +110,15 @@ def _error(status: int, code: str, message: str) -> JSONResponse:
 def install(app: FastAPI) -> None:
     """Add the router and its error mapping to an app (the real app, or a bare one in tests)."""
     app.include_router(router)
+    app.add_middleware(BodyLimit)
+
+    @app.exception_handler(RateLimited)
+    async def _rate(_: Request, e: RateLimited) -> JSONResponse:
+        return _error(429, "RATE_LIMITED", str(e))
+
+    @app.exception_handler(V2Unavailable)
+    async def _unavail(_: Request, e: V2Unavailable) -> JSONResponse:
+        return _error(503, "V2_UNAVAILABLE", f"this part of the service is unavailable: {e}")
 
     @app.exception_handler(records.NotFound)
     async def _nf(_: Request, e: records.NotFound) -> JSONResponse:
@@ -128,6 +206,13 @@ def post_draft(
 def post_session(
     request: Request, body: dict = Body(default={}), who: str = Depends(owner)
 ) -> dict:
+    v = _v2(request)
+    if body.get("live") and not v.live_limiter.allow(
+        request.client.host if request.client else "?"
+    ):
+        raise RateLimited(
+            "too many live sessions from this address; try again later or use the offline learner"
+        )
     return service.create_session(
         _v2(request),
         who,

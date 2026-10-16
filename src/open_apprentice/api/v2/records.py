@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import time
 from typing import Callable
 
 from open_apprentice.storage.store import PreconditionFailed, Store
@@ -51,18 +52,44 @@ def update(store: Store, key: str, owner: str, fn: Callable[[dict], dict]) -> di
 def idempotent(
     store: Store, owner: str, key: str, request_digest: str, produce: Callable[[], dict]
 ) -> dict:
-    """First call stores and returns produce()'s result; a repeat with the same request returns it again; a repeat with a
-    different request is refused."""
+    """First call runs produce() and stores its result; repeats with the same request return it (waiting while the first is
+    still running); a repeat with a different request is refused. A produce() that raises is not cached.
+    """
     k = f"idem/{owner}/{hashlib.sha256(key.encode()).hexdigest()}.json"
-    b = store.get(k)
-    if b is not None:
+    for _ in range(600):  # up to ~60 s waiting for an in-flight first request
+        b = store.get(k)
+        if b is None:
+            if not store.create(k, dumps({"digest": request_digest, "state": "pending"})):
+                continue
+            gen = store.get(k).generation  # type: ignore[union-attr]
+            return _produce(store, k, request_digest, gen, produce)
         d = json.loads(b.data)
         if d["digest"] != request_digest:
             raise IdempotencyConflict("this idempotency key was used with a different request")
-        return d["result"]
-    result = produce()
-    if not store.create(k, dumps({"digest": request_digest, "result": result})):
-        return idempotent(
-            store, owner, key, request_digest, produce
-        )  # lost a race: the stored one wins
+        state = d.get("state", "done")
+        if state == "done":
+            return d["result"]
+        if state == "failed":
+            try:
+                store.put(
+                    k,
+                    dumps({"digest": request_digest, "state": "pending"}),
+                    if_generation=b.generation,
+                )
+            except PreconditionFailed:
+                continue
+            return _produce(store, k, request_digest, store.get(k).generation, produce)  # type: ignore[union-attr]
+        time.sleep(0.1)  # pending: the first request is still running
+    raise IdempotencyConflict(
+        "a request with this idempotency key is still in progress; retry shortly"
+    )
+
+
+def _produce(store: Store, k: str, digest: str, gen: int, produce: Callable[[], dict]) -> dict:
+    try:
+        result = produce()
+    except BaseException:
+        store.put(k, dumps({"digest": digest, "state": "failed"}), if_generation=gen)
+        raise
+    store.put(k, dumps({"digest": digest, "state": "done", "result": result}), if_generation=gen)
     return result

@@ -8,7 +8,7 @@ import asyncio
 import json
 import pathlib
 from fractions import Fraction
-from typing import Optional
+from typing import Callable, Optional
 
 from pydantic import BaseModel
 
@@ -47,23 +47,33 @@ def _rule(text: str) -> Optional[list]:
 
 
 def _call(
-    provider: Provider,
+    factory: Callable[[], Provider],
     prompt: pathlib.Path,
     role: str,
     user: dict,
     schema: type[BaseModel],
     max_tokens: int,
 ) -> tuple[ValidatedCompletion, dict, Fraction]:
+    """One call on a fresh provider inside one event loop: pooled HTTP clients are bound to the loop that opened them,
+    and every asyncio.run is a new loop."""
     msgs = [Message("system", prompt.read_text()), Message("user", json.dumps(user))]
-    done = asyncio.run(
-        provider.complete_json(
-            messages=msgs,
-            output_schema=schema,
-            ctx=CallContext(role, "teaching"),
-            ledger=Ledger(Limits()),
-            max_tokens=max_tokens,
-        )
-    )
+
+    async def go() -> ValidatedCompletion:
+        provider = factory()
+        try:
+            return await provider.complete_json(
+                messages=msgs,
+                output_schema=schema,
+                ctx=CallContext(role, "teaching"),
+                ledger=Ledger(Limits()),
+                max_tokens=max_tokens,
+            )
+        finally:
+            close = getattr(provider, "aclose", None)
+            if close is not None:
+                await close()
+
+    done = asyncio.run(go())
     usd = _usd(done)
     if usd is None:
         raise ValueError("cost unknown: the provider did not report usage")
@@ -86,17 +96,17 @@ def _user(evidence_json: dict, round_kind: str, feedback: tuple[str, ...]) -> di
 class ProviderProposer:
     def __init__(
         self,
-        provider: Provider,
+        provider_factory: Callable[[], Provider],
         prompt_path: pathlib.Path = PROMPTS / "hypotheses_labels.md",
         max_tokens: int = 6000,
     ) -> None:
-        self.provider, self.prompt, self.max_tokens = provider, prompt_path, max_tokens
+        self.factory, self.prompt, self.max_tokens = provider_factory, prompt_path, max_tokens
 
     def propose(
         self, evidence_json: dict, round_kind: str, feedback: tuple[str, ...]
     ) -> tuple[list[dict], dict, Fraction]:
         done, usage, cost = _call(
-            self.provider,
+            self.factory,
             self.prompt,
             "hypotheses",
             _user(evidence_json, round_kind, feedback),
@@ -117,17 +127,17 @@ class ProviderProposer:
 class ProviderScopeProposer:
     def __init__(
         self,
-        provider: Provider,
+        provider_factory: Callable[[], Provider],
         prompt_path: pathlib.Path = PROMPTS / "correction_scope.md",
         max_tokens: int = 6000,
     ) -> None:
-        self.provider, self.prompt, self.max_tokens = provider, prompt_path, max_tokens
+        self.factory, self.prompt, self.max_tokens = provider_factory, prompt_path, max_tokens
 
     def propose_scope(
         self, evidence_json: dict, round_kind: str
     ) -> tuple[list[dict], dict, Fraction]:
         done, usage, cost = _call(
-            self.provider,
+            self.factory,
             self.prompt,
             "correction_scope",
             _user(evidence_json, round_kind, ()),

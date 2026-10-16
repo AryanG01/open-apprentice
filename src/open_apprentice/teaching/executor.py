@@ -87,7 +87,23 @@ def submit_response(log: SessionLog, resp: Response) -> bool:
     return False
 
 
+ENDED = frozenset(
+    {
+        "VersionStored",
+        "VersionActivated",
+        "Abstained",
+        "Errored",
+        "OverrideRecorded",
+        "CorrectionDismissed",
+        "CorrectionAbandoned",
+        "ActivationRejected",
+    }
+)  # a session with any of these takes no more answers (learning and correction logs)
+
+
 def _submit_checked(log: SessionLog, resp: Response, evs: list[Event], revision: int) -> bool:
+    if any(e.type in ENDED for e in evs):
+        return False
     reqs = {
         request_from_json(e.payload["request"]).request_id: request_from_json(e.payload["request"])
         for e in evs

@@ -8,9 +8,10 @@ import os
 import secrets
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from fractions import Fraction
-from typing import Callable, Optional, Protocol
+from typing import Any, Callable, Optional, Protocol
 
 from open_apprentice.drawio.parse import Page
 from open_apprentice.drawio.render import Rendered, render_page
@@ -42,6 +43,32 @@ class V2:
     render_svg: Optional[Callable[[Page], Optional[str]]] = (
         None  # SVG export from the same engine; None = unavailable
     )
+    live_limiter: "RateLimiter" = field(default_factory=lambda: RateLimiter(LIVE_SESSIONS_PER_HOUR))
+
+
+class RateLimiter:
+    """Per-client sliding window (spec 8: per-client rate limits in paid mode)."""
+
+    def __init__(self, per_hour: int) -> None:
+        self.per_hour = per_hour
+        self._hits: dict[str, list[float]] = {}
+        self._lock = threading.Lock()
+
+    def allow(self, client: str) -> bool:
+        now = time.monotonic()
+        with self._lock:
+            hits = [t for t in self._hits.get(client, []) if now - t < 3600]
+            if len(hits) >= self.per_hour:
+                self._hits[client] = hits
+                return False
+            self._hits[client] = hits + [now]
+            if len(self._hits) > 10_000:  # bounded memory: forget the oldest clients
+                for k in list(self._hits)[:5_000]:
+                    del self._hits[k]
+            return True
+
+
+LIVE_SESSIONS_PER_HOUR = 3
 
 
 class LocalDispatcher:
@@ -90,14 +117,17 @@ class LocalDispatcher:
         self._pool.shutdown(wait=True)
 
 
-def _secret() -> bytes:
+def _secret(store: Store) -> bytes:
+    """SESSION_SECRET if set; otherwise a key generated once and kept in the Store, so owner cookies survive restarts
+    and cold starts (anyone who can read the store can already read every owner's data)."""
     s = os.environ.get("SESSION_SECRET")
     if s:
         return s.encode()
-    log.warning(
-        "SESSION_SECRET is not set: owner cookies are signed with a per-process key and reset on restart"
-    )
-    return secrets.token_bytes(32)
+    store.create("v2/cookie-secret.bin", secrets.token_bytes(32))
+    b = store.get("v2/cookie-secret.bin")
+    assert b is not None
+    log.warning("SESSION_SECRET is not set: owner cookies are signed with a key kept in the store")
+    return b.data
 
 
 def make_v2(engine_url: Optional[str]) -> V2:
@@ -127,8 +157,17 @@ def make_v2(engine_url: Optional[str]) -> V2:
                 ProviderScopeProposer,
             )
 
-            provider = make_provider(load_settings())
-            proposer, scope = ProviderProposer(provider), ProviderScopeProposer(provider)
+            settings = load_settings()
+            if settings.provider_mode == "mock":
+                raise RuntimeError("PROVIDER_MODE=mock: there is no live model to call")
+            make_provider(
+                settings
+            )  # fails now, not at the first session, if credentials are missing
+
+            def factory() -> Any:
+                return make_provider(settings)
+
+            proposer, scope = ProviderProposer(factory), ProviderScopeProposer(factory)
             model, worst = "Live", Fraction(1, 5)
             cap = Fraction(os.environ.get("DEMO_MODEL_MAX_USD", "1.5"))
         except Exception as e:  # misconfigured live mode stays offline, visibly
@@ -144,7 +183,7 @@ def make_v2(engine_url: Optional[str]) -> V2:
         ledger=ledger,
         worst_usd=worst,
         dispatcher=LocalDispatcher(),
-        secret=_secret(),
+        secret=_secret(store),
         render_svg=(
             (lambda page: render_page(page, engine_url, png=False, svg=True).svg)
             if engine_url
