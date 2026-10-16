@@ -2,13 +2,18 @@
 the process then works in a fresh temporary directory, reads only the learner-visible episode, talks to the teacher
 over JSON lines, and writes its outcome. It never sees the hidden behaviour, the scoring documents or any mark.
 
-    python -m open_apprentice.learner.main --episode learner.json --system A|B|C|D --teacher-cmd '<argv json>'
+    python -m open_apprentice.learner.main --episode learner.json --system A|B|C|D --teacher-fds R,W
         --mode mock --seed N --out outcome.json
+
+The evaluator starts the teacher and hands over only the two pipe ends (R: answers, W: requests), so the learner never
+learns where the private episode lives. Files under benchmarks/, *.private.json and child processes are refused by
+the audit hook, and every refusal (even one the code swallows) makes the outcome a boundary violation.
 """
 
-from open_apprentice.teaching.isolation import install_learner_guard
+from open_apprentice.teaching import isolation
 
-install_learner_guard()
+isolation.install_learner_guard()
+isolation.install_file_guard()
 
 import argparse  # noqa: E402
 import json  # noqa: E402
@@ -27,12 +32,11 @@ from open_apprentice.teaching.constraints import scene_from_payload  # noqa: E40
 from open_apprentice.teaching.events import SessionLog  # noqa: E402
 from open_apprentice.learner import synthetic_render  # noqa: E402
 from open_apprentice.teaching.teacher import (  # noqa: E402
+    ProtocolError,
     Request,
     Response,
-    SubprocessTeacher,
     request_to_json,
     response_from_json,
-    ProtocolError,
 )
 
 GUARD_MESSAGE = "learner process may not import"
@@ -42,16 +46,22 @@ FORBIDDEN_MARKERS = ("benchmarks/final", ".private.json")
 
 
 class Refused(Exception):
-    pass
+    def __init__(self, msg: str, boundary: bool = False) -> None:
+        super().__init__(msg)
+        self.boundary = boundary
 
 
-class ShowingTeacher(SubprocessTeacher):
-    """The subprocess teacher, plus the scene of any generated probe it is asked about (the teacher process has never
-    seen probes; a person would see the rendered document)."""
+class ShowingTeacher:
+    """The teacher over two inherited pipe ends (JSON lines), plus the scene of any generated probe it is asked about
+    (the teacher process has never seen probes; a person would see the rendered document)."""
 
-    def __init__(self, argv: list[str]) -> None:
-        super().__init__(argv)
+    def __init__(self, read_fd: int, write_fd: int) -> None:
+        self.rf, self.wf = os.fdopen(read_fd, "r"), os.fdopen(write_fd, "w")
         self.logs: list[SessionLog] = []
+
+    def close(self) -> None:
+        self.wf.close()
+        self.rf.close()
 
     def _probe_scene(self, scene_id: str) -> Optional[dict]:
         for log in self.logs:
@@ -62,14 +72,13 @@ class ShowingTeacher(SubprocessTeacher):
         return None
 
     def ask(self, req: Request) -> Response:
-        assert self.proc.stdin and self.proc.stdout
         d = request_to_json(req)
         scene = self._probe_scene(d["scene_id"]) if "scene_id" in d else None
         if scene is not None:
             d["scene"] = scene
-        self.proc.stdin.write(json.dumps(d) + "\n")
-        self.proc.stdin.flush()
-        line = self.proc.stdout.readline()
+        self.wf.write(json.dumps(d) + "\n")
+        self.wf.flush()
+        line = self.rf.readline()
         if not line:
             raise ProtocolError("teacher process closed")
         out = json.loads(line)
@@ -255,17 +264,19 @@ def _usage(ctx: Context) -> dict:
 def _check_inputs(episode_path: Path) -> None:
     parts = episode_path.resolve().as_posix()
     if "/benchmarks/final/" in parts:
-        raise Refused("the episode file is under benchmarks/final")
+        raise Refused("the episode file is under benchmarks/final", boundary=True)
     for k, v in os.environ.items():
         if any(m in v for m in FORBIDDEN_MARKERS):
-            raise Refused(f"the environment names private evaluator files ({k})")
+            raise Refused(f"the environment names private evaluator files ({k})", boundary=True)
 
 
 def _check_cwd() -> None:
     here = Path.cwd()
     for p in (here, *here.parents):
         if (p / "benchmarks").exists():
-            raise Refused(f"a benchmarks/ folder is reachable from the working directory ({p})")
+            raise Refused(
+                f"a benchmarks/ folder is reachable from the working directory ({p})", True
+            )
 
 
 def _absolute_paths() -> None:
@@ -307,7 +318,8 @@ def run(args: argparse.Namespace) -> dict:
         if args.system not in SYSTEMS:
             raise Refused(f"system {args.system} is not available")
         store = LocalStore(Path("store"))
-        teacher = ShowingTeacher(json.loads(args.teacher_cmd))
+        rfd, wfd = (int(x) for x in args.teacher_fds.split(","))
+        teacher = ShowingTeacher(rfd, wfd)
         ctx = Context(store, episode, teacher, Ledger(store, Fraction(0)), args.mode, args.seed)
         ctx.result = result
         reason = _unsupported(episode)
@@ -321,6 +333,7 @@ def run(args: argparse.Namespace) -> dict:
     except Refused as e:
         result["reason"] = str(e)
         result["refused"] = True
+        result["boundary_refusal"] = e.boundary
     except ImportError as e:
         result["reason"] = f"{type(e).__name__}: {e}"
         result["boundary_violation"] = GUARD_MESSAGE in str(e)
@@ -345,6 +358,10 @@ def run(args: argparse.Namespace) -> dict:
     result["evaluator_modules"] = sorted(
         m for m in sys.modules if m.startswith("open_apprentice.evaluation")
     )
+    result["violations"] = list(isolation.violations)
+    if isolation.violations or result["evaluator_modules"]:
+        result["boundary_violation"] = True
+        result["status"] = "error"
     return result
 
 
@@ -352,7 +369,7 @@ def cli(argv: Optional[list[str]] = None) -> None:
     p = argparse.ArgumentParser(prog="open_apprentice.learner.main")
     p.add_argument("--episode", required=True)
     p.add_argument("--system", required=True, choices=["A", "B", "C", "D"])
-    p.add_argument("--teacher-cmd", required=True)
+    p.add_argument("--teacher-fds", required=True, help="R,W: inherited pipe ends to the teacher")
     p.add_argument("--mode", default="mock", choices=["mock", "live"])
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out", required=True)

@@ -176,3 +176,12 @@ def test_cli_run_writes_rows_for_the_chosen_episodes(tmp_path):
     out = Path(json.loads(r.output)["run_dir"])
     rows = [json.loads(x) for x in (out / "rows.jsonl").read_text().splitlines()]
     assert [x["method"] for x in rows] == ["A", "C"] and {x["episode"] for x in rows} == {ep.id}
+
+
+def test_boundary_refusals_and_loaded_evaluator_modules_are_release_blocking():
+    ep = _dev()[0]
+    refused = _outcome("error") | {"refused": True, "boundary_refusal": True}
+    loaded = _outcome("abstained") | {"evaluator_modules": ["open_apprentice.evaluation.labels"]}
+    for o in (refused, loaded):
+        s = score(ep, o)
+        assert s["terminal_outcome"] == "error" and "boundary_violation" in s["release_blocking"]

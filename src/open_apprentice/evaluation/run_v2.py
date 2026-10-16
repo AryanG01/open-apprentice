@@ -161,7 +161,13 @@ def _learning(ep: Episode, outcome: dict, spec: VSpec) -> tuple[str, dict]:
 
 def score(ep: Episode, outcome: dict) -> dict:
     """Terminal outcome (spec 7) of one learner outcome, plus the evaluator-private checks behind it."""
-    blocking = ["boundary_violation"] if outcome.get("boundary_violation") else []
+    violated = bool(
+        outcome.get("boundary_violation")
+        or outcome.get("boundary_refusal")
+        or outcome.get("evaluator_modules")
+    )
+    blocking = ["boundary_violation"] if violated else []
+    outcome = dict(outcome, boundary_violation=violated)
     terminal, check = _learning(ep, outcome, ep.spec)
     if check.get("preservation_accepted"):
         blocking.append("accepted_preservation_violation")
@@ -264,25 +270,40 @@ def run_learner(
         lf.write_bytes(codec.dumps(learner_view(ep)))
         pf.write_bytes(codec.dumps(episode_to_json(ep)))
         tlog = pdir / "teacher.jsonl"
-        teacher = [
-            sys.executable,
-            "-m",
-            "open_apprentice.evaluation.teacher_sim",
-            str(pf),
-            str(tlog),
-        ]
+        teacher = subprocess.Popen(
+            [sys.executable, "-m", "open_apprentice.evaluation.teacher_sim", str(pf), str(tlog)],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            env=_learner_env(),
+        )
+        assert teacher.stdin is not None and teacher.stdout is not None
+        fds = (
+            teacher.stdout.fileno(),
+            teacher.stdin.fileno(),
+        )  # the learner gets pipe ends, never the path
         out = ldir / "outcome.json"
         argv = [sys.executable, "-m", "open_apprentice.learner.main", "--episode", str(lf)]
-        argv += ["--system", system, "--teacher-cmd", json.dumps(teacher), "--mode", mode]
+        argv += ["--system", system, "--teacher-fds", f"{fds[0]},{fds[1]}", "--mode", mode]
         argv += ["--seed", str(seed), "--out", str(out)]
         t0 = time.monotonic()
         try:
             r = subprocess.run(
-                argv, env=_learner_env(), capture_output=True, text=True, timeout=wall_s
+                argv,
+                env=_learner_env(),
+                capture_output=True,
+                text=True,
+                timeout=wall_s,
+                pass_fds=fds,
             )
             stderr = r.stderr
         except subprocess.TimeoutExpired:
             stderr = "wall-clock limit"
+        finally:
+            teacher.stdin.close()
+            try:
+                teacher.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                teacher.kill()
         wall = time.monotonic() - t0
         if out.exists():
             outcome = json.loads(out.read_text())

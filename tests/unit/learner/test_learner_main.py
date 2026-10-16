@@ -29,20 +29,60 @@ def run_learner(tmp_path, ep, system="A", prefix=None, learner_dir=None, env=Non
     lf, pf = ldir / f"{ep.id}.json", pdir / f"{ep.id}.private.json"
     lf.write_bytes(codec.dumps(learner_view(ep)))
     pf.write_bytes(codec.dumps(episode_to_json(ep)))
-    teacher = [
-        sys.executable,
-        "-m",
-        "open_apprentice.evaluation.teacher_sim",
-        str(pf),
-        str(pdir / "log.jsonl"),
-    ]
+    teacher = subprocess.Popen(
+        [sys.executable, "-m", "open_apprentice.evaluation.teacher_sim", str(pf), str(pdir / "log.jsonl")],
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, env=ENV,
+    )  # fmt: skip
+    fds = (teacher.stdout.fileno(), teacher.stdin.fileno())
     out = tmp_path / "outcome.json"
-    args = ["--episode", str(lf), "--system", system, "--teacher-cmd", json.dumps(teacher)]
+    args = ["--episode", str(lf), "--system", system, "--teacher-fds", f"{fds[0]},{fds[1]}"]
     args += ["--mode", "mock", "--seed", "0", "--out", str(out)]
     head = prefix or [sys.executable, "-m", "open_apprentice.learner.main"]
-    r = subprocess.run([*head, *args], env=env or ENV, capture_output=True, text=True, timeout=120)
+    try:
+        r = subprocess.run([*head, *args], env=env or ENV, capture_output=True, text=True,
+                           timeout=120, pass_fds=fds)  # fmt: skip
+    finally:
+        teacher.stdin.close()
+        teacher.wait(timeout=10)
     assert out.exists(), r.stderr[-2000:]
     return json.loads(out.read_text()), r
+
+
+def _inject(body):
+    return [sys.executable, "-c",
+            "import open_apprentice.learner.main as m\n"
+            f"def bad(ctx):\n{body}\n"
+            "m.SYSTEMS['A'] = bad\nm.cli()\n"]  # fmt: skip
+
+
+def test_the_learner_is_never_given_the_private_episode_path(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue")
+    o, _ = run_learner(
+        tmp_path, ep, prefix=_inject("    import sys\n    ctx.result['argv'] = sys.argv")
+    )
+    assert o["argv"] and not any(".private.json" in a or "teacher_sim" in a for a in o["argv"])
+
+
+def test_opening_a_benchmarks_file_is_a_boundary_violation_even_if_caught(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue")
+    target = REPO / "benchmarks" / "development" / "battery" / "manifest.private.json"
+    body = f"    try:\n        open({str(target)!r}).read()\n    except Exception:\n        pass\n    ctx.result['status'] = 'abstained'"
+    o, _ = run_learner(tmp_path, ep, prefix=_inject(body))
+    assert o["boundary_violation"] is True and o["violations"]
+
+
+def test_a_swallowed_evaluator_import_is_still_a_boundary_violation(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue")
+    body = "    try:\n        import open_apprentice.evaluation.labels\n    except Exception:\n        pass\n    ctx.result['status'] = 'abstained'"
+    o, _ = run_learner(tmp_path, ep, prefix=_inject(body))
+    assert o["boundary_violation"] is True
+
+
+def test_spawning_a_process_is_a_boundary_violation(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue")
+    body = "    import subprocess\n    subprocess.run(['true'])"
+    o, _ = run_learner(tmp_path, ep, prefix=_inject(body))
+    assert o["status"] == "error" and o["boundary_violation"] is True
 
 
 def test_offline_a_reaches_a_terminal_status_without_loading_the_evaluator(tmp_path):
