@@ -97,6 +97,7 @@ source_modules = [
   "open_apprentice.teaching",
   "open_apprentice.storage",
   "open_apprentice.drawio",
+  "open_apprentice.learner",
 ]
 forbidden_modules = [
   "open_apprentice.evaluation",
