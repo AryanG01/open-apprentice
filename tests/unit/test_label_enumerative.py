@@ -106,15 +106,55 @@ def test_hand_placed_positions_within_tolerance_are_explained():
     # a person drags labels: positions are close to the rule's output (here off by 1/128 and by 0.3), never exact
     scene = {
         "objects": [
-            {"id": "n1", "kind": "node", "role": "", "attached": "", "x": 300, "y": 400, "w": 100, "h": 50},
-            {"id": "l1", "kind": "label", "role": "note", "attached": "n1", "x": 0, "y": 0, "w": "4953/64", "h": 14},
-            {"id": "n2", "kind": "node", "role": "", "attached": "", "x": 0, "y": 0, "w": 120, "h": 50},
-            {"id": "l2", "kind": "label", "role": "note", "attached": "n2", "x": 0, "y": 100, "w": 40, "h": 14},
+            {
+                "id": "n1",
+                "kind": "node",
+                "role": "",
+                "attached": "",
+                "x": 300,
+                "y": 400,
+                "w": 100,
+                "h": 50,
+            },
+            {
+                "id": "l1",
+                "kind": "label",
+                "role": "note",
+                "attached": "n1",
+                "x": 0,
+                "y": 0,
+                "w": "4953/64",
+                "h": 14,
+            },
+            {
+                "id": "n2",
+                "kind": "node",
+                "role": "",
+                "attached": "",
+                "x": 0,
+                "y": 0,
+                "w": 120,
+                "h": 50,
+            },
+            {
+                "id": "l2",
+                "kind": "label",
+                "role": "note",
+                "attached": "n2",
+                "x": 0,
+                "y": 100,
+                "w": 40,
+                "h": 14,
+            },
         ],
         "canvas": {"w": 900, "h": 700},
     }
     exact_l1_x = 300 + (100 - 4953 / 64) / 2  # 311.3046875, a multiple of 1/128
     moves = {"l1": [str(round(exact_l1_x * 64) / 64), 458], "l2": [40.3, 58]}
-    ev = {"teaching_evidence": [{"evidence": "demonstration", "scene": scene, "labels_moved_to": moves}]}
+    ev = {
+        "teaching_evidence": [
+            {"evidence": "demonstration", "scene": scene, "labels_moved_to": moves}
+        ]
+    }
     cands, _, _ = LabelEnumerator().propose(ev, "initial", ())
     assert any("a.y + a.h + 8" in c["text"] for c in cands), [c["summary"] for c in cands]

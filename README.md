@@ -52,6 +52,13 @@ uv run uvicorn open_apprentice.api.app:app --port 8000
 
 Open <http://localhost:8000>. No account, no API key and no model call is needed for the interactive demo.
 
+**Apprentice tab (the new flow, on real `.drawio` files).** Add two or more `.drawio` files, confirm which node each label
+describes, drag labels on one document (or type their x/y; arrow keys nudge 1, Shift 10, Alt 1/64), wait for the engine's
+render and press *This whole document is right*. Answer the questions on rendered alternatives, approve the preview (documents
+that would break the layout are shown as blocked and cannot be approved), then apply the skill to other documents and download
+the `.drawio`, SVG or receipt, or correct a result. Without `DEMO_MODEL_ENABLED=1` it uses an offline learner and spends nothing;
+every session and run shows `Model: … · Teacher: …`. The earlier badge demo is under *Earlier prototype*, unchanged.
+
 **Live NVIDIA Nemotron on Nebius Token Factory (the intended public configuration).** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
 `DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=1.5 uv run uvicorn open_apprentice.api.app:app --port 8000`. *Try it live* then defaults to **Nemotron-3-Ultra called live through Nebius Token Factory**: it proposes candidate rules
 (unioned with a bounded symbolic search so a rule the model omits can still be found; the teacher alone decides), writes the native procedure for each backend and attempts the repair. Every output is checked on the real engine before it is accepted;

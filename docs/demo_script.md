@@ -6,7 +6,7 @@ Numbers on Home were re-checked against the running app on 2026-10-12 (15 of 34 
 ## Set up (live Nemotron on Nebius Token Factory)
 - `DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=1.5 PYTHONPATH=src .venv/bin/python -m uvicorn open_apprentice.api.app:app --port 8000` with your Nebius key in `.env`; open `http://localhost:8000`, window 1440 wide. Dark mode follows the OS setting.
 - The hackathon requires running on Nebius Token Factory with an NVIDIA model, so the model segment is **live**: one full story is about 5 Nemotron calls, 36k tokens, about $0.085 and 89 s (measured). Rehearse once, then record. Keep a recorded-run take (Nemotron replay, labelled REPLAY) as a backup if a live call truncates or Nebius is slow; about 10 to 15% of model calls end in a truncation on any given run.
-- Before recording: `npm run build:web && npm run test:e2e` passes (9 browser tests), reload the page once so there is no stale session, check the Nebius balance.
+- Before recording: `npm run build:web && npm run test:e2e` passes (10 browser tests, including the Apprentice journey); the badge story below is now under the *Earlier prototype* tab (open `http://localhost:8000/#home`), reload the page once so there is no stale session, check the Nebius balance.
 - Do not speed up the story; if you cut, say "cut".
 
 | Time | On screen | Say (one idea per line) |

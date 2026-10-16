@@ -2,7 +2,7 @@
 
 Spec: `docs/superpowers/specs/2026-10-15-teach-correct-reuse-design.md`. Plans: `docs/superpowers/plans/`. Status values:
 **implemented** (code + test in this repository), **planned** (named plan), **deviation** (recorded difference from the spec).
-Updated at the end of Plan 4A (branch `p4a-api-v2`).
+Updated at the end of Plan 4C (branch `p4c-screens`).
 
 | Spec § | Requirement | Code | Status | Evidence |
 |---|---|---|---|---|
@@ -52,8 +52,12 @@ Updated at the end of Plan 4A (branch `p4a-api-v2`).
 | 8 | Provenance Model × Teacher on sessions, runs, skills | `api/v2/service.py` | implemented (offline enumerator reported as Fixture) | `test_sessions.py`, `test_runs.py` |
 | 8 | Offline learner for PROVIDER_MODE=mock and journeys | `concepts/label_enumerative.py` | implemented | `tests/unit/test_label_enumerative.py` |
 | 8 | `POST /internal/tasks/{action_id}` (Cloud Tasks, OIDC) | — | planned (Plan 4B; `LocalDispatcher` behind the same `Dispatcher` protocol today) | — |
-| 8 | Preview shows blocked documents with reasons | — | planned (Plan 4C; found in Plan 4A: a previewed output can later fail layout) | — |
-| 8 | Screens, overlays, keyboard nudges, journey test | — | planned (Plan 4C) | — |
+| 8 | Preview shows blocked documents with reasons; approving a blocked item is refused | `api/v2/service.item_checks` (geometric layout check on the session's scenes), `submit_answer` 409 `BLOCKED_ITEM`; `apps/web/src/v2/Question.tsx` | implemented | `tests/unit/api_v2/test_screens_backend.py::test_blocked_preview_item_cannot_be_approved` |
+| 8 | Screens: import and map, teach (drag + "This whole document is right" after the draft render), clarify (rendered alternatives + None / Not sure / Cancel), preview (Approve / Reject / Not sure), correct (partial / full approval), review revision, reuse and export, evidence panel | `apps/web/src/v2/*` | implemented | `tests/e2e/journey.test.mjs` |
+| 8 | Overlay transform document → image → display, draft render on drop, keys 1 / 10 / 1/64, x/y fields | `v2/geometry.ts`, `v2/DocumentView.tsx`; scene + image offset route | implemented | `tests/e2e/geometry.test.mjs`, journey alignment check at 1280 and 800 px |
+| 8 | Polling every 2 s, stale `manifest_revision` ignored, reload resumes | `v2/useSession.ts`, `v2/session.ts`, URL hash | implemented | `geometry.test.mjs` (stale revision), journey reload step |
+| 8 | Provenance per session, run, skill; live-unavailable wording | `v2/provenance.ts`, `Teach.tsx` | implemented (no recorded v2 example exists yet; the message links to the prototype's replay and says so) | journey steps 4 and 8 |
+| 8 | "Earlier prototype" tab keeps the badge flow unchanged | `App.tsx` | implemented | `tests/e2e/ui.test.mjs` (9 tests) |
 | 9 B | Property and state-sequence tests | `tests/unit/teaching/test_stateful.py` (event log, ledger, versions; Hypothesis `ci` profile, derandomized) | implemented | mutation check: removing the activation generation check fails `TestVersions` |
 | 10 | Staging and release deployment | `storage/gcs.py` (store contract over GCS, fake-bucket contract test); `docs/deploy_staging_proposal.md`, `oa staging-check` | staging: **proposed, not created** (needs owner approval); release: Plan 6 | `tests/unit/storage/test_store_contract.py`, `tests/unit/drawio/test_cli.py` |
 
