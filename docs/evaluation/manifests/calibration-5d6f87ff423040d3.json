@@ -1,0 +1,49 @@
+{
+ "approved": false,
+ "attempt_ceilings": {
+  "B": 12
+ },
+ "budget_at_writing": {
+  "ceiling_fits": true,
+  "remaining_usd": 1.297,
+  "spendable_usd": 40.77,
+  "spent_usd": 39.473
+ },
+ "ceiling_usd": 1.25,
+ "establishes": "prompt and parse viability for A and B and the cost per episode on development episodes; not an A-versus-B result",
+ "estimate_basis": "dry-run mean attempts per episode x $0.0419 per call (mean of earlier live teaching calls in spend.jsonl); the fixture B stops early, so B's share is a lower bound",
+ "estimate_calls": 13.06,
+ "estimate_usd": 0.547,
+ "expected_coverage": 1.0,
+ "kind": "calibration",
+ "manifest_id": "5d6f87ff423040d3",
+ "note": "B-only re-check after the development-only fix of B's prompt and tool-call parsing (calibration 2026-10-16 found B not viable)",
+ "protected_reserve_usd": 5.0,
+ "repeats": 1,
+ "runs": 5,
+ "split": "dev",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "SpendGuard stops the run when the next call's worst case would pass --cap-usd"
+ },
+ "systems": [
+  "B"
+ ],
+ "task_ids": [
+  "e88727066d3",
+  "e5a01549872",
+  "e7b523e24fc",
+  "ea5432e5dee",
+  "e9bacad414c"
+ ],
+ "task_strata": [
+  "catalogue",
+  "beyond",
+  "inconsistent",
+  "unsupported",
+  "sequential"
+ ],
+ "worst_case_per_attempt_usd": 0.192,
+ "worst_case_total_usd": 11.52
+}

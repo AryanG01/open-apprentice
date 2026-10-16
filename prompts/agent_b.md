@@ -24,6 +24,11 @@ THE TOOLS (the message shows what is left of each budget; a refused call still u
   abstain         {"reason": "<why>"}
                   Stop without saving a rule (for example the evidence contradicts itself, or no rule you can write fits it).
 
+HOW A RUN ENDS. A rule is saved only by `commit`, and `commit` needs an approved preview. So once a program fits the
+evidence and you have no question left that would change your mind, call `preview` on 1-3 documents, then commit it if
+the person approved. Proposing a program that already fits again changes nothing and wastes a turn. Conditions use the
+words `and`, `or`, `not`: never `&&` or `||`. Put every argument inside "args".
+
 THE MESSAGE gives: `evidence` (as described above), `documents` (id, role and scene of every document you may ask about),
 `programs` (id, summary, and whether it still fits the evidence), `budget` (what is left), and `history` (your earlier calls
 and their results, including the person's answers).

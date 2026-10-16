@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import Any, Callable, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 from open_apprentice.concepts.label_teaching import describe_compact
 from open_apprentice.concepts.rule_text import parse_rule_text
@@ -66,6 +66,18 @@ class ToolCall(BaseModel):
     model_config = {"extra": "forbid"}
     tool: str
     args: dict[str, Any] = {}
+
+    @model_validator(mode="before")
+    @classmethod
+    def _flat_args(cls, d: Any) -> Any:
+        """Calibration (2026-10-16): the model often writes {"tool": ..., "rules_text": ...} without the `args` wrapper.
+        Any other top-level key is read as an argument (`args` wins on a clash); unknown arguments are ignored.
+        """
+        if isinstance(d, dict) and set(d) - {"tool", "args"}:
+            extra = {k: v for k, v in d.items() if k not in ("tool", "args")}
+            args = d.get("args") if isinstance(d.get("args"), dict) else {}
+            return {"tool": d.get("tool"), "args": {**extra, **args}}
+        return d
 
 
 class BadCall(Exception):
@@ -215,6 +227,7 @@ class AgentB:
                 cands.append({"rule": _parse(t), "summary": t.splitlines()[0][:80], "text": t})
             except RuleError as e:
                 problems.append(f"does not parse: {str(e)[:160]}")
+        before = {p["hash"] for p in self._programs() if p["fits"]}
         self.log.append(
             "ModelProposalReturned",
             "model",
@@ -227,12 +240,22 @@ class AgentB:
             },
         )
         known = {p["hash"]: p for p in self._programs()}
+        again = [
+            known[h]["id"]
+            for h in dict.fromkeys(codec.digest(c["rule"]) for c in cands)
+            if h in before
+        ]
         lines = [
             f"{known[codec.digest(c['rule'])]['id']}: "
             + ("fits the evidence" if known[codec.digest(c["rule"])]["fits"] else "rejected -- ")
             + known[codec.digest(c["rule"])]["problem"]
             for c in cands
         ]
+        if again:
+            problems.append(
+                f"{', '.join(again)} already proposed and still fits: proposing it again changes nothing -- "
+                "ask about it, or preview it and then commit"
+            )
         return "; ".join(lines + problems)
 
     def t_register_probe(self, aid: str, args: dict) -> str:

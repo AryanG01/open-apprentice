@@ -139,6 +139,11 @@ def calibration_manifest(
     )
 
 
+def calibration_note(m: dict, note: str) -> dict:
+    """The same terms plus a stated purpose (part of the hashed terms)."""
+    return _finish({k: v for k, v in m.items() if k != "manifest_id"} | {"note": note})
+
+
 def funded_manifest(
     n_final: int,
     n_clarify: int,

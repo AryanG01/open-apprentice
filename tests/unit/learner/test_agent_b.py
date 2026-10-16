@@ -121,3 +121,28 @@ def test_the_attempt_budget_ends_the_run(tmp_path):
     status, log, turns, _ = _run(tmp_path, ep, replies)
     assert status == "abstained" and len(turns) == 8
     assert "budget" in next(e.payload["reason"] for e in log.events() if e.type == "Abstained")
+
+
+def test_tool_arguments_given_at_the_top_level_are_accepted(tmp_path):
+    ep = _clarify()
+    replies = [
+        {"tool": "propose", "rules_text": [_text(ep)]},  # args flattened, as the live model did
+        {"tool": "abstain", "reason": "stop", "turn": 1},  # plus a stray key
+    ]
+    status, log, turns, _ = _run(tmp_path, ep, replies)
+    assert status == "abstained"
+    assert not any(t.get("parse_failure") for t in turns)
+    assert turns[0]["result"].startswith("P1: fits")
+
+
+def test_re_proposing_a_fitting_program_points_to_preview(tmp_path):
+    ep = _clarify()
+    p = {"tool": "propose", "args": {"rules_text": [_text(ep)]}}
+    status, log, turns, _ = _run(tmp_path, ep, [p, p, {"tool": "abstain", "args": {"reason": "x"}}])
+    assert "already" in turns[1]["result"] and "preview" in turns[1]["result"]
+
+
+def test_prompt_states_the_preview_then_commit_path_and_the_boolean_words():
+    text = build_prompt()
+    assert "preview" in text and "then commit" in text
+    assert "`and`, `or`, `not`" in text and "&&" in text

@@ -948,12 +948,15 @@ def eval_manifest(
     ceiling_usd: Optional[float] = typer.Option(
         None, "--ceiling-usd", help="the run cap the owner agreed to (default: 2x the estimate)"
     ),
+    systems: str = typer.Option("A,B", "--systems", help="calibration systems"),
+    note: str = typer.Option("", "--note", help="what this calibration is for"),
 ) -> None:
     """Write the priced calibration manifest and the (unapproved) funded-tier manifest to docs/evaluation/manifests/."""
     from open_apprentice.evaluation.battery_v2 import REPO
     from open_apprentice.evaluation.manifests_v2 import (
         BUDGET_ROOT,
         calibration_manifest,
+        calibration_note,
         funded_manifest,
         measured_call_usd,
     )
@@ -974,7 +977,10 @@ def eval_manifest(
         budget["reserve_usd"],
         call_usd,
         ceiling_usd,
+        systems=tuple(x.strip() for x in systems.split(",") if x.strip()),
     )
+    if note:
+        cal = calibration_note(cal, note)
     # spec 7 T3: D on 8 clarification-required episodes
     fund = funded_manifest(len(final["episodes"]), 8, tokens, budget["reserve_usd"], call_usd)
     out = REPO / "docs/evaluation/manifests"
