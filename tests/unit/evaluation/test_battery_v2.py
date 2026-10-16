@@ -16,9 +16,19 @@ from open_apprentice.evaluation.battery_v2 import (
 from open_apprentice.evaluation.label_episodes import consistent_classes
 
 
+TEST_FINAL_BASE = (
+    170_000  # a stand-in: the real final seed base is drawn at freeze time and kept private
+)
+
+
 @lru_cache(maxsize=None)
 def _battery(split):
-    return tuple(build_battery(split))
+    return tuple(build_battery(split, TEST_FINAL_BASE if split == "final" else None))
+
+
+def test_the_final_split_cannot_be_rebuilt_without_its_private_seed_base():
+    with pytest.raises(ValueError, match="seed base"):
+        build_battery("final")
 
 
 def _demos(ep):

@@ -49,7 +49,6 @@ BATTERY_DIRS = {
     "dev": REPO / "benchmarks/development/battery",
     "final": REPO / "benchmarks/final/battery",
 }
-FINAL_HASHES = REPO / "docs/evaluation/battery_final.hashes.json"
 WALL_S = 300
 FORBIDDEN_ENV = ("benchmarks/final", ".private.json")
 
@@ -396,10 +395,9 @@ def run_battery(
 ) -> Path:
     if mode != "mock":
         raise PermissionError("live runs start only through the approved-manifest gate")
-    expected = None
     if split == "final":
-        expected = json.loads(FINAL_HASHES.read_text())["hashes"]
-    eps = load_split(battery_dir or BATTERY_DIRS[split], expected)
+        raise PermissionError("the final split runs only as the gated live run, once")
+    eps = load_split(battery_dir or BATTERY_DIRS[split])
     if episodes:
         eps = [e for e in eps if e.id in set(episodes)]
     run_id = run_id or f"{split}-{mode}-{time.strftime('%Y%m%dT%H%M%S')}"

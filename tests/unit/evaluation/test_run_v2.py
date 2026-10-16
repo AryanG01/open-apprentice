@@ -185,3 +185,8 @@ def test_boundary_refusals_and_loaded_evaluator_modules_are_release_blocking():
     for o in (refused, loaded):
         s = score(ep, o)
         assert s["terminal_outcome"] == "error" and "boundary_violation" in s["release_blocking"]
+
+
+def test_the_final_split_is_refused_outside_the_gated_live_run(tmp_path):
+    with pytest.raises(PermissionError, match="final"):
+        run_battery("final", ["C"], repeats=1, mode="mock", out_root=tmp_path)

@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+import secrets
 import subprocess
 from dataclasses import dataclass, field
 from fractions import Fraction as F
@@ -26,7 +27,9 @@ from open_apprentice.teaching.scope import members
 GENERATOR_VERSION = "battery-v2.2"
 SCORING_VERSION = "score-v2.1"
 TOLERANCE = F(1, 2)
-SEED_BASE = {"dev": 110_000, "final": 170_000}
+SEED_BASE = {
+    "dev": 110_000
+}  # the final base is drawn at freeze time and recorded only in the private manifest
 ATTEMPTS = 900
 REPO = Path(__file__).resolve().parents[3]
 REAL_FILES = {  # docs/corpus/drawio_provenance.md
@@ -337,10 +340,14 @@ def _opaque(split: str, seed: int) -> str:
     return "e" + hashlib.sha256(f"oa-battery/{split}/{seed}".encode()).hexdigest()[:10]
 
 
-def build_battery(split: str) -> list[Episode]:
+def build_battery(split: str, seed_base: Optional[int] = None) -> list[Episode]:
+    if seed_base is None:
+        if split != "dev":
+            raise ValueError("the final split needs its private seed base (drawn at freeze time)")
+        seed_base = SEED_BASE["dev"]
     out = []
     for i, (stratum, variant) in enumerate(PLAN[split]):
-        seed = SEED_BASE[split] + i
+        seed = seed_base + i
         for attempt in range(ATTEMPTS):
             g = _Gen(seed, attempt)
             try:
@@ -495,10 +502,10 @@ def _commit() -> str:
         return "unknown"
 
 
-def real_file_episodes(drawio_dir: Path) -> list[dict]:
+def real_file_episodes(drawio_dir: Path, seed_base: int) -> list[dict]:
     """Three final real-file episodes. Only the files' bytes are hashed here (checked against the provenance record);
     their contents are not parsed until the final run."""
-    rng = random.Random(SEED_BASE["final"] + 900)
+    rng = random.Random(seed_base + 900)
     out = []
     for name, want in REAL_FILES.items():
         got = _sha((drawio_dir / f"{name}.drawio").read_bytes())
@@ -515,13 +522,18 @@ def real_file_episodes(drawio_dir: Path) -> list[dict]:
     return out
 
 
-def freeze(split: str, out_dir: Path, drawio_dir: Optional[Path] = None) -> dict[str, str]:
+def freeze(
+    split: str, out_dir: Path, drawio_dir: Optional[Path] = None, seed_base: Optional[int] = None
+) -> dict[str, str]:
     out_dir = Path(out_dir)
+    if seed_base is None:
+        # final: a secret base far above the development seeds, so the episodes cannot be regenerated from the code
+        seed_base = SEED_BASE["dev"] if split == "dev" else 10**8 + secrets.randbelow(9 * 10**8)
     (out_dir / "episodes").mkdir(parents=True, exist_ok=True)
     (out_dir / "learner").mkdir(parents=True, exist_ok=True)
     files: dict[str, str] = {}
     entries = []
-    for ep in build_battery(split):
+    for ep in build_battery(split, seed_base):
         for rel, obj in (
             (f"episodes/{ep.id}.private.json", episode_to_json(ep)),
             (f"learner/{ep.id}.json", learner_view(ep)),
@@ -545,11 +557,11 @@ def freeze(split: str, out_dir: Path, drawio_dir: Optional[Path] = None) -> dict
         "scoring_version": SCORING_VERSION,
         "tolerance": "1/2",
         "code_commit": _commit(),
-        "seed_base": SEED_BASE[split],
+        "seed_base": seed_base,
         "episodes": entries,
         "files": files,
         "real_files": (
-            real_file_episodes(drawio_dir or REPO / "benchmarks/final/drawio")
+            real_file_episodes(drawio_dir or REPO / "benchmarks/final/drawio", seed_base)
             if split == "final"
             else []
         ),
