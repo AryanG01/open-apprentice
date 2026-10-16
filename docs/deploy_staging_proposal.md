@@ -1,10 +1,10 @@
-# Staging proposal (NOT created — needs the owner's approval)
+# Staging proposal (approved and created 2026-10-16 — results: `docs/staging_results.md`)
 
 **Purpose (spec §10, early staging integration).** Prove the deployed environment before the product depends on it. Each check
 is one `oa staging-check` invocation run inside the staging image (Cloud Run job below), printing one JSON line per check:
 1. **Render and measure** one supported draw.io diagram with the pinned viewer and the bundled font in Cloud Run's Chromium:
    `oa staging-check --file samples/drawio/d1.drawio --only render`; the job's command starts the engine first
-   (`sh -c 'node services/engine/src/server.js & sleep 5; oa staging-check …'`, `ENGINE_URL=http://127.0.0.1:8090`).
+   (`sh -c 'PORT=8090 HOST=127.0.0.1 node services/engine/src/server.js & …; oa staging-check …'` — the image's `PORT=8000` is the API's — `ENGINE_URL=http://127.0.0.1:8090`).
 2. **GCS conditional update with a deliberately lost race:** `OA_STORE=gcs oa staging-check --only race`
    (two writers on one generation; pass = exactly one winner and one precondition failure).
 3. **Restart survival:** `oa staging-check --only survival --phase write`, then force a new revision
@@ -52,7 +52,7 @@ gcloud run services add-iam-policy-binding open-apprentice-staging --project $P 
   --member serviceAccount:$SA --role roles/run.invoker  # before any job runs: the service refuses unauthenticated delivery
 gcloud run jobs create oa-staging-check --project $P --region $R --image us-central1-docker.pkg.dev/$P/oa/demo:latest \
   --service-account oa-staging-worker@$P.iam.gserviceaccount.com --max-retries 0 --memory 1Gi --command sh \
-  --args=-c,'node services/engine/src/server.js & sleep 5; exec oa staging-check --file samples/drawio/d1.drawio' \
+  --args=-c,'PORT=8090 HOST=127.0.0.1 node services/engine/src/server.js & sleep 10; exec oa staging-check --file samples/drawio/d1.drawio' \
   --set-env-vars OA_STORE=gcs,OA_BUCKET=$B,PROVIDER_MODE=mock,ENGINE_URL=http://127.0.0.1:8090
 gcloud run jobs update oa-staging-check --project $P --region $R --update-env-vars "$TASKS"
 gcloud run jobs execute oa-staging-check --project $P --region $R --wait   # race + survival(write) + tasks + render

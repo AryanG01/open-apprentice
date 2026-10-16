@@ -60,7 +60,7 @@ Updated at the end of Plan 4B (branch `p4b-tasks-probes`).
 | 8 | Provenance per session, run, skill; live-unavailable wording | `v2/provenance.ts`, `Teach.tsx` | implemented (no recorded v2 example exists yet; the message links to the prototype's replay and says so) | journey steps 4 and 8 |
 | 8 | "Earlier prototype" tab keeps the badge flow unchanged | `App.tsx` | implemented | `tests/e2e/ui.test.mjs` (9 tests) |
 | 9 B | Property and state-sequence tests | `tests/unit/teaching/test_stateful.py` (event log, ledger, versions; Hypothesis `ci` profile, derandomized) | implemented | mutation check: removing the activation generation check fails `TestVersions` |
-| 10 | Staging and release deployment | `storage/gcs.py` (store contract over GCS, fake-bucket contract test); `docs/deploy_staging_proposal.md`, `oa staging-check` (race, survival, render, tasks) | staging: **proposed, not created** (needs owner approval); release: Plan 6 | `tests/unit/storage/test_store_contract.py`, `tests/unit/drawio/test_cli.py` |
+| 10 | Staging and release deployment | `storage/gcs.py` (store contract over GCS, fake-bucket contract test); `docs/deploy_staging_proposal.md`, `oa staging-check` (race, survival, render, tasks) | staging: **created and checked 2026-10-16** (render, GCS race, Cloud Tasks OIDC dispatch, restart survival, forged-call refusal: all pass, `docs/staging_results.md`); release: Plan 6 | `tests/unit/storage/test_store_contract.py`, `tests/unit/drawio/test_cli.py` |
 
 ## Deviations
 1. `.drawio` native format instead of SVG (spec 13.1). Recorded in the spec.
