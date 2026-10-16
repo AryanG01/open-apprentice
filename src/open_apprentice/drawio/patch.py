@@ -88,3 +88,60 @@ def apply_edits(f: DrawioFile, page_index: int, edits: list[Edit], source_hash: 
     if len(out) > MAX_UPLOAD:
         raise DrawioRefused("the edited file would exceed the 2 MB upload limit")
     return out
+
+
+GEOMETRY_ATTRS = {"x": "x", "y": "y", "w": "width", "h": "height"}
+
+
+def apply_geometry(
+    f: DrawioFile,
+    page_index: int,
+    cells: dict[str, dict[str, Fraction]],
+    page_width: Optional[Fraction],
+    source_hash: str,
+) -> tuple[bytes, dict[str, dict[str, int]]]:
+    """Set node geometry (x, y, w, h) and optionally the page width, for generated probe documents. Values are serialized in
+    whole units, half up, like label targets; the serialized values are returned for the renderer's geometry check.
+    """
+    if f.doc_hash != source_hash:
+        raise DrawioRefused("the document changed since it was measured; measure it again")
+    page = f.pages[page_index]
+    by_id = {c.id: c for c in page.cells}
+    reps: list[tuple[int, int, bytes]] = []
+    serialized: dict[str, dict[str, int]] = {}
+    for cid, attrs in sorted(cells.items()):
+        c = by_id.get(cid)
+        if c is None or c.geometry_span is None:
+            raise DrawioRefused(f"cell {cid!r} has no geometry to edit")
+        s, t = c.geometry_span
+        tag = page.xml[s:t].decode("utf-8")
+        for k, v in sorted(attrs.items()):
+            n = round_half_up(v)
+            tag = _set_attr(tag, GEOMETRY_ATTRS[k], n)
+            serialized.setdefault(cid, {})[k] = n
+        reps.append((s, t, tag.encode("utf-8")))
+    if page_width is not None:
+        end = page.xml.index(b">") + 1
+        tag = page.xml[:end].decode("utf-8")
+        pat = re.compile(r'(\spageWidth=")[^"]*(")')
+        new = (
+            pat.sub(lambda m: f"{m.group(1)}{round_half_up(page_width)}{m.group(2)}", tag, count=1)
+            if pat.search(tag)
+            else tag.replace(
+                "<mxGraphModel", f'<mxGraphModel pageWidth="{round_half_up(page_width)}"', 1
+            )
+        )
+        reps.append((0, end, new.encode("utf-8")))
+    xml = page.xml
+    for s, t, new_b in sorted(reps, reverse=True):
+        xml = xml[:s] + new_b + xml[t:]
+    s0, e0 = page.content_span
+    if page.compressed:
+        out = f.raw[:s0] + xml + f.raw[e0:]
+    else:
+        out = f.raw
+        for s, t, new_b in sorted(reps, reverse=True):
+            out = out[: s0 + s] + new_b + out[s0 + t :]
+    if len(out) > MAX_UPLOAD:
+        raise DrawioRefused("the edited file would exceed the 2 MB upload limit")
+    return out, serialized
