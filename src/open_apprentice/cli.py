@@ -863,6 +863,40 @@ def eval_freeze(
     typer.echo(json.dumps({"split": split, "out": str(target), "hashes": freeze(split, target)}))
 
 
+@eval_app.command("run")
+def eval_run(
+    split: str = typer.Option(..., "--split", help="dev | final"),
+    systems: str = typer.Option("A,B,C,D", "--systems"),
+    repeats: int = typer.Option(1, "--repeats"),
+    mode: str = typer.Option("mock", "--mode", help="mock | live"),
+    episodes: Optional[str] = typer.Option(None, "--episodes", help="comma-separated episode ids"),
+    out: Optional[Path] = typer.Option(None, "--out", help="default: results/eval_v2"),
+    seed: int = typer.Option(0, "--seed"),
+) -> None:
+    """Run a frozen battery split (verified against its hashes first) and write rows.jsonl + manifest.json."""
+    from open_apprentice.evaluation.battery_v2 import REPO
+    from open_apprentice.evaluation.run_v2 import run_battery
+
+    if split not in ("dev", "final") or mode not in ("mock", "live"):
+        raise typer.BadParameter("split is dev or final; mode is mock or live")
+    if mode == "live":
+        typer.echo("oa eval run --mode live: refused (no approved manifest gate yet)", err=True)
+        raise typer.Exit(2)
+    names = [s.strip() for s in systems.split(",") if s.strip()]
+    if not names or set(names) - {"A", "B", "C", "D"}:
+        raise typer.BadParameter("systems are a comma-separated subset of A,B,C,D")
+    run_dir = run_battery(
+        split,
+        names,
+        repeats,
+        mode,
+        out_root=out or REPO / "results/eval_v2",
+        episodes=[e for e in (episodes or "").split(",") if e] or None,
+        seed=seed,
+    )
+    typer.echo(json.dumps({"run_dir": str(run_dir)}))
+
+
 @app.command("staging-check")
 def staging_check(
     file: Optional[Path] = None,
