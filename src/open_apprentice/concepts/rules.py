@@ -324,11 +324,23 @@ class _Run:
             self.state[t.id].update(vals)
 
 
-def evaluate_rule(body: list, objects: list[dict], canvas: dict) -> dict[str, dict[str, Fraction]]:
-    """Run a rule on concrete rational geometry. Validates first."""
+def evaluate_rule_counted(
+    body: list, objects: list[dict], canvas: dict
+) -> tuple[dict[str, dict[str, Fraction]], int]:
+    """Run a rule and report how many statements it executed (the probe search's evaluation budget). A RuleError raised
+    while running carries `.steps`, the statements executed before the failure."""
     validate_rule(body)
     if not 1 <= len(objects) <= MAX_OBJECTS:
         raise RuleError("object count out of range")
     run = _Run([to_obj(o) for o in objects], canvas)
-    run.block(body)
-    return run.state
+    try:
+        run.block(body)
+    except RuleError as e:
+        e.steps = run.steps  # type: ignore[attr-defined]
+        raise
+    return run.state, run.steps
+
+
+def evaluate_rule(body: list, objects: list[dict], canvas: dict) -> dict[str, dict[str, Fraction]]:
+    """Run a rule on concrete rational geometry. Validates first."""
+    return evaluate_rule_counted(body, objects, canvas)[0]

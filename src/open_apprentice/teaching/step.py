@@ -9,7 +9,12 @@ from typing import Optional, Union
 
 from open_apprentice.concepts.hypotheses import fits
 from open_apprentice.concepts.label_teaching import magic_condition
-from open_apprentice.concepts.rules import RuleError, evaluate_rule, validate_rule
+from open_apprentice.concepts.rules import (
+    RuleError,
+    evaluate_rule,
+    evaluate_rule_counted,
+    validate_rule,
+)
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.constraints import Evidence, derive
 from open_apprentice.teaching.events import Event
@@ -92,16 +97,22 @@ def _aid(events: list[Event], kind: str) -> str:
     return codec.digest({"kind": kind, "head": head, "n": len(events)})[:24]
 
 
-def run_output(rule: list, scene: dict) -> Optional[Output]:
+def run_output_counted(rule: list, scene: dict) -> tuple[Optional[Output], int]:
+    """The label output and the statements it cost (statements run before a failure still count)."""
     try:
-        st = evaluate_rule(rule, scene["objects"], scene["canvas"])
-    except RuleError:
-        return None
-    return {
+        st, steps = evaluate_rule_counted(rule, scene["objects"], scene["canvas"])
+    except RuleError as e:
+        return None, int(getattr(e, "steps", 0))
+    out = {
         o["id"]: (st[o["id"]]["x"], st[o["id"]]["y"])
         for o in scene["objects"]
         if o["kind"] == "label"
     }
+    return out, steps
+
+
+def run_output(rule: list, scene: dict) -> Optional[Output]:
+    return run_output_counted(rule, scene)[0]
 
 
 def _forbidden_effect(rule: list, scene: dict) -> bool:
