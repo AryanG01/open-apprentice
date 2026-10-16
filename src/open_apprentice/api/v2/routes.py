@@ -12,6 +12,7 @@ import threading
 from open_apprentice.api.v2 import identity, records, service, tasks
 from open_apprentice.api.v2.context import V2
 from open_apprentice.drawio.parse import MAX_UPLOAD, DrawioRefused
+from open_apprentice.storage.store import PreconditionFailed
 
 router = APIRouter(prefix="/api/v2")
 router_internal = APIRouter()
@@ -356,50 +357,61 @@ def _key_lock(key: str) -> threading.Lock:
         return _task_locks.setdefault(key, threading.Lock())
 
 
+TASK_LEASE_S = (
+    15 * 60
+)  # longer than a Cloud Run request may last; an older "running" claim belongs to a dead delivery
+
+
 @router_internal.post("/internal/tasks/{task_id}")
-def post_internal_task(
-    task_id: str, request: Request, body: dict = Body(default={})
-) -> JSONResponse:
+async def post_internal_task(task_id: str, request: Request) -> JSONResponse:
+    import json as _json
+    import time
+
+    from starlette.concurrency import run_in_threadpool
+
     v = getattr(request.app.state, "v2", None)
     auth = getattr(v, "internal_tasks", None)
     if v is None or auth is None:
         return _error(404, "NOT_FOUND", "not found")
     try:
-        auth.verify(request.headers.get("authorization"))
+        auth.verify(request.headers.get("authorization"))  # before reading anything the caller sent
     except tasks.Forbidden as e:
         return _error(403, "FORBIDDEN", str(e))
     if not task_id.isalnum() or len(task_id) > 64:
         return _error(400, "BAD_REQUEST", "bad task id")
-    key = f"tasks/{task_id}.json"
     try:
-        job = tasks.job_from_json(body)
+        job = tasks.job_from_json(_json.loads(await request.body() or b"{}"))
     except ValueError as e:
         return _error(400, "BAD_REQUEST", str(e))
-    if not v.store.create(key, records.dumps({"state": "running"})):
-        return JSONResponse(_task_state(v, key))  # duplicate delivery: report, never re-run
-    with _key_lock(job.key):
+    key = f"tasks/{task_id}.json"
+    claim = records.dumps({"state": "running", "at": int(time.time())})
+    if not v.store.create(key, claim):
+        b = v.store.get(key)
+        d = _json.loads(b.data) if b else {}
+        if d.get("state") != "running":
+            return JSONResponse(d)  # done or failed: duplicate delivery reports, never re-runs
+        if time.time() - int(d.get("at", 0)) < TASK_LEASE_S:
+            return _error(
+                503, "IN_PROGRESS", "this task is running in another delivery"
+            )  # Cloud Tasks retries non-2xx
         try:
-            service.run_job(v, job)
-            state: dict = {"state": "done"}
-        except (
-            Exception
-        ) as e:  # recorded, so Cloud Tasks does not retry a job whose failure is known
-            state = {"state": "failed", "reason": f"{type(e).__name__}: {e}"[:300]}
+            v.store.put(
+                key, claim, if_generation=b.generation if b else None
+            )  # take over a dead delivery's lease
+        except PreconditionFailed:
+            return _error(503, "IN_PROGRESS", "another delivery took this task over")
+
+    def run() -> dict:
+        with _key_lock(job.key):
+            try:
+                service.run_job(v, job)
+                return {"state": "done"}
+            except (
+                Exception
+            ) as e:  # recorded, so Cloud Tasks does not retry a job whose failure is known
+                return {"state": "failed", "reason": f"{type(e).__name__}: {e}"[:300]}
+
+    state = await run_in_threadpool(run)
     b = v.store.get(key)
     v.store.put(key, records.dumps(state), if_generation=b.generation if b else None)
     return JSONResponse(state)
-
-
-def _task_state(v: V2, key: str) -> dict:
-    import json
-    import time
-
-    for _ in range(
-        600
-    ):  # a concurrent first delivery is still running: wait for its outcome (≤ 60 s)
-        b = v.store.get(key)
-        d = json.loads(b.data) if b else {"state": "unknown"}
-        if d.get("state") != "running":
-            return d
-        time.sleep(0.1)
-    return {"state": "running"}

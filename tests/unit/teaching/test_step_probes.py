@@ -151,3 +151,20 @@ def test_probes_off_keeps_the_old_behaviour():
             {"action_id": a.action_id, "usage": {}, "candidates": []},
             "model",
         )
+
+
+def test_spent_question_budget_with_separable_rules_abstains_not_previews_or_commits():
+    # the batch documents cannot separate the rules, a probe could, but no question may be asked any more (spec 4 rule 5)
+    cfg = StepConfig(probes=True, max_choose=0)
+    log = started()
+    for _ in range(4):
+        a = step(log.evs, cfg)
+        if not hasattr(a, "round_kind"):
+            break
+        issue_proposal(log, a)
+        log.add(
+            "ModelProposalReturned",
+            {"action_id": a.action_id, "usage": {}, "candidates": []},
+            "model",
+        )
+    assert isinstance(a, Abstain) and a.reason == "unresolved disagreement", a

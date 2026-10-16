@@ -331,7 +331,7 @@ def step(events: list[Event], config: StepConfig) -> Action:
         aid = _aid(events, "AskTeacher")
         return AskTeacher(aid, ChooseOutput(f"q-{aid}", sid, ev.scene_hashes[sid], alts))
     # rule 3, generated probes: when no registered document separates the rules (spec 4)
-    if len(cands) >= 2 and config.probes and len(chooses) < config.max_choose:
+    if len(cands) >= 2 and config.probes:
         tried = {e.payload["probe_id"] for e in events if e.type == "ProbeRendered"}
         fresh = [
             p
@@ -340,6 +340,9 @@ def step(events: list[Event], config: StepConfig) -> Action:
         ]
         found = search(fresh, cands, config.max_evaluations)
         if found.best is not None:
+            if len(chooses) >= config.max_choose:
+                # a question would separate the rules but none may be asked: never commit over a known disagreement
+                return Abstain(_aid(events, "Abstain"), "unresolved disagreement")
             return RenderProbe(_aid(events, "RenderProbe"), found.best)
         if found.outcome in ("budget_exhausted", "candidates_failed_on_inputs"):
             # never "one behaviour": the search did not complete, so nothing may be committed

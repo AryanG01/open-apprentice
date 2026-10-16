@@ -106,7 +106,9 @@ def test_concurrent_deliveries_run_once(client, tasks_on, monkeypatch):
         t.start()
     for t in threads:
         t.join()
-    assert len(runs) == 1 and results == [200] * 4
+    assert (
+        len(runs) == 1 and set(results) <= {200, 503} and 200 in results
+    )  # in-flight duplicates are told to retry
 
 
 def test_a_failing_job_is_recorded_and_not_retried(client, tasks_on):
@@ -118,3 +120,36 @@ def test_a_failing_job_is_recorded_and_not_retried(client, tasks_on):
 
 def test_route_is_absent_unless_cloud_tasks_is_configured(client):
     assert ping(client).status_code == 404
+
+
+def test_a_task_whose_delivery_died_is_taken_over_after_its_lease(client, tasks_on):
+    import time
+
+    from open_apprentice.api.v2 import records
+
+    tasks_on.store.create(
+        "tasks/t9.json", records.dumps({"state": "running", "at": int(time.time()) - 3600})
+    )
+    r = ping(client, "t9")
+    assert r.status_code == 200 and r.json() == {"state": "done"}
+    assert tasks_on.store.get("staging/ping-1") is not None
+
+
+def test_a_task_still_running_elsewhere_is_not_acknowledged(client, tasks_on):
+    import time
+
+    from open_apprentice.api.v2 import records
+
+    tasks_on.store.create(
+        "tasks/t8.json", records.dumps({"state": "running", "at": int(time.time())})
+    )
+    r = ping(client, "t8")
+    assert r.status_code == 503  # Cloud Tasks retries a non-2xx; a 200 would drop the job for good
+    assert tasks_on.store.get("staging/ping-1") is None
+
+
+def test_forged_call_with_a_non_object_body_is_still_403(client, tasks_on):
+    r = client.post(
+        "/internal/tasks/t7", content=b"[1,2]", headers={"content-type": "application/json"}
+    )
+    assert r.status_code == 403

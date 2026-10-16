@@ -13,8 +13,9 @@ is one `oa staging-check` invocation run inside the staging image (Cloud Run job
 4. **Authenticated Cloud Tasks dispatch:** with the service in Cloud Tasks mode, `oa staging-check --only tasks` (run as the job
    below, same env) enqueues a `ping` job; Cloud Tasks delivers it to `POST /internal/tasks/{id}` on the staging service with an
    OIDC token for `oa-staging-worker`; the route verifies audience and service account, runs the job, and the check sees the
-   `staging/ping-…` object appear in the bucket (≤ 60 s). A request without that token is refused with 403 (unit-tested; checked
-   once by hand with `curl` against the staging URL).
+   `staging/ping-…` object appear in the bucket (≤ 60 s). A request without a valid token from that service account is refused with 403 by the app (unit-tested). To
+   check it on staging (to do once, after approval): send an identity token from a *different* principal that has invoker
+   rights (an unauthenticated `curl` is stopped by Cloud Run IAM before it reaches the app) and expect 403.
 
 ## Resources (project `oa-demo-1013-19737`, region `us-central1`)
 
@@ -47,6 +48,8 @@ TASKS="OA_DISPATCH=cloudtasks,OA_TASKS_QUEUE=projects/$P/locations/$R/queues/oa-
 gcloud run services update open-apprentice-staging --project $P --region $R --update-env-vars "$TASKS"
 gcloud tasks queues add-iam-policy-binding oa-staging --project $P --location $R --member serviceAccount:$SA --role roles/cloudtasks.enqueuer
 gcloud iam service-accounts add-iam-policy-binding $SA --project $P --member serviceAccount:$SA --role roles/iam.serviceAccountUser  # mint OIDC tokens for itself
+gcloud run services add-iam-policy-binding open-apprentice-staging --project $P --region $R \
+  --member serviceAccount:$SA --role roles/run.invoker  # before any job runs: the service refuses unauthenticated delivery
 gcloud run jobs create oa-staging-check --project $P --region $R --image us-central1-docker.pkg.dev/$P/oa/demo:latest \
   --service-account oa-staging-worker@$P.iam.gserviceaccount.com --max-retries 0 --memory 1Gi --command sh \
   --args=-c,'node services/engine/src/server.js & sleep 5; exec oa staging-check --file samples/drawio/d1.drawio' \
@@ -57,8 +60,6 @@ gcloud run jobs execute oa-staging-check --project $P --region $R --wait   # rac
 gcloud run jobs update oa-staging-check --project $P --region $R --update-env-vars OA_RESTART=1 \
   --args=-c,'exec oa staging-check --only survival --phase read'
 gcloud run jobs execute oa-staging-check --project $P --region $R --wait
-gcloud run services add-iam-policy-binding open-apprentice-staging --project $P --region $R \
-  --member serviceAccount:oa-staging-worker@$P.iam.gserviceaccount.com --role roles/run.invoker
 ```
 
 ## Teardown
