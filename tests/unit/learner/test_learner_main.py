@@ -114,3 +114,13 @@ def test_system_c_commits_a_catalogue_program_on_an_identifiable_episode(tmp_pat
         if e["type"] == "ModelProposalReturned"
     }
     assert sources == {"catalogue"}
+
+
+def test_system_d_runs_a_policy_with_uniform_questions(tmp_path):
+    ep = _ep(lambda e: e.stratum == "sequential" and e.clarification_required)
+    o, r = run_learner(tmp_path, ep, system="D")
+    assert o["system"] == "D" and o["status"] in ("committed", "abstained"), (
+        o["reason"],
+        r.stderr[-1500:],
+    )
+    assert o["question_selection"] == "uniform"

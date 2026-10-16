@@ -208,7 +208,14 @@ def system_c(ctx: Context) -> None:
     system_a(ctx, proposer=CatalogueProposer())
 
 
-SYSTEMS: dict[str, Callable[[Context], None]] = {"A": system_a, "C": system_c}
+def system_d(ctx: Context) -> None:
+    from open_apprentice.teaching.step import StepConfig
+
+    ctx.result["question_selection"] = "uniform"
+    system_a(ctx, config=StepConfig(probes=True, question_selection="uniform", seed=ctx.seed))
+
+
+SYSTEMS: dict[str, Callable[[Context], None]] = {"A": system_a, "C": system_c, "D": system_d}
 
 
 def _terminal_reason(ctx: Context) -> Optional[str]:

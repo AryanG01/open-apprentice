@@ -40,6 +40,8 @@ class StepConfig:
     max_evaluations: int = 5_000_000
     probes: bool = False  # generated probes need a renderer; the API turns them on
     max_probes: int = 128
+    question_selection: str = "best"  # "uniform": the system D ablation
+    seed: int = 0
 
 
 @dataclass(frozen=True)
@@ -237,6 +239,11 @@ def _selected(cands: list[dict]) -> dict:
     return min(cands, key=lambda c: (len(codec.dumps(c["rule"])), c["hash"]))
 
 
+def _uniform_pick(config: StepConfig, events: list[Event], n: int) -> int:
+    """System D: one of A's legal questions, uniformly, reproducibly from the manifest seed and the log length."""
+    return int(codec.digest([config.seed, len(events)]), 16) % n
+
+
 def step(events: list[Event], config: StepConfig) -> Action:
     issued: dict[str, dict] = {}
     resolved: set[str] = set()
@@ -307,6 +314,7 @@ def step(events: list[Event], config: StepConfig) -> Action:
     ]
     asked_scenes = {q.scene_id for q in chooses if isinstance(q, ChooseOutput)}
     best: Optional[tuple[tuple[int, int], str, list[tuple[Output, list[dict]]]]] = None
+    usable: list[tuple[tuple[int, int], str, list[tuple[Output, list[dict]]]]] = []
     disagreement_found = False
     if len(cands) >= 2:
         probe_scenes = sorted(sid for sid, r in ev.roles.items() if r == "probe")
@@ -321,8 +329,11 @@ def step(events: list[Event], config: StepConfig) -> Action:
             if not _usable(groups) or sid in asked_scenes:
                 continue
             score = (-_separated_pairs(groups, len(cands)), i)
+            usable.append((score, sid, groups))
             if best is None or score < best[0]:
                 best = (score, sid, groups)
+    if best is not None and config.question_selection == "uniform":
+        best = usable[_uniform_pick(config, events, len(usable))]
     if best is not None:
         if len(chooses) >= config.max_choose:
             return Abstain(_aid(events, "Abstain"), "unresolved disagreement")
@@ -343,7 +354,12 @@ def step(events: list[Event], config: StepConfig) -> Action:
             if len(chooses) >= config.max_choose:
                 # a question would separate the rules but none may be asked: never commit over a known disagreement
                 return Abstain(_aid(events, "Abstain"), "unresolved disagreement")
-            return RenderProbe(_aid(events, "RenderProbe"), found.best)
+            pick = found.best
+            if config.question_selection == "uniform":
+                # ponytail: re-groups every fresh probe outside the round's statement budget; fine at <=128 probes
+                legal = [p for p in fresh if _usable(_groups(cands, p.scene))] or [found.best]
+                pick = legal[_uniform_pick(config, events, len(legal))]
+            return RenderProbe(_aid(events, "RenderProbe"), pick)
         if found.outcome in ("budget_exhausted", "candidates_failed_on_inputs"):
             # never "one behaviour": the search did not complete, so nothing may be committed
             return Abstain(_aid(events, "Abstain"), f"search did not complete ({found.outcome})")
