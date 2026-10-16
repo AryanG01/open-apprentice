@@ -102,3 +102,15 @@ def test_a_sequential_episode_runs_learning_then_the_correction(tmp_path):
             "error",
             "activation_rejected",
         ), o["correction"]
+
+
+def test_system_c_commits_a_catalogue_program_on_an_identifiable_episode(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue" and not e.clarification_required)
+    o, r = run_learner(tmp_path, ep, system="C")
+    assert o["system"] == "C" and o["status"] == "committed", (o["reason"], r.stderr[-1500:])
+    sources = {
+        e["payload"]["usage"].get("source")
+        for e in o["events"]
+        if e["type"] == "ModelProposalReturned"
+    }
+    assert sources == {"catalogue"}

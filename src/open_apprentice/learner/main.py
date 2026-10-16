@@ -202,7 +202,13 @@ def system_a(ctx: Context, proposer: Any = None, config: Any = None) -> None:
             run_correction(ctx, proposer)
 
 
-SYSTEMS: dict[str, Callable[[Context], None]] = {"A": system_a}
+def system_c(ctx: Context) -> None:
+    from open_apprentice.concepts.catalogue_programs import CatalogueProposer
+
+    system_a(ctx, proposer=CatalogueProposer())
+
+
+SYSTEMS: dict[str, Callable[[Context], None]] = {"A": system_a, "C": system_c}
 
 
 def _terminal_reason(ctx: Context) -> Optional[str]:
