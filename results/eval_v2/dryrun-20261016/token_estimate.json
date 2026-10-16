@@ -2,27 +2,27 @@
  "per_system": {
   "A": {
    "episodes": 18,
-   "attempts_mean": 2.4444444444444446,
-   "tokens_per_episode": 11328,
-   "tokens_per_episode_max": 21694
+   "attempts_mean": 2.3333333333333335,
+   "tokens_per_episode": 10719,
+   "tokens_per_episode_max": 20554
   },
   "B": {
    "episodes": 18,
    "attempts_mean": 2.611111111111111,
-   "tokens_per_episode": 18486,
-   "tokens_per_episode_max": 37634
+   "tokens_per_episode": 18353,
+   "tokens_per_episode_max": 34493
   },
   "C": {
    "episodes": 18,
    "attempts_mean": 2.4444444444444446,
-   "tokens_per_episode": 11542,
+   "tokens_per_episode": 11430,
    "tokens_per_episode_max": 22692
   },
   "D": {
    "episodes": 18,
-   "attempts_mean": 2.4444444444444446,
-   "tokens_per_episode": 11328,
-   "tokens_per_episode_max": 21694
+   "attempts_mean": 2.3333333333333335,
+   "tokens_per_episode": 10719,
+   "tokens_per_episode_max": 20554
   }
  },
  "completion_assumed_per_attempt": 2000

@@ -15,12 +15,12 @@ Split `dev`, mode `mock`, systems A, B, C, D.
 
 **learning success** (fixture, not a model result)
 
-- A: 2/8 runs
-- B: 2/8 runs
+- A: 4/8 runs
+- B: 4/8 runs
 - C: 4/8 runs
-- D: 2/8 runs
+- D: 4/8 runs
 - A − B: mean episode difference +0.000, 95% bootstrap [+0.000, +0.000], 8 episodes; sign test +0 / −0 / ties 8, p = 1.0000
-- A − C: mean episode difference -0.250, 95% bootstrap [-0.625, +0.000], 8 episodes; sign test +0 / −2 / ties 6, p = 0.5000
+- A − C: mean episode difference +0.000, 95% bootstrap [+0.000, +0.000], 8 episodes; sign test +0 / −0 / ties 8, p = 1.0000
 - A − D: mean episode difference +0.000, 95% bootstrap [+0.000, +0.000], 8 episodes; sign test +0 / −0 / ties 8, p = 1.0000
 
 **correction success (end to end)** (fixture, not a model result)
@@ -33,6 +33,8 @@ Split `dev`, mode `mock`, systems A, B, C, D.
 - A − C: mean episode difference +0.000, 95% bootstrap [+0.000, +0.000], 6 episodes; sign test +0 / −0 / ties 6, p = 1.0000
 - A − D: mean episode difference +0.000, 95% bootstrap [+0.000, +0.000], 6 episodes; sign test +0 / −0 / ties 6, p = 1.0000
 
+Note: system B's correction cycle runs A's correction policy (the shared correction executor and scope proposer), so the correction endpoint for A − B reflects acquisition only; it is not a comparison of correction policies.
+
 Correction success given acquisition (denominator = runs that acquired the rule):
 - A: 5/6
 - B: 5/6
@@ -44,7 +46,7 @@ Correction success given acquisition (denominator = runs that acquired the rule)
 | stratum | A | B | C | D |
 |---|---|---|---|---|
 | beyond | 0/4 | 0/4 | 0/4 | 0/4 |
-| catalogue | 2/4 | 2/4 | 4/4 | 2/4 |
+| catalogue | 4/4 | 4/4 | 4/4 | 4/4 |
 | inconsistent | 2/2 | 2/2 | 2/2 | 2/2 |
 | sequential | 5/6 | 5/6 | 5/6 | 5/6 |
 | unsupported | 1/2 | 1/2 | 1/2 | 1/2 |
@@ -53,7 +55,7 @@ Correction success given acquisition (denominator = runs that acquired the rule)
 
 | spec_kind | A | B | C | D |
 |---|---|---|---|---|
-| catalogue | 10/14 | 10/14 | 12/14 | 10/14 |
+| catalogue | 12/14 | 12/14 | 12/14 | 12/14 |
 | fallback_chain | 0/1 | 0/1 | 0/1 | 0/1 |
 | gap_by_width | 0/1 | 0/1 | 0/1 | 0/1 |
 | role_sides | 0/1 | 0/1 | 0/1 | 0/1 |
@@ -61,10 +63,10 @@ Correction success given acquisition (denominator = runs that acquired the rule)
 
 ## Terminal outcomes
 
-- A: appropriate_refusal 3, correct_complete 7, unnecessary_abstention 7, wrong_commit 1
-- B: appropriate_refusal 3, correct_complete 7, unnecessary_abstention 7, wrong_commit 1
+- A: appropriate_refusal 3, correct_complete 9, unnecessary_abstention 5, wrong_commit 1
+- B: appropriate_refusal 3, correct_complete 9, unnecessary_abstention 5, wrong_commit 1
 - C: appropriate_refusal 3, correct_complete 9, unnecessary_abstention 5, wrong_commit 1
-- D: appropriate_refusal 3, correct_complete 7, unnecessary_abstention 7, wrong_commit 1
+- D: appropriate_refusal 3, correct_complete 9, unnecessary_abstention 5, wrong_commit 1
 
 ## Diagnostics (sums)
 
@@ -75,32 +77,34 @@ Correction success given acquisition (denominator = runs that acquired the rule)
 
 ## Cost per episode
 
-- A: mean $0.0000, mean tokens 0, mean wall 0.4 s
-- B: mean $0.0000, mean tokens 11377, mean wall 0.4 s
-- C: mean $0.0000, mean tokens 0, mean wall 0.8 s
-- D: mean $0.0000, mean tokens 0, mean wall 0.4 s
+- A: mean $0.0000, mean tokens 0, mean wall 0.3 s
+- B: mean $0.0000, mean tokens 11300, mean wall 0.4 s
+- C: mean $0.0000, mean tokens 0, mean wall 0.7 s
+- D: mean $0.0000, mean tokens 0, mean wall 0.3 s
 
 ## Repeat-to-repeat variation
 
-- A: r0 10/18
-- B: r0 10/18
+- A: r0 12/18
+- B: r0 12/18
 - C: r0 12/18
-- D: r0 10/18
+- D: r0 12/18
 
 Intervals describe this task collection only.
 
 ## Dry-run notes (offline dry run — not a model result)
 
 - Command: `oa eval run --split dev --systems A,B,C,D --repeats 1 --mode mock` then `oa eval report`, 2026-10-16,
-  on the frozen development battery (hash-verified before the run). Wall time 38.5 s for 72 learner processes
-  (each with its own teacher process). No provider call was made: A, C and D used offline candidate sources (the label
-  enumerator; C the 24-program catalogue), B used `agent_b.scripted_policy`, a deterministic fixture standing in for the model.
-- Every row is `origin=mock`, `model=Fixture`; the boundary check shows 0 violations.
-- What the dry run exposed (pipeline facts, not model results): the offline enumerator cannot express fallbacks or
-  beyond-catalogue behaviours, so A/B/D abstain there; every system COMMITS the forced-overlap convention (dev
-  unsupported episode 1) — the shared commit checks accept a demonstrated overlap, so "refuse to apply" is not
-  implemented in the learning core and is scored `wrong_commit`.
+  on the re-frozen development battery (battery-v2.3, hash-verified before the run). Wall time 33.1 s for 72 learner
+  processes, each talking to its own teacher process over inherited pipes. No provider call was made: A, C and D used
+  offline candidate sources (the label enumerator; C the 24-program catalogue), B used `agent_b.scripted_policy`, a
+  deterministic fixture standing in for the model.
+- Every row is `origin=mock`, `model=Fixture`; the boundary check (imports, file reads under benchmarks/, private
+  files, child processes) shows 0 violations.
+- What the dry run exposed (pipeline facts, not model results): the offline enumerator cannot express beyond-catalogue
+  behaviours, so every system abstains there; every system COMMITS the forced-overlap convention (dev unsupported
+  episode 1) — the shared commit checks accept a demonstrated overlap, so "refuse to apply" is not implemented in the
+  learning core and is scored `wrong_commit`.
 - Token estimate for pricing (`token_estimate.json`, `analysis_v2.token_estimate`): prompt sizes are measured from what
   each system sent (conservative len/3 estimate); completion tokens are ASSUMED at 2000 per attempt until calibration
-  measures them. Per episode: A ≈ 11.3k tokens (max 21.7k, 2.4 attempts), B ≈ 18.5k (max 37.6k, 2.6 turns). The
+  measures them. Per episode: A ≈ 10.7k tokens (max 20.6k, 2.3 attempts), B ≈ 18.4k (max 34.5k, 2.6 turns). The
   fixture B stops early; a live B may use up to its 8 + 4 attempt ceilings, which the worst-case reservation covers.

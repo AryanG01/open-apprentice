@@ -32,6 +32,6 @@
   "e41d8ce1132"
  ],
  "scoring_version": "score-v2.1",
- "wall_s": 38.5,
+ "wall_s": 33.1,
  "note": "offline: every row is origin=mock, model=Fixture; not a model result"
 }

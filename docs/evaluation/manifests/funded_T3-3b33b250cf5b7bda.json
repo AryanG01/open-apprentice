@@ -6,10 +6,10 @@
   "D": 12
  },
  "establishes": "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
- "estimate_tokens": 3491784,
- "estimate_usd": 12.2212,
+ "estimate_tokens": 3397032,
+ "estimate_usd": 11.8896,
  "kind": "funded_T3",
- "manifest_id": "39ac910b4b5f9c27",
+ "manifest_id": "3b33b250cf5b7bda",
  "note": "re-estimate from the calibration run before asking for approval",
  "protected_reserve_usd": 10.0,
  "runs": 240,
