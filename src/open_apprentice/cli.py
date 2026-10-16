@@ -38,6 +38,8 @@ demo_app = typer.Typer(help="Demo data.", no_args_is_help=True)
 app.add_typer(demo_app, name="demo")
 benchmark_app = typer.Typer(help="Frozen benchmarks.", no_args_is_help=True)
 app.add_typer(benchmark_app, name="benchmark")
+eval_app = typer.Typer(help="Plan 5 evaluation battery.", no_args_is_help=True)
+app.add_typer(eval_app, name="eval")
 
 
 def _not_implemented(command: str, milestone: str) -> None:
@@ -844,6 +846,21 @@ def drawio_check(file: Path, page: int = 0) -> None:
             }
         )
     )
+
+
+@eval_app.command("freeze")
+def eval_freeze(
+    split: str = typer.Option(..., "--split", help="dev | final"),
+    out: Optional[Path] = typer.Option(None, "--out", help="default: the split's battery folder"),
+) -> None:
+    """Author and freeze a battery split; print the content hashes to commit."""
+    from open_apprentice.evaluation.battery_v2 import REPO, freeze
+
+    if split not in ("dev", "final"):
+        raise typer.BadParameter("split is dev or final")
+    default = "benchmarks/final/battery" if split == "final" else "benchmarks/development/battery"
+    target = out or REPO / default
+    typer.echo(json.dumps({"split": split, "out": str(target), "hashes": freeze(split, target)}))
 
 
 @app.command("staging-check")
