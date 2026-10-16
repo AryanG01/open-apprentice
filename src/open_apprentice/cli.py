@@ -900,7 +900,16 @@ def eval_run(
             names = [x.strip() for x in systems.split(",") if x.strip()]
             eps = [e for e in (episodes or "").split(",") if e]
             run = {"split": split, "systems": names, "episodes": eps, "repeats": repeats}
-            run_live(manifest, cap_usd, factory, run)
+            from open_apprentice.config import load_settings
+            from open_apprentice.evaluation.run_v2 import run_live_battery
+
+            model = load_settings().nebius_model
+
+            def runner(m: dict, cap: float, _factory: object) -> None:
+                # the learner processes build their own guarded providers; this one is never built
+                typer.echo(json.dumps({"run_dir": str(run_live_battery(m, cap, model=model))}))
+
+            run_live(manifest, cap_usd, factory, run, runner=runner)
         except GateRefused as e:
             typer.echo(f"oa eval run --mode live: refused before any provider call: {e}", err=True)
             raise typer.Exit(2)
@@ -927,6 +936,9 @@ def eval_manifest(
     dry_run_dir: Path = typer.Option(
         Path("results/eval_v2/dryrun-20261016"), "--dry-run-dir", help="holds token_estimate.json"
     ),
+    ceiling_usd: Optional[float] = typer.Option(
+        None, "--ceiling-usd", help="the run cap the owner agreed to (default: 2x the estimate)"
+    ),
 ) -> None:
     """Write the priced calibration manifest and the (unapproved) funded-tier manifest to docs/evaluation/manifests/."""
     from open_apprentice.evaluation.battery_v2 import REPO
@@ -934,6 +946,7 @@ def eval_manifest(
         BUDGET_ROOT,
         calibration_manifest,
         funded_manifest,
+        measured_call_usd,
     )
     from open_apprentice.evaluation.run_v2 import BATTERY_DIRS, load_split
     from open_apprentice.evaluation.spend import load_budget, spendable, spent_so_far
@@ -942,15 +955,19 @@ def eval_manifest(
     final = json.loads(
         (REPO / "docs/evaluation/battery_final.md").read_text().split("```json")[1].split("```")[0]
     )
+    budget = load_budget(BUDGET_ROOT)
+    call_usd = measured_call_usd(BUDGET_ROOT)
     cal = calibration_manifest(
         load_split(BATTERY_DIRS["dev"]),
         tokens,
         round(spent_so_far(BUDGET_ROOT), 4),
-        spendable(load_budget(BUDGET_ROOT)),
+        spendable(budget),
+        budget["reserve_usd"],
+        call_usd,
+        ceiling_usd,
     )
-    fund = funded_manifest(
-        len(final["episodes"]), 8, tokens
-    )  # spec 7 T3: D on 8 clarification-required episodes
+    # spec 7 T3: D on 8 clarification-required episodes
+    fund = funded_manifest(len(final["episodes"]), 8, tokens, budget["reserve_usd"], call_usd)
     out = REPO / "docs/evaluation/manifests"
     out.mkdir(parents=True, exist_ok=True)
     for m in (cal, fund):

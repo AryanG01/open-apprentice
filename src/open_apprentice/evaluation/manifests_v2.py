@@ -20,17 +20,18 @@ from open_apprentice.teaching import codec
 
 APPROVED = REPO / "docs/evaluation/approved"
 BUDGET_ROOT = REPO / "results/redesign"
-ESTIMATE_USD_PER_M = 3.5  # output-heavy teaching runs (live-run cost note)
 WORST_USD_PER_M = 4.0  # SpendGuard's conservative rate
 PROMPT_CAP_TOKENS = 16_000  # assumed largest prompt per attempt (dry run: B's largest turn ~ 9k)
-MAX_COMPLETION_TOKENS = 6_000  # the proposers' max_tokens
+MAX_COMPLETION_TOKENS = (
+    32_000  # NEBIUS_COMPLETION_CAP: the provider raises every call's max_tokens to this floor
+)
+MODEL_ROLES = ("hypotheses", "agent", "agent_b", "correction_scope")
 ATTEMPTS = {
     "A": 8 + 4,
     "B": 8 + 4,
     "C": 8 + 4,
     "D": 8 + 4,
 }  # learning + one correction cycle (spec 3.7)
-RESERVE_USD = 10.0
 STRATA_ORDER = ("catalogue", "beyond", "inconsistent", "unsupported", "sequential")
 
 
@@ -50,9 +51,18 @@ def _per_attempt_worst() -> float:
     return round((PROMPT_CAP_TOKENS + MAX_COMPLETION_TOKENS) * WORST_USD_PER_M / 1e6, 4)
 
 
-def _estimate(counts: dict[str, int], tokens: dict) -> tuple[int, float]:
-    t = sum(n * tokens["per_system"][s]["tokens_per_episode"] for s, n in counts.items())
-    return t, round(t * ESTIMATE_USD_PER_M / 1e6, 4)
+def measured_call_usd(budget_root: Path = BUDGET_ROOT) -> float:
+    """Mean real cost of one model call in earlier live teaching runs (spend.jsonl)."""
+    f = Path(budget_root) / "spend.jsonl"
+    rows = [json.loads(x) for x in f.read_text().splitlines() if x.strip()] if f.exists() else []
+    usd = [r["usd"] for r in rows if r.get("role") in MODEL_ROLES]
+    return round(sum(usd) / len(usd), 4) if usd else 0.0
+
+
+def _estimate(counts: dict[str, int], tokens: dict, call_usd: float) -> tuple[float, float]:
+    """(expected calls, dollars): runs x the dry run's mean attempts per episode x the measured cost per call."""
+    calls = sum(n * tokens["per_system"][s]["attempts_mean"] for s, n in counts.items())
+    return round(calls, 2), round(calls * call_usd, 4)
 
 
 def _finish(m: dict) -> dict:
@@ -65,6 +75,9 @@ def calibration_manifest(
     tokens: dict,
     spent_usd: float,
     spendable_usd: float,
+    reserve_usd: float,
+    call_usd: float,
+    ceiling_usd: Optional[float] = None,
     systems: tuple[str, ...] = ("A", "B"),
     episodes: int = 5,
     repeats: int = 1,
@@ -78,8 +91,12 @@ def calibration_manifest(
     runs = len(picked) * len(systems) * repeats
     per_attempt = _per_attempt_worst()
     worst_total = round(sum(len(picked) * repeats * ATTEMPTS[s] * per_attempt for s in systems), 4)
-    est_tokens, est_usd = _estimate({s: len(picked) * repeats for s in systems}, tokens)
-    ceiling = min(worst_total, math.ceil(est_usd * 2 * 20) / 20)  # 2x headroom, rounded up to $0.05
+    est_calls, est_usd = _estimate({s: len(picked) * repeats for s in systems}, tokens, call_usd)
+    if ceiling_usd is None:
+        ceiling_usd = min(
+            worst_total, math.ceil(est_usd * 2 * 20) / 20
+        )  # 2x headroom, rounded up to $0.05
+    ceiling = ceiling_usd
     remaining = round(spendable_usd - spent_usd, 4)
     return _finish(
         {
@@ -93,19 +110,20 @@ def calibration_manifest(
             "attempt_ceilings": {s: ATTEMPTS[s] for s in systems},
             "worst_case_per_attempt_usd": per_attempt,
             "worst_case_total_usd": worst_total,
-            "estimate_tokens": est_tokens,
+            "estimate_calls": est_calls,
             "estimate_usd": est_usd,
             "estimate_basis": (
-                f"dry-run token estimate per episode x ${ESTIMATE_USD_PER_M}/M; completion tokens assumed "
-                f"{tokens.get('completion_assumed_per_attempt', 'n/a')} per attempt"
+                f"dry-run mean attempts per episode x ${call_usd} per call (mean of earlier live teaching calls in "
+                "spend.jsonl); the fixture B stops early, so B's share is a lower bound"
             ),
             "ceiling_usd": ceiling,
+            "expected_coverage": round(min(1.0, ceiling / est_usd), 2) if est_usd else 1.0,
             "stop_conditions": {
                 "run_cap": "SpendGuard stops the run when the next call's worst case would pass --cap-usd",
                 "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
                 "boundary_violation": "any information-boundary violation stops the run and is reported",
             },
-            "protected_reserve_usd": RESERVE_USD,
+            "protected_reserve_usd": reserve_usd,
             "budget_at_writing": {
                 "spent_usd": spent_usd,
                 "spendable_usd": spendable_usd,
@@ -121,12 +139,19 @@ def calibration_manifest(
     )
 
 
-def funded_manifest(n_final: int, n_clarify: int, tokens: dict, repeats: int = 3) -> dict:
+def funded_manifest(
+    n_final: int,
+    n_clarify: int,
+    tokens: dict,
+    reserve_usd: float,
+    call_usd: float,
+    repeats: int = 3,
+) -> dict:
     """Tier T3 (spec 7): A and B x 3 on all final episodes + D x 3 on the clarification-required ones. Generated, not
     approved; re-estimated after calibration."""
     counts = {"A": n_final * repeats, "B": n_final * repeats, "D": n_clarify * repeats}
     per_attempt = _per_attempt_worst()
-    est_tokens, est_usd = _estimate(counts, tokens)
+    est_calls, est_usd = _estimate(counts, tokens, call_usd)
     return _finish(
         {
             "kind": "funded_T3",
@@ -138,9 +163,9 @@ def funded_manifest(n_final: int, n_clarify: int, tokens: dict, repeats: int = 3
             "worst_case_total_usd": round(
                 sum(n * ATTEMPTS[s] * per_attempt for s, n in counts.items()), 2
             ),
-            "estimate_tokens": est_tokens,
+            "estimate_calls": est_calls,
             "estimate_usd": est_usd,
-            "protected_reserve_usd": RESERVE_USD,
+            "protected_reserve_usd": reserve_usd,
             "establishes": "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
             "approved": False,
             "note": "re-estimate from the calibration run before asking for approval",

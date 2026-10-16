@@ -262,7 +262,13 @@ def _learner_env() -> dict:
 
 
 def run_learner(
-    ep: Episode, system: str, mode: str, seed: int, keep: Path, wall_s: int = WALL_S
+    ep: Episode,
+    system: str,
+    mode: str,
+    seed: int,
+    keep: Path,
+    wall_s: int = WALL_S,
+    extra: tuple[str, ...] = (),
 ) -> tuple[dict, float]:
     ldir, pdir = Path(tempfile.mkdtemp(prefix="oa-l-")), Path(tempfile.mkdtemp(prefix="oa-p-"))
     try:
@@ -284,7 +290,7 @@ def run_learner(
         out = ldir / "outcome.json"
         argv = [sys.executable, "-m", "open_apprentice.learner.main", "--episode", str(lf)]
         argv += ["--system", system, "--teacher-fds", f"{fds[0]},{fds[1]}", "--mode", mode]
-        argv += ["--seed", str(seed), "--out", str(out)]
+        argv += ["--seed", str(seed), "--out", str(out), *extra]
         t0 = time.monotonic()
         try:
             r = subprocess.run(
@@ -328,9 +334,11 @@ def run_episode(
     repeat: int,
     out_dir: Path,
     model: str = "Fixture",
+    extra: tuple[str, ...] = (),
+    wall_s: int = WALL_S,
 ) -> RowV2:
     keep = Path(out_dir) / "episodes" / f"{ep.id}-{system}-r{repeat}"
-    outcome, wall = run_learner(ep, system, mode, seed, keep)
+    outcome, wall = run_learner(ep, system, mode, seed, keep, wall_s, extra)
     s = score(ep, outcome)
     evs = outcome.get("events") or []
     usage = outcome.get("usage") or {}
@@ -431,4 +439,83 @@ def run_battery(
         ),
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=1))
+    return out
+
+
+LIVE_WALL_S = 3600  # a live call may take minutes (SpendGuard's per-call deadline is 420 s)
+MIN_CALL_USD = 0.13  # the smallest worst case of one call (32k completion floor at $4/M): below this nothing can run
+
+
+def run_live_battery(
+    manifest: dict,
+    cap_usd: float,
+    out_root: Path = REPO / "results/eval_v2",
+    budget_root: Path = REPO / "results/redesign",
+    model: str = "",
+    run_id: Optional[str] = None,
+    dotenv: Path = REPO / ".env",
+) -> Path:
+    """The approved manifest's runs, live (called only after the paid-run gate). Systems alternate per episode in a
+    seeded order; each learner gets what is left of the run cap in the shared ledger; the run stops when no call can
+    fit or on any boundary violation. Partial results are kept and the coverage is reported."""
+    import random
+    from dataclasses import replace
+
+    from open_apprentice.providers.spend import spent_for_run
+
+    run_id = run_id or f"cal-{manifest['manifest_id']}-{time.strftime('%Y%m%dT%H%M%S')}"
+    wanted = list(manifest["task_ids"])
+    by_id = {e.id: e for e in load_split(BATTERY_DIRS[manifest["split"]])}
+    eps = [by_id[i] for i in wanted]
+    out = Path(out_root) / run_id
+    out.mkdir(parents=True, exist_ok=True)
+    total = len(eps) * len(manifest["systems"]) * manifest["repeats"]
+    done, stopped = 0, None
+    rng = random.Random(manifest.get("seed", 0))
+    t0 = time.monotonic()
+    with open(out / "rows.jsonl", "w") as f:
+        for r in range(manifest["repeats"]):
+            for ep in eps:
+                for system in rng.sample(manifest["systems"], len(manifest["systems"])):
+                    before = spent_for_run(run_id, Path(budget_root))
+                    left = round(cap_usd - before, 4)
+                    if left < MIN_CALL_USD:
+                        stopped = "run cap"
+                        break
+                    extra = ("--cap-usd", str(left), "--run-id", run_id)
+                    extra += ("--budget-root", str(budget_root), "--dotenv", str(dotenv))
+                    row = run_episode(ep, system, "live", r, r, out, model, extra, LIVE_WALL_S)
+                    usd = round(spent_for_run(run_id, Path(budget_root)) - before, 6)
+                    row = replace(row, usd=usd)
+                    f.write(json.dumps(asdict(row), default=str) + "\n")
+                    f.flush()
+                    done += 1
+                    if "boundary_violation" in row.release_blocking:
+                        stopped = "boundary violation"
+                        break
+                if stopped:
+                    break
+            if stopped:
+                break
+    (out / "manifest.json").write_text(
+        json.dumps(
+            {
+                "run_id": run_id,
+                "split": manifest["split"],
+                "mode": "live",
+                "model": model,
+                "systems": manifest["systems"],
+                "repeats": manifest["repeats"],
+                "episodes": wanted,
+                "approved_manifest": manifest["manifest_id"],
+                "cap_usd": cap_usd,
+                "spent_usd": round(spent_for_run(run_id, Path(budget_root)), 6),
+                "coverage": f"{done}/{total}",
+                "stopped": stopped,
+                "scoring_version": SCORING_VERSION,
+                "wall_s": round(time.monotonic() - t0, 1),
+            },
+            indent=1,
+        )
+    )
     return out

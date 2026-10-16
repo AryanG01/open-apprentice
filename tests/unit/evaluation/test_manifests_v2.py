@@ -10,11 +10,13 @@ from open_apprentice.evaluation.manifests_v2 import (
     check_live_gate,
     funded_manifest,
     manifest_id,
+    measured_call_usd,
     run_live,
 )
 
-TOKENS = {"per_system": {"A": {"tokens_per_episode": 11328}, "B": {"tokens_per_episode": 18486},
-                         "D": {"tokens_per_episode": 11328}}}  # fmt: skip
+TOKENS = {"per_system": {"A": {"tokens_per_episode": 11328, "attempts_mean": 2},
+                         "B": {"tokens_per_episode": 18486, "attempts_mean": 3},
+                         "D": {"tokens_per_episode": 11328, "attempts_mean": 2}}}  # fmt: skip
 
 
 @lru_cache(maxsize=None)
@@ -49,7 +51,8 @@ def _run(m, **kw):
 
 
 def _man():
-    return calibration_manifest(list(_dev()), TOKENS, spent_usd=0.0, spendable_usd=40.0)
+    return calibration_manifest(list(_dev()), TOKENS, spent_usd=0.0, spendable_usd=40.0, reserve_usd=5.0,
+                                call_usd=0.05)  # fmt: skip
 
 
 def _never_called():
@@ -57,36 +60,40 @@ def _never_called():
 
 
 def test_calibration_manifest_states_what_the_spec_asks():
-    m = calibration_manifest(list(_dev()), TOKENS, spent_usd=38.6, spendable_usd=40.0)
+    m = calibration_manifest(list(_dev()), TOKENS, spent_usd=38.6, spendable_usd=40.0, reserve_usd=5.0,
+                             call_usd=0.05)  # fmt: skip
     assert len(m["task_ids"]) == 5 and m["systems"] == ["A", "B"] and m["runs"] == 10
     assert m["attempt_ceilings"] == {"A": 12, "B": 12}
-    assert m["worst_case_per_attempt_usd"] > 0 and m["worst_case_total_usd"] > m["estimate_usd"] > 0
-    assert m["estimate_usd"] == round((5 * 11328 + 5 * 18486) * 3.5 / 1e6, 4)
-    assert m["protected_reserve_usd"] == 10.0
+    assert m["worst_case_per_attempt_usd"] == round((16_000 + 32_000) * 4.0 / 1e6, 4)
+    assert m["worst_case_total_usd"] > m["estimate_usd"] > 0
+    assert m["estimate_usd"] == round(
+        5 * 2 * 0.05 + 5 * 3 * 0.05, 4
+    )  # episodes x mean attempts x measured $/call
+    assert m["protected_reserve_usd"] == 5.0
     assert "not an A-versus-B result" in m["establishes"]
     assert {"run_cap", "global_ceiling", "boundary_violation"} <= set(m["stop_conditions"])
     assert m["manifest_id"] == manifest_id(m)
 
 
+def test_an_explicit_ceiling_is_kept_and_partial_coverage_is_stated():
+    m = calibration_manifest(list(_dev()), TOKENS, spent_usd=0.0, spendable_usd=40.0, reserve_usd=5.0,
+                             call_usd=0.05, ceiling_usd=0.5)  # fmt: skip
+    assert m["ceiling_usd"] == 0.5 and m["expected_coverage"] < 1
+
+
+def test_measured_call_cost_is_the_mean_over_model_calls(tmp_path):
+    root = _budget(tmp_path, 0.0)
+    rows = [
+        {"usd": 0.04, "role": "hypotheses"},
+        {"usd": 0.06, "role": "agent"},
+        {"usd": 9.0, "role": "binding"},
+    ]
+    (root / "spend.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+    assert measured_call_usd(root) == 0.05
+
+
 def test_funded_manifest_counts_240_runs_and_is_not_approved():
-    m = funded_manifest(36, 8, TOKENS)
-    assert m["runs"] == 240 and m["approved"] is False
-
-
-def test_calibration_manifest_states_what_the_spec_asks():
-    m = calibration_manifest(list(_dev()), TOKENS, spent_usd=38.6, spendable_usd=40.0)
-    assert len(m["task_ids"]) == 5 and m["systems"] == ["A", "B"] and m["runs"] == 10
-    assert m["attempt_ceilings"] == {"A": 12, "B": 12}
-    assert m["worst_case_per_attempt_usd"] > 0 and m["worst_case_total_usd"] > m["estimate_usd"] > 0
-    assert m["estimate_usd"] == round((5 * 11328 + 5 * 18486) * 3.5 / 1e6, 4)
-    assert m["protected_reserve_usd"] == 10.0
-    assert "not an A-versus-B result" in m["establishes"]
-    assert {"run_cap", "global_ceiling", "boundary_violation"} <= set(m["stop_conditions"])
-    assert m["manifest_id"] == manifest_id(m)
-
-
-def test_funded_manifest_counts_240_runs_and_is_not_approved():
-    m = funded_manifest(36, 8, TOKENS)
+    m = funded_manifest(36, 8, TOKENS, reserve_usd=5.0, call_usd=0.05)
     assert m["runs"] == 240 and m["approved"] is False
 
 

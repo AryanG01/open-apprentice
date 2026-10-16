@@ -190,3 +190,46 @@ def test_boundary_refusals_and_loaded_evaluator_modules_are_release_blocking():
 def test_the_final_split_is_refused_outside_the_gated_live_run(tmp_path):
     with pytest.raises(PermissionError, match="final"):
         run_battery("final", ["C"], repeats=1, mode="mock", out_root=tmp_path)
+
+
+def test_live_runner_alternates_systems_and_stops_at_the_cap(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+    from open_apprentice.evaluation.metrics import Row  # noqa: F401
+
+    root = tmp_path / "budget"
+    root.mkdir()
+    spend = root / "spend.jsonl"
+    calls = []
+
+    def fake(ep, system, mode, seed, repeat, out_dir, model="Fixture", extra=(), wall_s=0):
+        calls.append((ep.id, system, dict(zip(extra[::2], extra[1::2]))["--cap-usd"]))
+        with open(spend, "a") as f:  # every run spends 0.3 of the run id's money
+            f.write(
+                json.dumps({"run": dict(zip(extra[::2], extra[1::2]))["--run-id"], "usd": 0.3})
+                + "\n"
+            )
+        return rv.RowV2(
+            ep.id, repeat, system, ep.id, ep.stratum, False, False, None, origin="live", model=model
+        )
+
+    monkeypatch.setattr(rv, "run_episode", fake)
+    eps = [e.id for e in _dev()[:3]]
+    manifest = {
+        "manifest_id": "m1",
+        "split": "dev",
+        "task_ids": eps,
+        "systems": ["A", "B"],
+        "repeats": 1,
+        "seed": 0,
+    }
+    out = rv.run_live_battery(
+        manifest, 1.0, out_root=tmp_path, budget_root=root, model="M", run_id="cal-t"
+    )
+    m = json.loads((out / "manifest.json").read_text())
+    # 0.3 per run: after three runs 0.1 is left, below one call's worst case, so the run stops
+    assert len(calls) == 3 and m["stopped"] == "run cap" and m["coverage"] == "3/6"
+    assert [float(c) for _, _, c in calls] == pytest.approx([1.0, 0.7, 0.4])
+    orders = {e: [s for i, s, _ in calls if i == e] for e in eps}
+    assert sorted(orders[eps[0]]) == ["A", "B"]
+    rows = [json.loads(x) for x in (out / "rows.jsonl").read_text().splitlines()]
+    assert {r["origin"] for r in rows} == {"live"} and {r["model"] for r in rows} == {"M"}

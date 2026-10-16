@@ -96,6 +96,7 @@ class Context:
     mode: str
     seed: int
     worst: Fraction = Fraction(0)
+    factory: Optional[Callable[[], Any]] = None  # live: a SpendGuard-wrapped provider per call
     logs: dict[str, SessionLog] = field(default_factory=dict)
     result: dict[str, Any] = field(default_factory=dict)
 
@@ -182,11 +183,29 @@ def _offline_proposer() -> Any:
     return LabelEnumerator()
 
 
+def _model_proposer(ctx: Context) -> Any:
+    """The live model (learning and correction-scope proposals) or, offline, the labelled enumerator fixture."""
+    if ctx.factory is None:
+        return _offline_proposer()
+    from open_apprentice.providers.teaching_adapter import ProviderProposer, ProviderScopeProposer
+
+    class Live:  # one object serving both protocols, like the enumerator
+        learn, scope = ProviderProposer(ctx.factory), ProviderScopeProposer(ctx.factory)
+
+        def propose(self, *a: Any) -> Any:
+            return self.learn.propose(*a)
+
+        def propose_scope(self, *a: Any) -> Any:
+            return self.scope.propose_scope(*a)
+
+    return Live()
+
+
 def system_a(ctx: Context, proposer: Any = None, config: Any = None) -> None:
     from open_apprentice.teaching.executor import Executor
     from open_apprentice.teaching.step import StepConfig
 
-    proposer = proposer or _offline_proposer()
+    proposer = proposer or _model_proposer(ctx)
     log = open_learning_log(ctx)
     status = Executor(
         ctx.store,
@@ -224,17 +243,18 @@ def system_b(ctx: Context) -> None:
     from open_apprentice.providers.mock import MockProvider
 
     mock = MockProvider({}, functions={"agent_b": scripted_policy})
-    ctx.result["policy"] = "scripted_fixture"
+    factory = ctx.factory or (lambda: mock)
+    ctx.result["policy"] = "model" if ctx.factory else "scripted_fixture"
     ctx.result["correction_policy"] = (
         "A"  # B's corrections run the shared executor (ledger ruling, review I4)
     )
     log = open_learning_log(ctx)
-    status = run_agent_b(lambda: mock, log, ctx.teacher, ctx.ledger, AgentBudgets(), ctx.worst)
+    status = run_agent_b(factory, log, ctx.teacher, ctx.ledger, AgentBudgets(), ctx.worst)
     ctx.result["status"] = status
     if status == "committed":
         _activate(ctx, log)
         if ctx.episode.get("correction"):
-            run_correction(ctx, _offline_proposer())
+            run_correction(ctx, _model_proposer(ctx))
 
 
 SYSTEMS: dict[str, Callable[[Context], None]] = {
@@ -262,6 +282,39 @@ def _usage(ctx: Context) -> dict:
                     if isinstance(v, int) and not isinstance(v, bool):
                         total[k] = total.get(k, 0) + v
     return total
+
+
+LIVE_WORST_USD = Fraction(1, 5)  # per call: (16k prompt + 32k completion floor) at $4/M, rounded up
+
+
+def _live_factory(args: argparse.Namespace) -> Callable[[], Any]:
+    """Nemotron on Token Factory behind the shared SpendGuard ledger; this run id's cap holds across calls and
+    processes. Refuses (nothing is called) unless the settings name the live provider and a positive cap is given.
+    """
+    from open_apprentice.config import load_settings
+    from open_apprentice.providers.factory import make_provider
+    from open_apprentice.providers.spend import guarded_factory
+
+    if not args.cap_usd or args.cap_usd <= 0 or not args.run_id or not args.budget_root:
+        raise Refused("live mode needs a positive --cap-usd, --run-id and --budget-root")
+    settings = load_settings(args.dotenv)
+    if settings.provider_mode != "nebius":
+        raise Refused(
+            f"live mode needs PROVIDER_MODE=nebius (settings say {settings.provider_mode!r})"
+        )
+    env = settings._raw_env
+
+    def rate(k: str) -> Optional[float]:
+        return float(env[k]) if env.get(k) else None
+
+    return guarded_factory(
+        lambda: make_provider(settings),
+        run_id=args.run_id,
+        cap_usd=args.cap_usd,
+        root=Path(args.budget_root),
+        in_per_m=rate("INPUT_USD_PER_MILLION"),
+        out_per_m=rate("OUTPUT_USD_PER_MILLION"),
+    )
 
 
 def _check_inputs(episode_path: Path) -> None:
@@ -313,17 +366,21 @@ def run(args: argparse.Namespace) -> dict:
         episode_path = Path(args.episode).resolve()
         _check_inputs(episode_path)
         episode = json.loads(episode_path.read_text())
+        live = (
+            _live_factory(args) if args.mode == "live" else None
+        )  # settings are read before the chdir
         _absolute_paths()
         os.chdir(tempfile.mkdtemp(prefix="oa-learner-"))
         _check_cwd()
-        if args.mode != "mock":
-            raise Refused("live learner runs are started only by the gated evaluator command")
         if args.system not in SYSTEMS:
             raise Refused(f"system {args.system} is not available")
         store = LocalStore(Path("store"))
         rfd, wfd = (int(x) for x in args.teacher_fds.split(","))
         teacher = ShowingTeacher(rfd, wfd)
-        ctx = Context(store, episode, teacher, Ledger(store, Fraction(0)), args.mode, args.seed)
+        cap = Fraction(str(args.cap_usd)) if live else Fraction(0)
+        ctx = Context(store, episode, teacher, Ledger(store, cap), args.mode, args.seed)
+        if live:
+            ctx.factory, ctx.worst = live, LIVE_WORST_USD
         ctx.result = result
         reason = _unsupported(episode)
         if reason:
@@ -376,6 +433,12 @@ def cli(argv: Optional[list[str]] = None) -> None:
     p.add_argument("--mode", default="mock", choices=["mock", "live"])
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out", required=True)
+    p.add_argument("--cap-usd", type=float, default=0.0, help="live: this run's remaining cap")
+    p.add_argument("--run-id", default="", help="live: the shared-ledger run id")
+    p.add_argument(
+        "--budget-root", default="", help="live: folder holding budget.json and spend.jsonl"
+    )
+    p.add_argument("--dotenv", default=".env", help="live: settings file (read before the chdir)")
     args = p.parse_args(argv)
     out = Path(args.out).resolve()
     result = run(args)

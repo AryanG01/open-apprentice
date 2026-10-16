@@ -174,3 +174,15 @@ async def test_a_stalled_call_hits_the_wall_clock_deadline_and_is_charged_worst_
     with pytest.raises(ProviderTimeout):
         await g._call([Message("user", "x")], max_tokens=10, ctx=CTX)
     assert "timeout_worst_case" in (tmp_path / "spend.jsonl").read_text()
+
+
+async def test_a_run_cap_holds_across_fresh_guards_and_processes(tmp_path):
+    from open_apprentice.providers.spend import guarded_factory, spent_for_run
+
+    r = root(tmp_path)
+    (r / "spend.jsonl").write_text(json.dumps({"run": "other", "usd": 5.0}) + "\n")
+    factory = guarded_factory(lambda: Fake(usd=0.3), run_id="cal", cap_usd=0.5, root=r)
+    await factory()._call(MSGS, max_tokens=10, ctx=CTX)  # 0.3 of the 0.5 spent
+    assert spent_for_run("cal", r) == pytest.approx(0.3)
+    with pytest.raises(BudgetExhausted):  # a new guard (another call or process) sees only 0.2 left
+        await factory()._call(MSGS, max_tokens=100_000, ctx=CTX)

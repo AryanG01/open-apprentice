@@ -21,7 +21,9 @@ def _ep(pred):
     return next(e for e in _dev() if pred(e))
 
 
-def run_learner(tmp_path, ep, system="A", prefix=None, learner_dir=None, env=None):
+def run_learner(
+    tmp_path, ep, system="A", prefix=None, learner_dir=None, env=None, mode="mock", extra=()
+):
     ldir = learner_dir or tmp_path / "learner"
     pdir = tmp_path / "private"
     ldir.mkdir(parents=True, exist_ok=True)
@@ -36,7 +38,7 @@ def run_learner(tmp_path, ep, system="A", prefix=None, learner_dir=None, env=Non
     fds = (teacher.stdout.fileno(), teacher.stdin.fileno())
     out = tmp_path / "outcome.json"
     args = ["--episode", str(lf), "--system", system, "--teacher-fds", f"{fds[0]},{fds[1]}"]
-    args += ["--mode", "mock", "--seed", "0", "--out", str(out)]
+    args += ["--mode", mode, "--seed", "0", "--out", str(out), *extra]
     head = prefix or [sys.executable, "-m", "open_apprentice.learner.main"]
     try:
         r = subprocess.run([*head, *args], env=env or ENV, capture_output=True, text=True,
@@ -175,3 +177,16 @@ def test_system_b_runs_offline_with_the_scripted_fixture_policy(tmp_path):
     )
     assert o["policy"] == "scripted_fixture"
     assert any(e["type"] == "AgentTurn" for e in o["events"])
+
+
+def test_live_mode_refuses_without_a_live_provider_or_a_cap(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue")
+    dotenv = tmp_path / "mock.env"
+    dotenv.write_text("PROVIDER_MODE=mock\n")
+    env = {k: v for k, v in ENV.items() if k != "PROVIDER_MODE"}
+    common = ["--run-id", "t", "--budget-root", str(tmp_path), "--dotenv", str(dotenv)]
+    o, r = run_learner(tmp_path, ep, mode="live", env=env, extra=[*common, "--cap-usd", "0.5"])
+    assert o["status"] == "error" and "nebius" in o["reason"] and r.returncode == 2
+    o, _ = run_learner(tmp_path, ep, mode="live", env=env, extra=[*common, "--cap-usd", "0"])
+    assert "cap" in o["reason"]
+    assert not (tmp_path / "spend.jsonl").exists()
