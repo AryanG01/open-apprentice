@@ -160,6 +160,13 @@ def get_preview(doc_id: str, page_id: str, request: Request, who: str = Depends(
     return Response(service.preview_png(_v2(request), who, doc_id, page_id), media_type="image/png")
 
 
+@router.get("/documents/{doc_id}/pages/{page_id}/scene")
+def get_scene(
+    doc_id: str, page_id: str, request: Request, mapping_hash: str = "", who: str = Depends(owner)
+) -> dict:
+    return service.page_scene_view(_v2(request), who, doc_id, page_id, mapping_hash)
+
+
 def _field(body: dict, key: str, kind: type, default: Any = None) -> Any:
     v = body.get(key, default)
     if not isinstance(v, kind):

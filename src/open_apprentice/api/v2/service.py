@@ -94,6 +94,7 @@ def _render_json(r: Rendered) -> dict:
         },
         "missing": list(r.missing),
         "profile": r.profile,
+        "translate": {"x": _s(r.translate[0]), "y": _s(r.translate[1])},
     }
 
 
@@ -259,6 +260,7 @@ def draft_render(
     page = load_drawio(new).pages[idx]
     r = v.render(page)
     return {
+        "image_offset": {"x": _s(r.translate[0]), "y": _s(r.translate[1])},
         "png": base64.b64encode(r.png).decode() if r.png else None,
         "boxes": {
             k: {"x": _s(b.x), "y": _s(b.y), "w": _s(b.w), "h": _s(b.h)}
@@ -999,3 +1001,20 @@ def activate(
         _digest({"skill": skill_id, "v": version, "g": expected_generation}),
         produce,
     )
+
+
+def page_scene_view(v: V2, owner: str, doc_id: str, page_id: str, mapping_hash: str) -> dict:
+    """Scene geometry for the overlay, plus where document coordinates land in the preview image."""
+    _, _, _, sc = page_scene(v, owner, doc_id, page_id, mapping_hash)
+    r = _stored_render(v, doc_id, page_id)
+    keys = ("id", "kind", "role", "attached")
+    return {
+        "scene_hash": scene_digest(sc.scene),
+        "canvas": {k: _s(x) for k, x in sc.scene["canvas"].items()},
+        "image_offset": {"x": _s(r.translate[0]), "y": _s(r.translate[1])},
+        "objects": [
+            {**{k: o[k] for k in keys}, **{k: _s(o[k]) for k in ("x", "y", "w", "h")}}
+            for o in sc.scene["objects"]
+        ],
+        "movable": list(sc.movable),
+    }

@@ -31,6 +31,8 @@ class Rendered:
     profile: dict
     png: Optional[bytes]
     svg: Optional[str]
+    # image pixel = document coordinate + translate (the PNG is the viewer's SVG at scale 1)
+    translate: tuple[Fraction, Fraction] = (Fraction(0), Fraction(0))
 
 
 def q64(v: float | int | str) -> Fraction:
@@ -56,6 +58,10 @@ def parse_render(body: dict) -> Rendered:
         profile=dict(body.get("profile", {})),
         png=base64.b64decode(body["png"]) if body.get("png") else None,
         svg=body.get("svg"),
+        translate=(
+            q64(body.get("translate", {}).get("x", 0)),
+            q64(body.get("translate", {}).get("y", 0)),
+        ),
     )
 
 
