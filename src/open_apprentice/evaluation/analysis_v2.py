@@ -177,7 +177,9 @@ def report(run_dir: Path) -> str:
     return "\n".join(out)
 
 
-COMPLETION_ASSUMED = 2000  # tokens per live attempt: an ASSUMPTION until the calibration run measures it
+COMPLETION_ASSUMED = (
+    2000  # tokens per live attempt: an ASSUMPTION until the calibration run measures it
+)
 PROMPTS = Path(__file__).resolve().parents[3] / "prompts"
 
 
@@ -206,7 +208,10 @@ def token_estimate(run_dir: Path) -> dict:
                         if e.get("log", "learn") == log
                         and (
                             e["type"] in ("DemonstrationRecorded", "CorrectionStarted")
-                            or (e["type"] == "SceneRegistered" and e["payload"].get("role") == "demo")
+                            or (
+                                e["type"] == "SceneRegistered"
+                                and e["payload"].get("role") == "demo"
+                            )
                         )
                     ]
                 )
