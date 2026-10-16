@@ -220,6 +220,12 @@ class CorrectionExecutor:
             "base_program": d.base["program"],
             "corrected_scene": d.corrective.scene_id,
             "corrected_labels": list(d.corrective.mask),
+            # what was corrected and where to: without these no proposer can explain the edit
+            "corrected_scene_objects": codec.loads(codec.dumps(d.corrective.scene["objects"])),
+            "canvas": codec.loads(codec.dumps(d.corrective.scene["canvas"])),
+            "corrected_output": {
+                k: codec.loads(codec.dumps(list(v))) for k, v in (d.corrective.output or {}).items()
+            },
         }
         for attempt_no in range(1, MAX_TRIES + 1):
             if (
