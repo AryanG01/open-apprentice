@@ -1,0 +1,193 @@
+{
+ "code_commit": "76e3e43f69fa6a234175e081cd3209f7b3858176",
+ "episodes": [
+  {
+   "clarification_required": true,
+   "correction_kind": null,
+   "id": "e88727066d3",
+   "seed": 110000,
+   "spec_hash": "f77675310d9f58b4a5eca5809c43a7517ae67651ed84359075f1150ed1fa7f68",
+   "stratum": "catalogue"
+  },
+  {
+   "clarification_required": true,
+   "correction_kind": null,
+   "id": "eb33f9716f9",
+   "seed": 110001,
+   "spec_hash": "b00be3656a42e30ed763a20a0f5928d14d4d512262a692d0ba7c4ec0edc5e94d",
+   "stratum": "catalogue"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e3593b0aec5",
+   "seed": 110002,
+   "spec_hash": "ab99a6c97b668c70d4fac91bd92d1f93f3654080dff9414546f3350559778801",
+   "stratum": "catalogue"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e79c145bad5",
+   "seed": 110003,
+   "spec_hash": "bcee0341b7d587cee0bcded6c8dd8726c0777fee35e6facc4715c8073c1b0384",
+   "stratum": "catalogue"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e5a01549872",
+   "seed": 110004,
+   "spec_hash": "7d59d2650a187ed30c6eb1fc2095cd7c81d7e47bc382d2ce3c74a5a3c5927b25",
+   "stratum": "beyond"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e7cd70b2ba8",
+   "seed": 110005,
+   "spec_hash": "b02e52f837543cd3a28f41dfce1f16059dae9a15eee6668c4a5c0a9b160ebc70",
+   "stratum": "beyond"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "ef3c47b95b1",
+   "seed": 110006,
+   "spec_hash": "6e150d885ccdbcb988c193a99464c82f15ad55076a6dbe5fb51bff72f0ff6a4a",
+   "stratum": "beyond"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e5b3fceadac",
+   "seed": 110007,
+   "spec_hash": "ce5eb3089567a78d80f12f439dfa896bf5e0b392e65661d4144424afb7867b9c",
+   "stratum": "beyond"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e7b523e24fc",
+   "seed": 110008,
+   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
+   "stratum": "inconsistent"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e0119c547d5",
+   "seed": 110009,
+   "spec_hash": "aa296e3e6db3ce5c63bee4a59d042b931e0eda3fccd4a8fc432b4bd95b86c562",
+   "stratum": "inconsistent"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "ea5432e5dee",
+   "seed": 110010,
+   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
+   "stratum": "unsupported"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": null,
+   "id": "e620cde0c3e",
+   "seed": 110011,
+   "spec_hash": "bcee0341b7d587cee0bcded6c8dd8726c0777fee35e6facc4715c8073c1b0384",
+   "stratum": "unsupported"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": "compatible",
+   "id": "e9bacad414c",
+   "seed": 110012,
+   "spec_hash": "3850a25685db8eb90ed0d5bd8941ee915f9b22c6612da77277b336a2cdaa5f06",
+   "stratum": "sequential"
+  },
+  {
+   "clarification_required": true,
+   "correction_kind": "compatible",
+   "id": "e6ab691b80f",
+   "seed": 110013,
+   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
+   "stratum": "sequential"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": "superseding",
+   "id": "ee894d854af",
+   "seed": 110014,
+   "spec_hash": "f0eb88f619f3591fc120b52a8688299ad580ea1bf92f549208130ac0d430b063",
+   "stratum": "sequential"
+  },
+  {
+   "clarification_required": false,
+   "correction_kind": "conflict",
+   "id": "ea9778a73fb",
+   "seed": 110015,
+   "spec_hash": "d291ad3275bf6aec8c94cef762cc34e08cae642d2d143c3f366fa202460cc7db",
+   "stratum": "sequential"
+  },
+  {
+   "clarification_required": true,
+   "correction_kind": "override",
+   "id": "ee519fbf496",
+   "seed": 110016,
+   "spec_hash": "3850a25685db8eb90ed0d5bd8941ee915f9b22c6612da77277b336a2cdaa5f06",
+   "stratum": "sequential"
+  },
+  {
+   "clarification_required": true,
+   "correction_kind": "accidental",
+   "id": "e41d8ce1132",
+   "seed": 110017,
+   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
+   "stratum": "sequential"
+  }
+ ],
+ "files": {
+  "episodes/e0119c547d5.private.json": "f72b57770127b5b09a523814b336aa8328763f43fc1ab0e04aa493d7c9f7fa7c",
+  "episodes/e3593b0aec5.private.json": "ad675c6a71e91d9d519f72a7b6935bcce7e1350495f15ad984eb13bc6f8ec4cf",
+  "episodes/e41d8ce1132.private.json": "438021ddb8214d71b38758daaa514510e2c50530b493c5bbe6f8ffa3b4278524",
+  "episodes/e5a01549872.private.json": "1a55f860d20c3bf9bfab39a338d6641c9b57a94bcc5ac772a6f8fec0ddc4237a",
+  "episodes/e5b3fceadac.private.json": "321e8bb695001bc71cbf83f1e8e7546a1cab492ef9e125892a83a29f2a337aae",
+  "episodes/e620cde0c3e.private.json": "4d9c73e005bc469e1a9fc9772c94df35f2d83c2f6cf84051e0bbda2ae8fa0c95",
+  "episodes/e6ab691b80f.private.json": "714afa95b28074d446df599965fac8f6f4d2f5afe0c5c58a77d6a77e58c9c936",
+  "episodes/e79c145bad5.private.json": "3198e74e08f23c4aeee2a1122dbd36cf62b161507a0694ae736fd3d4385390de",
+  "episodes/e7b523e24fc.private.json": "f9d8f0d4855c0c01fddaa7bc537807374e340bf07aee12f78bb5be56df21dfe9",
+  "episodes/e7cd70b2ba8.private.json": "c1a500e76df839d940a2186c94c82e3ddd6a107841ba4b024e212ce736cb7ca0",
+  "episodes/e88727066d3.private.json": "ce0e7c0f03958737a8d363eb73b8e1611a37fd25fbc021cb821a8bdda478ac1e",
+  "episodes/e9bacad414c.private.json": "3bc22dda38d4a8a370d854b6623e3c6f8a76de150b7e2ab0402f3c1bae5400ab",
+  "episodes/ea5432e5dee.private.json": "f01dbebc409ea1c1a25459c68429e747920f05a61d723a5e18187bf28f5cea21",
+  "episodes/ea9778a73fb.private.json": "8436f741fbeb36bd581b3ab1a9d1a861ccd3af71b95cfe964a048c48bef8e891",
+  "episodes/eb33f9716f9.private.json": "8bdea015537f86b2d2467c7c3b3f2e4155ba4e13911bba89eb5d4741ec959224",
+  "episodes/ee519fbf496.private.json": "c6d3eb19f615bcabd354e9670cbb6454b8427d274373becb4ec438cc0a9cd323",
+  "episodes/ee894d854af.private.json": "2bf86e895a334c57873ea0e89b5c9ee2f4dfbe4d82b0dab5ec8d541e20482113",
+  "episodes/ef3c47b95b1.private.json": "181d6ee36571b5508b7b69219ea9d0756b8f64883203e3014220b69e177bc530",
+  "learner/e0119c547d5.json": "e7a669e68e6abf90704f7d5a011cd4791d3adb2213575800a5798d9ca7705735",
+  "learner/e3593b0aec5.json": "583add33a2d6a1a28499e3f4b67c5336a4628ede4895dd44ba307cbcbf2d36a8",
+  "learner/e41d8ce1132.json": "b81d7a29da2034f03c02cdd270a3391a5b7e19ef60a80cd6a372c2aea61d2bdc",
+  "learner/e5a01549872.json": "6fb91fee40ea2a7d99558526b0ecf2ccafec9820060cc023bb782305b410e274",
+  "learner/e5b3fceadac.json": "311211cff4d749a2dc09f24ef0b89b2377bb06ecaea5bd93d2f06d53f7e353d6",
+  "learner/e620cde0c3e.json": "765afaca677d8680924be39c4ba30d81370416fdb2091d6abcb2825b43286b4a",
+  "learner/e6ab691b80f.json": "86aea1bca99e1c083618bd730e8543be9e3226b342da38df87f8a6a796ae3c35",
+  "learner/e79c145bad5.json": "591d63a23c2f61cecf7fe70c179252df03e18a367e458d2c9d1fc6e8a6117dc9",
+  "learner/e7b523e24fc.json": "ec4abd7013e2ef6e6100380ebd8b0184b77129eaf6720b527f888b9cdceb8347",
+  "learner/e7cd70b2ba8.json": "8276ef4dc109bc02cfa7f89adae5cfb02d0a0873b9a564d7c04ed7f4cd39676c",
+  "learner/e88727066d3.json": "ec791ad4054a43161b8ca0187be88a3885d0000c5c7a8125ba2ea7a18a43c941",
+  "learner/e9bacad414c.json": "4dd868496402a614e2fc56a97432fd135801aba93a346fd1fd3423e8210b74e6",
+  "learner/ea5432e5dee.json": "a558ee3b8ae7295c35f66d0ab7eff398974fc4617464cdb487fcfda95f782049",
+  "learner/ea9778a73fb.json": "d995b92fe62e492eccb6e62138e923ecac34fa4b8ebed2856211a89424f76f3e",
+  "learner/eb33f9716f9.json": "9894e36fac16f385983823a834521da78b4cdfd7ffdfca0e689e7067edfd0dbb",
+  "learner/ee519fbf496.json": "ec87b23af50b9e49a4fc846390674c19f6a0447f962ee6710c90e5764bba00d7",
+  "learner/ee894d854af.json": "61a0e1cb99b7c86ad5323245eab73700b17f512a4cce004edc9a975fd21c48e8",
+  "learner/ef3c47b95b1.json": "77defb5c60fc0e085dd572209995a5f071e44948ec064238a9daceb8b17f9520"
+ },
+ "generator_version": "battery-v2.1",
+ "real_files": [],
+ "scoring_version": "score-v2.1",
+ "seed_base": 110000,
+ "split": "dev",
+ "tolerance": "1/2"
+}
