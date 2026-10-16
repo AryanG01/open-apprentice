@@ -26,6 +26,8 @@ COPY prompts prompts
 COPY configs configs
 COPY docs/capabilities.json docs/capabilities.json
 COPY docs/replay docs/replay
+# owner-authored draw.io samples (provenance: docs/corpus/drawio_provenance.md); used by `oa staging-check` and the demo
+COPY tests/fixtures/drawio_corpus/dev samples/drawio
 
 RUN mkdir -p /tmp/home && chmod 1777 /tmp/home
 # UID 1000 is the `node` user in this base image; Hugging Face Spaces also runs containers as UID 1000.

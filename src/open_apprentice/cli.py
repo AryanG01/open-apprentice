@@ -9,12 +9,19 @@ work from the first commit, and lets scripts/tests probe "is this wired up" inde
 
 from __future__ import annotations
 
+import json
+import os
 import sys
-from typing import Optional
+import uuid
+from pathlib import Path
+from typing import TYPE_CHECKING, Optional
 
 import typer
 
 from open_apprentice.cli_exit import ExitState, NotImplementedExit
+
+if TYPE_CHECKING:
+    from open_apprentice.storage.store import Store
 
 app = typer.Typer(
     name="oa",
@@ -804,6 +811,106 @@ def svg_trial(
 ) -> None:
     """v1.3: run the real-SVG matched pilot."""
     _not_implemented("svg-trial", "M5")
+
+
+@app.command("drawio-check")
+def drawio_check(file: Path, page: int = 0) -> None:
+    """Parse, classify, render and measure one page of a .drawio file; print what is movable and why anything is not."""
+    from open_apprentice.config import load_settings
+    from open_apprentice.drawio.classify import classify
+    from open_apprentice.drawio.parse import DrawioRefused, load_drawio
+    from open_apprentice.drawio.render import render_page
+
+    try:
+        f = load_drawio(file.read_bytes())
+        c = classify(f.pages[page])
+        r = render_page(f.pages[page], load_settings().engine_url, png=False)
+    except DrawioRefused as e:
+        typer.echo(json.dumps({"refused": str(e)}))
+        raise typer.Exit(2)
+    demoted = {
+        cid: "renders on more than one line"
+        for cid in c.movable
+        if cid in r.labels and r.labels[cid][1] > 1
+    }
+    typer.echo(
+        json.dumps(
+            {
+                "doc_hash": f.doc_hash,
+                "page": f.pages[page].id,
+                "movable": list(c.movable),
+                "fixed": list(c.fixed),
+                "reasons": c.reasons,
+                "demoted": demoted,
+                "missing": list(r.missing),
+                "profile": r.profile,
+            }
+        )
+    )
+
+
+def _store_from_env() -> Store:
+    from open_apprentice.storage.store import LocalStore
+
+    if os.environ.get("OA_STORE") == "gcs":
+        from google.cloud import storage
+
+        from open_apprentice.storage.gcs import GcsStore
+
+        return GcsStore(storage.Client().bucket(os.environ["OA_BUCKET"]))
+    return LocalStore(os.environ.get("OA_STORE_DIR", ".oa-store"))
+
+
+@app.command("staging-check")
+def staging_check(
+    file: Optional[Path] = None,
+    only: str = typer.Option("all", help="all | race | survival | render"),
+    phase: str = typer.Option(
+        "write", help="survival phase: write (before a restart) or read (after)"
+    ),
+) -> None:
+    """Staging integration (spec 10): a conditional-update race, restart survival, and render/measure of one file. Runs
+    against whatever OA_STORE points at; it creates no cloud resources."""
+    from open_apprentice.storage.store import PreconditionFailed
+
+    store = _store_from_env()
+    failed = False
+    if only in ("all", "race"):
+        key = f"staging/race-{uuid.uuid4().hex}"
+        g = store.put(key, b"0", if_generation=None)
+        results = []
+        for v in (b"a", b"b"):
+            try:
+                store.put(key, v, if_generation=g)
+                results.append("ok")
+            except PreconditionFailed:
+                results.append("precondition")
+        ok = results.count("ok") == 1 and results.count("precondition") == 1
+        typer.echo(
+            json.dumps(
+                {
+                    "check": "race",
+                    "ok": ok,
+                    "winners": results.count("ok"),
+                    "precondition_failures": results.count("precondition"),
+                }
+            )
+        )
+        failed = failed or not ok
+    if only in ("all", "survival"):
+        if phase == "write":
+            if store.get("staging/marker") is None:
+                store.create("staging/marker", b"alive")
+            typer.echo(json.dumps({"check": "survival", "phase": "write", "ok": True}))
+        else:
+            b = store.get("staging/marker")
+            ok = b is not None and b.data == b"alive"
+            typer.echo(json.dumps({"check": "survival", "phase": "read", "ok": ok}))
+            failed = failed or not ok
+    if only in ("all", "render") and file is not None:
+        drawio_check(file)
+    if failed:
+        raise typer.Exit(1)
 
 
 def main() -> None:

@@ -1,10 +1,16 @@
 # Staging proposal (NOT created — needs the owner's approval)
 
-**Purpose (spec §10, early staging integration, 17–20 Oct).** Prove the deployed environment before the product depends on it:
-1. render and measure one supported draw.io diagram with the pinned viewer and the bundled font in Cloud Run's Chromium;
-2. one real GCS conditional update, including a deliberately lost race (two writers, one precondition failure);
-3. one authenticated Cloud Tasks dispatch to a worker endpoint, with a scripted provider (no paid model call);
-4. restart the service and verify that a session, a skill version and the ledger survive.
+**Purpose (spec §10, early staging integration).** Prove the deployed environment before the product depends on it. Each check
+is one `oa staging-check` invocation run inside the staging image (Cloud Run job below), printing one JSON line per check:
+1. **Render and measure** one supported draw.io diagram with the pinned viewer and the bundled font in Cloud Run's Chromium:
+   `oa staging-check --file samples/drawio/d1.drawio --only render`; the job's command starts the engine first
+   (`sh -c 'node services/engine/src/server.js & sleep 5; oa staging-check …'`, `ENGINE_URL=http://127.0.0.1:8090`).
+2. **GCS conditional update with a deliberately lost race:** `OA_STORE=gcs oa staging-check --only race`
+   (two writers on one generation; pass = exactly one winner and one precondition failure).
+3. **Restart survival:** `oa staging-check --only survival --phase write`, then force a new revision
+   (`gcloud run jobs update … --update-env-vars OA_RESTART=<n>`), then `--only survival --phase read` (commands below).
+
+The authenticated Cloud Tasks dispatch (formerly check 3) moves to Plan 4, which builds the worker endpoint it needs.
 
 ## Resources (project `oa-demo-1013-19737`, region `us-central1`)
 
@@ -13,6 +19,7 @@
 | Cloud Storage bucket | `oa-staging-<6 random chars>` | Standard class, uniform bucket-level access, public access prevention on, lifecycle: delete objects older than 7 days |
 | Cloud Tasks queue | `oa-staging` | max dispatches 1/s, max concurrent 2, max attempts 3 |
 | Service account | `oa-staging-worker@oa-demo-1013-19737.iam.gserviceaccount.com` | `roles/storage.objectAdmin` on the bucket only; `roles/run.invoker` on the staging service only |
+| Cloud Run job | `oa-staging-check` | same image, command starts the engine then runs `oa staging-check`, 1 GiB, service account `oa-staging-worker`, env `OA_STORE=gcs`, `OA_BUCKET=<bucket>`, `PROVIDER_MODE=mock`; max retries 0 |
 | Cloud Run service | `open-apprentice-staging` | same image as production, `--min-instances 0 --max-instances 1 --memory 1Gi`, NOT public (`--no-allow-unauthenticated`), env `OA_STORE=gcs`, `OA_BUCKET=<bucket>`, `PROVIDER_MODE=mock` |
 
 The production service `open-apprentice` is not touched.
@@ -30,6 +37,15 @@ gcloud tasks queues create oa-staging --project $P --location $R --max-dispatche
 gcloud run deploy open-apprentice-staging --project $P --region $R --image us-central1-docker.pkg.dev/$P/oa/demo:latest \
   --service-account oa-staging-worker@$P.iam.gserviceaccount.com --min-instances 0 --max-instances 1 --memory 1Gi \
   --no-allow-unauthenticated --set-env-vars OA_STORE=gcs,OA_BUCKET=$B,PROVIDER_MODE=mock
+gcloud run jobs create oa-staging-check --project $P --region $R --image us-central1-docker.pkg.dev/$P/oa/demo:latest \
+  --service-account oa-staging-worker@$P.iam.gserviceaccount.com --max-retries 0 --memory 1Gi --command sh \
+  --args=-c,'node services/engine/src/server.js & sleep 5; exec oa staging-check --file samples/drawio/d1.drawio' \
+  --set-env-vars OA_STORE=gcs,OA_BUCKET=$B,PROVIDER_MODE=mock,ENGINE_URL=http://127.0.0.1:8090
+gcloud run jobs execute oa-staging-check --project $P --region $R --wait   # race + survival(write) + render
+# then force a new revision and read the marker back:
+gcloud run jobs update oa-staging-check --project $P --region $R --update-env-vars OA_RESTART=1 \
+  --args=-c,'exec oa staging-check --only survival --phase read'
+gcloud run jobs execute oa-staging-check --project $P --region $R --wait
 gcloud run services add-iam-policy-binding open-apprentice-staging --project $P --region $R \
   --member serviceAccount:oa-staging-worker@$P.iam.gserviceaccount.com --role roles/run.invoker
 ```
@@ -37,6 +53,7 @@ gcloud run services add-iam-policy-binding open-apprentice-staging --project $P 
 ## Teardown
 
 ```bash
+gcloud run jobs delete oa-staging-check --project $P --region $R --quiet
 gcloud run services delete open-apprentice-staging --project $P --region $R --quiet
 gcloud tasks queues delete oa-staging --project $P --location $R --quiet
 gcloud storage rm -r gs://$B
@@ -46,6 +63,7 @@ gcloud iam service-accounts delete oa-staging-worker@$P.iam.gserviceaccount.com 
 ## Cost estimate (to be confirmed in the console after a week)
 - Cloud Storage: a few MB for 7 days, effectively $0 (Standard storage in us-central1 is billed per GB-month).
 - Cloud Tasks: the first million operations per month are free; the test uses a handful.
+- Cloud Run job: billed per execution second; each check runs for well under a minute.
 - Cloud Run: scales to zero; the integration test runs for minutes; covered by the free tier already used by production.
 - Expected total: well under SGD 1 for the week. The existing SGD 1 budget alert on the project emails but does not stop spending.
 
