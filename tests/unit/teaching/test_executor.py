@@ -119,3 +119,10 @@ def test_one_transient_failure_is_retried_and_stays_in_the_accounting(tmp_path):
     fails = [e for e in log.events() if e.type == "ModelCallFailed"]
     assert len(fails) == 1 and fails[0].payload["terminal"] is False
     assert ledger.exposure()["uncertain"] == F(1, 5)  # the failed attempt stays at worst case
+
+
+def test_a_budget_refusal_is_classified_as_budget_not_other():
+    from open_apprentice.budget import BudgetExhausted
+    from open_apprentice.teaching.executor import failure_kind
+
+    assert failure_kind(BudgetExhausted("usd", "run cap $0.08")) == "budget"

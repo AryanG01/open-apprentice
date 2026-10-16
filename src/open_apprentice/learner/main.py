@@ -377,7 +377,14 @@ def run(args: argparse.Namespace) -> dict:
         store = LocalStore(Path("store"))
         rfd, wfd = (int(x) for x in args.teacher_fds.split(","))
         teacher = ShowingTeacher(rfd, wfd)
-        cap = Fraction(str(args.cap_usd)) if live else Fraction(0)
+        cap = Fraction(0)
+        if (
+            live
+        ):  # the run's total cap less what this run id has already spent (other learner processes)
+            from open_apprentice.providers.spend import spent_for_run
+
+            spent = spent_for_run(args.run_id, Path(args.budget_root))
+            cap = max(Fraction(0), Fraction(str(args.cap_usd)) - Fraction(str(round(spent, 6))))
         ctx = Context(store, episode, teacher, Ledger(store, cap), args.mode, args.seed)
         if live:
             ctx.factory, ctx.worst = live, LIVE_WORST_USD
@@ -433,7 +440,7 @@ def cli(argv: Optional[list[str]] = None) -> None:
     p.add_argument("--mode", default="mock", choices=["mock", "live"])
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out", required=True)
-    p.add_argument("--cap-usd", type=float, default=0.0, help="live: this run's remaining cap")
+    p.add_argument("--cap-usd", type=float, default=0.0, help="live: the run's total cap")
     p.add_argument("--run-id", default="", help="live: the shared-ledger run id")
     p.add_argument(
         "--budget-root", default="", help="live: folder holding budget.json and spend.jsonl"

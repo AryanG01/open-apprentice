@@ -454,10 +454,14 @@ def run_live_battery(
     model: str = "",
     run_id: Optional[str] = None,
     dotenv: Path = REPO / ".env",
+    resume: bool = False,
 ) -> Path:
     """The approved manifest's runs, live (called only after the paid-run gate). Systems alternate per episode in a
-    seeded order; each learner gets what is left of the run cap in the shared ledger; the run stops when no call can
-    fit or on any boundary violation. Partial results are kept and the coverage is reported."""
+    seeded order; each learner gets the run's total cap and its guard charges what this run id has already spent in
+    the shared ledger; the run stops when no call can fit or on any boundary violation. Partial results are kept and
+    the coverage is reported. `resume` continues an existing run id: rows that errored without spending anything
+    (they never reached the model) are moved to rows.superseded.jsonl and re-run; every other row stands.
+    """
     import random
     from dataclasses import replace
 
@@ -473,16 +477,31 @@ def run_live_battery(
     done, stopped = 0, None
     rng = random.Random(manifest.get("seed", 0))
     t0 = time.monotonic()
+    kept: dict[tuple, str] = {}
+    if resume and (out / "rows.jsonl").exists():
+        lines = [x for x in (out / "rows.jsonl").read_text().splitlines() if x.strip()]
+        with open(out / "rows.superseded.jsonl", "a") as sf:
+            for x in lines:
+                r = json.loads(x)
+                if r["terminal_outcome"] == "error" and not r.get("usd"):
+                    sf.write(x + "\n")
+                else:
+                    kept[(r["episode"], r["method"], r["rep"])] = x
+    done = len(kept)
     with open(out / "rows.jsonl", "w") as f:
+        for x in kept.values():
+            f.write(x + "\n")
         for r in range(manifest["repeats"]):
             for ep in eps:
                 for system in rng.sample(manifest["systems"], len(manifest["systems"])):
+                    if (ep.id, system, r) in kept:
+                        continue
                     before = spent_for_run(run_id, Path(budget_root))
                     left = round(cap_usd - before, 4)
                     if left < MIN_CALL_USD:
                         stopped = "run cap"
                         break
-                    extra = ("--cap-usd", str(left), "--run-id", run_id)
+                    extra = ("--cap-usd", str(cap_usd), "--run-id", run_id)
                     extra += ("--budget-root", str(budget_root), "--dotenv", str(dotenv))
                     row = run_episode(ep, system, "live", r, r, out, model, extra, LIVE_WALL_S)
                     usd = round(spent_for_run(run_id, Path(budget_root)) - before, 6)

@@ -9,6 +9,7 @@ import uuid
 from fractions import Fraction
 from typing import Callable, Optional, Protocol
 
+from open_apprentice.budget import BudgetExhausted
 from open_apprentice.concepts.label_teaching import describe_compact
 from open_apprentice.providers.base import ProviderTimeout, TruncatedOutput
 from open_apprentice.skills.versions import SkillStore
@@ -132,6 +133,8 @@ def _submit_checked(log: SessionLog, resp: Response, evs: list[Event], revision:
 
 def failure_kind(e: BaseException) -> str:
     """Categorise a provider failure. Only truncation, timeout and transport are retried (spec 3.7)."""
+    if isinstance(e, BudgetExhausted):
+        return "budget"
     if isinstance(e, TruncatedOutput):
         return "truncation"
     if isinstance(e, (ProviderTimeout, TimeoutError)):
@@ -192,11 +195,16 @@ class Executor:
             or (e.type == "ModelCallFailed" and not e.payload.get("terminal"))
         )
 
-    def _fail(self, action_id: str, reason: str, terminal: bool) -> None:
+    def _fail(self, action_id: str, reason: str, terminal: bool, detail: str = "") -> None:
         self.log.append(
             "ModelCallFailed",
             "system",
-            {"action_id": action_id, "reason": reason, "terminal": terminal},
+            {
+                "action_id": action_id,
+                "reason": reason,
+                "terminal": terminal,
+                "detail": detail[:300],
+            },
         )
 
     def _propose(self, action: RequestModelProposal) -> None:
@@ -222,7 +230,7 @@ class Executor:
                 self.ledger.mark_unknown(attempt)
                 kind = failure_kind(e)
                 terminal = attempt_no == MAX_TRIES or kind not in TRANSIENT
-                self._fail(action.action_id, kind, terminal)
+                self._fail(action.action_id, kind, terminal, f"{type(e).__name__}: {e}")
                 if terminal:
                     return
                 continue

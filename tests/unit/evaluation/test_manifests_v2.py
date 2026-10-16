@@ -166,3 +166,19 @@ def test_cli_live_without_manifest_exits_refused():
 
     r = CliRunner().invoke(app, ["eval", "run", "--split", "dev", "--mode", "live"])
     assert r.exit_code == 2 and "manifest" in r.output
+
+
+def test_cli_live_run_does_not_fall_through_to_the_offline_runner(monkeypatch):
+    from typer.testing import CliRunner
+
+    import open_apprentice.evaluation.manifests_v2 as mv
+    from open_apprentice.cli import app
+
+    seen = {}
+    monkeypatch.setattr(
+        mv, "run_live", lambda mid, cap, factory, run, runner=None: seen.update(run=run)
+    )
+    r = CliRunner().invoke(app, ["eval", "run", "--split", "dev", "--mode", "live", "--manifest", "x",
+                                 "--cap-usd", "0.5", "--resume", "cal-x"])  # fmt: skip
+    assert r.exit_code == 0, r.output
+    assert seen["run"]["split"] == "dev"

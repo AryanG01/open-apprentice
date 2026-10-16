@@ -878,6 +878,11 @@ def eval_run(
     cap_usd: float = typer.Option(
         0.0, "--cap-usd", help="live: run cap, at most the manifest ceiling"
     ),
+    resume: Optional[str] = typer.Option(
+        None,
+        "--resume",
+        help="live: continue this run id (re-runs only rows that never reached the model)",
+    ),
 ) -> None:
     """Run a frozen battery split (verified against its hashes first) and write rows.jsonl + manifest.json. Live runs
     pass the paid-run gate first (approved manifest, cap within its ceiling, protected reserve untouched).
@@ -907,7 +912,10 @@ def eval_run(
 
             def runner(m: dict, cap: float, _factory: object) -> None:
                 # the learner processes build their own guarded providers; this one is never built
-                typer.echo(json.dumps({"run_dir": str(run_live_battery(m, cap, model=model))}))
+                out = run_live_battery(
+                    m, cap, model=model, run_id=resume, resume=resume is not None
+                )
+                typer.echo(json.dumps({"run_dir": str(out)}))
 
             run_live(manifest, cap_usd, factory, run, runner=runner)
         except GateRefused as e:
@@ -916,6 +924,7 @@ def eval_run(
         except NotImplementedError as e:
             typer.echo(f"oa eval run --mode live: {e}", err=True)
             raise typer.Exit(int(ExitState.NOT_IMPLEMENTED))
+        return
     names = [s.strip() for s in systems.split(",") if s.strip()]
     if not names or set(names) - {"A", "B", "C", "D"}:
         raise typer.BadParameter("systems are a comma-separated subset of A,B,C,D")
