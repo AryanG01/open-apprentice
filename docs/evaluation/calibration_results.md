@@ -59,3 +59,19 @@ A development-only revision of B's prompt and tool-call parsing:
 
 Then a second, small calibration: B only, on the same 5 dev episodes, about **$1.6** at the observed $0.32 per
 episode. A needs no change. The funded tier should wait for that, and for a top-up.
+
+## B re-check after the fix (live, 2026-10-17) — stopped early
+
+Run `cal-5d6f87ff423040d3-20261017T004842` (manifest `5d6f87ff423040d3`, B only, cap $1.25). **Spent $0.288.** I
+stopped it after the first episode to save the remaining budget, because the failure was the same:
+- The fixes worked mechanically: no flattened-argument parse failures, and no `&&`/`||`.
+- B still never called `preview`. It re-proposed P1 four times, although each reply told it "P1 already proposed and
+  still fits ... preview it and then commit".
+- Twice it called `request_demo` / `ask_choose` without a document id.
+- One call was truncated, and it ran out of its 8 attempts.
+
+This makes three B episodes with the same pattern: with this prompt, the model does not follow the tool protocol's
+stopping path. B as specified (same model, acting freely) is therefore a very weak baseline here. An A-versus-B result
+would mostly measure B's inability to drive the tools, not the value of A's policy.
+
+Spend logged so far: $39.76 of $45.77 funded; $1.01 left above the $5 reserve.

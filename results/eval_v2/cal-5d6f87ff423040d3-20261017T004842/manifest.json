@@ -1,0 +1,1 @@
+{"run_id": "cal-5d6f87ff423040d3-20261017T004842", "split": "dev", "mode": "live", "model": "nvidia/Nemotron-3-Ultra-550b-a55b", "systems": ["B"], "repeats": 1, "approved_manifest": "5d6f87ff423040d3", "cap_usd": 1.25, "spent_usd": 0.2876, "coverage": "1/5", "stopped": "stopped by hand after episode 1 (same failure as the calibration; budget saved)"}
