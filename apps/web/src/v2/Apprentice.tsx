@@ -4,9 +4,21 @@ import { Question } from "./Question";
 import { Teach } from "./Teach";
 import { get } from "./api";
 import { useSession } from "./useSession";
-import type { DocumentInfo, Provenance } from "./types";
+import { Correct } from "./Correct";
+import { provenanceLine } from "./provenance";
+import { Reuse } from "./Reuse";
+import type { DocRef, DocumentInfo, RunInfo, RunResult } from "./types";
 
 const DOCS_KEY = "oa.v2.docs";
+const SKILL_KEY = "oa.v2.skill";
+
+const readSkill = (): string | null => {
+  try {
+    return localStorage.getItem(SKILL_KEY);
+  } catch {
+    return null;
+  }
+};
 
 const STATE_TEXT: Record<string, string> = {
   teaching: "teaching",
@@ -17,11 +29,12 @@ const STATE_TEXT: Record<string, string> = {
   failed: "stopped",
   cancelled: "cancelled",
   review: "review",
-  activated: "activated",
-  override: "kept as a one-document override",
+  activated: "the corrected version is now active",
+  override: "kept as a one-document override; the skill is unchanged",
+  dismissed: "dismissed as a mistaken edit; the skill is unchanged",
+  activation_rejected: "not activated: the skill changed meanwhile; reload the skill and correct again",
 };
 
-export const provenanceLine = (p: Provenance): string => `Model: ${p.model} · Teacher: ${p.teacher}`;
 
 function readHash(): { sid: string | null } {
   const m = window.location.hash.match(/^#apprentice\/s\/([0-9a-f]+)/);
@@ -42,6 +55,21 @@ export function Apprentice() {
   const [sid, setSid] = useState<string | null>(readHash().sid);
   const { state, error, refresh } = useSession(sid);
   const [backend, setBackend] = useState<"unknown" | "yes" | "no">("unknown");
+  const [skillId, setSkillId] = useState<string | null>(readSkill());
+  const [correcting, setCorrecting] = useState<{ run: RunInfo; ref: DocRef; result: RunResult } | null>(null);
+
+  // a teaching session that committed names the skill; keep it for reuse across reloads
+  useEffect(() => {
+    const s = state?.result.skill_id;
+    if (s && s !== skillId) {
+      setSkillId(s);
+      try {
+        localStorage.setItem(SKILL_KEY, s);
+      } catch {
+        /* storage unavailable */
+      }
+    }
+  }, [state, skillId]);
 
   const setDocs = useCallback((f: (d: DocumentInfo[]) => DocumentInfo[]) => {
     setDocsState((old) => {
@@ -106,6 +134,20 @@ export function Apprentice() {
           )}
           <button type="button" onClick={() => { window.location.hash = "apprentice"; setSid(null); }}>Start over with these documents</button>
         </section>
+      ) : null}
+      {correcting && skillId ? (
+        <Correct
+          skillId={skillId}
+          run={correcting.run}
+          doc={correcting.ref}
+          result={correcting.result}
+          title={docs.find((d) => d.doc_id === correcting.ref.doc_id)?.name ?? "document"}
+          onSession={(id) => { setCorrecting(null); openSession(id); }}
+          onClose={() => setCorrecting(null)}
+        />
+      ) : null}
+      {skillId && !correcting && (!state || ["committed", "activated", "override", "dismissed", "failed", "cancelled"].includes(state.state)) ? (
+        <Reuse docs={docs} skillId={skillId} onCorrect={(run, ref, result) => setCorrecting({ run, ref, result })} />
       ) : null}
     </main>
   );

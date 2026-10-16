@@ -393,3 +393,7 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .question .option.blocked { border-color: #a40000; background: #fff5f5; }
 .question img.item { display: block; max-width: 100%; margin: 0.4rem 0; border: 1px solid var(--line, #ddd); }
 .question .actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+.results .result { border: 1px solid var(--line, #ccc); padding: 0.5rem; margin: 0.5rem 0; }
+.results .result.blocked, .results .result.failed { border-color: #a40000; }
+.checks { list-style: none; padding-left: 0; }
+.pick { display: block; }
