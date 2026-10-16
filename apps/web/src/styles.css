@@ -365,3 +365,16 @@ ul.pairs label { display: grid; gap: 4px; font-size: 0.9rem; }
 ul.pairs select { font: inherit; padding: 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-width: 9rem; }
 ul.pairs button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 7px 12px; border-radius: 8px; cursor: pointer; }
 @media (max-width: 760px) { .svgpair { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Apprentice (v2) ---- */
+.docview { margin: 0 0 1rem; }
+.docview-stage { position: relative; display: inline-block; max-width: 100%; line-height: 0; border: 1px solid var(--line, #ccc); }
+.docview-stage img { max-width: 100%; height: auto; display: block; user-select: none; }
+.docview .lab { position: absolute; padding: 0; margin: 0; background: transparent; border: 1px solid rgba(0, 90, 200, 0.55); cursor: grab; touch-action: none; }
+.docview .lab:focus-visible, .docview .lab.sel { outline: 2px solid #005ac8; outline-offset: 1px; }
+.docview .lab.moved { border: 2px dashed #b35c00; }
+.docview .lab .badge { position: absolute; top: -1.4em; left: 0; font-size: 0.7rem; line-height: 1.2; background: #b35c00; color: #fff; padding: 0 0.25em; }
+.docview .fields { display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem; flex-wrap: wrap; }
+.docview .fields input { width: 7rem; }
+.docview figcaption { margin-top: 0.4rem; }
+.docview .safety { display: block; color: var(--muted, #666); }
