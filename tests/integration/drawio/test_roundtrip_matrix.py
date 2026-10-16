@@ -20,7 +20,7 @@ def run(engine_url, tmp_path, raw, cell, dx, dy, page_index=0):
     c = classify(page)
     r = render_page(page, engine_url)
     nodes = [n for n in c.fixed if n in r.nodes]
-    s = build_scene(c, r, {m: (nodes[0], "note") for m in c.movable})
+    s = build_scene(c, r, {m: (nodes[0], "note") for m in c.movable}, f.doc_hash)
     o = next(o for o in s.scene["objects"] if o["id"] == cell)
     targets = {cell: (o["x"] + dx, o["y"] + dy)}
     edits = plan_edits(page, s.offsets, targets)
@@ -94,9 +94,12 @@ def test_real_corpus_file_round_trip(engine_url, tmp_path):
 
 def test_refuses_unmeasurable_label(engine_url):
     raw = drawio(model([node("n1", 40, 40), label("l1", 200, 200, value="&amp;nbsp;")]))
-    page = load_drawio(raw).pages[0]
+    f = load_drawio(raw)
+    page = f.pages[0]
     with pytest.raises(DrawioRefused, match="measured"):
-        build_scene(classify(page), render_page(page, engine_url), {"l1": ("n1", "note")})
+        build_scene(
+            classify(page), render_page(page, engine_url), {"l1": ("n1", "note")}, f.doc_hash
+        )
 
 
 def test_refuses_out_of_rectangle_content():

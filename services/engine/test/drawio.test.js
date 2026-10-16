@@ -64,3 +64,15 @@ test("oversized and non-string input is refused", async () => {
   assert.equal((await render(123)).status, 400);
   assert.equal((await render("x".repeat(5 * 1024 * 1024))).status, 400);
 });
+
+test("a render that times out still closes its browser context", async () => {
+  const quick = new Engine({ renderTimeoutMs: 300 }); // long enough that the context exists, short enough to cut the viewer load
+  await quick.start();
+  try {
+    const base = quick.contextCountForTest();
+    await assert.rejects(quick.renderDrawio(page(node("n1", 40, 40))), (e) => e.code === "TIMEOUT");
+    assert.equal(quick.contextCountForTest(), base);
+  } finally {
+    await quick.close();
+  }
+});

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from fractions import Fraction
 from typing import Optional
@@ -27,11 +28,17 @@ class Classified:
     ]  # geometry box in document coordinates
 
 
+NUMBER = re.compile(
+    r"-?\d{1,9}(\.\d{1,9})?"
+)  # what draw.io writes; anything else is refused before Fraction sees it
+
+
 def _num(v: Optional[str]) -> Fraction:
-    try:
-        return Fraction(v) if v not in (None, "") else Fraction(0)
-    except ValueError as e:
-        raise DrawioRefused(f"a geometry value {v!r} is not a number") from e
+    if v in (None, ""):
+        return Fraction(0)
+    if not NUMBER.fullmatch(v):
+        raise DrawioRefused(f"a geometry value {v[:40]!r} is not a number")
+    return Fraction(v)
 
 
 def _label_problem(c: Cell, layers: set[str]) -> str:

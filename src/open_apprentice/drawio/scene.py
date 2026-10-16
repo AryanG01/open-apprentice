@@ -19,6 +19,7 @@ class DrawioScene:
     offsets: dict[str, tuple[Fraction, Fraction]]
     movable: tuple[str, ...]
     demoted: dict[str, str]
+    doc_hash: str  # the document these measurements came from; publish refuses any other
 
 
 def _obj(cid: str, kind: str, b: Box, role: str = "", attached: str = "") -> dict:
@@ -34,7 +35,9 @@ def _obj(cid: str, kind: str, b: Box, role: str = "", attached: str = "") -> dic
     }
 
 
-def build_scene(c: Classified, r: Rendered, mapping: dict[str, tuple[str, str]]) -> DrawioScene:
+def build_scene(
+    c: Classified, r: Rendered, mapping: dict[str, tuple[str, str]], doc_hash: str
+) -> DrawioScene:
     objects: list[dict] = []
     offsets: dict[str, tuple[Fraction, Fraction]] = {}
     movable: list[str] = []
@@ -85,4 +88,5 @@ def build_scene(c: Classified, r: Rendered, mapping: dict[str, tuple[str, str]])
         offsets,
         tuple(movable),
         demoted,
+        doc_hash,
     )

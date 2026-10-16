@@ -45,9 +45,11 @@ export class Engine {
   #healthy = false;
   #onDisconnect = null;
   #renders = 0;
+  #renderTimeoutMs;
 
-  constructor({ idleMs = SESSION_IDLE_MS } = {}) {
+  constructor({ idleMs = SESSION_IDLE_MS, renderTimeoutMs = RENDER_TIMEOUT_MS } = {}) {
     this.#idleMs = idleMs;
+    this.#renderTimeoutMs = renderTimeoutMs;
   }
 
   get healthy() { return this.#healthy; }
@@ -191,19 +193,30 @@ export class Engine {
     if (this.#renders >= MAX_RENDERS) throw Object.assign(new Error("render limit"), { code: "LIMIT" });
     this.#renders += 1;
     let timer;
+    let opened = null;
     try {
       const timeout = new Promise((_, reject) => {
-        timer = setTimeout(() => reject(Object.assign(new Error("render timed out"), { code: "TIMEOUT" })), RENDER_TIMEOUT_MS);
+        timer = setTimeout(() => reject(Object.assign(new Error("render timed out"), { code: "TIMEOUT" })), this.#renderTimeoutMs);
       });
-      const out = await Promise.race([renderPage(this.#browser, xml, { wantPng, wantSvg }), timeout]);
+      const work = (async () => {
+        opened = openFontPage(this.#browser);
+        return renderPage(await opened, xml, { wantPng, wantSvg });
+      })();
+      const out = await Promise.race([work, timeout]);
       return { ...out, profile: { ...PROFILE_BASE, chromium: this.#browser.version() } };
     } catch (e) {
       if (e.code) throw e;
       throw Object.assign(new Error(String(e.message).split("\n")[0].slice(0, 200)), { code: "RENDER_FAILED" });
     } finally {
       clearTimeout(timer);
+      // close the context here, whatever the race's outcome: an abandoned render must not keep a live page behind
+      if (opened) await opened.then(({ context }) => context.close(), () => {}).catch(() => {});
       this.#renders -= 1;
     }
+  }
+
+  contextCountForTest() {
+    return this.#browser.contexts().length;
   }
 
   async textWidthForTest(family, text) {

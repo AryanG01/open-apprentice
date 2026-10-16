@@ -46,75 +46,71 @@ export async function openFontPage(browser) {
   }
 }
 
-export async function renderPage(browser, xml, { wantPng = true, wantSvg = false } = {}) {
-  const { context, page, blocked } = await openFontPage(browser);
-  try {
-    await page.addScriptTag({ content: VIEWER });
-    const out = await page.evaluate(async (xmlText) => {
-      const doc = mxUtils.parseXml(xmlText);
-      const container = document.getElementById("c");
-      const v = new GraphViewer(container, doc.documentElement, { highlight: "none", nav: false, resize: false, center: false });
-      const graph = v.graph;
-      graph.view.setScale(1);
-      await document.fonts.ready;
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-      const svg = container.querySelector("svg");
-      const inv = svg.getScreenCTM().inverse();
-      const toDoc = (cx, cy) => {
-        const p = svg.createSVGPoint(); p.x = cx; p.y = cy;
-        const q = p.matrixTransform(inv);
-        return { x: q.x / graph.view.scale - graph.view.translate.x, y: q.y / graph.view.scale - graph.view.translate.y };
-      };
-      const box = (l, t, r, b) => { const a = toDoc(l, t), c = toDoc(r, b); return { x: a.x, y: a.y, w: c.x - a.x, h: c.y - a.y }; };
-      const res = { translate: { x: graph.view.translate.x, y: graph.view.translate.y }, labels: {}, nodes: {}, missing: [] };
-      for (const cell of Object.values(graph.model.cells)) {
-        if (!cell.vertex) continue;
-        const st = graph.view.getState(cell);
-        if (!st) { res.missing.push(cell.id); continue; }
-        if ((cell.style || "").startsWith("text;")) {
-          const rects = [];
-          if (st.text && st.text.node) {
-            const walker = document.createTreeWalker(st.text.node, NodeFilter.SHOW_TEXT);
-            for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-              if (!n.textContent.replace(/ /g, " ").trim()) continue;
-              const range = document.createRange(); range.selectNodeContents(n);
-              rects.push(...[...range.getClientRects()].filter((r) => r.width > 0 && r.height > 0));
-            }
+// The caller owns the context (opened with openFontPage) and closes it, including when a render is abandoned on timeout.
+export async function renderPage({ page, blocked }, xml, { wantPng = true, wantSvg = false } = {}) {
+  await page.addScriptTag({ content: VIEWER });
+  const out = await page.evaluate(async (xmlText) => {
+    const doc = mxUtils.parseXml(xmlText);
+    const container = document.getElementById("c");
+    const v = new GraphViewer(container, doc.documentElement, { highlight: "none", nav: false, resize: false, center: false });
+    const graph = v.graph;
+    graph.view.setScale(1);
+    await document.fonts.ready;
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const svg = container.querySelector("svg");
+    const inv = svg.getScreenCTM().inverse();
+    const toDoc = (cx, cy) => {
+      const p = svg.createSVGPoint(); p.x = cx; p.y = cy;
+      const q = p.matrixTransform(inv);
+      return { x: q.x / graph.view.scale - graph.view.translate.x, y: q.y / graph.view.scale - graph.view.translate.y };
+    };
+    const box = (l, t, r, b) => { const a = toDoc(l, t), c = toDoc(r, b); return { x: a.x, y: a.y, w: c.x - a.x, h: c.y - a.y }; };
+    const res = { translate: { x: graph.view.translate.x, y: graph.view.translate.y }, labels: {}, nodes: {}, missing: [] };
+    for (const cell of Object.values(graph.model.cells)) {
+      if (!cell.vertex) continue;
+      const st = graph.view.getState(cell);
+      if (!st) { res.missing.push(cell.id); continue; }
+      if ((cell.style || "").startsWith("text;")) {
+        const rects = [];
+        if (st.text && st.text.node) {
+          const walker = document.createTreeWalker(st.text.node, NodeFilter.SHOW_TEXT);
+          for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+            if (!n.textContent.replace(/ /g, " ").trim()) continue;
+            const range = document.createRange(); range.selectNodeContents(n);
+            rects.push(...[...range.getClientRects()].filter((r) => r.width > 0 && r.height > 0));
           }
-          if (!rects.length) { res.missing.push(cell.id); continue; }
-          let l = Math.min(...rects.map((r) => r.left)), t = Math.min(...rects.map((r) => r.top));
-          let r = Math.max(...rects.map((q) => q.right)), b = Math.max(...rects.map((q) => q.bottom));
-          // a visible background or border on the label's own HTML box extends the measured box
-          const div = st.text.node.querySelector("div div") || st.text.node.querySelector("div");
-          if (div) {
-            const cs = getComputedStyle(div);
-            const bg = cs.backgroundColor && cs.backgroundColor !== "rgba(0, 0, 0, 0)" && cs.backgroundColor !== "transparent";
-            if (bg || parseFloat(cs.borderTopWidth) > 0) {
-              const d = div.getBoundingClientRect();
-              l = Math.min(l, d.left); t = Math.min(t, d.top); r = Math.max(r, d.right); b = Math.max(b, d.bottom);
-            }
-          }
-          const lines = new Set(rects.map((q) => Math.round(q.top))).size;
-          res.labels[cell.id] = { box: box(l, t, r, b), lines, rects: rects.length };
-        } else {
-          const s = graph.view.scale, tr = graph.view.translate;
-          const state = { x: st.x / s - tr.x, y: st.y / s - tr.y, w: st.width / s, h: st.height / s };
-          let element = null;
-          const shapeNode = st.shape && st.shape.node;
-          if (shapeNode) {
-            const q = shapeNode.getBoundingClientRect();
-            if (q.width > 0 || q.height > 0) element = box(q.left, q.top, q.right, q.bottom);
-          }
-          res.nodes[cell.id] = { state, element, stroke: Number(st.style.strokeWidth || 1) };
         }
+        if (!rects.length) { res.missing.push(cell.id); continue; }
+        let l = Math.min(...rects.map((r) => r.left)), t = Math.min(...rects.map((r) => r.top));
+        let r = Math.max(...rects.map((q) => q.right)), b = Math.max(...rects.map((q) => q.bottom));
+        // a visible background or border on the label's own HTML box extends the measured box
+        const div = st.text.node.querySelector("div div") || st.text.node.querySelector("div");
+        if (div) {
+          const cs = getComputedStyle(div);
+          const bg = cs.backgroundColor && cs.backgroundColor !== "rgba(0, 0, 0, 0)" && cs.backgroundColor !== "transparent";
+          if (bg || parseFloat(cs.borderTopWidth) > 0) {
+            const d = div.getBoundingClientRect();
+            l = Math.min(l, d.left); t = Math.min(t, d.top); r = Math.max(r, d.right); b = Math.max(b, d.bottom);
+          }
+        }
+        const lines = new Set(rects.map((q) => Math.round(q.top))).size;
+        res.labels[cell.id] = { box: box(l, t, r, b), lines, rects: rects.length };
+      } else {
+        const s = graph.view.scale, tr = graph.view.translate;
+        const state = { x: st.x / s - tr.x, y: st.y / s - tr.y, w: st.width / s, h: st.height / s };
+        let element = null;
+        const shapeNode = st.shape && st.shape.node;
+        if (shapeNode) {
+          const q = shapeNode.getBoundingClientRect();
+          if (q.width > 0 || q.height > 0) element = box(q.left, q.top, q.right, q.bottom);
+        }
+        res.nodes[cell.id] = { state, element, stroke: Number(st.style.strokeWidth || 1) };
       }
-      return res;
-    }, xml);
-    out.png = wantPng ? (await page.locator("#c svg").screenshot({ type: "png" })).toString("base64") : null;
-    out.svg = wantSvg ? await page.evaluate(() => new XMLSerializer().serializeToString(document.querySelector("#c svg"))) : null;
-    out.blocked_requests = blocked;
-    return out;
-  } finally {
-    await context.close().catch(() => {});
-  }
+    }
+    return res;
+  }, xml);
+  out.png = wantPng ? (await page.locator("#c svg").screenshot({ type: "png" })).toString("base64") : null;
+  out.svg = wantSvg ? await page.evaluate(() => new XMLSerializer().serializeToString(document.querySelector("#c svg"))) : null;
+  out.blocked_requests = blocked;
+  return out;
 }

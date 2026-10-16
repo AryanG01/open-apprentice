@@ -204,6 +204,12 @@ def _cells(xml: bytes) -> tuple[dict[str, str], tuple[Cell, ...]]:
         if name == "mxGraphModel" and not model:
             model.update(attrs)
         elif name in ("UserObject", "object"):
+            for (
+                k,
+                v,
+            ) in attrs.items():  # placeholders can substitute any wrapper attribute into a label
+                if "<" in v:
+                    _check_label_html(v)
             wrapper.append({"id": attrs.get("id", ""), "value": attrs.get("label", "")})
         elif name == "mxCell":
             rec = _Rec(dict(attrs), wrapper[-1] if wrapper else None)
@@ -263,9 +269,16 @@ def _cells(xml: bytes) -> tuple[dict[str, str], tuple[Cell, ...]]:
                 r.wrapper is not None,
             )
         )
+    parents = {c.id: c.parent for c in out}
     for c in out:
         if c.parent and c.parent not in seen:
             raise DrawioRefused(f"cell {c.id!r} has an unknown parent {c.parent!r}")
+    for c in out:
+        cur, steps = c.id, 0
+        while parents.get(cur):
+            cur, steps = parents[cur], steps + 1
+            if cur == c.id or steps > MAX_DEPTH:
+                raise DrawioRefused(f"cell {c.id!r} has a cyclic or too deep parent chain")
     return model, tuple(out)
 
 
@@ -288,7 +301,6 @@ def load_drawio(raw: bytes) -> DrawioFile:
 
 
 def page_document(page: Page) -> str:
-    """One page as an uncompressed <mxfile>, the form the engine's renderer takes."""
-    return (
-        f'<mxfile><diagram id="{page.id}" name="page">{page.xml.decode("utf-8")}</diagram></mxfile>'
-    )
+    """One page as an uncompressed <mxfile>, the form the engine's renderer takes. No file text is interpolated outside the
+    page XML itself (whose bytes were validated), so a crafted page id cannot inject markup."""
+    return f'<mxfile><diagram id="p" name="page">{page.xml.decode("utf-8")}</diagram></mxfile>'

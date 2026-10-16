@@ -71,7 +71,7 @@ def publish(
     intent: Optional[dict] = None,
     drift: Optional[str] = None,
 ) -> Receipt:
-    new = apply_edits(f, page_index, edits, f.doc_hash)
+    new = apply_edits(f, page_index, edits, before.doc_hash)
     g = load_drawio(new)
     others_ok = all(
         new[q.content_span[0] : q.content_span[1]] == f.raw[p.content_span[0] : p.content_span[1]]

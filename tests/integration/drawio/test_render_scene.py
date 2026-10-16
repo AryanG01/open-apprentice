@@ -9,7 +9,7 @@ def test_corpus_page_becomes_a_scene(engine_url):
     c = classify(f.pages[0])
     r = render_page(f.pages[0], engine_url)
     first_node = next(cid for cid in c.fixed if cid in r.nodes)
-    s = build_scene(c, r, {cid: (first_node, "note") for cid in c.movable})
+    s = build_scene(c, r, {cid: (first_node, "note") for cid in c.movable}, f.doc_hash)
     assert {o["kind"] for o in s.scene["objects"]} >= {"node", "label"}
     assert r.png and r.profile["viewer_sha256"].startswith("bc7586cb")
     for cid in s.movable:

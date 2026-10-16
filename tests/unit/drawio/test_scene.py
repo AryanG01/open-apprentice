@@ -41,7 +41,7 @@ def test_quantum_is_one_sixty_fourth():
 
 def test_scene_uses_measured_boxes_and_stores_offsets():
     c, r = setup()
-    s = build_scene(c, r, {"l1": ("n1", "note")})
+    s = build_scene(c, r, {"l1": ("n1", "note")}, "h")
     lab = next(o for o in s.scene["objects"] if o["id"] == "l1")
     assert (lab["kind"], lab["role"], lab["attached"]) == ("label", "note", "n1")
     assert (lab["x"], lab["y"], lab["w"], lab["h"]) == (52, 103, 30, 14)
@@ -50,7 +50,7 @@ def test_scene_uses_measured_boxes_and_stores_offsets():
 
 def test_wrapped_label_is_demoted_to_obstacle_with_reason():
     c, r = setup(lines=2)
-    s = build_scene(c, r, {"l1": ("n1", "note")})
+    s = build_scene(c, r, {"l1": ("n1", "note")}, "h")
     assert s.movable == () and "more than one line" in s.demoted["l1"]
     assert next(o for o in s.scene["objects"] if o["id"] == "l1")["kind"] == "obstacle"
 
@@ -58,16 +58,16 @@ def test_wrapped_label_is_demoted_to_obstacle_with_reason():
 def test_node_mismatch_above_half_unit_blocks():
     c, r = setup(element=(42, 40, 100, 50))  # 2 units off; tolerance is 0.5 + stroke/2 = 1
     with pytest.raises(DrawioRefused, match="disagrees"):
-        build_scene(c, r, {"l1": ("n1", "note")})
+        build_scene(c, r, {"l1": ("n1", "note")}, "h")
 
 
 def test_unmapped_movable_label_is_an_error():
     c, r = setup()
     with pytest.raises(ValueError, match="mapping"):
-        build_scene(c, r, {})
+        build_scene(c, r, {}, "h")
 
 
 def test_measured_box_outside_page_is_refused():
     c, r = setup(label_box=(590, 103, 30, 14))
     with pytest.raises(DrawioRefused, match="outside the page"):
-        build_scene(c, r, {"l1": ("n1", "note")})
+        build_scene(c, r, {"l1": ("n1", "note")}, "h")

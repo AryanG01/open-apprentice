@@ -31,7 +31,7 @@ def fake_render(page, *, shift=(2, 3), size=(30, 14)):
 def prepare(targets):
     f = load_drawio(drawio(M))
     page = f.pages[0]
-    before = build_scene(classify(page), fake_render(page), {"l1": ("n1", "note")})
+    before = build_scene(classify(page), fake_render(page), {"l1": ("n1", "note")}, f.doc_hash)
     return f, before, plan_edits(page, before.offsets, targets)
 
 
