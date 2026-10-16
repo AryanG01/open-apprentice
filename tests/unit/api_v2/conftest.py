@@ -98,3 +98,32 @@ def import_and_confirm(client, v2, raw, name="d.drawio"):
         json={"page_id": pid, "labels": {}, "confirm": True},
     ).json()["mapping_hash"]
     return {"doc_id": doc["doc_id"], "page_id": pid, "mapping_hash": mh}
+
+
+RIGHT_12 = {
+    "l1": ["152", "58"],
+    "l2": ["412", "58"],
+}  # fake render: label box = geometry + (2, 3), 30x14
+
+
+def start_session(client, v2, demo_raw, batch_raw, boxes=RIGHT_12, key="k1"):
+    ref = import_and_confirm(client, v2, demo_raw)
+    bref = import_and_confirm(client, v2, batch_raw, "b.drawio")
+    sh = client.get(f"/api/v2/documents/{ref['doc_id']}").json()["pages"][0]["scene_hash"]
+    body = {
+        "documents": [ref, bref],
+        "demonstrations": [{"document_ref": 0, "before_scene_hash": sh, "boxes": boxes}],
+        "live": False,
+        "idempotency_key": key,
+    }
+    sid = client.post("/api/v2/sessions", json=body).json()["session_id"]
+    v2.dispatcher.drain()
+    return sid
+
+
+@pytest.fixture
+def two_docs_session(client, v2, doc_bytes, batch_bytes):
+    sid = start_session(client, v2, doc_bytes, batch_bytes)
+    s = client.get(f"/api/v2/sessions/{sid}").json()
+    assert s["outstanding"], s
+    return sid, s

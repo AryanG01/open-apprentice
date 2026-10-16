@@ -141,3 +141,15 @@ def post_session(
 @router.get("/sessions/{sid}")
 def get_session(sid: str, request: Request, who: str = Depends(owner)) -> dict:
     return service.session_state(_v2(request), who, sid)
+
+
+@router.post("/sessions/{sid}/responses")
+def post_response(
+    sid: str, request: Request, body: dict = Body(default={}), who: str = Depends(owner)
+) -> dict:
+    return service.submit_answer(_v2(request), who, sid, body)
+
+
+@router.post("/sessions/{sid}/cancel")
+def post_cancel(sid: str, request: Request, who: str = Depends(owner)) -> dict:
+    return service.cancel_session(_v2(request), who, sid)

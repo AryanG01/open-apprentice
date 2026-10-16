@@ -567,3 +567,95 @@ def _correction_state(
     types: list, req: Optional[dict], waiting_model: set, abstain: Any, error: Any
 ) -> str:  # Task 8
     return "draft"
+
+
+# ---- answers and cancellation --------------------------------------------------------------------------------------------
+
+
+def _norm_response(d: dict) -> tuple:
+    return (d.get("kind"), d.get("selected"), [list(p) for p in d.get("per_item") or []])
+
+
+def _same_response(stored: dict, new: dict) -> bool:
+    return _norm_response(stored) == _norm_response(new)
+
+
+def submit_answer(v: V2, owner: str, sid: str, body: dict) -> dict:
+    from open_apprentice.teaching.events import SessionLog
+    from open_apprentice.teaching.executor import submit_response
+    from open_apprentice.teaching.teacher import Response
+
+    records.load(v.store, _meta_key(sid), owner)
+    log = SessionLog(v.store, sid)
+    manifest, _ = log.manifest()
+    evs = log.events()
+    rid = body.get("request_id")
+    prior = next(
+        (
+            e.payload["response"]
+            for e in evs
+            if e.type == "ResponseRecorded" and e.payload["response"]["request_id"] == rid
+        ),
+        None,
+    )
+    if prior is not None:
+        if _same_response(prior, body):
+            return {"accepted": True, "duplicate": True}
+        raise Conflict("NOT_OUTSTANDING", "this question was already answered differently")
+    req, _ = _open_request(evs)
+    if (
+        req is None
+        or req["request_id"] != rid
+        or body.get("intent_revision") != manifest["intent_revision"]
+    ):
+        raise Conflict("NOT_OUTSTANDING", "this question is no longer open; reload the session")
+    try:
+        resp = Response(
+            rid,
+            str(body.get("kind", "")),
+            body.get("selected"),
+            tuple((str(p[0]), str(p[1])) for p in body.get("per_item") or []),
+            None,
+            "human",
+        )
+    except (TypeError, IndexError) as e:
+        raise Conflict("INVALID_ANSWER", f"the answer is malformed ({e})") from e
+    if not submit_response(log, resp):
+        raise Conflict(
+            "INVALID_ANSWER", "the answer does not fit the question (or it was answered meanwhile)"
+        )
+    v.dispatcher.submit(sid, lambda: advance(v, sid))
+    return {"accepted": True, "duplicate": False}
+
+
+TERMINAL_TYPES = (
+    "Abstained",
+    "Errored",
+    "VersionStored",
+    "OverrideRecorded",
+    "CorrectionDismissed",
+    "ActivationRejected",
+)
+
+
+def cancel_session(v: V2, owner: str, sid: str) -> dict:
+    """Stop new authorizations (spec 8). Late provider usage is still booked by the executor; late results cannot resume."""
+    from open_apprentice.teaching.events import Conflict as LogConflict
+    from open_apprentice.teaching.events import SessionLog
+
+    meta, _ = records.load(v.store, _meta_key(sid), owner)
+    log = SessionLog(v.store, sid)
+    for _ in range(20):
+        if any(e.type in TERMINAL_TYPES for e in log.events()):
+            return {"cancelled": False}
+        try:
+            if meta["kind"] == "correction":
+                log.append("CorrectionAbandoned", "human", {})
+            else:
+                log.append(
+                    "Abstained", "human", {"action_id": f"cancel-{sid}", "reason": CANCELLED}
+                )
+            return {"cancelled": True}
+        except LogConflict:
+            continue  # the session moved; look again
+    raise Conflict("BUSY", "the session is busy; try again")
