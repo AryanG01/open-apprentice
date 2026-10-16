@@ -44,6 +44,9 @@ jobs:
       - name: Engine tests (real Konva and Fabric in Chromium)
         run: npm test
 
+      - name: Web geometry and state helpers
+        run: npm run test:geometry
+
       - name: Python tests, including engine-backed integration tests
         run: OA_ENGINE_TESTS=1 uv run pytest -q tests
 

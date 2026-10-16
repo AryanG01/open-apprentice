@@ -13,6 +13,7 @@
   "scripts": {
     "test": "npm test -w services/engine",
     "build:web": "npm run build -w apps/web",
+    "test:geometry": "node --experimental-strip-types --test tests/e2e/geometry.test.mjs",
     "test:e2e": "OA_E2E=1 node --test tests/e2e/ui.test.mjs",
     "lint": "npm run lint -w apps/web"
   }
