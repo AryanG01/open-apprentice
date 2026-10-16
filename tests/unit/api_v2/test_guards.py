@@ -11,6 +11,8 @@ ROUTES = [
     ("get", "/api/v2/sessions/{sid}"),
     ("post", "/api/v2/sessions/{sid}/responses"),
     ("post", "/api/v2/sessions/{sid}/cancel"),
+    ("get", "/api/v2/sessions/{sid}/requests/q/items/a.png"),
+    ("get", "/api/v2/documents/{doc}/pages/{page}/scene"),
     ("get", "/api/v2/runs/{run}"),
     ("get", "/api/v2/runs/{run}/export"),
     ("post", "/api/v2/runs/{run}/cancel"),

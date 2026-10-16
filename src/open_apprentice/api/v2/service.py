@@ -468,12 +468,18 @@ def _open_request(evs: list) -> tuple[Optional[dict], Optional[str]]:
     return None, None
 
 
-def _approve_all(req: dict) -> dict:
+def _approve_all(req: dict, checks: Optional[dict] = None) -> dict:
     t = req["type"]
+    ok = {i: c["ok"] for i, c in (checks or {}).items()}
     if t == "ChooseOutput":
         return {"kind": "choose", "selected": req["alternatives"][0][0]}
     if t == "ConfirmPreview":
-        return {"kind": "items", "per_item": [[it[0], "approve"] for it in req["items"]]}
+        return {
+            "kind": "items",
+            "per_item": [
+                [it[0], "approve" if ok.get(it[0], True) else "reject"] for it in req["items"]
+            ],
+        }
     if t == "ConfirmCorrectionScope":
         first = next(
             (i["interp_id"] for i in req["interpretations"] if i["kind"] == "revise"), "ov"
@@ -529,11 +535,14 @@ def session_state(v: V2, owner: str, sid: str) -> dict:
     spend = v.ledger.exposure(action_ids)
     outstanding = None
     if req is not None and state in ("waiting_for_answer", "preview_ready", "review"):
+        checks = item_checks(evs, req)
         outstanding = {
             "request_id": req["request_id"],
             "intent_revision": manifest["intent_revision"],
             "request": req,
-            "approve_all_answer": _approve_all(req),
+            "item_ids": list(item_outputs(req)),
+            "checks": checks,
+            "approve_all_answer": _approve_all(req, checks),
         }
     return {
         "session_id": sid,
@@ -634,6 +643,15 @@ def submit_answer(v: V2, owner: str, sid: str, body: dict) -> dict:
         or body.get("intent_revision") != manifest["intent_revision"]
     ):
         raise Conflict("NOT_OUTSTANDING", "this question is no longer open; reload the session")
+    if req["type"] == "ConfirmPreview":
+        checks = item_checks(evs, req)
+        for p in body.get("per_item") or []:
+            item = str(p[0]) if isinstance(p, (list, tuple)) and len(p) == 2 else ""
+            if p[1:] == ["approve"] and not checks.get(item, {"ok": True})["ok"]:
+                raise Conflict(
+                    "BLOCKED_ITEM",
+                    "this document cannot be approved: " + "; ".join(checks[item]["reasons"]),
+                )
     try:
         resp = Response(
             rid,
@@ -1017,4 +1035,117 @@ def page_scene_view(v: V2, owner: str, doc_id: str, page_id: str, mapping_hash: 
             for o in sc.scene["objects"]
         ],
         "movable": list(sc.movable),
+    }
+
+
+# ---- rendered question items and their checks ----------------------------------------------------------------------------
+
+
+def item_outputs(req: dict) -> dict[str, tuple[str, dict]]:
+    """Every renderable item of a question: id → (scene id, output)."""
+    t = req["type"]
+    if t == "ChooseOutput":
+        return {a: (req["scene_id"], out) for a, out in req["alternatives"]}
+    if t == "ConfirmPreview":
+        return {i: (sid, out) for i, sid, _, out in req["items"]}
+    if t == "ConfirmCorrectionScope":
+        return {
+            f"{it['interp_id']}:{k}": (sid, out)
+            for it in req["interpretations"]
+            for k, (sid, _, out) in enumerate(it["consequences"])
+        }
+    return {}
+
+
+def _session_scenes(evs: list) -> dict[str, dict]:
+    out: dict[str, dict] = {}
+    for e in evs:
+        if e.type == "SceneRegistered":
+            out[e.payload["scene_id"]] = scene_from_payload(e.payload["scene"])
+        elif e.type == "CorrectionStarted":
+            out[e.payload["scene_id"]] = scene_from_payload(e.payload["scene"])
+    return out
+
+
+def _layout_check(scene: dict, output: dict) -> dict:
+    """Geometric layout safety of an output on its scene: positioned labels inside the page, no overlap (touching allowed)."""
+    placed = {k: (Fraction(str(p[0])), Fraction(str(p[1]))) for k, p in output.items()}
+    boxes = {
+        o["id"]: (*placed.get(o["id"], (o["x"], o["y"])), o["w"], o["h"]) for o in scene["objects"]
+    }
+    W, H = scene["canvas"]["w"], scene["canvas"]["h"]
+    reasons = []
+    for k in sorted(placed):
+        if k not in boxes:
+            continue
+        x, y, w, h = boxes[k]
+        if x < 0 or y < 0 or x + w > W or y + h > H:
+            reasons.append(f"label {k} would lie outside the page")
+        for other, (ox, oy, ow, oh) in sorted(boxes.items()):
+            if other != k and x < ox + ow and ox < x + w and y < oy + oh and oy < y + h:
+                reasons.append(f"label {k} would overlap {other}")
+    return {"ok": not reasons, "reasons": reasons}
+
+
+def item_checks(evs: list, req: dict) -> dict[str, dict]:
+    scenes = _session_scenes(evs)
+    out = {}
+    for item, (sid, output) in item_outputs(req).items():
+        sc = scenes.get(sid)
+        out[item] = (
+            _layout_check(sc, output)
+            if sc is not None
+            else {"ok": False, "reasons": ["unknown document"]}
+        )
+    return out
+
+
+def _ref_for_scene(v: V2, owner: str, meta: dict, scene_id: str) -> dict:
+    refs = meta.get("documents") or []
+    if meta["kind"] == "correction":
+        refs = records.load(v.store, _run_key(meta["run_id"]), owner)[0]["documents"]
+    ref = next((r for r in refs if isinstance(r, dict) and _scene_id(r) == scene_id), None)
+    if ref is None:
+        raise records.NotFound(scene_id)
+    return ref
+
+
+def item_png(v: V2, owner: str, sid: str, request_id: str, item_id: str) -> bytes:
+    import hashlib
+
+    from open_apprentice.teaching.events import SessionLog
+
+    meta, _ = records.load(v.store, _meta_key(sid), owner)
+    evs = SessionLog(v.store, sid).events()
+    req = next(
+        (
+            e.payload["request"]
+            for e in evs
+            if e.type == "RequestIssued" and e.payload["request"]["request_id"] == request_id
+        ),
+        None,
+    )
+    if req is None or item_id not in item_outputs(req):
+        raise records.NotFound(item_id)
+    key = f"sessions/{sid}/renders/{request_id}/{hashlib.sha256(item_id.encode()).hexdigest()}.png"
+    cached = v.store.get(key)
+    if cached is not None:
+        return cached.data
+    scene_id, output = item_outputs(req)[item_id]
+    ref = _ref_for_scene(v, owner, meta, scene_id)
+    draft = draft_render(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"], output)
+    if not draft["png"]:
+        raise Conflict("NO_PREVIEW", "the renderer returned no image")
+    data = base64.b64decode(draft["png"])
+    v.store.create(key, data)
+    return data
+
+
+def config(v: V2) -> dict:
+    from open_apprentice.drawio.parse import MAX_UPLOAD
+
+    return {
+        "live_available": bool(v.live_available()),
+        "model": v.model,
+        "max_upload_bytes": MAX_UPLOAD,
     }

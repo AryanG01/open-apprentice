@@ -322,3 +322,20 @@ def post_activate(
     return service.activate(
         v, who, skill_id, _field(body, "version", int), gen, _field(body, "idempotency_key", str)
     )
+
+
+# ---- question items and config -------------------------------------------------------------------------------------------
+
+
+@router.get("/sessions/{sid}/requests/{request_id}/items/{item_id}.png")
+def get_item_png(
+    sid: str, request_id: str, item_id: str, request: Request, who: str = Depends(owner)
+) -> Response:
+    return Response(
+        service.item_png(_v2(request), who, sid, request_id, item_id), media_type="image/png"
+    )
+
+
+@router.get("/config")
+def get_config(request: Request) -> dict:
+    return service.config(_v2(request))
