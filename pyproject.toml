@@ -95,6 +95,7 @@ type = "forbidden"
 source_modules = [
   "open_apprentice.teaching",
   "open_apprentice.storage",
+  "open_apprentice.drawio",
 ]
 forbidden_modules = [
   "open_apprentice.evaluation",
