@@ -289,3 +289,37 @@ def test_a_resumed_live_run_reruns_only_runs_that_never_reached_the_model(tmp_pa
     )
     superseded = [json.loads(x) for x in (out / "rows.superseded.jsonl").read_text().splitlines()]
     assert [(r["episode"], r["method"]) for r in superseded] == [(eps[0].id, "B")]
+
+
+@pytest.mark.parametrize("status,reason", [
+    ("abstained", "budget: reserving 1/5 would exceed cap 8949/50000"),
+    ("error", "provider: budget: reserving 1/5 would exceed cap 8949/50000"),
+])  # fmt: skip
+def test_a_dollar_cap_stop_is_a_stopped_run_not_an_outcome(status, reason):
+    ep = next(e for e in _dev() if e.stratum == "unsupported")
+    s = score(ep, _outcome(status) | {"reason": reason})
+    assert s["terminal_outcome"] == "error" and s["budget_stop"] is True
+
+
+def test_running_out_of_attempts_is_still_an_outcome():
+    ep = next(e for e in _dev() if e.stratum == "catalogue")
+    s = score(ep, _outcome("abstained") | {"reason": "budget exhausted: 8 provider attempts"})
+    assert s["terminal_outcome"] == "unnecessary_abstention" and s["budget_stop"] is False
+
+
+def test_rescore_rewrites_rows_from_the_kept_outcomes(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+
+    ep = next(e for e in _dev() if e.stratum == "unsupported")
+    row = rv.RowV2(ep.id, 0, "B", ep.id, ep.stratum, False, False, None, usd=0.0, origin="live", model="M",
+                   terminal_outcome="appropriate_refusal")  # fmt: skip
+    (tmp_path / "rows.jsonl").write_text(json.dumps(asdict(row)) + "\n")
+    (tmp_path / "manifest.json").write_text(json.dumps({"split": "dev"}))
+    keep = tmp_path / "episodes" / f"{ep.id}-B-r0"
+    keep.mkdir(parents=True)
+    (keep / "outcome.json").write_text(
+        json.dumps(_outcome("abstained") | {"reason": "budget: reserving 1/5"})
+    )
+    rv.rescore(tmp_path)
+    r = json.loads((tmp_path / "rows.jsonl").read_text())
+    assert r["terminal_outcome"] == "error" and r["failure"] == "budget_stop" and r["model"] == "M"

@@ -110,3 +110,14 @@ def test_report_says_b_corrections_ran_a_policy(tmp_path):
         json.dumps({"run_id": "x", "split": "dev", "mode": "mock"})
     )
     assert "not a comparison of correction policies" in report(tmp_path)
+
+
+def test_report_counts_budget_stops_apart_from_outcomes(tmp_path):
+    rows = _pairs(1, 0, 0) + [_row("e9", "B", "error", failure="budget_stop")]
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"run_id": "x", "split": "dev", "mode": "live", "coverage": "3/3"})
+    )
+    md = report(tmp_path)
+    assert "runs with an outcome: 2 of 3 (1 stopped by the dollar cap)" in md
+    assert "- B: 0/1 runs" in md  # the stopped run is no outcome and is left out of the endpoints

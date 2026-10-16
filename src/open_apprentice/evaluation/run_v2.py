@@ -45,6 +45,7 @@ OUTCOMES = (
     "error",
 )
 TOL = F(1, 2)
+DOLLAR_STOP = re.compile(r"budget: reserving|provider: budget|BUDGET_EXHAUSTED\[usd\]")
 BATTERY_DIRS = {
     "dev": REPO / "benchmarks/development/battery",
     "final": REPO / "benchmarks/final/battery",
@@ -210,6 +211,11 @@ def score(ep: Episode, outcome: dict) -> dict:
         result["correction"] = corr
         result["terminal_outcome"] = terminal
     result["release_blocking"] = blocking
+    # a run stopped by the dollar cap has no outcome (spec 7: a budget stop keeps partial results and reports
+    # coverage); running out of the allowed ATTEMPTS is an outcome and stays as scored
+    result["budget_stop"] = bool(DOLLAR_STOP.search(str(outcome.get("reason") or "")))
+    if result["budget_stop"]:
+        result["terminal_outcome"] = "error"
     return result
 
 
@@ -355,7 +361,11 @@ def run_episode(
         claimed_success=committed,
         correct=(terminal == "correct_complete") if committed else None,
         abstained=outcome.get("status") == "abstained",
-        failure=outcome.get("reason") if terminal == "error" else None,
+        failure=(
+            "budget_stop"
+            if s["budget_stop"]
+            else (outcome.get("reason") if terminal == "error" else None)
+        ),
         tokens=int(usage.get("prompt_tokens", 0)) + int(usage.get("completion_tokens", 0)),
         calls=sum(
             1
@@ -443,7 +453,7 @@ def run_battery(
 
 
 LIVE_WALL_S = 3600  # a live call may take minutes (SpendGuard's per-call deadline is 420 s)
-MIN_CALL_USD = 0.13  # the smallest worst case of one call (32k completion floor at $4/M): below this nothing can run
+MIN_CALL_USD = 0.2  # the learner reserves this per call (32k completion floor + prompt at $4/M): below it nothing runs
 
 
 def run_live_battery(
@@ -538,3 +548,39 @@ def run_live_battery(
         )
     )
     return out
+
+
+def rescore(run_dir: Path) -> None:
+    """Re-score a run's rows from its kept outcome files (after a scoring fix); run metadata (model, cost, wall time)
+    is kept. Rows whose outcome file is missing are left as they are."""
+    from dataclasses import fields, replace
+
+    run_dir = Path(run_dir)
+    split = json.loads((run_dir / "manifest.json").read_text())["split"]
+    by_id = {e.id: e for e in load_split(BATTERY_DIRS[split])}
+    names = {f.name for f in fields(RowV2)}
+    out = []
+    for line in (run_dir / "rows.jsonl").read_text().splitlines():
+        if not line.strip():
+            continue
+        row = RowV2(**{k: v for k, v in json.loads(line).items() if k in names})
+        f = run_dir / "episodes" / f"{row.episode}-{row.method}-r{row.rep}" / "outcome.json"
+        if f.exists():
+            outcome = json.loads(f.read_text())
+            s = score(by_id[row.episode], outcome)
+            committed = outcome.get("status") == "committed"
+            row = replace(
+                row,
+                terminal_outcome=s["terminal_outcome"],
+                correction=s["correction"],
+                release_blocking=s["release_blocking"],
+                correct=(s["terminal_outcome"] == "correct_complete") if committed else None,
+                failure=(
+                    "budget_stop"
+                    if s["budget_stop"]
+                    else (outcome.get("reason") if s["terminal_outcome"] == "error" else None)
+                ),
+                diagnostics=_diagnostics(outcome),
+            )
+        out.append(json.dumps(asdict(row), default=str))
+    (run_dir / "rows.jsonl").write_text("\n".join(out) + "\n")

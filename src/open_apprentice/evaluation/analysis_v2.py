@@ -106,6 +106,13 @@ def report(run_dir: Path) -> str:
         f"Split `{manifest.get('split')}`, mode `{manifest.get('mode')}`, systems {', '.join(systems)}.",
         "",
     ]
+    stops = sum(1 for r in rows if r.get("failure") == "budget_stop")
+    out += [
+        f"Coverage: runs with an outcome: {len(rows) - stops} of {len(rows)} ({stops} stopped by the dollar cap).",
+        "",
+    ]
+    cost_rows = rows  # cost and diagnostics include stopped runs; outcomes do not
+    rows = [r for r in rows if r.get("failure") != "budget_stop"]
 
     blocking = Counter(b for r in rows for b in r.get("release_blocking", []))
     mislabelled = sum(
@@ -164,9 +171,9 @@ def report(run_dir: Path) -> str:
             if r["method"] == s:
                 d.update({k: int(v) for k, v in (r.get("diagnostics") or {}).items()})
         out.append(f"- {s}: " + ", ".join(f"{k} {d[k]}" for k in sorted(d)))
-    out += ["", "## Cost per episode", ""]
+    out += ["", "## Cost per episode (every run, stopped ones included)", ""]
     for s in systems:
-        sel = [r for r in rows if r["method"] == s]
+        sel = [r for r in cost_rows if r["method"] == s]
         usd = [r["usd"] for r in sel if r.get("usd") is not None]
         out.append(
             f"- {s}: mean ${mean(usd) if usd else 0:.4f}, mean tokens {mean(r['tokens'] for r in sel):.0f}, "
