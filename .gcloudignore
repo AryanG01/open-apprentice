@@ -17,7 +17,15 @@ benchmarks/final/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-tests/
+# tests stay out, except the owner-authored draw.io samples the demo image ships (docker/demo.Dockerfile)
+tests/*
+!tests/fixtures/
+tests/fixtures/*
+!tests/fixtures/drawio_corpus/
+tests/fixtures/drawio_corpus/*
+!tests/fixtures/drawio_corpus/dev/
+.oa-store/
+.superpowers/
 .uv-cache/
 .hypothesis/
 .claude/
