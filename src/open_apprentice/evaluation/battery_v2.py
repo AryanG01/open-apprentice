@@ -23,7 +23,7 @@ from open_apprentice.teaching import codec
 from open_apprentice.teaching.constraints import scene_from_payload
 from open_apprentice.teaching.scope import members
 
-GENERATOR_VERSION = "battery-v2.1"
+GENERATOR_VERSION = "battery-v2.2"
 SCORING_VERSION = "score-v2.1"
 TOLERANCE = F(1, 2)
 SEED_BASE = {"dev": 110_000, "final": 170_000}
@@ -152,6 +152,25 @@ def _rotate_first_label(scene: dict) -> dict:
     objs = [dict(o) for o in scene["objects"]]
     next(o for o in objs if o["kind"] == "label")["rotation"] = 90
     return {"objects": objs, "canvas": scene["canvas"]}
+
+
+def _situation_grid(roles: tuple[str, str]) -> dict:
+    """A fixed diagnostic scene: one labelled node per (role, node width, node height) situation, so a scope selector
+    is checked on every combination of the attributes the selectors can name (a bounded check). Two scenes (one per
+    role order) keep each under the 32-object limit."""
+    objs: list[dict] = []
+    combos = [(roles[0], w, h) for w in (50, 70, 90, 140) for h in (40, 60, 80)]
+    combos += [(roles[1], w, h) for w in (50, 140) for h in (40, 80)]
+    for i, (role, w, h) in enumerate(combos):
+        x, y = 20 + (i % 6) * 200, 20 + (i // 6) * 200
+        objs.append(
+            {"id": f"n{i}", "kind": "node", "role": "", "attached": ""} | dict(x=x, y=y, w=w, h=h)
+        )
+        objs.append(
+            {"id": f"l{i}", "kind": "label", "role": role, "attached": f"n{i}"}
+            | dict(x=x, y=y + h + 4, w=56, h=16)
+        )
+    return {"objects": objs, "canvas": {"w": 1200, "h": 800}}
 
 
 def _cat(spec: Spec) -> VSpec:
@@ -283,7 +302,11 @@ def _sequential(variant: tuple[str, str], g: _Gen) -> dict:
         correction |= {"scene": target, "corrected_output": out}
     else:
         target = demo_scenes[0] if kind == "conflict" else g.scene()
-        diagnostic = g.scenes(4)
+        diagnostic = [
+            _situation_grid(("note", "warning")),
+            _situation_grid(("warning", "note")),
+            *g.scenes(2),
+        ]
         for group in (diagnostic, scoring):
             if not any(changed(s) for s in group) or not any(
                 len(changed(s)) < len(_labels(s)) for s in group
