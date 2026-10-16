@@ -146,3 +146,55 @@ def test_prompt_states_the_preview_then_commit_path_and_the_boolean_words():
     text = build_prompt()
     assert "preview" in text and "then commit" in text
     assert "`and`, `or`, `not`" in text and "&&" in text
+
+
+def _options(log, store, ep, mock_replies=()):
+    from open_apprentice.learner.agent_b import AgentB
+
+    b = AgentB(lambda: MockProvider({"agent_b": list(mock_replies)}), log, teacher_for(ep),
+               Ledger(store, F(0)), AgentBudgets(), F(0))  # fmt: skip
+    return b, {o["id"] for o in b.options()}
+
+
+def test_options_offer_preview_then_commit_only_when_commit_would_pass(tmp_path):
+    ep = _clarify()
+    replies = [
+        {"choose": "propose", "rules_text": [_text(ep)]},
+        {"choose": "preview:P1"},
+        {"choose": "commit:P1"},
+    ]
+    status, log, turns, _ = _run(tmp_path, ep, replies)
+    assert status == "committed", turns
+    assert not any(t.get("parse_failure") for t in turns)
+
+
+def test_commit_is_not_offered_before_an_approved_preview(tmp_path):
+    ep = _clarify()
+    store, log = _start(tmp_path, ep)
+    b, ids = _options(log, store, ep)
+    assert ids == {"propose", "abstain", "demo:b0"}
+    b.t_propose("x", {"rules_text": [_text(ep)]})
+    ids = {o["id"] for o in b.options()}
+    assert "preview:P1" in ids and not any(i.startswith("commit") for i in ids)
+
+
+def test_an_ask_option_names_programs_whose_outputs_are_separated(tmp_path):
+    ep = _clarify()
+    store, log = _start(tmp_path, ep)
+    b, _ = _options(log, store, ep)
+    demos = list(zip(ep.demo_scenes, ep.demo_outputs))
+    from open_apprentice.evaluation.label_episodes import consistent_classes
+
+    a, c = [v[0] for v in consistent_classes(demos).values()][:2]
+    texts = [program_text(s.primary, s.fallback, s.scope, int(s.gap)) for s in (a, c)]
+    b.t_propose("x", {"rules_text": texts})
+    asks = [o for o in b.options() if o["tool"] == "ask_choose"]
+    assert asks and all(o["args"]["programs"] == ["P1", "P2"] for o in asks)
+
+
+def test_an_unknown_option_is_a_parse_failure(tmp_path):
+    ep = _clarify()
+    status, log, turns, _ = _run(
+        tmp_path, ep, [{"choose": "commit:P9"}, {"choose": "abstain", "reason": "x"}]
+    )
+    assert turns[0]["parse_failure"] and status == "abstained"

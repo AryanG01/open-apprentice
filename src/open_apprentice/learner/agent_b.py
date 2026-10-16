@@ -33,6 +33,8 @@ from open_apprentice.teaching.step import (
     PresentPreview,
     StepConfig,
     _filter,
+    _groups,
+    _usable,
     candidate_pool,
     run_output,
 )
@@ -73,6 +75,9 @@ class ToolCall(BaseModel):
         """Calibration (2026-10-16): the model often writes {"tool": ..., "rules_text": ...} without the `args` wrapper.
         Any other top-level key is read as an argument (`args` wins on a clash); unknown arguments are ignored.
         """
+        if isinstance(d, dict) and "choose" in d and "tool" not in d:  # the option protocol
+            rest = {k: v for k, v in d.items() if k != "choose"}
+            return {"tool": "choose", "args": {**rest, "option": d["choose"]}}
         if isinstance(d, dict) and set(d) - {"tool", "args"}:
             extra = {k: v for k, v in d.items() if k not in ("tool", "args")}
             args = d.get("args") if isinstance(d.get("args"), dict) else {}
@@ -180,8 +185,63 @@ class AgentB:
                 "preview_left": self.b.max_previews - self._requests("ConfirmPreview"),
                 "request_demo_left": self.b.max_demos - self._requests("RequestDemonstration"),
             },
+            "options": [{k: o[k] for k in ("id", "tool", "args", "what")} for o in self.options()],
             "history": self.history[-8:],
         }
+
+    def options(self) -> list[dict]:
+        """B's legal next steps with their arguments filled in (the option protocol, after calibration showed the
+        model could not drive free-form tool calls). B still chooses its own questions and when to stop; generated
+        probes are not offered."""
+        ev = derive(self.log.events())
+        progs = self._programs()
+        fitting = [p for p in progs if p["fits"]]
+        asked = {
+            e.payload["request"].get("scene_id")
+            for e in self.log.events()
+            if e.type == "RequestIssued"
+        }
+        docs = sorted(sid for sid, r in ev.roles.items() if r in ("batch", "probe"))
+        open_docs = [d for d in docs if d not in ev.approved and d not in ev.rejected]
+        opts: list[dict] = [
+            {"id": "propose", "tool": "propose", "args": {},
+             "what": "propose 1-4 new rules: add \"rules_text\": [...]"},
+        ]  # fmt: skip
+        if self._requests("ChooseOutput") < self.b.max_choose and len(fitting) >= 2:
+            for sid in docs:
+                if sid in asked or sid in ev.approved:
+                    continue
+                groups = _groups(fitting, ev.scenes[sid])
+                if _usable(groups):
+                    pids = [g[1][0]["id"] for g in groups]
+                    opts.append({"id": f"ask:{sid}:{','.join(pids)}", "tool": "ask_choose",
+                                 "args": {"scene_id": sid, "programs": pids},
+                                 "what": f"ask the person which of {', '.join(pids)} is right on {sid}"})  # fmt: skip
+        if self._requests("ConfirmPreview") < self.b.max_previews and open_docs:
+            for p in fitting[:4]:
+                if any(run_output(p["rule"], ev.scenes[d]) is None for d in open_docs[:3]):
+                    continue
+                opts.append({"id": f"preview:{p['id']}", "tool": "preview",
+                             "args": {"doc_ids": open_docs[:3], "program": p["id"]},
+                             "what": f"ask the person to approve {p['id']}'s output on {', '.join(open_docs[:3])}"})  # fmt: skip
+        for p in fitting:
+            approved = any(
+                run_output(p["rule"], ev.scenes[sid]) == out
+                for sid, out in ev.preview_approved.items()
+            )
+            rejected = any(
+                run_output(p["rule"], ev.scenes[sid]) in outs for sid, outs in ev.rejected.items()
+            )
+            if approved and not rejected:
+                opts.append({"id": f"commit:{p['id']}", "tool": "commit", "args": {"program": p["id"]},
+                             "what": f"save {p['id']} (approved, fits all evidence)"})  # fmt: skip
+        if self._requests("RequestDemonstration") < self.b.max_demos and open_docs:
+            d = open_docs[0]
+            opts.append({"id": f"demo:{d}", "tool": "request_demo", "args": {"scene_id": d},
+                         "what": f"ask the person to place the labels on {d} themselves"})  # fmt: skip
+        opts.append({"id": "abstain", "tool": "abstain", "args": {},
+                     "what": "stop without a rule: add \"reason\": \"...\""})  # fmt: skip
+        return opts
 
     # ---- tools
     def _program(self, pid: Any) -> dict:
@@ -430,6 +490,14 @@ class AgentB:
             "commit": self.t_commit,
             "abstain": self.t_abstain,
         }
+        if call.tool == "choose":
+            chosen = {o["id"]: o for o in self.options()}.get(call.args.get("option"))
+            if chosen is None:
+                raise BadCall(f"{call.args.get('option')!r} is not one of the offered options")
+            extra = {k: v for k, v in call.args.items() if k in ("rules_text", "reason")}
+            call = ToolCall(tool=chosen["tool"], args={**chosen["args"], **extra})
+            if call.tool == "abstain":
+                call.args.setdefault("reason", "chose to stop")
         sub = f"{aid}-{call.tool}"
         if call.tool == "propose":
             return self.t_propose(sub, call.args)
