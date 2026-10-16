@@ -1,0 +1,24 @@
+{
+ "approved": false,
+ "attempt_ceilings": {
+  "A": 12,
+  "B": 12,
+  "D": 12
+ },
+ "establishes": "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
+ "estimate_tokens": 3491784,
+ "estimate_usd": 12.2212,
+ "kind": "funded_T3",
+ "manifest_id": "39ac910b4b5f9c27",
+ "note": "re-estimate from the calibration run before asking for approval",
+ "protected_reserve_usd": 10.0,
+ "runs": 240,
+ "runs_per_system": {
+  "A": 108,
+  "B": 108,
+  "D": 24
+ },
+ "split": "final",
+ "worst_case_per_attempt_usd": 0.088,
+ "worst_case_total_usd": 253.44
+}

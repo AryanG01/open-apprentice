@@ -872,16 +872,38 @@ def eval_run(
     episodes: Optional[str] = typer.Option(None, "--episodes", help="comma-separated episode ids"),
     out: Optional[Path] = typer.Option(None, "--out", help="default: results/eval_v2"),
     seed: int = typer.Option(0, "--seed"),
+    manifest: Optional[str] = typer.Option(
+        None, "--manifest", help="live: an approved manifest id"
+    ),
+    cap_usd: float = typer.Option(
+        0.0, "--cap-usd", help="live: run cap, at most the manifest ceiling"
+    ),
 ) -> None:
-    """Run a frozen battery split (verified against its hashes first) and write rows.jsonl + manifest.json."""
+    """Run a frozen battery split (verified against its hashes first) and write rows.jsonl + manifest.json. Live runs
+    pass the paid-run gate first (approved manifest, cap within its ceiling, protected reserve untouched).
+    """
     from open_apprentice.evaluation.battery_v2 import REPO
     from open_apprentice.evaluation.run_v2 import run_battery
 
     if split not in ("dev", "final") or mode not in ("mock", "live"):
         raise typer.BadParameter("split is dev or final; mode is mock or live")
     if mode == "live":
-        typer.echo("oa eval run --mode live: refused (no approved manifest gate yet)", err=True)
-        raise typer.Exit(2)
+        from open_apprentice.evaluation.manifests_v2 import GateRefused, run_live
+
+        def factory() -> object:  # built only after the gate passed
+            from open_apprentice.config import load_settings
+            from open_apprentice.providers.factory import make_provider
+
+            return make_provider(load_settings())
+
+        try:
+            run_live(manifest, cap_usd, factory)
+        except GateRefused as e:
+            typer.echo(f"oa eval run --mode live: refused before any provider call: {e}", err=True)
+            raise typer.Exit(2)
+        except NotImplementedError as e:
+            typer.echo(f"oa eval run --mode live: {e}", err=True)
+            raise typer.Exit(int(ExitState.NOT_IMPLEMENTED))
     names = [s.strip() for s in systems.split(",") if s.strip()]
     if not names or set(names) - {"A", "B", "C", "D"}:
         raise typer.BadParameter("systems are a comma-separated subset of A,B,C,D")
@@ -895,6 +917,44 @@ def eval_run(
         seed=seed,
     )
     typer.echo(json.dumps({"run_dir": str(run_dir)}))
+
+
+@eval_app.command("manifest")
+def eval_manifest(
+    dry_run_dir: Path = typer.Option(
+        Path("results/eval_v2/dryrun-20261016"), "--dry-run-dir", help="holds token_estimate.json"
+    ),
+) -> None:
+    """Write the priced calibration manifest and the (unapproved) funded-tier manifest to docs/evaluation/manifests/."""
+    from open_apprentice.evaluation.battery_v2 import REPO
+    from open_apprentice.evaluation.manifests_v2 import (
+        BUDGET_ROOT,
+        calibration_manifest,
+        funded_manifest,
+    )
+    from open_apprentice.evaluation.run_v2 import BATTERY_DIRS, load_split
+    from open_apprentice.evaluation.spend import load_budget, spendable, spent_so_far
+
+    tokens = json.loads((dry_run_dir / "token_estimate.json").read_text())
+    final = json.loads(
+        (REPO / "docs/evaluation/battery_final.md").read_text().split("```json")[1].split("```")[0]
+    )
+    cal = calibration_manifest(
+        load_split(BATTERY_DIRS["dev"]),
+        tokens,
+        round(spent_so_far(BUDGET_ROOT), 4),
+        spendable(load_budget(BUDGET_ROOT)),
+    )
+    fund = funded_manifest(
+        len(final["episodes"]), 8, tokens
+    )  # spec 7 T3: D on 8 clarification-required episodes
+    out = REPO / "docs/evaluation/manifests"
+    out.mkdir(parents=True, exist_ok=True)
+    for m in (cal, fund):
+        (out / f"{m['kind']}-{m['manifest_id']}.json").write_text(
+            json.dumps(m, indent=1, sort_keys=True) + "\n"
+        )
+    typer.echo(json.dumps({"calibration": cal["manifest_id"], "funded": fund["manifest_id"]}))
 
 
 @eval_app.command("report")
