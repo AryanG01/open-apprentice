@@ -51,8 +51,12 @@ class SimTeacher:
         scenes: dict[str, dict],
         scope_intent: Optional[dict] = None,
         demo_spec: Optional[VSpec] = None,
+        private: frozenset[str] = frozenset(),
     ) -> None:
         self.spec, self.scenes, self.scope_intent = _v(spec), dict(scenes), scope_intent
+        self.private = (
+            private  # scoring and diagnostic scenes: the teacher's own, never asked about
+        )
         self.demo_spec = (
             demo_spec  # inconsistent episodes: demonstrations follow the conflicting script
         )
@@ -86,7 +90,23 @@ class SimTeacher:
             raise ProtocolError(f"scene {scene_id} is already registered with other content")
         self.scenes[scene_id] = scene
 
+    def _asked(self, scene_id: str, scene_hash: str) -> None:
+        """A request may only name a scene the learner was shown, with that scene's exact hash."""
+        if scene_id in self.private or scene_id not in self.scenes:
+            raise ProtocolError(f"scene {scene_id} was never shown to the learner")
+        if codec.digest(self.scenes[scene_id]) != scene_hash:
+            raise ProtocolError(f"scene {scene_id} does not match the request's hash")
+
     def answer(self, req: Request) -> Response:
+        if isinstance(req, (ChooseOutput, RequestDemonstration)):
+            self._asked(req.scene_id, req.scene_hash)
+        elif isinstance(req, ConfirmPreview):
+            for _, sid, sh, _ in req.items:
+                self._asked(sid, sh)
+        elif isinstance(req, ConfirmCorrectionScope):
+            for i in req.interpretations:
+                for sid, sh, _ in i.consequences:
+                    self._asked(sid, sh)
         if isinstance(req, ConfirmCorrectionScope) or (
             isinstance(req, ConfirmPreview) and req.purpose in CORRECTION_PURPOSES
         ):
@@ -163,7 +183,9 @@ def teacher_for(ep: Any) -> SimTeacher:
         }
     conflict = ep.meta.get("conflict_spec")
     demo = vspec_from_json(conflict) if conflict else None
-    return SimTeacher(ep.spec, scene_ids(ep), scope_intent=intent, demo_spec=demo)
+    scenes = scene_ids(ep)
+    private = frozenset(k for k in scenes if k[0] in "sx")
+    return SimTeacher(ep.spec, scenes, scope_intent=intent, demo_spec=demo, private=private)
 
 
 def handle(t: SimTeacher, req_json: dict) -> dict:

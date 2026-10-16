@@ -93,6 +93,7 @@ def test_learner_view_holds_no_spec_scoring_or_marks():
         assert view["id"] == ep.id
         if view["correction"] is not None:
             assert set(view["correction"]) == {"scene_id", "corrected_output", "mask"}
+            assert set(view["correction"]["corrected_output"]) == set(view["correction"]["mask"])
         assert {d["scene_id"] for d in view["demonstrations"]} | set(view["batch"]) <= set(
             view["scenes"]
         )

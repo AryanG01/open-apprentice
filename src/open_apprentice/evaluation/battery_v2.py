@@ -459,7 +459,10 @@ def learner_view(ep: Episode) -> dict:
         scenes["c0"] = ep.correction["scene"]
         correction = {
             "scene_id": "c0",
-            "corrected_output": _out_json(ep.correction["corrected_output"]),
+            # only the labels the teacher edited: the other labels' answers on c0 are hidden behaviour
+            "corrected_output": _out_json(
+                {k: ep.correction["corrected_output"][k] for k in ep.correction["mask"]}
+            ),
             "mask": list(ep.correction["mask"]),
         }
     return _plain(

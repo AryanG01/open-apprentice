@@ -128,8 +128,8 @@ def test_previews_after_the_scope_question_are_judged_by_the_corrected_behaviour
     ep = _ep("sequential", "compatible")
     c = ep.correction
     t = teacher_for(ep)
-    s = ep.scoring_scenes[0]
-    sid = "s0"
+    s = ep.batch_scenes[0]
+    sid = "b0"
     before = t.answer(
         ConfirmPreview("p0", "learning_preview", (("i", sid, _h(s), _full(ep.spec, s)),))
     )
@@ -189,3 +189,22 @@ def test_unknown_scene_without_payload_is_a_protocol_error():
     t = teacher_for(_ep("catalogue"))
     with pytest.raises(ProtocolError):
         t.answer(RequestDemonstration("q", "nope", "h"))
+
+
+def test_scoring_and_diagnostic_scenes_are_never_answered():
+    ep = _ep("sequential", "compatible")
+    t = teacher_for(ep)
+    for sid, scene in (("s0", ep.scoring_scenes[0]), ("x0", ep.correction["diagnostic_scenes"][0])):
+        with pytest.raises(ProtocolError):
+            t.answer(RequestDemonstration("q", sid, _h(scene)))
+
+
+def test_a_request_whose_hash_does_not_match_the_scene_is_refused():
+    ep = _ep("catalogue")
+    t = teacher_for(ep)
+    s = ep.batch_scenes[0]
+    with pytest.raises(ProtocolError):
+        t.answer(RequestDemonstration("q", "b0", _h(ep.batch_scenes[1])))
+    truth = _full(ep.spec, s)
+    with pytest.raises(ProtocolError):
+        t.answer(ConfirmPreview("p", "learning_preview", (("i", "b0", "bad", truth),)))
