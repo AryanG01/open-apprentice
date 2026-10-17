@@ -1,5 +1,5 @@
 {
- "code_commit": "3f533290289f983d7dc69b640e20e4461b9d23f3",
+ "code_commit": "28838c9a080ba87ace1e1f43103de55519f3d139",
  "episodes": [
   {
    "clarification_required": true,
@@ -184,9 +184,9 @@
   "learner/ee894d854af.json": "68ff1d96a6ce19d7a321ac9459223ae4283ec7a70f092384f044d8fdc0569c1d",
   "learner/ef3c47b95b1.json": "77defb5c60fc0e085dd572209995a5f071e44948ec064238a9daceb8b17f9520"
  },
- "generator_version": "battery-v2.4",
+ "generator_version": "battery-v2.5",
  "real_files": [],
- "scoring_version": "score-v2.1",
+ "scoring_version": "score-v2.2",
  "seed_base": 110000,
  "split": "dev",
  "tolerance": "1/2"
