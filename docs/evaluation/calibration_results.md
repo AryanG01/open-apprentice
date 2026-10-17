@@ -169,3 +169,32 @@ Findings:
 4. **Cost per episode on these strata:** A about $0.13, B about $0.23.
 
 Spend logged after calibration 2: about $41.79.
+
+## Plan 6 re-check (live, 2026-10-17)
+
+Run `cal-166bc623e6dd2953-20261017T170822` (manifest `166bc623e6dd2953`, A and B, dev episodes: forced overlap, tall-nodes
+correction, warning-labels correction). **Spent $0.869**, 2 workers, under `caffeinate -is`. Battery v2.5, score v2.2.
+
+| Episode | A | B |
+|---|---|---|
+| forced overlap | **appropriate_refusal** (`refused_layout`), 2 calls, $0.074 | error: used all 8 attempts, never previewed, $0.208 |
+| sequential, tall nodes → below | acquired; correction abstained, $0.162 | acquired; correction abstained ("rejected all scopes"), $0.176 |
+| sequential, warnings → below | acquired; correction abstained, $0.118 | **correct_complete, correction activated and scored successful**, $0.131 |
+
+Findings:
+1. **The layout refusal works on the live model** (A). B did not benefit: it only meets the refusal at `commit`,
+   which it never reached. Fixed after the run: B is now told which programs would be refused (`layout_problem`) and is
+   not offered their preview or commit.
+2. **Scope selectors are now relational**, as intended: none compared geometry with constants.
+3. **The first live correction success** came from B's own correction cycle on the warnings episode.
+4. **Why A's warning-labels correction failed** (offline replay of its stored candidates): `o.role == "warning"` was
+   proposed, but its rule rewrote labels outside the scope (unexplained diff), so it was never shown. The other
+   candidates failed to run on the corrected document. Fixed after the run (not yet run live): the shared scope
+   proposer now asks for only the movement for the selected labels (`patch_text`) and composes
+   *saved program, then the patch for the selector's labels*, so nothing outside the scope can change. Both A and B
+   use this proposer.
+5. **Tall nodes:** both systems proposed `role == "note" and w < h` variants, narrower than the true scope (all labels
+   on nodes at least as tall as wide), so the teacher answered `none`. This is the genuine ambiguity of a one-document
+   correction; clarification and more questions are the product's answer, within budget.
+
+Spend logged: $42.66 of $95.77 funded; $37.34 spendable (authorized $90, reserve $10).
