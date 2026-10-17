@@ -1,0 +1,27 @@
+{
+ "run_id": "cal-0927857b4f1ea46b-20261017T185133",
+ "split": "final",
+ "mode": "live",
+ "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+ "systems": [
+  "D"
+ ],
+ "repeats": 3,
+ "episodes": [
+  "e1bf2e33295",
+  "e232b39e368",
+  "e47dfb3336d",
+  "e502559d32a",
+  "e0900860e87",
+  "e10848ba4e6",
+  "e166942ff4d",
+  "e2b27c5edde"
+ ],
+ "approved_manifest": "0927857b4f1ea46b",
+ "cap_usd": 3.2,
+ "spent_usd": 2.675477,
+ "coverage": "24/24",
+ "stopped": null,
+ "scoring_version": "score-v2.2",
+ "wall_s": 1563.5
+}
