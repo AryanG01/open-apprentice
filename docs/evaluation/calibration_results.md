@@ -200,3 +200,28 @@ Findings:
    correction; clarification and more questions are the product's answer, within budget.
 
 Spend logged: $42.66 of $95.77 funded; $37.34 spendable (authorized $90, reserve $10).
+
+## Post-review live check (live, 2026-10-17)
+
+Run `cal-66690c5d6824956a-20261017T180802` (manifest `66690c5d6824956a`, A and B, same three dev episodes, 2 workers, then
+one resume for the run the cap check had held back). **Spent $0.922** of $1.25. Code: master after Plan 6 (the tree-built
+scope patch and B's layout feedback, neither run live before; cross-process spend reservations in use).
+
+| Episode | A | B |
+|---|---|---|
+| forced overlap | **appropriate_refusal** (`refused_layout`), 2 calls, $0.129 | error: used all 8 attempts, $0.218 |
+| sequential, tall nodes → below | **correct, correction activated and successful**, 3 calls, $0.131 | acquired; correction abstained, then ran out of attempts, 6 calls, $0.236 |
+| sequential, warning labels → below | **correct, correction activated and successful**, 3 calls, $0.074 | **correct, correction activated and successful**, 5 calls, $0.109 |
+
+Findings:
+1. **The scope composition fix works live.** A's correction succeeded on both sequential episodes (it had failed on both
+   before). Correction success over the two live checks: A 2/4 → 2/2 after the fix; B 1/4 → 1/2.
+2. **A refuses a forced overlap on its first call twice running; B does not.** B is now told which programs would be
+   refused (`refusing to apply: … leaves the page`) every turn and still keeps choosing `propose` until it runs out of
+   attempts. This is B's own choice, not missing feedback. It is scored an error (nothing was surfaced).
+3. **B's correction cycle needs more calls than A's** (tall nodes: 3 proposer calls and 5 agent turns against A's 1 and 0);
+   the report now states this alongside the correction comparison.
+4. **Parallel runs under the new spend reservations worked:** 0 reservations left outstanding, totals equal the sum of
+   per-run costs. The cap check held one run back at $0.847 spent (conservative, as designed); it was resumed.
+
+Spend logged: $43.58 of $95.77 funded; $36.4 spendable (authorized $90, reserve $10).
