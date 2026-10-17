@@ -1,0 +1,37 @@
+{
+ "run_id": "dryrun-20261017",
+ "split": "dev",
+ "mode": "mock",
+ "model": "Fixture",
+ "systems": [
+  "A",
+  "B",
+  "C",
+  "D"
+ ],
+ "repeats": 1,
+ "seed": 0,
+ "episodes": [
+  "e88727066d3",
+  "eb33f9716f9",
+  "e3593b0aec5",
+  "e79c145bad5",
+  "e5a01549872",
+  "e7cd70b2ba8",
+  "ef3c47b95b1",
+  "e5b3fceadac",
+  "e7b523e24fc",
+  "e0119c547d5",
+  "ea5432e5dee",
+  "e620cde0c3e",
+  "e9bacad414c",
+  "e6ab691b80f",
+  "ee894d854af",
+  "ea9778a73fb",
+  "ee519fbf496",
+  "e41d8ce1132"
+ ],
+ "scoring_version": "score-v2.2",
+ "wall_s": 39.0,
+ "note": "offline: every row is origin=mock, model=Fixture; not a model result"
+}

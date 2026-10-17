@@ -656,6 +656,10 @@ def scripted_policy(messages: list) -> dict:
     docs = [d for d, v in state["documents"].items() if v["role"] == "batch"][:3]
     if "preview" not in tools and docs and state["budget"]["preview_left"] > 0:
         return {"tool": "preview", "args": {"doc_ids": docs, "program": fitting[0]["id"]}}
+    if any(
+        h.get("tool") == "commit" and "refused" in str(h.get("result")) for h in state["history"]
+    ):
+        return {"tool": "abstain", "args": {"reason": "the commit was refused"}}
     last = next((h for h in reversed(state["history"]) if h.get("tool") == "preview"), None)
     if last and "reject" not in str(last.get("result")) and "approve" in str(last.get("result")):
         return {"tool": "commit", "args": {"program": last["args"]["program"]}}

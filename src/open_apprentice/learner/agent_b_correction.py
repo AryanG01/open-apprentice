@@ -327,7 +327,10 @@ def scripted_correction_policy(messages: list) -> dict:
     """
     import json
 
-    ids = [o["id"] for o in json.loads(messages[1].content)["options"]]
+    state = json.loads(messages[1].content)
+    ids = [o["id"] for o in state["options"]]
+    if any("answered none" in str(h.get("result")) for h in state["history"]):
+        return {"choose": "abstain", "reason": "the person said no scope fits"}
     for prefix in ("commit:", "revision_preview:", "affected:", "ask_scope", "propose_scope"):
         hit = next((i for i in ids if i.startswith(prefix)), None)
         if hit:
