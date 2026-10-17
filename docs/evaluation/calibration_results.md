@@ -75,3 +75,25 @@ stopping path. B as specified (same model, acting freely) is therefore a very we
 would mostly measure B's inability to drive the tools, not the value of A's policy.
 
 Spend logged so far: $39.76 of $45.77 funded; $1.01 left above the $5 reserve.
+
+## B with the option protocol (live, 2026-10-17)
+
+Run `cal-3e42a9e799961d84-20261017T010307` (manifest `3e42a9e799961d84`, B only, catalogue and beyond, cap $0.70).
+**Spent $0.437**, of which about $0.06 went to an attempt lost when the laptop slept mid-call (resumed under
+`caffeinate -i`).
+
+| Episode | B (option protocol) | B before (free tool calls) |
+|---|---|---|
+| catalogue | **correct_complete** — 4 calls, $0.063 | 8 calls, no commit, $0.30 |
+| beyond catalogue | 8 calls, no rule parsed, $0.31 | 8 calls, no commit, $0.35 |
+
+- **The protocol fix worked:** on the catalogue episode B proposed, previewed and committed a correct rule in half the
+  calls.
+- **On the harder episode the remaining failure is writing rules in the language.**
+  - Its first call was cut off at the output limit.
+  - It then wrote rules as English prose ("Nodes have fixed positions…") or pseudo-code ("for each label in labels:").
+    That gave 18 unparseable rules, so no program ever fit.
+  - A, with `hypotheses_labels.md` (the same grammar text plus a few more lines on how to answer), solved this
+    episode in 2 calls.
+
+Spend logged: $40.20 of $45.77 funded; **about $0.57 left above the $5 reserve**.
