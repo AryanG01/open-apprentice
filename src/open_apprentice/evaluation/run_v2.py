@@ -281,6 +281,17 @@ def _diagnostics(outcome: dict) -> dict:
         )
         + sum(1 for e in evs if e["type"] == "AgentTurn" and e["payload"].get("parse_failure")),
         "budget_exhausted": any("budget" in r for r in reasons),
+        # correction effort (spec 3.7 budgets): B chooses its own steps, so it may use more provider calls than A
+        "correction_proposer_calls": sum(
+            1
+            for e in evs
+            if e.get("log") == "correct"
+            and e["type"] == "ActionIssued"
+            and e["payload"].get("kind") == "RequestModelProposal"
+        ),
+        "correction_agent_turns": sum(
+            1 for e in evs if e.get("log") == "correct" and e["type"] == "AgentTurn"
+        ),
     }
 
 
@@ -540,8 +551,13 @@ def run_live_battery(
                 if engine_url is None:
                     raise RuntimeError("real-file episodes need the engine: give engine_url")
                 by_id[r["id"]] = real_file_episode(
-                    files, k, vspec_from_json(r["spec"]), engine_url, r["id"]
-                )
+                    files,
+                    k,
+                    vspec_from_json(r["spec"]),
+                    engine_url,
+                    r["id"],
+                    [x["sha256"] for x in real],
+                )  # every file is hash-checked against the freeze before it is read
     eps = [by_id[i] for i in wanted]
     out = Path(out_root) / run_id
     out.mkdir(parents=True, exist_ok=True)
@@ -574,10 +590,21 @@ def run_live_battery(
         extra = ("--cap-usd", str(cap_usd), "--run-id", run_id)
         extra += ("--budget-root", str(budget_root), "--dotenv", str(dotenv))
         running: set = set()
+        meta: dict = {}  # future -> (episode, system, repeat), to name a run whose worker raised
 
         def finished(fut: Any) -> None:
             nonlocal done, stopped
-            row = fut.result()
+            try:
+                row = fut.result()
+            except (
+                Exception
+            ) as e:  # a paid run whose scoring or engine step raised: keep the row, never lose the rest
+                ep_, system_, rep_ = meta[fut]
+                row = RowV2(
+                    ep_.id, rep_, system_, ep_.id, ep_.stratum, False, False, None, origin="live", model=model,
+                    stratum=ep_.stratum, terminal_outcome="error",
+                    failure=f"runner_exception: {type(e).__name__}: {e}"[:300],
+                )  # fmt: skip
             with lock:
                 f.write(json.dumps(asdict(row), default=str) + "\n")
                 f.flush()
@@ -597,21 +624,21 @@ def run_live_battery(
             if left < MIN_CALL_USD * (len(running) + 1):
                 stopped = "run cap"
                 break
-            running.add(
-                pool.submit(
-                    run_episode,
-                    ep,
-                    system,
-                    "live",
-                    r,
-                    r,
-                    out,
-                    model,
-                    extra,
-                    LIVE_WALL_S,
-                    engine_url,
-                )
+            fut = pool.submit(
+                run_episode,
+                ep,
+                system,
+                "live",
+                r,
+                r,
+                out,
+                model,
+                extra,
+                LIVE_WALL_S,
+                engine_url,
             )
+            meta[fut] = (ep, system, r)
+            running.add(fut)
         for fut in wait(running).done:
             finished(fut)
     (out / "manifest.json").write_text(

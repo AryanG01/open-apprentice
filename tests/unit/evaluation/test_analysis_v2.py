@@ -134,3 +134,17 @@ def test_report_breaks_refusals_down_by_kind(tmp_path):
     assert (
         "## Refusals by kind" in md and "- A: no_program 1" in md and "- B: agent_abstained 1" in md
     )
+
+
+def test_report_discloses_correction_effort_per_system(tmp_path):
+    seq = lambda s, calls, turns: _row("s1", s, "correct_complete", stratum="sequential",  # noqa: E731
+                                       diagnostics={"correction_proposer_calls": calls, "correction_agent_turns": turns})  # fmt: skip
+    rows = _pairs(1, 0, 0) + [seq("A", 2, 0), seq("B", 3, 5)]
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"run_id": "x", "split": "dev", "mode": "mock"})
+    )
+    md = report(tmp_path)
+    assert "## Correction effort" in md and "- A: proposer calls 2.0, agent turns 0.0" in md
+    assert "- B: proposer calls 3.0, agent turns 5.0" in md
+    assert "B's correction cycle may use more provider calls than A's" in md

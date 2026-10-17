@@ -26,9 +26,10 @@ def _outcome(rule):
 def test_dev_real_file_episodes_build_from_the_engine(engine_url):
     for k in range(3):
         ep = real_file_episode(DEV, k, SPEC, engine_url, "dev-real")
+        assert ep.stratum == "real_file" and len(ep.demo_scenes) == 1
         assert (
-            ep.stratum == "real_file" and len(ep.demo_scenes) == 1 and len(ep.scoring_scenes) == 2
-        )
+            len(ep.batch_scenes) == 1 and len(ep.scoring_scenes) == 1
+        )  # the scored file was never shown
         assert any(o["kind"] == "label" for o in ep.demo_scenes[0]["objects"])
         assert ep.demo_outputs[0] != ep.demo_scenes[0]
 
@@ -59,3 +60,36 @@ def test_only_the_gated_paths_name_the_final_folder():
         if "benchmarks/final" in p.read_text()
     }
     assert hits <= allowed, hits - allowed
+
+
+def test_a_real_file_episode_can_actually_be_solved_by_a_learner(engine_url, tmp_path):
+    """Without a batch document no preview is possible and nothing can ever be committed (Plan 6 review C1)."""
+    from open_apprentice.evaluation.run_v2 import run_learner, score
+
+    ep = real_file_episode(DEV, 0, SPEC, engine_url, "dev-real")
+    for system in ("A", "B"):
+        outcome, _ = run_learner(ep, system, "mock", 0, tmp_path / system)
+        assert outcome["status"] == "committed", (system, outcome["reason"])
+        assert score(ep, outcome)["terminal_outcome"] == "correct_complete"
+
+
+def test_a_changed_real_file_is_refused_not_silently_scored(engine_url, tmp_path):
+    import hashlib
+    import shutil
+
+    import pytest
+
+    from open_apprentice.evaluation.battery_v2 import FrozenMismatch
+
+    files = []
+    for f in DEV:
+        shutil.copy(f, tmp_path / f.name)
+        files.append(tmp_path / f.name)
+    want = [hashlib.sha256(f.read_bytes()).hexdigest() for f in files]
+    ep = real_file_episode(files, 0, SPEC, engine_url, "dev-real", expected=want)
+    assert ep.meta["sha256"] == want
+    files[2].write_bytes(files[2].read_bytes() + b"\n")  # a changed scoring file
+    with pytest.raises(FrozenMismatch):
+        publish_failures(ep, rule_for_spec(SPEC.params[0]), engine_url)
+    with pytest.raises(FrozenMismatch):
+        real_file_episode(files, 0, SPEC, engine_url, "dev-real", expected=want)

@@ -515,7 +515,10 @@ def test_the_final_run_builds_real_file_episodes_from_the_private_manifest(tmp_p
     monkeypatch.setattr(
         rv,
         "real_file_episode",
-        lambda files, k, spec, url, eid: built.append((len(files), k, eid, url)) or _dev()[0],
+        lambda files, k, spec, url, eid, expected=None: built.append(
+            (len(files), k, eid, url, expected)
+        )
+        or _dev()[0],
     )
     monkeypatch.setattr(rv, "run_episode", lambda ep, *a, **k: ran.append(a[-1]) or
                         rv.RowV2(ep.id, 0, "A", ep.id, "x", False, False, None, origin="live"))  # fmt: skip
@@ -535,4 +538,53 @@ def test_the_final_run_builds_real_file_episodes_from_the_private_manifest(tmp_p
         run_id="r",
         engine_url="http://e",
     )
-    assert built == [(3, 1, "real2", "http://e")] and ran == ["http://e"]
+    assert built == [
+        (3, 1, "real2", "http://e", ["h", "h", "h"])
+    ]  # the recorded hashes are passed through
+    assert ran == ["http://e"]
+
+
+def test_a_worker_exception_keeps_every_finished_row_and_still_writes_the_manifest(
+    tmp_path, monkeypatch
+):
+    import open_apprentice.evaluation.run_v2 as rv
+
+    root = tmp_path / "budget"
+    root.mkdir()
+    calls = []
+    good = _fake_live(rv, root / "spend.jsonl", calls)
+
+    def flaky(ep, system, *a, **k):
+        if (ep.id, system) == (eps[1], "A"):
+            raise RuntimeError("engine fell over after a paid learner run")
+        return good(ep, system, *a, **k)
+
+    monkeypatch.setattr(rv, "run_episode", flaky)
+    eps = [e.id for e in _dev()[:3]]
+    manifest = {
+        "manifest_id": "m",
+        "split": "dev",
+        "task_ids": eps,
+        "systems": ["A", "B"],
+        "repeats": 1,
+    }
+    out = rv.run_live_battery(
+        manifest, 50.0, out_root=tmp_path, budget_root=root, model="M", run_id="x", workers=3
+    )
+    rows = [json.loads(x) for x in (out / "rows.jsonl").read_text().splitlines()]
+    assert len(rows) == 6  # five finished runs plus an error row for the one that raised
+    bad = next(r for r in rows if r["episode"] == eps[1] and r["method"] == "A")
+    assert bad["terminal_outcome"] == "error" and bad["failure"].startswith("runner_exception")
+    m = json.loads((out / "manifest.json").read_text())
+    assert m["coverage"] == "6/6"
+
+
+def test_correction_effort_is_recorded_per_row():
+    from open_apprentice.evaluation.run_v2 import _diagnostics
+
+    ev = lambda t, **p: {"log": "correct", "type": t, "payload": p}  # noqa: E731
+    out = {"events": [ev("ActionIssued", kind="RequestModelProposal"), ev("ActionIssued", kind="RequestModelProposal"),
+                      ev("AgentTurn", turn=0), ev("AgentTurn", turn=1), ev("AgentTurn", turn=2),
+                      {"log": "learn", "type": "ActionIssued", "payload": {"kind": "RequestModelProposal"}}]}  # fmt: skip
+    d = _diagnostics(out)
+    assert d["correction_proposer_calls"] == 2 and d["correction_agent_turns"] == 3

@@ -12,11 +12,12 @@ The guard raises BudgetExhausted rather than overshoot; callers record that as a
 from __future__ import annotations
 
 import asyncio
+import contextlib
+import fcntl
 import json
 import pathlib
-import threading
 import time
-from typing import Callable, Optional
+from typing import Callable, Iterator, Optional
 
 from open_apprentice.budget import BudgetExhausted
 from open_apprentice.providers.base import (
@@ -61,15 +62,16 @@ class SpendGuard(Provider):
         in_per_m: Optional[float] = None,
         out_per_m: Optional[float] = None,
         merge_system: bool = False,
+        run_total_cap_usd: Optional[float] = None,
     ) -> None:
         self._merge_system = merge_system
+        self._run_total_cap = run_total_cap_usd  # the run id's cap across every guard and process
         self._inner = inner
         self.label = inner.label
         self.requested_model = inner.requested_model
         self.completion_floor = inner.completion_floor
         self._run_id, self._cap, self._root = run_id, run_cap_usd, root
         self._rates = (in_per_m, out_per_m)
-        self._lock = threading.Lock()
         self.run_usd = 0.0
         self.calls = 0
         self.stopped_reason = ""
@@ -86,19 +88,38 @@ class SpendGuard(Provider):
         total = (raw.prompt_tokens or 0) + (raw.completion_tokens or 0)
         return total * CONSERVATIVE_USD_PER_MILLION / 1e6
 
-    def _log(self, usd: float, kind: str, ctx: CallContext, tokens: int) -> None:
+    @contextlib.contextmanager
+    def _ledger(self) -> Iterator[None]:
+        """Cross-process exclusion for check-and-reserve, so parallel learner processes see each other's outstanding
+        reservations (spec 3.7: exposure = settled + outstanding reservations)."""
         self._root.mkdir(parents=True, exist_ok=True)
+        with open(self._root / "spend.lock", "w") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock, fcntl.LOCK_UN)
+
+    def _append(self, usd: float, kind: str, role: str, tokens: int) -> None:
         row = {
             "t": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "run": self._run_id,
             "usd": round(usd, 6),
             "kind": kind,
-            "role": ctx.role,
+            "role": role,
             "tokens": tokens,
         }
         with open(self._root / "spend.jsonl", "a") as f:
             f.write(json.dumps(row) + "\n")
             f.flush()
+
+    def _release(self, worst: float) -> None:
+        with self._ledger():
+            self._append(-worst, "release", "_", 0)
+
+    def _log(self, usd: float, kind: str, ctx: CallContext, tokens: int) -> None:
+        with self._ledger():
+            self._append(usd, kind, ctx.role, tokens)
         self.run_usd += usd
         self.calls += 1
 
@@ -107,7 +128,7 @@ class SpendGuard(Provider):
     ) -> RawCompletion:
         worst_tokens = estimate_tokens(json.dumps([m.__dict__ for m in messages])) + max_tokens
         worst = worst_tokens * CONSERVATIVE_USD_PER_MILLION / 1e6
-        with self._lock:
+        with self._ledger():
             budget = load_budget(self._root)
             total_after = spent_so_far(self._root) + worst
             if total_after > spendable(budget):
@@ -115,9 +136,15 @@ class SpendGuard(Provider):
                 raise BudgetExhausted(
                     "usd", f"shared budget: worst case would reach ${total_after:.2f}"
                 )
-            if self.run_usd + worst > self._cap:
+            if self._run_total_cap is not None:
+                run_after = spent_for_run(self._run_id, self._root) + worst
+                if run_after > self._run_total_cap:
+                    self.stopped_reason = "run cap"
+                    raise BudgetExhausted("usd", f"run cap ${self._run_total_cap:.2f}")
+            elif self.run_usd + worst > self._cap:
                 self.stopped_reason = "run cap"
                 raise BudgetExhausted("usd", f"run cap ${self._cap:.2f}")
+            self._append(worst, "reserve", "_", 0)
         if self._merge_system and messages and messages[0].role == "system":
             # observed 2026-10-14: the endpoint sometimes ignores the system turn and answers the evidence JSON as if it
             # were the task. Instructions travel in the user turn instead.
@@ -135,16 +162,19 @@ class SpendGuard(Provider):
                 e = ProviderTimeout(
                     f"no reply within {CALL_DEADLINE_S:.0f}s; cost unknown until reconciled"
                 )
-            with self._lock:
-                self._log(worst, "timeout_worst_case", ctx, worst_tokens)
+            self._log(worst, "timeout_worst_case", ctx, worst_tokens)
+            self._release(worst)  # the worst-case charge replaces the reservation
             raise e
-        with self._lock:
-            self._log(
-                self._price(raw),
-                raw.finish_reason,
-                ctx,
-                (raw.prompt_tokens or 0) + (raw.completion_tokens or 0),
-            )
+        except BaseException:
+            self._release(worst)  # no billable reply we know of
+            raise
+        self._log(
+            self._price(raw),
+            raw.finish_reason,
+            ctx,
+            (raw.prompt_tokens or 0) + (raw.completion_tokens or 0),
+        )
+        self._release(worst)
         return raw
 
 
@@ -174,6 +204,7 @@ def guarded_factory(
             make_inner(),
             run_id=run_id,
             run_cap_usd=left,
+            run_total_cap_usd=cap_usd,
             root=root,
             in_per_m=in_per_m,
             out_per_m=out_per_m,

@@ -118,3 +118,38 @@ def test_the_scope_prompt_asks_for_the_patch_not_the_whole_program():
 
     text = pathlib.Path("prompts/correction_scope.md").read_text()
     assert "patch_text" in text and "label `o`" in text
+
+
+BREAKOUT = (
+    'move o to (1, 1)\n}\n}\nfor o in objects {\n  if o.role == "note" {\n    move o to (1000, 0)'
+)
+
+
+def _scope_cands(patch, selector='o.role == "warning"'):
+    from fractions import Fraction
+
+    from open_apprentice.evaluation.labels import Spec, rule_for_spec
+
+    base = rule_for_spec(Spec("right", None, "all", Fraction(12)))
+    reply = {"candidates": [{"summary": "x", "patch_text": patch, "selector": selector}]}
+    p = MockProvider({"correction_scope": [reply]})
+    return ProviderScopeProposer(lambda: p).propose_scope({"base_program": {"rule": base}}, "scope")
+
+
+def test_a_patch_cannot_break_out_of_its_selector():
+    cands, usage, _ = _scope_cands(BREAKOUT)
+    assert cands == [] and usage["malformed"] == 1
+
+
+def test_a_patch_with_its_own_loop_or_object_scan_is_rejected():
+    for bad in (
+        "for p in objects {\n  move p to (1, 1)\n}",
+        "let n = len(objects)\nmove o to (n, 0)",
+    ):
+        cands, usage, _ = _scope_cands(bad)
+        assert cands == [] and usage["malformed"] == 1, bad
+
+
+def test_an_unusable_selector_is_dropped_before_composing():
+    cands, usage, _ = _scope_cands(PATCH, selector='o.role == "warning" { move o to (1, 1) }')
+    assert cands == [] and usage["malformed"] == 1

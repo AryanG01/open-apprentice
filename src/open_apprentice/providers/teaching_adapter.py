@@ -162,10 +162,35 @@ class ProviderScopeProposer:
         return cands, {**usage, "malformed": malformed}, cost
 
 
+def _mentions(node: object, test: Callable[[dict], bool]) -> bool:
+    if isinstance(node, list):
+        return any(_mentions(n, test) for n in node)
+    if isinstance(node, dict):
+        return test(node) or any(_mentions(v, test) for v in node.values())
+    return False
+
+
 def _compose(base: list, selector: str, patch: str) -> Optional[list]:
-    """The saved program, then the patch applied only to the selected labels (the later move wins), so nothing outside
-    the selector can change. The same composition the offline enumerator uses."""
-    body = "\n".join("      " + line for line in patch.strip().splitlines())
-    text = f'for o in objects {{\n  if o.kind == "label" {{\n    if {selector} {{\n{body}\n    }}\n  }}\n}}'
-    extra = _rule(text)
-    return None if extra is None else base + extra
+    """The saved program, then the patch applied only to the labels the selector names (the later move wins), so
+    nothing outside the selector can change. Built on the syntax tree, never by splicing text into text: the patch is
+    parsed alone inside a one-statement loop (a brace breakout adds a statement or fails to parse), may not loop or scan
+    the objects itself, and is placed inside the parsed selector's own condition."""
+    from open_apprentice.teaching.scope import SelectorError, parse_selector
+
+    try:
+        sel = parse_selector(selector)
+        only = parse_rule_text("for o in objects {\n" + patch.strip() + "\n}")
+        validate_rule(only)
+        validate_rule(sel)
+    except (RuleError, SelectorError):
+        return None
+    if len(only) != 1 or only[0].get("op") != "for_each" or only[0].get("var") != "o":
+        return None
+    body = only[0]["body"]
+    if _mentions(body, lambda n: n.get("op") == "for_each" or n.get("ref") == "objects"):
+        return None
+    try:  # sel = [for o in objects: [if kind == label: [if SELECTOR: <marker>]]]
+        sel[0]["body"][0]["then"][0]["then"] = body
+    except (KeyError, IndexError, TypeError):
+        return None
+    return base + sel

@@ -191,8 +191,10 @@ Findings:
    proposed, but its rule rewrote labels outside the scope (unexplained diff), so it was never shown. The other
    candidates failed to run on the corrected document. Fixed after the run (not yet run live): the shared scope
    proposer now asks for only the movement for the selected labels (`patch_text`) and composes
-   *saved program, then the patch for the selector's labels*, so nothing outside the scope can change. Both A and B
-   use this proposer.
+   *saved program, then the patch for the selector's labels*. The composition is built on the syntax tree (the
+   patch is parsed on its own, may not loop or scan the objects, and sits inside the parsed selector's condition), so
+   a patch cannot reach outside its selector; the first text-splicing version could, which the Plan 6 review caught.
+   Both A and B use this proposer.
 5. **Tall nodes:** both systems proposed `role == "note" and w < h` variants, narrower than the true scope (all labels
    on nodes at least as tall as wide), so the teacher answered `none`. This is the genuine ambiguity of a one-document
    correction; clarification and more questions are the product's answer, within budget.

@@ -53,7 +53,11 @@ async def test_every_call_is_logged_including_truncated_ones(tmp_path):
     g = SpendGuard(Fake(finish="length", usd=0.01), run_id="r", run_cap_usd=1, root=root(tmp_path))
     await g._call(MSGS, max_tokens=100, ctx=CTX)
     assert spent_so_far(tmp_path) == pytest.approx(0.01) and g.calls == 1
-    assert json.loads((tmp_path / "spend.jsonl").read_text())["kind"] == "length"
+    assert [json.loads(x)["kind"] for x in (tmp_path / "spend.jsonl").read_text().splitlines()] == [
+        "reserve",
+        "length",
+        "release",
+    ]
 
 
 async def test_unknown_cost_is_charged_at_the_conservative_rate(tmp_path):
@@ -186,3 +190,39 @@ async def test_a_run_cap_holds_across_fresh_guards_and_processes(tmp_path):
     assert spent_for_run("cal", r) == pytest.approx(0.3)
     with pytest.raises(BudgetExhausted):  # a new guard (another call or process) sees only 0.2 left
         await factory()._call(MSGS, max_tokens=100_000, ctx=CTX)
+
+
+async def test_concurrent_guards_cannot_both_start_a_call_that_only_one_budget_fits(tmp_path):
+    """Several learner processes near the cap: each guard must see the others' outstanding reservations."""
+    import asyncio
+
+    started = asyncio.Event()
+
+    class Slow(Fake):
+        async def _call(self, messages, *, max_tokens, ctx):
+            started.set()
+            await asyncio.sleep(0.3)  # still in flight while the other guard checks
+            return await super()._call(messages, max_tokens=max_tokens, ctx=ctx)
+
+    r = root(tmp_path, total=50, funded=50, reserve=10)
+    (r / "budget.json").write_text(
+        json.dumps({"authorized_total_usd": 50, "funded_usd": 50, "reserve_usd": 10})
+    )
+    (r / "spend.jsonl").write_text(json.dumps({"run": "o", "usd": 39.92}) + "\n")  # 0.08 spendable
+    # one worst case: (300/3 + 10000) tokens at $4/M = $0.0404; two do not fit in $0.08
+    guards = [SpendGuard(Slow(usd=0.001), run_id="r", run_cap_usd=1, root=r) for _ in range(2)]
+    results = await asyncio.gather(
+        *(g._call(MSGS, max_tokens=10_000, ctx=CTX) for g in guards), return_exceptions=True
+    )
+    ok = [x for x in results if not isinstance(x, BaseException)]
+    refused = [x for x in results if isinstance(x, BudgetExhausted)]
+    assert len(ok) == 1 and len(refused) == 1
+
+
+async def test_a_settled_call_leaves_only_its_actual_cost_in_the_ledger(tmp_path):
+    r = root(tmp_path)
+    g = SpendGuard(Fake(usd=0.02), run_id="r", run_cap_usd=1, root=r)
+    await g._call(MSGS, max_tokens=100, ctx=CTX)
+    assert spent_so_far(r) == pytest.approx(0.02)  # the reservation and its release net to zero
+    kinds = [json.loads(x)["kind"] for x in (r / "spend.jsonl").read_text().splitlines()]
+    assert kinds == ["reserve", "stop", "release"]

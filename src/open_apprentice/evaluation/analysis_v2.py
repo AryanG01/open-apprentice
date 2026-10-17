@@ -179,6 +179,21 @@ def report(run_dir: Path) -> str:
             if r["method"] == s:
                 d.update({k: int(v) for k, v in (r.get("diagnostics") or {}).items()})
         out.append(f"- {s}: " + ", ".join(f"{k} {d[k]}" for k in sorted(d)))
+    seq_rows = [r for r in cost_rows if r["stratum"] == "sequential"]
+    out += ["", "## Correction effort (sequential episodes, mean per run)", ""]
+    for s in systems:
+        sel = [r for r in seq_rows if r["method"] == s]
+        if not sel:
+            continue
+        calls = mean((r.get("diagnostics") or {}).get("correction_proposer_calls", 0) for r in sel)
+        turns = mean((r.get("diagnostics") or {}).get("correction_agent_turns", 0) for r in sel)
+        out.append(f"- {s}: proposer calls {calls:.1f}, agent turns {turns:.1f}")
+    out += [
+        "",
+        "B's correction cycle may use more provider calls than A's: every B decision is itself a model call, and B gets the",
+        "spec's 4 correction attempts plus whatever its learning cycle left unused (never more than 12 in all). A's policy runs",
+        "at most a scope round and one revision round. Read the correction comparison with that difference in mind.",
+    ]
     out += ["", "## Cost per episode (every run, stopped ones included)", ""]
     for s in systems:
         sel = [r for r in cost_rows if r["method"] == s]
