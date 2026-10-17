@@ -209,7 +209,7 @@ class AgentB:
         open_docs = [d for d in docs if d not in ev.approved and d not in ev.rejected]
         opts: list[dict] = [
             {"id": "propose", "tool": "propose", "args": {},
-             "what": "get 1-4 new candidate rules drafted from the evidence (or give your own \"rules_text\")"},
+             "what": "get 1-4 new candidate rules drafted from the evidence"},
         ]  # fmt: skip
         if self._requests("ChooseOutput") < self.b.max_choose and len(fitting) >= 2:
             for sid in docs:
@@ -308,10 +308,15 @@ class AgentB:
     def t_propose(self, aid: str, args: dict) -> str:
         texts = args.get("rules_text")
         cands, problems, usage = [], [], {"source": ROLE}
-        if texts is None and self.proposer is not None:
+        if self.proposer is not None:
+            # calibration 2026-10-17: given the choice, the model wrote its own (unparseable) rules every time
             cands, problems, usage = self._shared_proposals(aid)
             if not cands and not problems:
                 problems.append("the proposal call returned no usable rule")
+            if texts is not None:
+                problems.append(
+                    "your own rules_text was not used: rules are drafted by the proposal call"
+                )
         else:
             if not isinstance(texts, list) or not 1 <= len(texts) <= 4:
                 raise BadCall("rules_text must be a list of 1-4 rules")

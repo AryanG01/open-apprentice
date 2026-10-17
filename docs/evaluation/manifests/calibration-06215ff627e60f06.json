@@ -1,0 +1,43 @@
+{
+ "approved": false,
+ "attempt_ceilings": {
+  "B": 12
+ },
+ "budget_at_writing": {
+  "ceiling_fits": true,
+  "remaining_usd": 4.5578,
+  "spendable_usd": 45.0,
+  "spent_usd": 40.4422
+ },
+ "ceiling_usd": 1.0,
+ "establishes": "prompt and parse viability for A and B and the cost per episode on development episodes; not an A-versus-B result",
+ "estimate_basis": "dry-run mean attempts per episode x $0.0416 per call (mean of earlier live teaching calls in spend.jsonl); the fixture B stops early, so B's share is a lower bound",
+ "estimate_calls": 5.22,
+ "estimate_usd": 0.2172,
+ "expected_coverage": 1.0,
+ "kind": "calibration",
+ "manifest_id": "06215ff627e60f06",
+ "note": "B-only re-check: propose always runs A's proposal call; B chooses when to propose, ask, preview, commit or stop",
+ "protected_reserve_usd": 5.0,
+ "repeats": 1,
+ "runs": 2,
+ "split": "dev",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "SpendGuard stops the run when the next call's worst case would pass --cap-usd"
+ },
+ "systems": [
+  "B"
+ ],
+ "task_ids": [
+  "e88727066d3",
+  "e5a01549872"
+ ],
+ "task_strata": [
+  "catalogue",
+  "beyond"
+ ],
+ "worst_case_per_attempt_usd": 0.192,
+ "worst_case_total_usd": 4.608
+}

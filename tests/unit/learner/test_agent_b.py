@@ -240,3 +240,15 @@ def test_proposal_calls_count_against_the_attempt_budget(tmp_path):
         status == "abstained" and len(turns) == 4 and len(prop.calls) == 4
     )  # 4 turns x 2 calls = 8 attempts
     assert [c[0] for c in prop.calls] == ["initial", "contrastive", "contrastive", "contrastive"]
+
+
+def test_with_a_shared_proposer_b_cannot_substitute_its_own_rules(tmp_path):
+    ep = _clarify()
+    prop = _CountingProposer([_text(ep)])
+    replies = [
+        {"choose": "propose", "rules_text": ["for o in objects { && }"]},
+        {"choose": "abstain", "reason": "x"},
+    ]
+    status, log, turns = _run_with(tmp_path, ep, replies, prop)
+    assert len(prop.calls) == 1 and turns[0]["result"].startswith("P1: fits")
+    assert "not used" in turns[0]["result"]
