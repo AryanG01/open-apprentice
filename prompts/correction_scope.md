@@ -10,7 +10,9 @@ THE EVIDENCE.
 
 THE SELECTOR names which labels the revision is meant to change: ONE boolean expression over the label `o` and its node
 `object(o.attached)`, using only role, attachment and the ORIGINAL geometry, for example `o.role == "warning"` or
-`object(o.attached).w > 120`. No loops, no `let`, no `move`, no braces.
+`o.w > object(o.attached).w` (a label wider than its node). No loops, no `let`, no `move`, no braces.
+Compare values of the diagram with each other (a label's or node's sizes and positions) rather than with fixed numbers;
+fixed sizes copied from the corrected diagram are rejected.
 
 Each candidate must reproduce every corrected label exactly and change nothing outside its selector on other diagrams. If a
 candidate also changes some earlier approved examples, say so in its summary; the user will be asked to approve those changes.

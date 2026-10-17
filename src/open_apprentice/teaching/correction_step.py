@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Union
 
+from open_apprentice.concepts.label_teaching import magic_condition
 from open_apprentice.concepts.rules import RuleError, validate_rule
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.corrections import Draft, derive_draft, draft_items
@@ -105,7 +106,8 @@ def _admissible(c: dict, d: Draft) -> Optional[dict]:
     """The candidate with its conflict set, or None when it must never be shown to the user."""
     try:
         validate_rule(c["rule"])
-        parse_selector(c["selector"])
+        if magic_condition(parse_selector(c["selector"])):
+            return None  # a size copied from the corrected diagram memorises it (same filter as learning rules)
         if any(_forbidden_effect(c["rule"], sc) for sc in d.scenes.values()):
             return None
         if not item_fits(c["rule"], d.corrective)[0]:
