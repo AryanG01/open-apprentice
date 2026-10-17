@@ -121,3 +121,16 @@ def test_report_counts_budget_stops_apart_from_outcomes(tmp_path):
     md = report(tmp_path)
     assert "runs with an outcome: 2 of 3 (1 stopped by the dollar cap)" in md
     assert "- B: 0/1 runs" in md  # the stopped run is no outcome and is left out of the endpoints
+
+
+def test_report_breaks_refusals_down_by_kind(tmp_path):
+    rows = [_row("e1", "A", "appropriate_refusal", refusal_kind="no_program"),
+            _row("e1", "B", "appropriate_refusal", refusal_kind="agent_abstained")]  # fmt: skip
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"run_id": "x", "split": "dev", "mode": "mock"})
+    )
+    md = report(tmp_path)
+    assert (
+        "## Refusals by kind" in md and "- A: no_program 1" in md and "- B: agent_abstained 1" in md
+    )

@@ -45,6 +45,14 @@ OUTCOMES = (
     "error",
 )
 TOL = F(1, 2)
+ATTEMPTS_OUT = re.compile(r"budget exhausted: \d+ provider attempts|provider: attempt budget")
+REFUSAL_KINDS = (
+    ("no acceptable program", "no_program"),
+    ("unresolved disagreement", "unresolved_disagreement"),
+    ("refusing to apply", "refused_layout"),
+    ("unsupported structure", "unsupported_structure"),
+    ("agent:", "agent_abstained"),
+)
 DOLLAR_STOP = re.compile(r"budget: reserving|provider: budget|BUDGET_EXHAUSTED\[usd\]")
 BATTERY_DIRS = {
     "dev": REPO / "benchmarks/development/battery",
@@ -66,6 +74,7 @@ class RowV2(Row):
     model: str = "Fixture"
     reason: Optional[str] = None
     correction_policy: Optional[str] = None
+    refusal_kind: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------------------------------- scoring
@@ -212,11 +221,32 @@ def score(ep: Episode, outcome: dict) -> dict:
         result["terminal_outcome"] = terminal
     result["release_blocking"] = blocking
     # a run stopped by the dollar cap has no outcome (spec 7: a budget stop keeps partial results and reports
-    # coverage); running out of the allowed ATTEMPTS is an outcome and stays as scored
-    result["budget_stop"] = bool(DOLLAR_STOP.search(str(outcome.get("reason") or "")))
-    if result["budget_stop"]:
+    # coverage); running out of the allowed ATTEMPTS is an error for every system (A's executor already records it
+    # as Errored), never a refusal: nothing was surfaced
+    reason = str(outcome.get("reason") or "")
+    result["budget_stop"] = bool(DOLLAR_STOP.search(reason))
+    result["attempts_exhausted"] = bool(ATTEMPTS_OUT.search(reason)) and not result["budget_stop"]
+    if result["budget_stop"] or result["attempts_exhausted"]:
         result["terminal_outcome"] = "error"
+    result["refusal_kind"] = (
+        _refusal_kind(reason) if result["terminal_outcome"] == "appropriate_refusal" else None
+    )
     return result
+
+
+def _refusal_kind(reason: str) -> str:
+    for pattern, kind in REFUSAL_KINDS:
+        if pattern in reason:
+            return kind
+    return "other"
+
+
+def _failure(s: dict, outcome: dict) -> Optional[str]:
+    if s["budget_stop"]:
+        return "budget_stop"
+    if s["attempts_exhausted"]:
+        return "attempts_exhausted"
+    return outcome.get("reason") if s["terminal_outcome"] == "error" else None
 
 
 def _diagnostics(outcome: dict) -> dict:
@@ -361,11 +391,8 @@ def run_episode(
         claimed_success=committed,
         correct=(terminal == "correct_complete") if committed else None,
         abstained=outcome.get("status") == "abstained",
-        failure=(
-            "budget_stop"
-            if s["budget_stop"]
-            else (outcome.get("reason") if terminal == "error" else None)
-        ),
+        failure=_failure(s, outcome),
+        refusal_kind=s["refusal_kind"],
         tokens=int(usage.get("prompt_tokens", 0)) + int(usage.get("completion_tokens", 0)),
         calls=sum(
             1
@@ -575,11 +602,8 @@ def rescore(run_dir: Path) -> None:
                 correction=s["correction"],
                 release_blocking=s["release_blocking"],
                 correct=(s["terminal_outcome"] == "correct_complete") if committed else None,
-                failure=(
-                    "budget_stop"
-                    if s["budget_stop"]
-                    else (outcome.get("reason") if s["terminal_outcome"] == "error" else None)
-                ),
+                failure=_failure(s, outcome),
+                refusal_kind=s["refusal_kind"],
                 diagnostics=_diagnostics(outcome),
             )
         out.append(json.dumps(asdict(row), default=str))

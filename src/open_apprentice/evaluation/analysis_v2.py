@@ -164,6 +164,14 @@ def report(run_dir: Path) -> str:
     for s in systems:
         c = Counter(r["terminal_outcome"] for r in rows if r["method"] == s)
         out.append(f"- {s}: " + ", ".join(f"{k} {c[k]}" for k in sorted(c)))
+    out += ["", "## Refusals by kind", ""]
+    for s in systems:
+        k = Counter(
+            r.get("refusal_kind") or "unknown"
+            for r in rows
+            if r["method"] == s and r["terminal_outcome"] == "appropriate_refusal"
+        )
+        out.append(f"- {s}: " + (", ".join(f"{x} {k[x]}" for x in sorted(k)) or "none"))
     out += ["", "## Diagnostics (sums)", ""]
     for s in systems:
         d: Counter = Counter()

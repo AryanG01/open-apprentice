@@ -25,7 +25,7 @@ from open_apprentice.teaching.constraints import scene_from_payload
 from open_apprentice.teaching.scope import members
 
 GENERATOR_VERSION = "battery-v2.4"
-SCORING_VERSION = "score-v2.1"
+SCORING_VERSION = "score-v2.2"
 TOLERANCE = F(1, 2)
 SEED_BASE = {
     "dev": 110_000

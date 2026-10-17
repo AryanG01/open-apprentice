@@ -304,7 +304,9 @@ def test_a_dollar_cap_stop_is_a_stopped_run_not_an_outcome(status, reason):
 def test_running_out_of_attempts_is_still_an_outcome():
     ep = next(e for e in _dev() if e.stratum == "catalogue")
     s = score(ep, _outcome("abstained") | {"reason": "budget exhausted: 8 provider attempts"})
-    assert s["terminal_outcome"] == "unnecessary_abstention" and s["budget_stop"] is False
+    assert (
+        s["terminal_outcome"] == "error" and s["budget_stop"] is False and s["attempts_exhausted"]
+    )
 
 
 def test_rescore_rewrites_rows_from_the_kept_outcomes(tmp_path, monkeypatch):
@@ -323,3 +325,26 @@ def test_rescore_rewrites_rows_from_the_kept_outcomes(tmp_path, monkeypatch):
     rv.rescore(tmp_path)
     r = json.loads((tmp_path / "rows.jsonl").read_text())
     assert r["terminal_outcome"] == "error" and r["failure"] == "budget_stop" and r["model"] == "M"
+
+
+@pytest.mark.parametrize("status,reason", [
+    ("abstained", "budget exhausted: 8 provider attempts"),
+    ("error", "provider: attempt budget"),
+])  # fmt: skip
+def test_running_out_of_attempts_is_an_error_not_a_refusal(status, reason):
+    ep = next(e for e in _dev() if e.stratum == "inconsistent")
+    s = score(ep, _outcome(status) | {"reason": reason})
+    assert s["terminal_outcome"] == "error" and s["attempts_exhausted"] is True
+
+
+@pytest.mark.parametrize("reason,kind", [
+    ("no acceptable program found within the search limits", "no_program"),
+    ("unresolved disagreement", "unresolved_disagreement"),
+    ("refusing to apply: d0: l1 leaves the page", "refused_layout"),
+    ("unsupported structure: l0 in b0 has rotation", "unsupported_structure"),
+    ("agent: the demonstrations contradict each other", "agent_abstained"),
+])  # fmt: skip
+def test_a_refusal_carries_its_kind(reason, kind):
+    ep = next(e for e in _dev() if e.stratum == "inconsistent")
+    s = score(ep, _outcome("abstained") | {"reason": reason})
+    assert s["terminal_outcome"] == "appropriate_refusal" and s["refusal_kind"] == kind
