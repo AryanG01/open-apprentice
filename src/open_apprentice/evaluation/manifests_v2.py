@@ -164,18 +164,34 @@ def measured_episode_usd(results_root: Path = REPO / "results/eval_v2") -> dict[
     return {k: round(sum(v) / len(v), 4) for k, v in sorted(per.items())}
 
 
+def d_episode_ids(episodes: list[dict]) -> list[str]:
+    """The D ablation set (spec 7: 8 clarification-required episodes): the clarification-required catalogue episodes,
+    then the first sequential ones by id, up to 8. A fixed rule, chosen before any final result."""
+    cat = sorted(
+        e["id"] for e in episodes if e["stratum"] == "catalogue" and e["clarification_required"]
+    )
+    seq = sorted(
+        e["id"] for e in episodes if e["stratum"] == "sequential" and e["clarification_required"]
+    )
+    return (cat + seq)[:8]
+
+
 def funded_manifests(
     final_ids: list[str],
     clarify_ids: list[str],
     episode_usd: dict[str, float],
     reserve_usd: float,
     repeats: int = 3,
+    ab_ceiling_usd: Optional[float] = None,
+    d_ceiling_usd: Optional[float] = None,
 ) -> tuple[dict, dict]:
     """Tier T3 (spec 7) as two gated runs (a gate binds one run shape): A and B x 3 on every final episode, and D x 3
     on the clarification-required ones. Estimates come from the live calibrations; the ceiling adds 25% headroom.
     Generated, not approved."""
 
-    def one(kind: str, systems: list[str], ids: list[str], what: str) -> dict:
+    def one(
+        kind: str, systems: list[str], ids: list[str], what: str, ceiling: Optional[float]
+    ) -> dict:
         runs = len(ids) * len(systems) * repeats
         est = round(sum(len(ids) * repeats * episode_usd[s] for s in systems), 2)
         return _finish(
@@ -190,7 +206,8 @@ def funded_manifests(
                 "worst_case_per_attempt_usd": _per_attempt_worst(),
                 "episode_usd_measured": {s: episode_usd[s] for s in systems},
                 "estimate_usd": est,
-                "ceiling_usd": math.ceil(est * 1.25 * 20) / 20,
+                "ceiling_usd": ceiling if ceiling is not None else math.ceil(est * 1.25 * 20) / 20,
+                "expected_coverage": round(min(1.0, ceiling / est), 2) if ceiling and est else 1.0,
                 "stop_conditions": {
                     "run_cap": "no new run starts unless every run in flight can still make one call",
                     "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
@@ -207,12 +224,14 @@ def funded_manifests(
         ["A", "B"],
         final_ids,
         "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
+        ab_ceiling_usd,
     )
     d = one(
         "funded_T3_D",
         ["D"],
         clarify_ids,
         "the question-selection ablation (A's policy with uniform questions) on the clarification-required episodes",
+        d_ceiling_usd,
     )
     return ab, d
 

@@ -229,3 +229,33 @@ def test_measured_episode_cost_comes_from_live_calibration_rows(tmp_path):
             {"method": "B", "usd": 0.2, "origin": "live", "failure": None}]  # fmt: skip
     (d / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
     assert measured_episode_usd(tmp_path) == {"A": 0.2, "B": 0.2}
+
+
+def test_funded_ceilings_can_be_set_to_fit_the_budget():
+    from open_apprentice.evaluation.manifests_v2 import funded_manifests
+
+    ids = [f"e{i}" for i in range(36)]
+    ab, d = funded_manifests(
+        ids,
+        ids[:8],
+        {"A": 0.11, "B": 0.19, "D": 0.11},
+        10.0,
+        ab_ceiling_usd=33.0,
+        d_ceiling_usd=3.0,
+    )
+    assert ab["ceiling_usd"] == 33.0 and d["ceiling_usd"] == 3.0
+    assert ab["expected_coverage"] == round(min(1.0, 33.0 / ab["estimate_usd"]), 2)
+
+
+def test_d_runs_on_the_catalogue_clarification_episodes_plus_the_first_sequential_ones():
+    from open_apprentice.evaluation.manifests_v2 import d_episode_ids
+
+    eps = [
+        {"id": f"c{i}", "stratum": "catalogue", "clarification_required": i < 4} for i in range(8)
+    ]
+    eps += [
+        {"id": f"s{i:02d}", "stratum": "sequential", "clarification_required": True}
+        for i in (9, 3, 7, 1, 5, 2)
+    ]
+    eps += [{"id": "b0", "stratum": "beyond", "clarification_required": False}]
+    assert d_episode_ids(eps) == ["c0", "c1", "c2", "c3", "s01", "s02", "s03", "s05"]

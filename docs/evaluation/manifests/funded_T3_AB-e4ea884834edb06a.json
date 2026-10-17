@@ -1,0 +1,72 @@
+{
+ "approved": false,
+ "attempt_ceilings": {
+  "A": 12,
+  "B": 12
+ },
+ "ceiling_usd": 38.9,
+ "episode_usd_measured": {
+  "A": 0.1144,
+  "B": 0.2003
+ },
+ "establishes": "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
+ "estimate_usd": 36.82,
+ "expected_coverage": 1.0,
+ "kind": "funded_T3_AB",
+ "manifest_id": "e4ea884834edb06a",
+ "protected_reserve_usd": 10.0,
+ "repeats": 3,
+ "runs": 234,
+ "split": "final",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "no new run starts unless every run in flight can still make one call"
+ },
+ "systems": [
+  "A",
+  "B"
+ ],
+ "task_ids": [
+  "e0900860e87",
+  "e0994265d1a",
+  "e0d18744978",
+  "e107e8a4dc0",
+  "e10848ba4e6",
+  "e166942ff4d",
+  "e1a704b6222",
+  "e1bf2e33295",
+  "e1e19c6f941",
+  "e232b39e368",
+  "e2b27c5edde",
+  "e2b878b0e18",
+  "e2fd0b1d3ba",
+  "e34386cbe69",
+  "e384a5298bc",
+  "e412c1fc37f",
+  "e44cd79226b",
+  "e47dfb3336d",
+  "e502559d32a",
+  "e5b447fd63f",
+  "e6388b54494",
+  "e651f2f0a96",
+  "e658e6b913e",
+  "e7321f3a5be",
+  "e79cd46b660",
+  "e7c73053073",
+  "e7fbac09783",
+  "e857fbbe263",
+  "e885bee9800",
+  "e9703f6b34e",
+  "e9c740cf9ae",
+  "ea6afa2c415",
+  "eb85f32650d",
+  "ede4aba5f22",
+  "eef0749149f",
+  "ef157cb1266",
+  "ea8e1486ac8",
+  "e8d706a6917",
+  "e74e24dfbc3"
+ ],
+ "worst_case_per_attempt_usd": 0.192
+}

@@ -967,6 +967,8 @@ def eval_manifest(
     episode_ids: Optional[str] = typer.Option(
         None, "--episode-ids", help="comma-separated dev episode ids"
     ),
+    ab_ceiling: Optional[float] = typer.Option(None, "--ab-ceiling-usd", help="funded A/B run cap"),
+    d_ceiling: Optional[float] = typer.Option(None, "--d-ceiling-usd", help="funded D run cap"),
     funded: bool = typer.Option(
         False,
         "--funded",
@@ -980,6 +982,7 @@ def eval_manifest(
         BUDGET_ROOT,
         calibration_manifest,
         calibration_note,
+        d_episode_ids,
         funded_manifests,
         measured_call_usd,
         measured_episode_usd,
@@ -996,10 +999,17 @@ def eval_manifest(
         ids = sorted(e["id"] for e in private["episodes"]) + [
             r["id"] for r in private["real_files"]
         ]
-        clarify = sorted(e["id"] for e in private["episodes"] if e["clarification_required"])
+        clarify = d_episode_ids(private["episodes"])
         usd = measured_episode_usd()
         usd.setdefault("D", usd["A"])  # D runs A's policy and calls
-        made = funded_manifests(ids, clarify, usd, budget["reserve_usd"])
+        made = funded_manifests(
+            ids,
+            clarify,
+            usd,
+            budget["reserve_usd"],
+            ab_ceiling_usd=ab_ceiling,
+            d_ceiling_usd=d_ceiling,
+        )
         for m in made:
             (out / f"{m['kind']}-{m['manifest_id']}.json").write_text(
                 json.dumps(m, indent=1, sort_keys=True) + "\n"

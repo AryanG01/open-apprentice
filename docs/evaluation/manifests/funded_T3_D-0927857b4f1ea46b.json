@@ -1,0 +1,38 @@
+{
+ "approved": false,
+ "attempt_ceilings": {
+  "D": 12
+ },
+ "ceiling_usd": 3.2,
+ "episode_usd_measured": {
+  "D": 0.1144
+ },
+ "establishes": "the question-selection ablation (A's policy with uniform questions) on the clarification-required episodes",
+ "estimate_usd": 2.75,
+ "expected_coverage": 1.0,
+ "kind": "funded_T3_D",
+ "manifest_id": "0927857b4f1ea46b",
+ "protected_reserve_usd": 10.0,
+ "repeats": 3,
+ "runs": 24,
+ "split": "final",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "no new run starts unless every run in flight can still make one call"
+ },
+ "systems": [
+  "D"
+ ],
+ "task_ids": [
+  "e1bf2e33295",
+  "e232b39e368",
+  "e47dfb3336d",
+  "e502559d32a",
+  "e0900860e87",
+  "e10848ba4e6",
+  "e166942ff4d",
+  "e2b27c5edde"
+ ],
+ "worst_case_per_attempt_usd": 0.192
+}
