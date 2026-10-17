@@ -19,12 +19,13 @@ Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-igno
 `docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
 systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offline dry run
 (`results/eval_v2/dryrun-20261016/report.md`, not a model result), and the paid-run gate. Suite 945 on 3.13 and 3.12.
-**Calibration ran live 2026-10-16** (`docs/evaluation/calibration_results.md`): $0.871 spent; 3 of 10 runs reached an
-outcome before the cap. A is viable (2/2 correct, about $0.09 per episode); B is not (31% unusable tool calls, never
-previews, so it never commits). **Waiting on the owner:** the balance after the run (expected about $6.30), a
-development-only fix of B's prompt and parsing plus a B-only re-calibration (about $1.6), and a top-up for the funded
-tier (re-estimated at $50-60). Reserve lowered to $5 by the owner. Before the funded tier: B's own correction tools,
-the real-file final episodes. Known product gap: no system refuses a demonstrated forced-overlap convention.
+**Calibration and B re-checks ran live 2026-10-16/17** (`docs/evaluation/calibration_results.md`): $1.84 spent in
+total. A is viable (2/2 correct, about $0.09 per episode). B is not yet: 1 correct out of 5 episodes, even after the
+option protocol (B picks among legal next steps) and access to A's proposal call. It keeps writing its own rules,
+often with `&&`. Next design: B's `propose` always uses A's proposal call (about $0.50 of cap per test episode).
+**Waiting on the owner:** a top-up (about $0.33 left above the $5 reserve; the funded tier is re-estimated at
+$50-60), and the B decision. Before the funded tier: B's own correction tools, the real-file final episodes. Known
+product gap: no system refuses a demonstrated forced-overlap convention.
 master is 26 commits ahead of origin (not pushed).
 
 **Money:** `results/redesign/budget.json` = $50 authorized, $10 reserve; about $38.60 already spent → about **$1.40 spendable**.
