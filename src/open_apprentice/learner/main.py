@@ -147,7 +147,9 @@ def _activate(ctx: Context, log: SessionLog) -> Optional[int]:
     return version
 
 
-def run_correction(ctx: Context, scope_proposer: Any) -> None:
+def run_correction(
+    ctx: Context, scope_proposer: Any, runner: Optional[Callable[[SessionLog], str]] = None
+) -> None:
     """The teacher's corrective edit on the output the learner's active version produced (spec 5)."""
     from open_apprentice.skills.versions import SkillStore
     from open_apprentice.teaching.correction_executor import CorrectionExecutor, start_correction
@@ -167,9 +169,12 @@ def run_correction(ctx: Context, scope_proposer: Any) -> None:
     )
     ctx.logs["correct"] = log
     ctx.teacher.logs.append(log)
-    status = CorrectionExecutor(
-        ctx.store, log, scope_proposer, ctx.teacher, ctx.ledger, worst_usd=ctx.worst
-    ).run()
+    if runner is not None:  # system B: its own choices over the shared correction machinery
+        status = runner(log)
+    else:
+        status = CorrectionExecutor(
+            ctx.store, log, scope_proposer, ctx.teacher, ctx.ledger, worst_usd=ctx.worst
+        ).run()
     out: dict[str, Any] = {"status": status, "program": None}
     if status == "activated":
         v, _, _ = SkillStore(ctx.store).active(SKILL)
@@ -239,32 +244,47 @@ def system_d(ctx: Context) -> None:
 
 
 def system_b(ctx: Context) -> None:
-    from open_apprentice.learner.agent_b import AgentBudgets, run_agent_b, scripted_policy
+    from open_apprentice.learner.agent_b import AgentB, AgentBudgets, scripted_policy
+    from open_apprentice.learner.agent_b_correction import (
+        CorrectionAgentB,
+        scripted_correction_policy,
+    )
     from open_apprentice.providers.mock import MockProvider
 
-    mock = MockProvider({}, functions={"agent_b": scripted_policy})
+    mock = MockProvider(
+        {}, functions={"agent_b": scripted_policy, "agent_b_correction": scripted_correction_policy}
+    )
     factory = ctx.factory or (lambda: mock)
     ctx.result["policy"] = "model" if ctx.factory else "scripted_fixture"
-    ctx.result["correction_policy"] = (
-        "A"  # B's corrections run the shared executor (ledger ruling, review I4)
-    )
+    ctx.result["correction_policy"] = "B"
     log = open_learning_log(ctx)
-    status = run_agent_b(
+    budgets = AgentBudgets()
+    agent = AgentB(
         factory,
         log,
         ctx.teacher,
         ctx.ledger,
-        AgentBudgets(),
+        budgets,
         ctx.worst,
         proposer=_model_proposer(
             ctx
         ),  # B's `propose` runs A's proposal call (same prompt, same model)
     )
+    status = agent.run()
     ctx.result["status"] = status
     if status == "committed":
         _activate(ctx, log)
         if ctx.episode.get("correction"):
-            run_correction(ctx, _model_proposer(ctx))
+            # 4 correction attempts plus the learning cycle's unused ones: at most 12 for the episode (spec 3.7)
+            left = 12 - agent.attempts
+
+            def runner(clog: SessionLog) -> str:
+                return CorrectionAgentB(
+                    factory, ctx.store, clog, ctx.teacher, ctx.ledger, _model_proposer(ctx), ctx.worst,
+                    max_attempts=max(4, left),
+                ).run()  # fmt: skip
+
+            run_correction(ctx, _model_proposer(ctx), runner)
 
 
 SYSTEMS: dict[str, Callable[[Context], None]] = {

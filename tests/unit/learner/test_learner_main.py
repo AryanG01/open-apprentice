@@ -175,7 +175,7 @@ def test_system_b_runs_offline_with_the_scripted_fixture_policy(tmp_path):
         o["reason"],
         r.stderr[-1500:],
     )
-    assert o["policy"] == "scripted_fixture"
+    assert o["policy"] == "scripted_fixture" and o["correction_policy"] == "B"
     assert any(e["type"] == "AgentTurn" for e in o["events"])
 
 

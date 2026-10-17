@@ -90,11 +90,11 @@ class BadCall(Exception):
     """A tool call that cannot be read (unknown tool, missing or mistyped arguments): a parse failure."""
 
 
-def build_prompt() -> str:
-    """agent_b.md with the grammar documentation and examples taken verbatim from hypotheses_labels.md."""
+def build_prompt(name: str = "agent_b.md") -> str:
+    """A B prompt with the grammar documentation and examples taken verbatim from hypotheses_labels.md."""
     shared = (PROMPTS / "hypotheses_labels.md").read_text()
     grammar = shared[shared.index("THE EVIDENCE.") : shared.index("HOW TO CHOOSE DIFFERENT")]
-    return (PROMPTS / "agent_b.md").read_text().replace("{{SHARED_GRAMMAR}}", grammar.strip())
+    return (PROMPTS / name).read_text().replace("{{SHARED_GRAMMAR}}", grammar.strip())
 
 
 class _NoProposer:
