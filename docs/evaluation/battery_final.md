@@ -3,15 +3,16 @@
 Frozen 2026-10-16 with `oa eval freeze --split final` before any learner run. The private files live in
 `benchmarks/final/battery/` (git-ignored); only their hashes and the learner-projected manifest are committed here.
 `oa eval run --split final` re-hashes every file against `battery_final.hashes.json` and refuses on any mismatch.
-Earlier freezes were replaced before any learner ran on the final split: v2.1 (its scope-diagnostic set could not
-tell a near-miss selector apart) and the first v2.2 freeze (public seed base; learner files carried unmasked
-correction outputs; both found by the final review). No learner ever read a final episode.
+Earlier freezes were replaced before any learner ran on the final split: v2.1 (scope diagnostics could not tell a
+near-miss selector apart), v2.2 (public seed base; unmasked correction outputs), v2.3 (the truth layouts of ordinary
+episodes left the page or overlapped where the teacher places labels, so the forced-overlap episode was not
+distinguishable). No learner ever read a final episode.
 
-- Generator: `battery-v2.3`, scoring `score-v2.1`, tolerance 1/2
-- Generator code commit: `127f116ebf64a201c9ba83dc2db947c5ff048528`
+- Generator: `battery-v2.4`, scoring `score-v2.1`, tolerance 1/2
+- Generator code commit: `3f533290289f983d7dc69b640e20e4461b9d23f3`
 - Seed base: drawn at freeze time and recorded only in the private manifest (development: 110000)
-- `manifest.private.json` sha256: `b1f6eacbf1559c655a77623315c52948fded99df1e8f6a0667e9a40dfd346134`
-- `manifest.public.json` sha256: `d35a6b7e9089ca2ebbbd6e2d5b49433a30d1953575b442a4658917c0b565d976`
+- `manifest.private.json` sha256: `9a97f13109120edad06ac04e95ce3c85d3e5dc4cfa4912401263885da49d9828`
+- `manifest.public.json` sha256: `3a1250f0c1b84c23f0ec16e22f26cf4fc21701439a668c5b4c407495d873539c`
 - Episodes: 36 (catalogue 8, beyond 8, inconsistent 4, unsupported 4, sequential 12) plus 3 real-file episodes on
   `benchmarks/final/drawio/f1-f3` (bytes hashed and matched to `docs/corpus/drawio_provenance.md`; contents not parsed).
 
@@ -20,42 +21,42 @@ correction outputs; both found by the final review). No learner ever read a fina
 ```json
 {
  "episodes": [
-  "e0589ff7692",
-  "e0ef68b5765",
-  "e0f21bde332",
-  "e167f4be004",
-  "e1beb848fe8",
-  "e225b49e9a3",
-  "e247783934f",
-  "e2834f747ae",
-  "e371fe329f9",
-  "e37d57569f9",
-  "e46e9a2c35e",
-  "e4cf599184d",
-  "e515b65577a",
-  "e53f49247ce",
-  "e5ccdc91408",
-  "e608bf9464e",
-  "e6248b2b29d",
-  "e6a9773be91",
-  "e6c86a5ebc2",
-  "e8550264e92",
-  "e88fa81edd7",
-  "e9b9637da0f",
-  "ea0fc3aba12",
-  "ea2179b1ea6",
-  "ea35e08d122",
-  "ea55d264111",
-  "ea87070f33d",
-  "eac04c7e6db",
-  "eb6e0a33c09",
-  "ec4b3681577",
-  "ec949a58b5a",
-  "ed8e392e213",
-  "ee799a5cb57",
-  "ef6906243da",
-  "efd8d946fc4",
-  "effc94c7633"
+  "e0de6a89637",
+  "e0f8989564c",
+  "e16bc065f23",
+  "e287ccd3415",
+  "e3ef639970b",
+  "e518bf79df5",
+  "e5e4441cf0a",
+  "e5fdcda9185",
+  "e606b592b8b",
+  "e6c84f84187",
+  "e719bec9a66",
+  "e78d5ceb7fb",
+  "e80ce954fd8",
+  "e8401adcaf9",
+  "e89ce6400a2",
+  "e8cb31f647a",
+  "e91a6817ac9",
+  "e9cd3a3f769",
+  "e9f02a17e79",
+  "eb1f88d2b65",
+  "eb2dc4632c9",
+  "eb7dbaadf6a",
+  "eb7f6ed1115",
+  "ebc24d22014",
+  "ebdc397dec8",
+  "ebe4d5ea5b0",
+  "ec4eb9aafb9",
+  "ec6c0d941b3",
+  "ed1d46df39e",
+  "ed2a1c5ee0f",
+  "ed339711520",
+  "ed61dfc6e19",
+  "ed66843d71e",
+  "eeb5de06f8b",
+  "ef26b490ac4",
+  "efe2cad1efe"
  ],
  "split": "final"
 }
@@ -65,77 +66,77 @@ correction outputs; both found by the final review). No learner ever read a fina
 
 | file | sha256 |
 |---|---|
-| `episodes/e0589ff7692.private.json` | `350701a2070b0ff2f64d94f8b076dc8a7b83c66436e147952e4a905811408f50` |
-| `episodes/e0ef68b5765.private.json` | `34a47c4dd5eb1f7ec356a54e050e62cf227530c23f60f4a37da0758e74d84b43` |
-| `episodes/e0f21bde332.private.json` | `732de7dd0f43a577c038f39c2772b8fda74d7a8ad6f482f43deffe9be6414a3e` |
-| `episodes/e167f4be004.private.json` | `eb6b76bd7599b5ec21d6a4eeb2003cf9d22927c94eeb2b5b585ea759114a3d29` |
-| `episodes/e1beb848fe8.private.json` | `e21f155f00d4f96fc64cd400d499c92f5e33e25358311f8faffb17bf47d8285a` |
-| `episodes/e225b49e9a3.private.json` | `0f9465c2466a53a308c50ef072f829c6d38b55084cb6feb688bfb450cb3ffc60` |
-| `episodes/e247783934f.private.json` | `da205064ce5e0d4888ab8dbab857299d837d4f0ef2c478f9ae1f556ea8ca48f1` |
-| `episodes/e2834f747ae.private.json` | `f4ff88dddd756bdcacb0d36025b6dd4398300dbb5cfc544132405220df6f23c5` |
-| `episodes/e371fe329f9.private.json` | `093628790a06aa0cab9f4709bda0c4021710f0801b46f2a2c093cbf0a88914d5` |
-| `episodes/e37d57569f9.private.json` | `1640b7a8002a8b16f52bf714686d7bf0a3248789639905c06521005a3b510bad` |
-| `episodes/e46e9a2c35e.private.json` | `6d0531ba25e2cf2b2956764fbe5cd4978eec31076c17ed0fbd53957fbfbd90d0` |
-| `episodes/e4cf599184d.private.json` | `cf3640a94411274c5f28741ceb18b8f0387f47015096ad2958b471c1628841a0` |
-| `episodes/e515b65577a.private.json` | `e189124e8e1b832313f524ed5f68532b6a8400e1cc78efeea758ec6bda08bd44` |
-| `episodes/e53f49247ce.private.json` | `d261dc5683538b88bb56ac10a6bcb01c3e560cd0f2d61d1c8dfcdaa7fa90be1f` |
-| `episodes/e5ccdc91408.private.json` | `b3225ad2a7c05eeedc92eec748e32cec6de8dec2d82e0a415d812d1c7ec4c991` |
-| `episodes/e608bf9464e.private.json` | `244bdff63416cbe957442eb5cd3870eda3fbe0f3a842c8e5906f903563c35bb2` |
-| `episodes/e6248b2b29d.private.json` | `25ad3b9072c7aa35fa1ad55be5908df7aa0093ad44b4946f2f9545b5b1a9f755` |
-| `episodes/e6a9773be91.private.json` | `f1a0fbd4d94e2407ee132b5c41e921269833f117c2f8c68ef3afe51f98bf65f3` |
-| `episodes/e6c86a5ebc2.private.json` | `b0237b5c751ada90c7d153ec72a95b0afc0643eb2db12dfbaec314e9cbd0ac16` |
-| `episodes/e8550264e92.private.json` | `2efd88013c9a15b66db258877504079b7f2d6ffec910476caea8a02bddeda46d` |
-| `episodes/e88fa81edd7.private.json` | `e3a2a4a6c7cd486d1f749efcb86564b99bf51ee300799c0299f92b7b2f7608e6` |
-| `episodes/e9b9637da0f.private.json` | `676aaa02c4355e312528597b94912eb11d21de793b1aef31c87a9b9d4c6bed3d` |
-| `episodes/ea0fc3aba12.private.json` | `fcb5d58c62d2954ed22f17e347c2611d222cf00cf7d8de579350d824543a4d1f` |
-| `episodes/ea2179b1ea6.private.json` | `52d6550122e82ee4382cdd2d12af933cda3ed707b84363497ef9cce472a6db87` |
-| `episodes/ea35e08d122.private.json` | `5b97ea2ad487266425649a0e369760ea5f36f433e0100af3e9482d572d78d344` |
-| `episodes/ea55d264111.private.json` | `5a4176720b28edec467cf770c0a6dcaeb7f7121ba630f41bb1556dae2b13356d` |
-| `episodes/ea87070f33d.private.json` | `dcad1feb41801a0fa4710cdee06ae09651e3505fb4c1d2ce816218256b1f0e69` |
-| `episodes/eac04c7e6db.private.json` | `bf4eddac1953aa0ebf749197f6e5c882a68b98fd72aa2ade26a92298624b29de` |
-| `episodes/eb6e0a33c09.private.json` | `b5302d3fc0eed9314875ea4a38fcfd0feb119e1c6d412e97b3f2a4d6479f8290` |
-| `episodes/ec4b3681577.private.json` | `0a5c19320e0391ce56015dfe168e73e2a862d52d2fab697c5a8ebee1861bf475` |
-| `episodes/ec949a58b5a.private.json` | `3dc670c8fdb030e3c06115b437de4c393cbc4f8e239d885f6dec7bbabefd2bff` |
-| `episodes/ed8e392e213.private.json` | `aee9fd2d131734ee3804cc72504e8632ce591379abfcf875530e93e8e4f8d406` |
-| `episodes/ee799a5cb57.private.json` | `5cefb32f87aefc3310f1958ac313b3a48d14de731228a696978571fcfae550c6` |
-| `episodes/ef6906243da.private.json` | `9c5435a6f4f1cd815d500d373f1095eec0812953711be6708eb426b341f72c24` |
-| `episodes/efd8d946fc4.private.json` | `11d14ee45bc3ffaea03f0bd4900ba1a741fcc12aad6f56d207382569652b73dc` |
-| `episodes/effc94c7633.private.json` | `66cf7dd0812c7468bd6c6a3a0b4fe2eee7f6e1fe50904d5acd24723227664909` |
-| `learner/e0589ff7692.json` | `e2f446c9f6e890aa60a64f54a68ecea48e55fc485f026088a94784aa210d7c28` |
-| `learner/e0ef68b5765.json` | `582e8439fdc4491ce9ca28a20fddde07c6442dc06bd7669980d478939cfe7840` |
-| `learner/e0f21bde332.json` | `f0f6688ab69a6fa53c82abcf03f7763b6c743c95a0e93d133229893507dd1c44` |
-| `learner/e167f4be004.json` | `954e40afc5ba11abbf6bf67cf246dc00e8bf78d10013cdc3273dfdb9453e0d15` |
-| `learner/e1beb848fe8.json` | `db84f4e19603843c33d52892452ff585a2ad5adbd8f52e1db1abc8a40e0b7e57` |
-| `learner/e225b49e9a3.json` | `21afd468d96760dcb633ad14bec78ddac908d115a63db5dd6ed5116129855bf4` |
-| `learner/e247783934f.json` | `5d28f5ae2de478093e19a5a9e7793c8df0fa2838a745c7f44259b0899b33c6ad` |
-| `learner/e2834f747ae.json` | `55ae42143a7893a01e602cc3e9ebd8c690eea0698edc0e0d0c7a8aa35a17b1e7` |
-| `learner/e371fe329f9.json` | `9ae1e5201ac4e90b2806184c0c26dfa8941848a9ac9e88c46f64e370e216d52a` |
-| `learner/e37d57569f9.json` | `b932ab084e379fbe993d7b333db0480c6288d3bb4919b35e440bd4837c3a2ef4` |
-| `learner/e46e9a2c35e.json` | `785b777c336fe95f4bb6d63eb1c72c1b74a0e27fdb96911b4d00551ae0983dab` |
-| `learner/e4cf599184d.json` | `0bc3bb72fd2c12790d0db50d477b0ab168d2d9c7393c51f997335be6d00851f0` |
-| `learner/e515b65577a.json` | `7b11c904a7eeb044252e5d3a04c872dc7882727f1e788acae6419975b280ff27` |
-| `learner/e53f49247ce.json` | `609d4c48a137b4a930cc407067e7a53fe92c49ae0a9496e2f27f91cd963d6f34` |
-| `learner/e5ccdc91408.json` | `7b5f7ab76103d66b26b8435b2967234815c99e500792f86db6977b6b2f13a41c` |
-| `learner/e608bf9464e.json` | `62120d7a7b1795d37061ee779b60e8a2e0a574346493a37467e577f53693309e` |
-| `learner/e6248b2b29d.json` | `c99bd414cff41bd8f00cbe510a1e2fe1b5d188f73402ea0a76452be35009a142` |
-| `learner/e6a9773be91.json` | `1d87a0476d658a7cd579fc8c1b2da2bbd1b71f548b44c4abcea01048c8d806fd` |
-| `learner/e6c86a5ebc2.json` | `31bafe405a6fdf2bd0ce21ea16772fba5692adc5d631dc3b9f223d1d0a02810c` |
-| `learner/e8550264e92.json` | `095e8ab9e899fe3c0ab5b7586fd6c8cd723883c0c1dc7ce8a0f2f3b6dc9a7784` |
-| `learner/e88fa81edd7.json` | `38ff90922832cb341f6f0d261f77567bf521109db61a8019e5c0b15d1b3b0cd8` |
-| `learner/e9b9637da0f.json` | `57bf353265cf5b2edd6d43690ead575ad59818afe244314d011bab4caeb7f680` |
-| `learner/ea0fc3aba12.json` | `d9817bf41cc5a7e2f210fbf9ac56e8549eecd785347748856d4592d317c3de42` |
-| `learner/ea2179b1ea6.json` | `74330c770cc017abf402cfaf52b9363dc5186d88613ddffc85aef752b214ff4d` |
-| `learner/ea35e08d122.json` | `f2e69b183b55869e2cad975a484960dca6e6942f683ff74f4d32e664db4e1492` |
-| `learner/ea55d264111.json` | `0b8dc77fe9ee356327cddfa6f447213841a129e97777350f2c735549aa453bbe` |
-| `learner/ea87070f33d.json` | `e2c70d6c8214369130436348d692f9befd780706c33bb70534ef257f368bcb45` |
-| `learner/eac04c7e6db.json` | `e4770adafc57851d8f97755c4037a4bffabd6400eff466e010ada0864204d5a3` |
-| `learner/eb6e0a33c09.json` | `5e6ee8cdf917b0f39eae58c8678598bdab7ef81982e27c3827fdb31ea2316d51` |
-| `learner/ec4b3681577.json` | `dbc8df9ee0d863ad4c2f46f31548eb313ac2a3d6ddf13c513d434a01e50077aa` |
-| `learner/ec949a58b5a.json` | `9600e979567b62f3da2981219e16c9c99bdb7fe7176e921ea5ff68fc1a947b95` |
-| `learner/ed8e392e213.json` | `cb206a0ab57826494e6caef7fd0a402d29950ad149b1674c7ae24d33df806e37` |
-| `learner/ee799a5cb57.json` | `0e16b370d10be74cc4ca06c4649808c848613f7a0462d577cbd6182e122f3126` |
-| `learner/ef6906243da.json` | `5d2fdeb6d46a67d22b8e48e0953316f39d39bc4ee4102cf7e25b4395ba1f7ee2` |
-| `learner/efd8d946fc4.json` | `f3a5eec4ce75100e87005b467eda2ede98962c3d21e43c91f9a75b90594d2197` |
-| `learner/effc94c7633.json` | `8062ed510d3e9aa43dafb572e3d16e04fc35977d89617556f49020d88b5225a8` |
-| `manifest.private.json` | `b1f6eacbf1559c655a77623315c52948fded99df1e8f6a0667e9a40dfd346134` |
-| `manifest.public.json` | `d35a6b7e9089ca2ebbbd6e2d5b49433a30d1953575b442a4658917c0b565d976` |
+| `episodes/e0de6a89637.private.json` | `1914ca4d0cd99e4a8ab527d9ef653bd10eec2ed7205a48e6919a08aae079a355` |
+| `episodes/e0f8989564c.private.json` | `4e136a6211e2a2a1b91f3c3da2f3ee9bb83c0b36cd1784b7d02cd7c5289fa2b3` |
+| `episodes/e16bc065f23.private.json` | `415e56cb61e676813af1cd314e2185613d54250229aeddba4130fefc80b359f5` |
+| `episodes/e287ccd3415.private.json` | `89644204c6e91025884e849160f11664195d2fb0eadec648d278ed1e8f2a8a2e` |
+| `episodes/e3ef639970b.private.json` | `cb3efa8e676e891927ed06a63422da2f0204fbba90c568cb57557165e11f4f49` |
+| `episodes/e518bf79df5.private.json` | `c1b0a15a5144af40c0ea7a1fd3735983a0785015fa401fa4d182de6238d3caad` |
+| `episodes/e5e4441cf0a.private.json` | `44eafd4b45ef588dc0eb0bf3b47bd101d2b62438be58089c274d9bdfa7646dc9` |
+| `episodes/e5fdcda9185.private.json` | `36af6ed7a9643e1a2da5757ef51ce4f5ec256462e54cfa026447d9de9e110cc6` |
+| `episodes/e606b592b8b.private.json` | `5a244e880aa18f55bdd3d1d2d3573c7ea3011d27b1b34e2b463be165170f9666` |
+| `episodes/e6c84f84187.private.json` | `842401578437a305e5d921a6fa0c6ca2c13bf19d634a485c9b6875151ec506ec` |
+| `episodes/e719bec9a66.private.json` | `53af2a2c7f2d93ce9a5c2f8078f3e6f6c8f9467a355910cfaeaf7d346d3fe13f` |
+| `episodes/e78d5ceb7fb.private.json` | `851a6dbbdf7cab3afc0922328620f15dcf0715136d3db9781ad1d4ef9b29d408` |
+| `episodes/e80ce954fd8.private.json` | `dca962f4362ae667f49aa2be8fe41c4929581a553529cb8f23a4159b9fd72d26` |
+| `episodes/e8401adcaf9.private.json` | `1c693241c8bb4e3de1e2c875b24566796f4905d10b2678a40cf009538bea627d` |
+| `episodes/e89ce6400a2.private.json` | `05fec0d62cb956f1074a9a86de3a78830b864fcea13dc96ddffeb85ff94004ef` |
+| `episodes/e8cb31f647a.private.json` | `dc046b77d9e74cc1f02ebf30a28226935d2e36b45c6a93a071ecb3262a3549e8` |
+| `episodes/e91a6817ac9.private.json` | `c0071292f1108fe68643cdfd1a52141bbb2b4d75e9f3c9571391882a356f901e` |
+| `episodes/e9cd3a3f769.private.json` | `473a422e1e0134f5540fe784bfe301645c345f23955654daff34c254104eefdb` |
+| `episodes/e9f02a17e79.private.json` | `bf306fcbf543bea307944f7a4b1281f536cdb4d8c9e40e4997dbbedece14e479` |
+| `episodes/eb1f88d2b65.private.json` | `b18bb606ee4161ffd2a5bfb3110072b36026c5401ac622298dc8a99cc952c6ae` |
+| `episodes/eb2dc4632c9.private.json` | `1a9eb9f04b1b0ba17d02fac4ed524770c5a7c3fc6f2e3bc9bd14e663e1d08c9c` |
+| `episodes/eb7dbaadf6a.private.json` | `ac759d62cb70f3f1c8f109af269084f6846268230b83c89e80d0de94e3616aa4` |
+| `episodes/eb7f6ed1115.private.json` | `63e1689d745227caa58dea1aa82228e6ac081d4f8fab104136b3cabc9290b28f` |
+| `episodes/ebc24d22014.private.json` | `d49c035b8cf797bd49a9a0ae2653275cdb00e116816cde4946d4c6b400f73266` |
+| `episodes/ebdc397dec8.private.json` | `aab0624e59450bdc1ec46f858e3c6c8c6a5bf8034fd483cf17e61da56c1e66ef` |
+| `episodes/ebe4d5ea5b0.private.json` | `6644e4b3a482404ca5ba82e6591e8ed12531627f01aec907d5076b19ec957fbf` |
+| `episodes/ec4eb9aafb9.private.json` | `b53b4ace8c349ebd7d5d700d0e18959a8a97998793b15fc0edee50af370a7408` |
+| `episodes/ec6c0d941b3.private.json` | `4ac1a3034dcc49ffd4c74fc267339e224b792ff0eeeaa5f5be27e4e0b215463c` |
+| `episodes/ed1d46df39e.private.json` | `e158e75d3ebbf85c700c110357b5a97101a64db8a3f5f43884122bc6d16bd315` |
+| `episodes/ed2a1c5ee0f.private.json` | `9cf33fe072c532b0e94fd7e4a79d05a200911ba92994695a627e0f670e4fb2a4` |
+| `episodes/ed339711520.private.json` | `45e005b5d9e8ce3aad4fb16bfafc594e1ed1775018007da79d47316b4a168c25` |
+| `episodes/ed61dfc6e19.private.json` | `74e26d0d2a9bb6127a4202d5786404d76504ffd17c288d4d902db25d4f0c43e5` |
+| `episodes/ed66843d71e.private.json` | `e345f6370dbf9a506a3dc51a02644084eeabc2956fe9d621c7ceb9186668f08a` |
+| `episodes/eeb5de06f8b.private.json` | `eb376e529081f13a86ef9c715ccec0918f98660b14a0f489bc723a030ce8afcb` |
+| `episodes/ef26b490ac4.private.json` | `54491efcfd0a873d30bf79f0d5689b618045cd30a7152e2cadb9eecdd3891095` |
+| `episodes/efe2cad1efe.private.json` | `969253ac045de8eb8810787edb26d52586f5353ca65418a0cfb6584c4d2da499` |
+| `learner/e0de6a89637.json` | `42826881684fbc6f17da7bd35206d48e877903b910e137727c44ff305467c879` |
+| `learner/e0f8989564c.json` | `5f75cc34157b397a8db9fb8484aea128e2add50e2876383272fb0e4ebf08ead9` |
+| `learner/e16bc065f23.json` | `e7bcf2f936e360ce045129f9c0ebef5f638080a2b7dba70f48e32b4ddecae9de` |
+| `learner/e287ccd3415.json` | `f7f2439b3cbc0b1b9a5caa70638db872f6289adfaac190ef3441ce92214dc4d3` |
+| `learner/e3ef639970b.json` | `81db9be46fe4fcdd66ef59c385f5244945260c9800eff9253d9c96570a8abb32` |
+| `learner/e518bf79df5.json` | `ab9753d18a3e44014ac05ba097451be3cd954eb177b81e67e9f805dee0ecad83` |
+| `learner/e5e4441cf0a.json` | `d390b4fe362aff064467d04c5fc0162c492fbecf6c00e86a12380acaf6d9c86b` |
+| `learner/e5fdcda9185.json` | `062f5b0d3453c1c6f1e36784f578b5b45b8848e1bf010d13d576babda62f69f9` |
+| `learner/e606b592b8b.json` | `dd4f244b7edbe3450eed0abc79d8d977912f257d811f54707e4137706eb7aac4` |
+| `learner/e6c84f84187.json` | `b91ff8a6cf931e32c4fbc89c3b911b50b6f4a0b14fd0acb6f3c32ab86d4af0f8` |
+| `learner/e719bec9a66.json` | `92f1d5f1127d74336b7406d28a499f343a66deea1156b9f776d640ada4e4c44a` |
+| `learner/e78d5ceb7fb.json` | `29e487ce5373317dfe3990fac89d686eb552bef9a43375d628159895db49de1f` |
+| `learner/e80ce954fd8.json` | `6a536f20650b1d728d8a8d856ad39d0a03c1c32604b489b868ef35b3abca0cbc` |
+| `learner/e8401adcaf9.json` | `d2430eaedc28ba254332ccbb0bade61816fb94d5013e81d96d3c0cf972f6fba5` |
+| `learner/e89ce6400a2.json` | `c942ab1ad0b97af4f1923ff0e2be457c724f0ad914c32aaed6da6f9a8c5eb59c` |
+| `learner/e8cb31f647a.json` | `d808a9cc942f911c12938422c08fc69e0eea2f2b55d9e61bc9b50c5d8cc2c813` |
+| `learner/e91a6817ac9.json` | `b641c934f66bc23c747172125d359c8fe752d0691de8962c7d2ff0c5d8b2892e` |
+| `learner/e9cd3a3f769.json` | `f7d3c85122ed57b7d723dd9b1269755eb0a3be4b3e79234c895aaf44f9dc7469` |
+| `learner/e9f02a17e79.json` | `409501c90c0e4c1a828e430bb097b8d05ffcdca668f0f3fc7b84096c3ab2ffe4` |
+| `learner/eb1f88d2b65.json` | `7822f13084dc6dbcebc21cf1ca55b98871e52337482d661b60f114e9f09fb42a` |
+| `learner/eb2dc4632c9.json` | `28f1b61e4be4d17d70811ca35e64c0c09b921cc06e41b419ea046cc1aee027b2` |
+| `learner/eb7dbaadf6a.json` | `9dcf76899e1e6d11860e4052f521cd03bc24314053bec9ef763aaeb8ef38b499` |
+| `learner/eb7f6ed1115.json` | `2d9ff2b5b9e909602f3a32dfb1f378b20e6c31c408c27464074e25aa894a3e7f` |
+| `learner/ebc24d22014.json` | `09fd65df6e72ac240d95a8668bccc9233f37b9bdbde8b6f877b929791f6a8545` |
+| `learner/ebdc397dec8.json` | `a869a42e1a1aed5d0daeca681350b3d12b330bc44d6d2fb617977589c0693ab2` |
+| `learner/ebe4d5ea5b0.json` | `37cd706db0390af05a588876acba60336f6b659810e9a0cf86cceb410de57c3d` |
+| `learner/ec4eb9aafb9.json` | `2c8b64ca78469cf121c2214b7f6b664534cb23aeba62be4df25056e624a32c6e` |
+| `learner/ec6c0d941b3.json` | `db52507f6f7871feb339ac65d0c483a00d67e68eb7d47b330fb255f2277ded42` |
+| `learner/ed1d46df39e.json` | `9edc5b00cd3380ee21b9061c1674c603156592678a76687af3e8ed8aa0b07d0a` |
+| `learner/ed2a1c5ee0f.json` | `e697dd8fb33d975ad6a7f848326e6aeb76a5d05f42422e82de7f4e8ef8e07bcf` |
+| `learner/ed339711520.json` | `ad2b2a345395e664d0eaef3e953f5af570789fb1a441eaf97cad599900785efb` |
+| `learner/ed61dfc6e19.json` | `0b9ac238602614a33f2c1fd2c3dcc5da8d21c398ff71f17e42e52ab88372856d` |
+| `learner/ed66843d71e.json` | `c87a468bd59a35b8a6086902b8287295fb7303b8b82030fa6c4d4d542ab7ad2b` |
+| `learner/eeb5de06f8b.json` | `8878dc84cb94127eb4f542faaeea59ab0ca9496a63a821ec78362a1faea433a2` |
+| `learner/ef26b490ac4.json` | `e6bad9473c60b51363bd53f28b58711bc264bee2325d8e4ef230b8589ba5680a` |
+| `learner/efe2cad1efe.json` | `867fb90551525b2916b017d67c7276c16ab768ff0fa78239078d64680ecde4c4` |
+| `manifest.private.json` | `9a97f13109120edad06ac04e95ce3c85d3e5dc4cfa4912401263885da49d9828` |
+| `manifest.public.json` | `3a1250f0c1b84c23f0ec16e22f26cf4fc21701439a668c5b4c407495d873539c` |

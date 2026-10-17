@@ -1,12 +1,12 @@
 {
- "code_commit": "127f116ebf64a201c9ba83dc2db947c5ff048528",
+ "code_commit": "3f533290289f983d7dc69b640e20e4461b9d23f3",
  "episodes": [
   {
    "clarification_required": true,
    "correction_kind": null,
    "id": "e88727066d3",
    "seed": 110000,
-   "spec_hash": "67af09520ca1a8a9cd36054833978da2a4f6e35e4f9cbb6d2e22e661b715eac2",
+   "spec_hash": "ef18f93b3ca1da13332a54350f8c2c1e1244400399c4c1cc359bee56f51951d9",
    "stratum": "catalogue"
   },
   {
@@ -14,7 +14,7 @@
    "correction_kind": null,
    "id": "eb33f9716f9",
    "seed": 110001,
-   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
+   "spec_hash": "ef18f93b3ca1da13332a54350f8c2c1e1244400399c4c1cc359bee56f51951d9",
    "stratum": "catalogue"
   },
   {
@@ -70,7 +70,7 @@
    "correction_kind": null,
    "id": "e7b523e24fc",
    "seed": 110008,
-   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
+   "spec_hash": "aa296e3e6db3ce5c63bee4a59d042b931e0eda3fccd4a8fc432b4bd95b86c562",
    "stratum": "inconsistent"
   },
   {
@@ -98,11 +98,11 @@
    "stratum": "unsupported"
   },
   {
-   "clarification_required": false,
+   "clarification_required": true,
    "correction_kind": "compatible",
    "id": "e9bacad414c",
    "seed": 110012,
-   "spec_hash": "3850a25685db8eb90ed0d5bd8941ee915f9b22c6612da77277b336a2cdaa5f06",
+   "spec_hash": "89624f41e7de9a8d879cc0c226ce43722af958a7ad2aba8625e88121a44cf146",
    "stratum": "sequential"
   },
   {
@@ -114,7 +114,7 @@
    "stratum": "sequential"
   },
   {
-   "clarification_required": false,
+   "clarification_required": true,
    "correction_kind": "superseding",
    "id": "ee894d854af",
    "seed": 110014,
@@ -122,7 +122,7 @@
    "stratum": "sequential"
   },
   {
-   "clarification_required": false,
+   "clarification_required": true,
    "correction_kind": "conflict",
    "id": "ea9778a73fb",
    "seed": 110015,
@@ -149,42 +149,42 @@
  "files": {
   "episodes/e0119c547d5.private.json": "f72b57770127b5b09a523814b336aa8328763f43fc1ab0e04aa493d7c9f7fa7c",
   "episodes/e3593b0aec5.private.json": "ad675c6a71e91d9d519f72a7b6935bcce7e1350495f15ad984eb13bc6f8ec4cf",
-  "episodes/e41d8ce1132.private.json": "438021ddb8214d71b38758daaa514510e2c50530b493c5bbe6f8ffa3b4278524",
-  "episodes/e5a01549872.private.json": "1a55f860d20c3bf9bfab39a338d6641c9b57a94bcc5ac772a6f8fec0ddc4237a",
-  "episodes/e5b3fceadac.private.json": "83ac1e4165a137f950f0207324e2fc68a644db74ac3701f83fb56ecbc4adc1b6",
+  "episodes/e41d8ce1132.private.json": "8294741553b842a4bb458c6fcc00fff5c0235d6fc2d56986d31a0be3e13f402f",
+  "episodes/e5a01549872.private.json": "2e9198157ba0a11b1a0065a77cad5f359f1a591d9c591cae219d98ea4f6f3245",
+  "episodes/e5b3fceadac.private.json": "2c1472a973928553d98a549e2b60ff07ce227e928e0ed8d668f59dddc8446667",
   "episodes/e620cde0c3e.private.json": "4d9c73e005bc469e1a9fc9772c94df35f2d83c2f6cf84051e0bbda2ae8fa0c95",
-  "episodes/e6ab691b80f.private.json": "5fd3946f7728400b31137124d3f1b6938506fe94940ebc506a79a661faa06c99",
+  "episodes/e6ab691b80f.private.json": "a187f7a5ccc8e442fa88c787524a7c99af5c8e102948ff2654a89f9128bb7fd0",
   "episodes/e79c145bad5.private.json": "3198e74e08f23c4aeee2a1122dbd36cf62b161507a0694ae736fd3d4385390de",
-  "episodes/e7b523e24fc.private.json": "f9d8f0d4855c0c01fddaa7bc537807374e340bf07aee12f78bb5be56df21dfe9",
-  "episodes/e7cd70b2ba8.private.json": "c1a500e76df839d940a2186c94c82e3ddd6a107841ba4b024e212ce736cb7ca0",
-  "episodes/e88727066d3.private.json": "4f8fbc3932b581a032f2229303cd8812c5a5429899190372ce40bf75a9f11de4",
-  "episodes/e9bacad414c.private.json": "42820c60a1d3ed252d29eb305d7c07a1bc303a08664510c6d13a5d4ae2247888",
+  "episodes/e7b523e24fc.private.json": "5aa2935908abf79a382dc43b79617a1cdbac288c9b190dcacb00763d08010462",
+  "episodes/e7cd70b2ba8.private.json": "89bdf8bd5b31a15349b4b8602e0beff63c2c2ca28043aea9825e146d474af8ec",
+  "episodes/e88727066d3.private.json": "f462063119153e74f30d62125096ee9aa06f32de8b6cb8d87939f28dec543750",
+  "episodes/e9bacad414c.private.json": "9fdebda76273975051de76c90a0497f507d9e49aed522f8aa8d56d4619d5c5cc",
   "episodes/ea5432e5dee.private.json": "f01dbebc409ea1c1a25459c68429e747920f05a61d723a5e18187bf28f5cea21",
-  "episodes/ea9778a73fb.private.json": "82898e96e084ab33e576896ffc2b4b395cb7a21970b9be03f158d61412c68440",
-  "episodes/eb33f9716f9.private.json": "ec352487bb5d14aec7fbb6d02ad2eee0f4cbd7a1632b5d8889f64b128bd7a3bd",
-  "episodes/ee519fbf496.private.json": "c6d3eb19f615bcabd354e9670cbb6454b8427d274373becb4ec438cc0a9cd323",
-  "episodes/ee894d854af.private.json": "e6cbe930c4351fe3f4e8dc00ef7333fecc0a81161ad0baf1a6b6f5a09489ded8",
+  "episodes/ea9778a73fb.private.json": "c4b4920f7f70576ee6289782bf9ef963a4a11c76e03145eef890f446b35190ee",
+  "episodes/eb33f9716f9.private.json": "73b8f3059c8a30cbec35c1c5bbdfde1f67ce038576894a74d01dd9a7eeda4cf0",
+  "episodes/ee519fbf496.private.json": "9fad9c88bda956c2b53a97ea8feccc445fbaae20bca5fb9da44b5211d4004a78",
+  "episodes/ee894d854af.private.json": "a5b752612d3952aea46b35e5fd5eb9bede5791de09ca485e3c646c4697d4ab9e",
   "episodes/ef3c47b95b1.private.json": "181d6ee36571b5508b7b69219ea9d0756b8f64883203e3014220b69e177bc530",
   "learner/e0119c547d5.json": "e7a669e68e6abf90704f7d5a011cd4791d3adb2213575800a5798d9ca7705735",
   "learner/e3593b0aec5.json": "583add33a2d6a1a28499e3f4b67c5336a4628ede4895dd44ba307cbcbf2d36a8",
-  "learner/e41d8ce1132.json": "283b1960b5808902801ba471b1aa654ea0a3d31e3eb5563002c0a9f5f649e35b",
-  "learner/e5a01549872.json": "6fb91fee40ea2a7d99558526b0ecf2ccafec9820060cc023bb782305b410e274",
-  "learner/e5b3fceadac.json": "efdcd9b34049858f2e1641d310375a58559d8321522c009b0c4546160145fbd2",
+  "learner/e41d8ce1132.json": "8d898284fb9f260442e5c43cd200a2e986b43dca73f7cbad32d4b27c64d38548",
+  "learner/e5a01549872.json": "bcccdca8c94d08fc6f5fcfad749fdec2ce6f8551294aaa18b9573feca83e012a",
+  "learner/e5b3fceadac.json": "156efc344de709839b619000733100519b8764533ed68deadc7fb5e3afc3f9f5",
   "learner/e620cde0c3e.json": "765afaca677d8680924be39c4ba30d81370416fdb2091d6abcb2825b43286b4a",
-  "learner/e6ab691b80f.json": "d586f89860fc9fc4b12cd44a2775e049d96f56ee1b4d1ebed2a9e7880c0ac390",
+  "learner/e6ab691b80f.json": "50b172528e9a7d64055fa4ca7f5c1e66d791d57188fbe68f8daa9649a0522101",
   "learner/e79c145bad5.json": "591d63a23c2f61cecf7fe70c179252df03e18a367e458d2c9d1fc6e8a6117dc9",
-  "learner/e7b523e24fc.json": "ec4abd7013e2ef6e6100380ebd8b0184b77129eaf6720b527f888b9cdceb8347",
-  "learner/e7cd70b2ba8.json": "8276ef4dc109bc02cfa7f89adae5cfb02d0a0873b9a564d7c04ed7f4cd39676c",
-  "learner/e88727066d3.json": "6db0244f5e3d37b28384c4d6c022d28cf0483627190063ea47d93e165d21a277",
-  "learner/e9bacad414c.json": "e19dd0e7743b171112f3b3cf53f45384af4b7dd1cbf10cac65531caadff81943",
+  "learner/e7b523e24fc.json": "ce24de62f79e5d87a25a6305009c149a10bb5d411d26a4e1b120640db7019a62",
+  "learner/e7cd70b2ba8.json": "ae7da34476b3a09675ff0faf7576ea03c25d9b0bcd6f148406a2b1688b1997eb",
+  "learner/e88727066d3.json": "4208c14831df6214ded26f1721ebc67bf17bfd7405a5d7a89b356b476e4df15d",
+  "learner/e9bacad414c.json": "c4c5cbd899ce51c1572612cf87441e7e1313f775bde544ddd4224e0b02e49022",
   "learner/ea5432e5dee.json": "a558ee3b8ae7295c35f66d0ab7eff398974fc4617464cdb487fcfda95f782049",
-  "learner/ea9778a73fb.json": "d39cfc409c08fb4ee1396fb66564b6977ae39141c77f3739cb71477d7319c524",
-  "learner/eb33f9716f9.json": "eaf549d9602f52f054b1ea1564e97defcfb2352b0ecdbf7d5fb6f895580b310b",
-  "learner/ee519fbf496.json": "9b360896aeb07f6ba10f01737dded6ad88e6177587713e3cb2946a1452f4b4b6",
-  "learner/ee894d854af.json": "d6b64045b330640826054812d487fb4f29c5a72e9086b55c120ce92d46fefdea",
+  "learner/ea9778a73fb.json": "f6eaebeefbdfd461b8960c619a366efab0436a1063ee4c7f113e81a1153f7d0d",
+  "learner/eb33f9716f9.json": "abfdfc9743928e6b970ae2e450e536eba45648b74b387988b9bb0712c9041e85",
+  "learner/ee519fbf496.json": "9f299f859fbbc53e0e6538a921872a719460269db9d00389d9548bab163f0481",
+  "learner/ee894d854af.json": "68ff1d96a6ce19d7a321ac9459223ae4283ec7a70f092384f044d8fdc0569c1d",
   "learner/ef3c47b95b1.json": "77defb5c60fc0e085dd572209995a5f071e44948ec064238a9daceb8b17f9520"
  },
- "generator_version": "battery-v2.3",
+ "generator_version": "battery-v2.4",
  "real_files": [],
  "scoring_version": "score-v2.1",
  "seed_base": 110000,
