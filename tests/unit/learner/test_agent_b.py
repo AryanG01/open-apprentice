@@ -198,3 +198,45 @@ def test_an_unknown_option_is_a_parse_failure(tmp_path):
         tmp_path, ep, [{"choose": "commit:P9"}, {"choose": "abstain", "reason": "x"}]
     )
     assert turns[0]["parse_failure"] and status == "abstained"
+
+
+class _CountingProposer:
+    def __init__(self, texts):
+        self.texts, self.calls = texts, []
+
+    def propose(self, evidence_json, round_kind, feedback):
+        from open_apprentice.concepts.rule_text import parse_rule_text
+
+        self.calls.append((round_kind, len(evidence_json["teaching_evidence"]), tuple(feedback)))
+        return (
+            [{"rule": parse_rule_text(t), "summary": "s", "text": t} for t in self.texts],
+            {"prompt_tokens": 7},
+            F(0),
+        )
+
+
+def _run_with(tmp_path, ep, replies, proposer, budgets=None):
+    store, log = _start(tmp_path, ep)
+    mock = MockProvider({"agent_b": list(replies)})
+    status = run_agent_b(lambda: mock, log, teacher_for(ep), Ledger(store, F(0)), budgets or AgentBudgets(), F(0),
+                         proposer=proposer)  # fmt: skip
+    return status, log, [e.payload for e in log.events() if e.type == "AgentTurn"]
+
+
+def test_choosing_propose_without_rules_runs_the_shared_proposal_call(tmp_path):
+    ep = _clarify()
+    prop = _CountingProposer([_text(ep)])
+    replies = [{"choose": "propose"}, {"choose": "preview:P1"}, {"choose": "commit:P1"}]
+    status, log, turns = _run_with(tmp_path, ep, replies, prop)
+    assert status == "committed" and prop.calls == [("initial", len(ep.demo_scenes), ())]
+    assert turns[0]["result"].startswith("P1: fits")
+
+
+def test_proposal_calls_count_against_the_attempt_budget(tmp_path):
+    ep = _clarify()
+    prop = _CountingProposer([_text(ep)])
+    status, log, turns = _run_with(tmp_path, ep, [{"choose": "propose"}] * 10, prop)
+    assert (
+        status == "abstained" and len(turns) == 4 and len(prop.calls) == 4
+    )  # 4 turns x 2 calls = 8 attempts
+    assert [c[0] for c in prop.calls] == ["initial", "contrastive", "contrastive", "contrastive"]

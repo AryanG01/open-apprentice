@@ -950,7 +950,12 @@ def eval_manifest(
     ),
     systems: str = typer.Option("A,B", "--systems", help="calibration systems"),
     note: str = typer.Option("", "--note", help="what this calibration is for"),
-    n_episodes: int = typer.Option(5, "--n-episodes", help="development episodes, one per stratum in order"),
+    n_episodes: int = typer.Option(
+        5, "--n-episodes", help="development episodes, one per stratum in order"
+    ),
+    episode_ids: Optional[str] = typer.Option(
+        None, "--episode-ids", help="comma-separated dev episode ids"
+    ),
 ) -> None:
     """Write the priced calibration manifest and the (unapproved) funded-tier manifest to docs/evaluation/manifests/."""
     from open_apprentice.evaluation.battery_v2 import REPO
@@ -980,6 +985,7 @@ def eval_manifest(
         ceiling_usd,
         systems=tuple(x.strip() for x in systems.split(",") if x.strip()),
         episodes=n_episodes,
+        task_ids=[x for x in (episode_ids or "").split(",") if x] or None,
     )
     if note:
         cal = calibration_note(cal, note)

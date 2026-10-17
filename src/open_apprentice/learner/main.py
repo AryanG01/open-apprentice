@@ -249,7 +249,17 @@ def system_b(ctx: Context) -> None:
         "A"  # B's corrections run the shared executor (ledger ruling, review I4)
     )
     log = open_learning_log(ctx)
-    status = run_agent_b(factory, log, ctx.teacher, ctx.ledger, AgentBudgets(), ctx.worst)
+    status = run_agent_b(
+        factory,
+        log,
+        ctx.teacher,
+        ctx.ledger,
+        AgentBudgets(),
+        ctx.worst,
+        proposer=_model_proposer(
+            ctx
+        ),  # B's `propose` runs A's proposal call (same prompt, same model)
+    )
     ctx.result["status"] = status
     if status == "committed":
         _activate(ctx, log)

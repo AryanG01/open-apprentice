@@ -81,10 +81,14 @@ def calibration_manifest(
     systems: tuple[str, ...] = ("A", "B"),
     episodes: int = 5,
     repeats: int = 1,
+    task_ids: Optional[list[str]] = None,
 ) -> dict:
     """Calibration: a few development episodes x A, B. It measures prompt/parse viability and cost per episode."""
     picked: list[Episode] = []
-    for stratum in STRATA_ORDER * episodes:
+    if task_ids:
+        by_id = {e.id: e for e in dev_battery}
+        picked = [by_id[i] for i in task_ids]
+    for stratum in () if task_ids else STRATA_ORDER * episodes:
         nxt = next((e for e in dev_battery if e.stratum == stratum and e not in picked), None)
         if nxt is not None and len(picked) < episodes:
             picked.append(nxt)

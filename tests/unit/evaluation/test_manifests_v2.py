@@ -182,3 +182,11 @@ def test_cli_live_run_does_not_fall_through_to_the_offline_runner(monkeypatch):
                                  "--cap-usd", "0.5", "--resume", "cal-x"])  # fmt: skip
     assert r.exit_code == 0, r.output
     assert seen["run"]["split"] == "dev"
+
+
+def test_a_calibration_can_name_its_episodes():
+    ep = next(e for e in _dev() if e.stratum == "beyond")
+    m = calibration_manifest(
+        list(_dev()), TOKENS, 0.0, 40.0, 5.0, 0.05, 0.4, systems=("B",), task_ids=[ep.id]
+    )
+    assert m["task_ids"] == [ep.id] and m["task_strata"] == ["beyond"] and m["runs"] == 1

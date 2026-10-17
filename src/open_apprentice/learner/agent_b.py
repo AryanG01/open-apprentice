@@ -118,7 +118,11 @@ class AgentB:
         worst_usd: Fraction,
         probe_renderer: Callable[[Probe], ProbeResult] = synthetic_render,
         skill_id: str = "skill",
+        proposer: Optional[Any] = None,
     ) -> None:
+        # proposer: the SAME proposal call A uses; run when B chooses `propose` without writing rules (calibration
+        # 2026-10-17 showed the model could not write rules from B's prompt). It counts against B's attempts.
+        self.proposer, self.attempts, self.proposals = proposer, 0, 0
         self.factory, self.log, self.ledger, self.b, self.worst = (
             provider_factory,
             log,
@@ -205,7 +209,7 @@ class AgentB:
         open_docs = [d for d in docs if d not in ev.approved and d not in ev.rejected]
         opts: list[dict] = [
             {"id": "propose", "tool": "propose", "args": {},
-             "what": "propose 1-4 new rules: add \"rules_text\": [...]"},
+             "what": "get 1-4 new candidate rules drafted from the evidence (or give your own \"rules_text\")"},
         ]  # fmt: skip
         if self._requests("ChooseOutput") < self.b.max_choose and len(fitting) >= 2:
             for sid in docs:
@@ -275,18 +279,49 @@ class AgentB:
             self.ex._ask(PresentPreview(aid, request, preview_hash))
         return None
 
+    def _shared_proposals(self, aid: str) -> tuple[list[dict], list[str], dict]:
+        """One call of A's proposal prompt on the current evidence, reserved and settled like any attempt."""
+        if self.attempts >= self.b.max_attempts:
+            return [], ["refused: no provider attempts left for a proposal call"], {}
+        ev = derive(self.log.events())
+        feedback = tuple(p["problem"] for p in self._programs() if p["problem"])[-8:]
+        attempt = uuid.uuid4().hex
+        try:
+            self.ledger.reserve(attempt, aid, self.worst)
+        except OverBudget as e:
+            return [], [f"refused: budget: {e}"], {}
+        self.ledger.dispatched(attempt)
+        self.attempts += 1
+        kind = "initial" if self.proposals == 0 else "contrastive"
+        self.proposals += 1
+        try:
+            cands, usage, cost = self.proposer.propose(
+                {"teaching_evidence": describe_compact(ev.positives)}, kind, feedback
+            )
+        except Exception as e:  # provider failure: cost unknown, kept at worst case
+            self.ledger.mark_unknown(attempt)
+            return [], [f"the proposal call failed ({failure_kind(e)})"], {}
+        self.ledger.settle(attempt, cost)
+        kept = [c for c in cands if isinstance(c, dict) and isinstance(c.get("rule"), list)]
+        return kept, [], dict(usage or {})
+
     def t_propose(self, aid: str, args: dict) -> str:
         texts = args.get("rules_text")
-        if not isinstance(texts, list) or not 1 <= len(texts) <= 4:
-            raise BadCall("rules_text must be a list of 1-4 rules")
-        cands, problems = [], []
-        for t in texts:
-            if not isinstance(t, str):
-                raise BadCall("each rule must be a string")
-            try:
-                cands.append({"rule": _parse(t), "summary": t.splitlines()[0][:80], "text": t})
-            except RuleError as e:
-                problems.append(f"does not parse: {str(e)[:160]}")
+        cands, problems, usage = [], [], {"source": ROLE}
+        if texts is None and self.proposer is not None:
+            cands, problems, usage = self._shared_proposals(aid)
+            if not cands and not problems:
+                problems.append("the proposal call returned no usable rule")
+        else:
+            if not isinstance(texts, list) or not 1 <= len(texts) <= 4:
+                raise BadCall("rules_text must be a list of 1-4 rules")
+            for t in texts:
+                if not isinstance(t, str):
+                    raise BadCall("each rule must be a string")
+                try:
+                    cands.append({"rule": _parse(t), "summary": t.splitlines()[0][:80], "text": t})
+                except RuleError as e:
+                    problems.append(f"does not parse: {str(e)[:160]}")
         before = {p["hash"] for p in self._programs() if p["fits"]}
         self.log.append(
             "ModelProposalReturned",
@@ -296,7 +331,7 @@ class AgentB:
                 "action_id": aid,
                 "candidates": cands,
                 "malformed": len(problems),
-                "usage": {"source": ROLE},
+                "usage": usage,  # a shared proposal call's own tokens; B's turn tokens are on AgentTurn
             },
         )
         known = {p["hash"]: p for p in self._programs()}
@@ -506,12 +541,14 @@ class AgentB:
         return tools[call.tool](sub, call.args)
 
     def run(self) -> str:
-        for turn in range(self.b.max_attempts):
+        turn = -1
+        while self.attempts < self.b.max_attempts:
+            turn += 1
             if self.status():
                 break
             aid = f"turn-{turn}"
             self.ex._issue(aid, "AgentTurn")
-            user = self._state(self.b.max_attempts - turn)
+            user = self._state(self.b.max_attempts - self.attempts)
             attempt = uuid.uuid4().hex
             try:
                 self.ledger.reserve(attempt, aid, self.worst)
@@ -519,6 +556,7 @@ class AgentB:
                 self.log.append("Abstained", "system", {"action_id": aid, "reason": f"budget: {e}"})
                 break
             self.ledger.dispatched(attempt)
+            self.attempts += 1
             record: dict[str, Any] = {"action_id": aid, "turn": turn}
             try:
                 done, usage, cost = _call(
@@ -572,8 +610,18 @@ def run_agent_b(
     budgets: AgentBudgets,
     worst_usd: Fraction,
     probe_renderer: Callable[[Probe], ProbeResult] = synthetic_render,
+    proposer: Optional[Any] = None,
 ) -> str:
-    return AgentB(provider_factory, log, teacher, ledger, budgets, worst_usd, probe_renderer).run()
+    return AgentB(
+        provider_factory,
+        log,
+        teacher,
+        ledger,
+        budgets,
+        worst_usd,
+        probe_renderer,
+        proposer=proposer,
+    ).run()
 
 
 def scripted_policy(messages: list) -> dict:

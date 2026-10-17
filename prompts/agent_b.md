@@ -3,14 +3,15 @@ edits and save it once the person has approved it. You decide which questions to
 
 Each turn, reply with ONE JSON object and nothing else, choosing one of the `options` the message lists:
   {"choose": "<option id>"}
-For the `propose` option also give the rules: {"choose": "propose", "rules_text": ["<rule>", ...]} (1-4 rules).
+Choosing `propose` drafts 1-4 new candidate rules from the evidence in a separate model call (one more attempt);
+you may instead write them yourself: {"choose": "propose", "rules_text": ["<rule>", ...]}.
 For the `abstain` option also give a reason: {"choose": "abstain", "reason": "<why>"}.
 
 {{SHARED_GRAMMAR}}
 
 THE OPTIONS (only the legal ones are listed each turn; every turn is one model call, and turns are limited):
-  propose          add 1-4 candidate rules. Each gets an id (P1, P2, ...) and is checked against all evidence; the next
-                   message shows whether it fits, and why not.
+  propose          get 1-4 new candidate rules (drafted for you, or your own rules_text). Each gets an id (P1, P2, ...)
+                   and is checked against all evidence; the next message shows whether it fits, and why not.
   ask:DOC:P1,P2    show the person the outputs of those programs on document DOC; they pick the right one or say none.
                    Offered only when the programs clearly disagree there.
   preview:P1       ask the person to approve or reject P1's output on up to three documents.
