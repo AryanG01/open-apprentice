@@ -24,7 +24,7 @@ from open_apprentice.teaching import codec
 from open_apprentice.teaching.constraints import scene_from_payload
 from open_apprentice.teaching.scope import members
 
-GENERATOR_VERSION = "battery-v2.4"
+GENERATOR_VERSION = "battery-v2.5"
 SCORING_VERSION = "score-v2.2"
 TOLERANCE = F(1, 2)
 SEED_BASE = {
@@ -41,6 +41,8 @@ REAL_FILES = {  # docs/corpus/drawio_provenance.md
     "f2": "6d405ac75d76a21512383e7a97ee86debb03b757d720fa9b9fff6abf3625e17b",
     "f3": "23b305bc21766e2f314b8e5478bb6238c0b2fc60d4d0aa2bb1289916afde843a",
 }
+
+REAL_FILE_SPECS = tuple(s for s in CATALOGUE if s.fallback is not None or s.primary == "below")
 
 # corrections: base catalogue behaviour -> corrected behaviour, and the selector naming exactly the labels that change
 TEMPLATES = {
@@ -538,7 +540,9 @@ def real_file_episodes(drawio_dir: Path, seed_base: int) -> list[dict]:
     """Three final real-file episodes. Only the files' bytes are hashed here (checked against the provenance record);
     their contents are not parsed until the final run."""
     rng = random.Random(seed_base + 900)
-    out = []
+    out = (
+        []
+    )  # conventions that survive page edges: on the dev files "right, no fallback" cannot even be published
     for name, want in REAL_FILES.items():
         got = _sha((drawio_dir / f"{name}.drawio").read_bytes())
         if got != want:
@@ -548,7 +552,7 @@ def real_file_episodes(drawio_dir: Path, seed_base: int) -> list[dict]:
                 "id": _opaque("final-real", int(name[1:])),
                 "file": f"benchmarks/final/drawio/{name}.drawio",
                 "sha256": got,
-                "spec": vspec_to_json(_cat(rng.choice(CATALOGUE))),
+                "spec": vspec_to_json(_cat(rng.choice(REAL_FILE_SPECS))),
             }
         )
     return out

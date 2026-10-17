@@ -915,7 +915,13 @@ def eval_run(
             def runner(m: dict, cap: float, _factory: object) -> None:
                 # the learner processes build their own guarded providers; this one is never built
                 out = run_live_battery(
-                    m, cap, model=model, run_id=resume, resume=resume is not None, workers=workers
+                    m,
+                    cap,
+                    model=model,
+                    run_id=resume,
+                    resume=resume is not None,
+                    workers=workers,
+                    engine_url=load_settings().engine_url if split == "final" else None,
                 )
                 typer.echo(json.dumps({"run_dir": str(out)}))
 
@@ -987,7 +993,9 @@ def eval_manifest(
     if funded:
         # evaluator-only: the clarification-required marks are in the private final manifest
         private = json.loads((BATTERY_DIRS["final"] / "manifest.private.json").read_text())
-        ids = sorted(e["id"] for e in private["episodes"])
+        ids = sorted(e["id"] for e in private["episodes"]) + [
+            r["id"] for r in private["real_files"]
+        ]
         clarify = sorted(e["id"] for e in private["episodes"] if e["clarification_required"])
         usd = measured_episode_usd()
         usd.setdefault("D", usd["A"])  # D runs A's policy and calls

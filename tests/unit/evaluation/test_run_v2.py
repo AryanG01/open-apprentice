@@ -202,7 +202,18 @@ def test_live_runner_alternates_systems_and_stops_at_the_cap(tmp_path, monkeypat
     spend = root / "spend.jsonl"
     calls = []
 
-    def fake(ep, system, mode, seed, repeat, out_dir, model="Fixture", extra=(), wall_s=0):
+    def fake(
+        ep,
+        system,
+        mode,
+        seed,
+        repeat,
+        out_dir,
+        model="Fixture",
+        extra=(),
+        wall_s=0,
+        engine_url=None,
+    ):
         calls.append((ep.id, system, dict(zip(extra[::2], extra[1::2]))["--cap-usd"]))
         with open(spend, "a") as f:  # every run spends 0.3 of the run id's money
             f.write(
@@ -265,7 +276,18 @@ def test_a_resumed_live_run_reruns_only_runs_that_never_reached_the_model(tmp_pa
     (out / "rows.jsonl").write_text("".join(json.dumps(asdict(r)) + "\n" for r in old))
     calls = []
 
-    def fake(ep, system, mode, seed, repeat, out_dir, model="Fixture", extra=(), wall_s=0):
+    def fake(
+        ep,
+        system,
+        mode,
+        seed,
+        repeat,
+        out_dir,
+        model="Fixture",
+        extra=(),
+        wall_s=0,
+        engine_url=None,
+    ):
         calls.append((ep.id, system))
         return rv.RowV2(
             ep.id, repeat, system, ep.id, ep.stratum, False, False, None, origin="live", model=model
@@ -355,7 +377,18 @@ def _fake_live(rv, spend, calls, boundary_at=None):
 
     lock = threading.Lock()
 
-    def fake(ep, system, mode, seed, repeat, out_dir, model="Fixture", extra=(), wall_s=0):
+    def fake(
+        ep,
+        system,
+        mode,
+        seed,
+        repeat,
+        out_dir,
+        model="Fixture",
+        extra=(),
+        wall_s=0,
+        engine_url=None,
+    ):
         args = dict(zip(extra[::2], extra[1::2]))
         with lock:
             calls.append((ep.id, system, repeat))
@@ -438,3 +471,68 @@ def test_the_final_split_is_loaded_against_the_committed_hashes(tmp_path, monkey
         rv.run_live_battery(
             manifest, 1.0, out_root=tmp_path, budget_root=tmp_path, model="M", run_id="f"
         )
+
+
+def test_real_file_specs_are_conventions_that_survive_page_edges():
+    from open_apprentice.evaluation.battery_v2 import REAL_FILE_SPECS
+
+    assert REAL_FILE_SPECS and all(
+        s.fallback is not None or s.primary == "below" for s in REAL_FILE_SPECS
+    )
+
+
+def test_a_real_file_publish_failure_makes_a_correct_looking_commit_wrong(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+
+    ep = next(e for e in _dev() if e.stratum == "catalogue")
+    ep = type(ep)(**{**ep.__dict__, "stratum": "real_file", "meta": {"files": [], "demo_file": 0}})
+    rule = rule_for_spec(ep.spec.params[0])
+    monkeypatch.setattr(rv, "run_learner", lambda *a, **k: (_outcome("committed", rule), 1.0))
+    monkeypatch.setattr(rv, "publish_failures", lambda ep, rule, url: ["f2.drawio: layout"])
+    row = rv.run_episode(ep, "A", "live", 0, 0, tmp_path, engine_url="http://engine")
+    assert row.terminal_outcome == "wrong_commit" and row.diagnostics["publish_failures"] == [
+        "f2.drawio: layout"
+    ]
+
+
+def test_the_final_run_builds_real_file_episodes_from_the_private_manifest(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+    from open_apprentice.evaluation.battery_v2 import verify_frozen, vspec_to_json
+    from open_apprentice.evaluation.specs_v2 import VSpec
+
+    d = tmp_path / "final"
+    freeze("dev", d)
+    m = json.loads((d / "manifest.private.json").read_text())
+    spec = vspec_to_json(VSpec("catalogue", (Spec("below", None, "all", 12),)))
+    m["real_files"] = [
+        {"id": f"real{i}", "file": f"x/f{i}.drawio", "sha256": "h", "spec": spec} for i in (1, 2, 3)
+    ]
+    (d / "manifest.private.json").write_text(json.dumps(m))
+    (tmp_path / "hashes.json").write_text(json.dumps({"hashes": verify_frozen(d)}))
+    monkeypatch.setitem(rv.BATTERY_DIRS, "final", d)
+    monkeypatch.setattr(rv, "FINAL_HASHES", tmp_path / "hashes.json")
+    built, ran = [], []
+    monkeypatch.setattr(
+        rv,
+        "real_file_episode",
+        lambda files, k, spec, url, eid: built.append((len(files), k, eid, url)) or _dev()[0],
+    )
+    monkeypatch.setattr(rv, "run_episode", lambda ep, *a, **k: ran.append(a[-1]) or
+                        rv.RowV2(ep.id, 0, "A", ep.id, "x", False, False, None, origin="live"))  # fmt: skip
+    manifest = {
+        "manifest_id": "m",
+        "split": "final",
+        "task_ids": ["real2"],
+        "systems": ["A"],
+        "repeats": 1,
+    }
+    rv.run_live_battery(
+        manifest,
+        5.0,
+        out_root=tmp_path,
+        budget_root=tmp_path,
+        model="M",
+        run_id="r",
+        engine_url="http://e",
+    )
+    assert built == [(3, 1, "real2", "http://e")] and ran == ["http://e"]

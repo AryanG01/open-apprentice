@@ -30,9 +30,11 @@ from open_apprentice.evaluation.battery_v2 import (
     episode_to_json,
     learner_view,
     verify_frozen,
+    vspec_from_json,
 )
 from open_apprentice.evaluation.labels import check_after
 from open_apprentice.evaluation.metrics import Row
+from open_apprentice.evaluation.real_files import publish_failures, real_file_episode
 from open_apprentice.evaluation.specs_v2 import VSpec, oracle_v
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.step import _forbidden_effect
@@ -373,10 +375,21 @@ def run_episode(
     model: str = "Fixture",
     extra: tuple[str, ...] = (),
     wall_s: int = WALL_S,
+    engine_url: Optional[str] = None,
 ) -> RowV2:
     keep = Path(out_dir) / "episodes" / f"{ep.id}-{system}-r{repeat}"
     outcome, wall = run_learner(ep, system, mode, seed, keep, wall_s, extra)
     s = score(ep, outcome)
+    published: list[str] = []
+    rule = (outcome.get("program") or {}).get("rule")
+    if ep.stratum == "real_file" and s["terminal_outcome"] == "correct_complete" and rule:
+        if engine_url is None:
+            raise RuntimeError(
+                "real-file episodes are scored through the engine: no engine_url given"
+            )
+        published = publish_failures(ep, rule, engine_url)
+        if published:
+            s = dict(s, terminal_outcome="wrong_commit")
     evs = outcome.get("events") or []
     usage = outcome.get("usage") or {}
     spend = outcome.get("spend") or {}
@@ -409,7 +422,7 @@ def run_episode(
         spec_kind=ep.spec.kind,
         clarification_required=ep.clarification_required,
         terminal_outcome=terminal,
-        diagnostics=_diagnostics(outcome),
+        diagnostics=_diagnostics(outcome) | ({"publish_failures": published} if published else {}),
         correction=s["correction"],
         release_blocking=s["release_blocking"],
         model=model,
@@ -494,6 +507,7 @@ def run_live_battery(
     dotenv: Path = REPO / ".env",
     resume: bool = False,
     workers: int = 1,
+    engine_url: Optional[str] = None,
 ) -> Path:
     """The approved manifest's runs, live (called only after the paid-run gate). Systems alternate per episode in a
     seeded order; each learner gets the run's total cap and its guard charges what this run id has already spent in
@@ -515,6 +529,19 @@ def run_live_battery(
     ):  # the frozen final battery, checked against the committed hashes
         expected = json.loads(Path(FINAL_HASHES).read_text())["hashes"]
     by_id = {e.id: e for e in load_split(BATTERY_DIRS[manifest["split"]], expected)}
+    if (
+        manifest["split"] == "final"
+    ):  # the three real-file episodes, built through the engine at run time
+        private = json.loads((BATTERY_DIRS["final"] / "manifest.private.json").read_text())
+        real = private.get("real_files", [])
+        files = [REPO / r["file"] for r in real]
+        for k, r in enumerate(real):
+            if r["id"] in wanted:
+                if engine_url is None:
+                    raise RuntimeError("real-file episodes need the engine: give engine_url")
+                by_id[r["id"]] = real_file_episode(
+                    files, k, vspec_from_json(r["spec"]), engine_url, r["id"]
+                )
     eps = [by_id[i] for i in wanted]
     out = Path(out_root) / run_id
     out.mkdir(parents=True, exist_ok=True)
@@ -571,7 +598,19 @@ def run_live_battery(
                 stopped = "run cap"
                 break
             running.add(
-                pool.submit(run_episode, ep, system, "live", r, r, out, model, extra, LIVE_WALL_S)
+                pool.submit(
+                    run_episode,
+                    ep,
+                    system,
+                    "live",
+                    r,
+                    r,
+                    out,
+                    model,
+                    extra,
+                    LIVE_WALL_S,
+                    engine_url,
+                )
             )
         for fut in wait(running).done:
             finished(fut)
