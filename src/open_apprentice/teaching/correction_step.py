@@ -170,7 +170,7 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
     if not d.rounds:
         return RequestModelProposal(_aid(events, "RequestModelProposal"), "scope")
 
-    cands = [a for c in _candidates(events) if (a := _admissible(c, d)) is not None]
+    cands = admissible_candidates(events, d)
     can_revise = "revision" not in d.rounds and d.attempts < config.max_attempts
     if d.authorized is None:
         if (not cands or d.none_answered) and can_revise:
@@ -182,15 +182,9 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
             )
         if d.clarifications >= config.max_clarifications:
             return Abstain(_aid(events, "Abstain"), "clarification budget exhausted")
-        return _ask_scope(events, d, cands)
+        return scope_request(events, d, cands)
 
-    selector = d.authorized["selector"]
-    inside = [
-        c
-        for c in cands
-        if all(members(c["selector"], sc) == members(selector, sc) for sc in d.scenes.values())
-        and all(item_fits(c["rule"], i)[0] for i in d.chosen_outputs + d.rejected_items)
-    ]
+    inside = inside_scope(d, cands)
     if not inside:
         return Abstain(_aid(events, "Abstain"), "no program fits the authorized scope")
     for sid in sorted(d.scenes):
@@ -204,8 +198,39 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
                 _aid(events, "Abstain"), "unresolved disagreement inside the authorized scope"
             )
     sel = min(inside, key=_size_key)
+    return (
+        affected_request(events, d, sel, config)
+        or revision_request(events, d, sel, config)
+        or commit_or_reason(events, d, sel)
+    )
 
-    pending = [i for i in d.base_items if i.id in sel["conflicts"] and i.id not in d.superseded]
+
+def admissible_candidates(events: list[Event], d: Draft) -> list[dict]:
+    """Every proposed scope candidate that may be shown, with its conflict set."""
+    return [a for c in _candidates(events) if (a := _admissible(c, d)) is not None]
+
+
+def inside_scope(d: Draft, cands: list[dict]) -> list[dict]:
+    """Candidates whose selector names exactly the authorized scope on every document, fitting the answers so far."""
+    selector = d.authorized["selector"] if d.authorized else None
+    return [
+        c
+        for c in cands
+        if selector is not None
+        and all(members(c["selector"], sc) == members(selector, sc) for sc in d.scenes.values())
+        and all(item_fits(c["rule"], i)[0] for i in d.chosen_outputs + d.rejected_items)
+    ]
+
+
+def pending_affected(d: Draft, sel: dict) -> list[EvidenceItem]:
+    return [i for i in d.base_items if i.id in sel["conflicts"] and i.id not in d.superseded]
+
+
+def affected_request(
+    events: list[Event], d: Draft, sel: dict, config: CorrectionConfig
+) -> Optional[CorrectionAction]:
+    """The affected-examples review of `sel` (or why it cannot happen); None once nothing is pending."""
+    pending = pending_affected(d, sel)
     if pending and not d.affected_used:
         if len(pending) > config.max_affected:
             return Abstain(_aid(events, "Abstain"), "too many affected examples to review")
@@ -227,30 +252,36 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
             _aid(events, "Abstain"),
             "an affected example was not approved; the active version is unchanged",
         )
+    return None
 
-    if not d.revision_preview_used:
-        base_rule = d.base["program"]["rule"]
-        others = [s for s in sorted(d.scenes) if s != d.corrective.scene_id]
-        changed = [
-            s
-            for s in others
-            if run_output(base_rule, d.scenes[s]) != run_output(sel["rule"], d.scenes[s])
-        ]
-        same = [s for s in others if s not in changed]
-        chosen = (changed[:1] + same[:1] + changed[1:] + same[1:])[: config.max_revision_preview]
-        if not chosen:
-            return Abstain(
-                _aid(events, "Abstain"), "no document available for the revision preview"
-            )
-        aid = _aid(events, "PresentPreview")
-        items = tuple(
-            (f"r{k}", s, d.scene_hashes[s], run_output(sel["rule"], d.scenes[s]) or {})
-            for k, s in enumerate(chosen)
-        )
-        return PresentPreview(
-            aid, ConfirmPreview(f"p-{aid}", "revision_preview", items), sel["key"]
-        )
 
+def revision_request(
+    events: list[Event], d: Draft, sel: dict, config: CorrectionConfig
+) -> Optional[CorrectionAction]:
+    """The revision preview of `sel` (or why it cannot happen); None once it was used."""
+    if d.revision_preview_used:
+        return None
+    base_rule = d.base["program"]["rule"]
+    others = [s for s in sorted(d.scenes) if s != d.corrective.scene_id]
+    changed = [
+        s
+        for s in others
+        if run_output(base_rule, d.scenes[s]) != run_output(sel["rule"], d.scenes[s])
+    ]
+    same = [s for s in others if s not in changed]
+    chosen = (changed[:1] + same[:1] + changed[1:] + same[1:])[: config.max_revision_preview]
+    if not chosen:
+        return Abstain(_aid(events, "Abstain"), "no document available for the revision preview")
+    aid = _aid(events, "PresentPreview")
+    items = tuple(
+        (f"r{k}", s, d.scene_hashes[s], run_output(sel["rule"], d.scenes[s]) or {})
+        for k, s in enumerate(chosen)
+    )
+    return PresentPreview(aid, ConfirmPreview(f"p-{aid}", "revision_preview", items), sel["key"])
+
+
+def commit_or_reason(events: list[Event], d: Draft, sel: dict) -> CorrectionAction:
+    """The correction commit predicate (spec 5) for `sel`: CommitCorrection, or Abstain with the failed check."""
     items_all = draft_items(d)
     misses = [i.id for i in items_all if not item_fits(sel["rule"], i)[0]]
     active_after = [i for i in d.base_items if i.id not in d.superseded]
@@ -298,7 +329,8 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
     )
 
 
-def _ask_scope(events: list[Event], d: Draft, cands: list[dict]) -> AskTeacher:
+def scope_request(events: list[Event], d: Draft, cands: list[dict]) -> AskTeacher:
+    """ConfirmCorrectionScope over up to 2 of the given candidates (distinct scopes), plus override and accidental."""
     revise: list[dict] = []
     for c in sorted(cands, key=_size_key):
         sig = tuple(
