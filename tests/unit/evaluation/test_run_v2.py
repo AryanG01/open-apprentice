@@ -348,3 +348,93 @@ def test_a_refusal_carries_its_kind(reason, kind):
     ep = next(e for e in _dev() if e.stratum == "inconsistent")
     s = score(ep, _outcome("abstained") | {"reason": reason})
     assert s["terminal_outcome"] == "appropriate_refusal" and s["refusal_kind"] == kind
+
+
+def _fake_live(rv, spend, calls, boundary_at=None):
+    import threading
+
+    lock = threading.Lock()
+
+    def fake(ep, system, mode, seed, repeat, out_dir, model="Fixture", extra=(), wall_s=0):
+        args = dict(zip(extra[::2], extra[1::2]))
+        with lock:
+            calls.append((ep.id, system, repeat))
+            n = len(calls)
+            with open(spend, "a") as f:
+                f.write(json.dumps({"run": args["--run-id"], "usd": 0.1}) + "\n")
+        rb = ["boundary_violation"] if boundary_at == n else []
+        return rv.RowV2(ep.id, repeat, system, ep.id, ep.stratum, False, False, None, origin="live", model=model,
+                        release_blocking=rb, usd=0.1)  # fmt: skip
+
+    return fake
+
+
+def test_parallel_workers_run_each_run_once_and_stay_under_the_cap(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+
+    root = tmp_path / "budget"
+    root.mkdir()
+    calls = []
+    monkeypatch.setattr(rv, "run_episode", _fake_live(rv, root / "spend.jsonl", calls))
+    eps = [e.id for e in _dev()[:6]]
+    manifest = {
+        "manifest_id": "m",
+        "split": "dev",
+        "task_ids": eps,
+        "systems": ["A", "B"],
+        "repeats": 1,
+    }
+    out = rv.run_live_battery(
+        manifest, 2.0, out_root=tmp_path, budget_root=root, model="M", run_id="p", workers=4
+    )
+    rows = [json.loads(x) for x in (out / "rows.jsonl").read_text().splitlines()]
+    assert len(rows) == len(calls) == len({(r["episode"], r["method"]) for r in rows})
+    assert len(rows) * 0.1 <= 2.0 + 1e-9
+    m = json.loads((out / "manifest.json").read_text())
+    assert m["coverage"] == f"{len(rows)}/12" and (m["stopped"] == "run cap") == (len(rows) < 12)
+
+
+def test_a_boundary_violation_stops_new_submissions(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+
+    root = tmp_path / "budget"
+    root.mkdir()
+    calls = []
+    monkeypatch.setattr(
+        rv, "run_episode", _fake_live(rv, root / "spend.jsonl", calls, boundary_at=2)
+    )
+    eps = [e.id for e in _dev()[:6]]
+    manifest = {
+        "manifest_id": "m",
+        "split": "dev",
+        "task_ids": eps,
+        "systems": ["A", "B"],
+        "repeats": 1,
+    }
+    out = rv.run_live_battery(
+        manifest, 50.0, out_root=tmp_path, budget_root=root, model="M", run_id="b", workers=2
+    )
+    assert len(calls) <= 3  # the violating run plus at most one already in flight
+    assert json.loads((out / "manifest.json").read_text())["stopped"] == "boundary violation"
+
+
+def test_the_final_split_is_loaded_against_the_committed_hashes(tmp_path, monkeypatch):
+    import open_apprentice.evaluation.run_v2 as rv
+
+    hashes = freeze("dev", tmp_path / "final")
+    (tmp_path / "hashes.json").write_text(json.dumps({"hashes": hashes}))
+    victim = sorted((tmp_path / "final" / "episodes").glob("*.json"))[0]
+    victim.write_bytes(victim.read_bytes() + b" ")
+    monkeypatch.setitem(rv.BATTERY_DIRS, "final", tmp_path / "final")
+    monkeypatch.setattr(rv, "FINAL_HASHES", tmp_path / "hashes.json")
+    manifest = {
+        "manifest_id": "m",
+        "split": "final",
+        "task_ids": [],
+        "systems": ["A"],
+        "repeats": 1,
+    }
+    with pytest.raises(FrozenMismatch):
+        rv.run_live_battery(
+            manifest, 1.0, out_root=tmp_path, budget_root=tmp_path, model="M", run_id="f"
+        )

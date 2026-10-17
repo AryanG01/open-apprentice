@@ -148,38 +148,73 @@ def calibration_note(m: dict, note: str) -> dict:
     return _finish({k: v for k, v in m.items() if k != "manifest_id"} | {"note": note})
 
 
-def funded_manifest(
-    n_final: int,
-    n_clarify: int,
-    tokens: dict,
+def measured_episode_usd(results_root: Path = REPO / "results/eval_v2") -> dict[str, float]:
+    """Mean real cost of one episode per system, over the live calibration rows (dollar-cap stops left out)."""
+    per: dict[str, list[float]] = {}
+    for f in sorted(Path(results_root).glob("cal-*/rows.jsonl")):
+        for line in f.read_text().splitlines():
+            r = json.loads(line) if line.strip() else None
+            if (
+                r
+                and r.get("origin") == "live"
+                and r.get("failure") != "budget_stop"
+                and r.get("usd")
+            ):
+                per.setdefault(r["method"], []).append(float(r["usd"]))
+    return {k: round(sum(v) / len(v), 4) for k, v in sorted(per.items())}
+
+
+def funded_manifests(
+    final_ids: list[str],
+    clarify_ids: list[str],
+    episode_usd: dict[str, float],
     reserve_usd: float,
-    call_usd: float,
     repeats: int = 3,
-) -> dict:
-    """Tier T3 (spec 7): A and B x 3 on all final episodes + D x 3 on the clarification-required ones. Generated, not
-    approved; re-estimated after calibration."""
-    counts = {"A": n_final * repeats, "B": n_final * repeats, "D": n_clarify * repeats}
-    per_attempt = _per_attempt_worst()
-    est_calls, est_usd = _estimate(counts, tokens, call_usd)
-    return _finish(
-        {
-            "kind": "funded_T3",
-            "split": "final",
-            "runs": sum(counts.values()),
-            "runs_per_system": counts,
-            "attempt_ceilings": {s: ATTEMPTS[s] for s in counts},
-            "worst_case_per_attempt_usd": per_attempt,
-            "worst_case_total_usd": round(
-                sum(n * ATTEMPTS[s] * per_attempt for s, n in counts.items()), 2
-            ),
-            "estimate_calls": est_calls,
-            "estimate_usd": est_usd,
-            "protected_reserve_usd": reserve_usd,
-            "establishes": "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
-            "approved": False,
-            "note": "re-estimate from the calibration run before asking for approval",
-        }
+) -> tuple[dict, dict]:
+    """Tier T3 (spec 7) as two gated runs (a gate binds one run shape): A and B x 3 on every final episode, and D x 3
+    on the clarification-required ones. Estimates come from the live calibrations; the ceiling adds 25% headroom.
+    Generated, not approved."""
+
+    def one(kind: str, systems: list[str], ids: list[str], what: str) -> dict:
+        runs = len(ids) * len(systems) * repeats
+        est = round(sum(len(ids) * repeats * episode_usd[s] for s in systems), 2)
+        return _finish(
+            {
+                "kind": kind,
+                "split": "final",
+                "systems": systems,
+                "task_ids": list(ids),
+                "repeats": repeats,
+                "runs": runs,
+                "attempt_ceilings": {s: ATTEMPTS[s] for s in systems},
+                "worst_case_per_attempt_usd": _per_attempt_worst(),
+                "episode_usd_measured": {s: episode_usd[s] for s in systems},
+                "estimate_usd": est,
+                "ceiling_usd": math.ceil(est * 1.25 * 20) / 20,
+                "stop_conditions": {
+                    "run_cap": "no new run starts unless every run in flight can still make one call",
+                    "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+                    "boundary_violation": "any information-boundary violation stops the run and is reported",
+                },
+                "protected_reserve_usd": reserve_usd,
+                "establishes": what,
+                "approved": False,
+            }
+        )
+
+    ab = one(
+        "funded_T3_AB",
+        ["A", "B"],
+        final_ids,
+        "the paired A-versus-B comparison on the frozen battery (both primary endpoints)",
     )
+    d = one(
+        "funded_T3_D",
+        ["D"],
+        clarify_ids,
+        "the question-selection ablation (A's policy with uniform questions) on the clarification-required episodes",
+    )
+    return ab, d
 
 
 def check_live_gate(

@@ -878,6 +878,7 @@ def eval_run(
     cap_usd: float = typer.Option(
         0.0, "--cap-usd", help="live: run cap, at most the manifest ceiling"
     ),
+    workers: int = typer.Option(1, "--workers", help="live: learner processes in parallel"),
     resume: Optional[str] = typer.Option(
         None,
         "--resume",
@@ -893,6 +894,7 @@ def eval_run(
     if split not in ("dev", "final") or mode not in ("mock", "live"):
         raise typer.BadParameter("split is dev or final; mode is mock or live")
     if mode == "live":
+        from open_apprentice.evaluation.battery_v2 import FrozenMismatch
         from open_apprentice.evaluation.manifests_v2 import GateRefused, run_live
 
         def factory() -> object:  # built only after the gate passed
@@ -913,13 +915,16 @@ def eval_run(
             def runner(m: dict, cap: float, _factory: object) -> None:
                 # the learner processes build their own guarded providers; this one is never built
                 out = run_live_battery(
-                    m, cap, model=model, run_id=resume, resume=resume is not None
+                    m, cap, model=model, run_id=resume, resume=resume is not None, workers=workers
                 )
                 typer.echo(json.dumps({"run_dir": str(out)}))
 
             run_live(manifest, cap_usd, factory, run, runner=runner)
         except GateRefused as e:
             typer.echo(f"oa eval run --mode live: refused before any provider call: {e}", err=True)
+            raise typer.Exit(2)
+        except FrozenMismatch as e:
+            typer.echo(f"oa eval run: refused: hash mismatch: {e}", err=True)
             raise typer.Exit(2)
         except NotImplementedError as e:
             typer.echo(f"oa eval run --mode live: {e}", err=True)
@@ -956,24 +961,44 @@ def eval_manifest(
     episode_ids: Optional[str] = typer.Option(
         None, "--episode-ids", help="comma-separated dev episode ids"
     ),
+    funded: bool = typer.Option(
+        False,
+        "--funded",
+        help="write the two funded-tier manifests instead (reads the private final marks)",
+    ),
 ) -> None:
-    """Write the priced calibration manifest and the (unapproved) funded-tier manifest to docs/evaluation/manifests/."""
+    """Write a priced calibration manifest, or with --funded the two (unapproved) funded-tier manifests, to
+    docs/evaluation/manifests/."""
     from open_apprentice.evaluation.battery_v2 import REPO
     from open_apprentice.evaluation.manifests_v2 import (
         BUDGET_ROOT,
         calibration_manifest,
         calibration_note,
-        funded_manifest,
+        funded_manifests,
         measured_call_usd,
+        measured_episode_usd,
     )
     from open_apprentice.evaluation.run_v2 import BATTERY_DIRS, load_split
     from open_apprentice.evaluation.spend import load_budget, spendable, spent_so_far
 
-    tokens = json.loads((dry_run_dir / "token_estimate.json").read_text())
-    final = json.loads(
-        (REPO / "docs/evaluation/battery_final.md").read_text().split("```json")[1].split("```")[0]
-    )
+    out = REPO / "docs/evaluation/manifests"
+    out.mkdir(parents=True, exist_ok=True)
     budget = load_budget(BUDGET_ROOT)
+    if funded:
+        # evaluator-only: the clarification-required marks are in the private final manifest
+        private = json.loads((BATTERY_DIRS["final"] / "manifest.private.json").read_text())
+        ids = sorted(e["id"] for e in private["episodes"])
+        clarify = sorted(e["id"] for e in private["episodes"] if e["clarification_required"])
+        usd = measured_episode_usd()
+        usd.setdefault("D", usd["A"])  # D runs A's policy and calls
+        made = funded_manifests(ids, clarify, usd, budget["reserve_usd"])
+        for m in made:
+            (out / f"{m['kind']}-{m['manifest_id']}.json").write_text(
+                json.dumps(m, indent=1, sort_keys=True) + "\n"
+            )
+        typer.echo(json.dumps({m["kind"]: m["manifest_id"] for m in made}))
+        return
+    tokens = json.loads((dry_run_dir / "token_estimate.json").read_text())
     call_usd = measured_call_usd(BUDGET_ROOT)
     cal = calibration_manifest(
         load_split(BATTERY_DIRS["dev"]),
@@ -989,15 +1014,10 @@ def eval_manifest(
     )
     if note:
         cal = calibration_note(cal, note)
-    # spec 7 T3: D on 8 clarification-required episodes
-    fund = funded_manifest(len(final["episodes"]), 8, tokens, budget["reserve_usd"], call_usd)
-    out = REPO / "docs/evaluation/manifests"
-    out.mkdir(parents=True, exist_ok=True)
-    for m in (cal, fund):
-        (out / f"{m['kind']}-{m['manifest_id']}.json").write_text(
-            json.dumps(m, indent=1, sort_keys=True) + "\n"
-        )
-    typer.echo(json.dumps({"calibration": cal["manifest_id"], "funded": fund["manifest_id"]}))
+    (out / f"{cal['kind']}-{cal['manifest_id']}.json").write_text(
+        json.dumps(cal, indent=1, sort_keys=True) + "\n"
+    )
+    typer.echo(json.dumps({"calibration": cal["manifest_id"]}))
 
 
 @eval_app.command("report")

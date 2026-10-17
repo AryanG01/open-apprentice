@@ -8,7 +8,6 @@ from open_apprentice.evaluation.manifests_v2 import (
     GateRefused,
     calibration_manifest,
     check_live_gate,
-    funded_manifest,
     manifest_id,
     measured_call_usd,
     run_live,
@@ -90,11 +89,6 @@ def test_measured_call_cost_is_the_mean_over_model_calls(tmp_path):
     ]
     (root / "spend.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
     assert measured_call_usd(root) == 0.05
-
-
-def test_funded_manifest_counts_240_runs_and_is_not_approved():
-    m = funded_manifest(36, 8, TOKENS, reserve_usd=5.0, call_usd=0.05)
-    assert m["runs"] == 240 and m["approved"] is False
 
 
 def test_live_without_a_manifest_refuses(tmp_path):
@@ -190,3 +184,48 @@ def test_a_calibration_can_name_its_episodes():
         list(_dev()), TOKENS, 0.0, 40.0, 5.0, 0.05, 0.4, systems=("B",), task_ids=[ep.id]
     )
     assert m["task_ids"] == [ep.id] and m["task_strata"] == ["beyond"] and m["runs"] == 1
+
+
+def test_a_hash_mismatch_is_a_clean_cli_refusal(monkeypatch):
+    from typer.testing import CliRunner
+
+    import open_apprentice.evaluation.manifests_v2 as mv
+    from open_apprentice.cli import app
+    from open_apprentice.evaluation.battery_v2 import FrozenMismatch
+
+    def boom(*a, **k):
+        raise FrozenMismatch("episodes/x.private.json does not match its recorded hash")
+
+    monkeypatch.setattr(mv, "run_live", boom)
+    r = CliRunner().invoke(
+        app,
+        ["eval", "run", "--split", "final", "--mode", "live", "--manifest", "x", "--cap-usd", "1"],
+    )
+    assert r.exit_code == 2 and "refused: hash mismatch" in r.output
+
+
+def test_the_funded_tier_is_two_manifests_with_the_right_runs():
+    from open_apprentice.evaluation.manifests_v2 import funded_manifests
+
+    ids = [f"e{i}" for i in range(36)]
+    ab, d = funded_manifests(ids, ids[:8], {"A": 0.11, "B": 0.19, "D": 0.11}, reserve_usd=10.0)
+    assert (ab["runs"], ab["systems"], ab["repeats"], ab["task_ids"]) == (216, ["A", "B"], 3, ids)
+    assert (d["runs"], d["systems"], d["task_ids"]) == (24, ["D"], ids[:8])
+    assert (
+        ab["estimate_usd"] == round(108 * 0.11 + 108 * 0.19, 2)
+        and ab["ceiling_usd"] >= ab["estimate_usd"]
+    )
+    assert ab["split"] == d["split"] == "final" and not ab["approved"]
+
+
+def test_measured_episode_cost_comes_from_live_calibration_rows(tmp_path):
+    from open_apprentice.evaluation.manifests_v2 import measured_episode_usd
+
+    d = tmp_path / "cal-x"
+    d.mkdir()
+    rows = [{"method": "A", "usd": 0.1, "origin": "live", "failure": None},
+            {"method": "A", "usd": 0.3, "origin": "live", "failure": None},
+            {"method": "B", "usd": 0.0, "origin": "live", "failure": "budget_stop"},
+            {"method": "B", "usd": 0.2, "origin": "live", "failure": None}]  # fmt: skip
+    (d / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    assert measured_episode_usd(tmp_path) == {"A": 0.2, "B": 0.2}

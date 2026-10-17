@@ -59,6 +59,7 @@ BATTERY_DIRS = {
     "final": REPO / "benchmarks/final/battery",
 }
 WALL_S = 300
+FINAL_HASHES = REPO / "docs/evaluation/battery_final.hashes.json"
 FORBIDDEN_ENV = ("benchmarks/final", ".private.json")
 
 
@@ -492,6 +493,7 @@ def run_live_battery(
     run_id: Optional[str] = None,
     dotenv: Path = REPO / ".env",
     resume: bool = False,
+    workers: int = 1,
 ) -> Path:
     """The approved manifest's runs, live (called only after the paid-run gate). Systems alternate per episode in a
     seeded order; each learner gets the run's total cap and its guard charges what this run id has already spent in
@@ -500,13 +502,19 @@ def run_live_battery(
     (they never reached the model) are moved to rows.superseded.jsonl and re-run; every other row stands.
     """
     import random
-    from dataclasses import replace
+    import threading
+    from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
     from open_apprentice.providers.spend import spent_for_run
 
     run_id = run_id or f"cal-{manifest['manifest_id']}-{time.strftime('%Y%m%dT%H%M%S')}"
     wanted = list(manifest["task_ids"])
-    by_id = {e.id: e for e in load_split(BATTERY_DIRS[manifest["split"]])}
+    expected = None
+    if (
+        manifest["split"] == "final"
+    ):  # the frozen final battery, checked against the committed hashes
+        expected = json.loads(Path(FINAL_HASHES).read_text())["hashes"]
+    by_id = {e.id: e for e in load_split(BATTERY_DIRS[manifest["split"]], expected)}
     eps = [by_id[i] for i in wanted]
     out = Path(out_root) / run_id
     out.mkdir(parents=True, exist_ok=True)
@@ -525,34 +533,48 @@ def run_live_battery(
                 else:
                     kept[(r["episode"], r["method"], r["rep"])] = x
     done = len(kept)
-    with open(out / "rows.jsonl", "w") as f:
+    todo = [
+        (r, ep, system)
+        for r in range(manifest["repeats"])
+        for ep in eps
+        for system in rng.sample(manifest["systems"], len(manifest["systems"]))
+        if (ep.id, system, r) not in kept
+    ]
+    lock = threading.Lock()
+    with open(out / "rows.jsonl", "w") as f, ThreadPoolExecutor(max(1, workers)) as pool:
         for x in kept.values():
             f.write(x + "\n")
-        for r in range(manifest["repeats"]):
-            for ep in eps:
-                for system in rng.sample(manifest["systems"], len(manifest["systems"])):
-                    if (ep.id, system, r) in kept:
-                        continue
-                    before = spent_for_run(run_id, Path(budget_root))
-                    left = round(cap_usd - before, 4)
-                    if left < MIN_CALL_USD:
-                        stopped = "run cap"
-                        break
-                    extra = ("--cap-usd", str(cap_usd), "--run-id", run_id)
-                    extra += ("--budget-root", str(budget_root), "--dotenv", str(dotenv))
-                    row = run_episode(ep, system, "live", r, r, out, model, extra, LIVE_WALL_S)
-                    usd = round(spent_for_run(run_id, Path(budget_root)) - before, 6)
-                    row = replace(row, usd=usd)
-                    f.write(json.dumps(asdict(row), default=str) + "\n")
-                    f.flush()
-                    done += 1
-                    if "boundary_violation" in row.release_blocking:
-                        stopped = "boundary violation"
-                        break
-                if stopped:
-                    break
+        extra = ("--cap-usd", str(cap_usd), "--run-id", run_id)
+        extra += ("--budget-root", str(budget_root), "--dotenv", str(dotenv))
+        running: set = set()
+
+        def finished(fut: Any) -> None:
+            nonlocal done, stopped
+            row = fut.result()
+            with lock:
+                f.write(json.dumps(asdict(row), default=str) + "\n")
+                f.flush()
+                done += 1
+                if "boundary_violation" in row.release_blocking:
+                    stopped = "boundary violation"
+
+        for r, ep, system in todo:
+            while len(running) >= max(1, workers):
+                complete, running = wait(running, return_when=FIRST_COMPLETED)
+                for fut in complete:
+                    finished(fut)
             if stopped:
                 break
+            # every run in flight may still need one call's worst case: start another only if all of them fit
+            left = cap_usd - spent_for_run(run_id, Path(budget_root))
+            if left < MIN_CALL_USD * (len(running) + 1):
+                stopped = "run cap"
+                break
+            running.add(
+                pool.submit(run_episode, ep, system, "live", r, r, out, model, extra, LIVE_WALL_S)
+            )
+        for fut in wait(running).done:
+            finished(fut)
     (out / "manifest.json").write_text(
         json.dumps(
             {
