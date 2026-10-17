@@ -97,3 +97,20 @@ Run `cal-3e42a9e799961d84-20261017T010307` (manifest `3e42a9e799961d84`, B only,
     episode in 2 calls.
 
 Spend logged: $40.20 of $45.77 funded; **about $0.57 left above the $5 reserve**.
+
+## B with A's proposal call available (live, 2026-10-17)
+
+Run `cal-1532dedb366c7408-20261017T104126` (manifest `1532dedb366c7408`, B only, beyond episode, cap $0.40).
+**Spent $0.244**; the run stopped at the dollar cap after 7 calls (scored `budget_stop`, not an outcome).
+- **B never used the drafted proposals.** Every time it chose `propose`, it also wrote its own `rules_text`, so A's
+  proposal call never ran.
+- 4 of its 6 rules did not parse, all because of `&&`, which the prompt explicitly forbids. The other 2 parsed but
+  contradicted the demonstrations.
+- The cap check reserves $0.20 per call, so a $0.40 cap allows only about $0.20 of actual spend.
+
+So far, across 5 B episodes (all on the same model), B committed a correct rule once (catalogue, option protocol).
+The remaining blocker is that it writes its own rules and writes them badly. The next design would make `propose` always
+use A's proposal call, with B choosing only when to propose. That needs about $0.50 of cap for one episode ($0.30 of
+spend plus the $0.20 per-call reservation).
+
+Spend logged: $40.44 of $45.77 funded; **about $0.33 left above the $5 reserve**.
