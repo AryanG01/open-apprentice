@@ -114,3 +114,27 @@ use A's proposal call, with B choosing only when to propose. That needs about $0
 spend plus the $0.20 per-call reservation).
 
 Spend logged: $40.44 of $45.77 funded; **about $0.33 left above the $5 reserve**.
+
+## B with propose always running A's proposal call (live, 2026-10-17) — B is viable
+
+Run `cal-06215ff627e60f06-20261017T113625` (manifest `06215ff627e60f06`, B only, catalogue and beyond, cap $1.00).
+**Spent $0.277.**
+
+| Episode | B | A (calibration) |
+|---|---|---|
+| catalogue | **correct_complete**, 4 calls, $0.133 | correct_complete, 2 calls, $0.066 |
+| beyond catalogue | **correct_complete**, 4 calls, $0.144 | correct_complete, 2 calls, $0.118 |
+
+- B now drives the protocol: propose → propose → preview on 3 documents (all approved) → commit.
+- B committed while 3 proposed programs still fit the evidence, without asking a question. That is exactly the
+  free-agent behaviour A's question policy is to be compared against; here the previewed choice was right on the
+  fresh documents.
+- **The frozen B design** for the funded tier:
+  - the option protocol;
+  - `propose` = A's proposal call;
+  - B's own choice of questions, previews and stopping;
+  - corrections on the shared executor.
+- Cost per episode is about $0.14 for B and about $0.09 for A, on these two strata. The inconsistent, unsupported and
+  sequential episodes have not been run live yet; nor have the correction calls.
+
+Spend logged: $40.72 total.
