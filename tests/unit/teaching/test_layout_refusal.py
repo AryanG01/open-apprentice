@@ -106,3 +106,17 @@ def test_a_correction_commit_runs_the_layout_check(monkeypatch):
     monkeypatch.setattr(cs, "layout_problems", lambda rule, scenes: ["o1: l1 leaves the page"])
     with pytest.raises(AssertionError, match="refusing to apply"):
         test_scope_affected_and_revision_preview_complete_within_budget()
+
+
+def test_b_is_told_when_a_program_would_be_refused_and_is_not_offered_its_preview(tmp_path):
+    from open_apprentice.concepts.catalogue_programs import program_text
+    from open_apprentice.learner.agent_b import AgentB, AgentBudgets
+
+    store, log = _log(tmp_path, EDGE)
+    b = AgentB(lambda: None, log, ApprovingTeacher(), Ledger(store, F(5)), AgentBudgets(), F(0))
+    msg = b.t_propose("p", {"rules_text": [program_text("right", None, "all", 12)]})
+    assert "refusing to apply" in msg and "leaves the page" in msg
+    ids = {o["id"] for o in b.options()}
+    assert not any(i.startswith(("preview", "commit")) for i in ids) and "abstain" in ids
+    prog = b._state(8)["programs"][0]
+    assert "leaves the page" in prog["layout_problem"]

@@ -160,6 +160,11 @@ class AgentB:
                     "summary": c["summary"],
                     "fits": bool(kept),
                     "problem": "; ".join(why)[:300] if why else "",
+                    # the shared layout refusal (spec 7), told to B as A's mechanical feedback: a convention the
+                    # person demonstrated that leaves the page or overlaps will not be applied
+                    "layout_problem": (
+                        "; ".join(layout_problems(c["rule"], hand_placed(ev.items))[:3]) if kept else ""
+                    ),
                 }
             )
         return out
@@ -182,7 +187,8 @@ class AgentB:
             "evidence": describe_compact(ev.positives),
             "documents": docs,
             "programs": [
-                {k: p[k] for k in ("id", "summary", "fits", "problem")} for p in self._programs()
+                {k: p[k] for k in ("id", "summary", "fits", "problem", "layout_problem")}
+                for p in self._programs()
             ],
             "budget": {
                 "turns_left": turns_left,
@@ -200,7 +206,7 @@ class AgentB:
         probes are not offered."""
         ev = derive(self.log.events())
         progs = self._programs()
-        fitting = [p for p in progs if p["fits"]]
+        fitting = [p for p in progs if p["fits"] and not p["layout_problem"]]
         asked = {
             e.payload["request"].get("scene_id")
             for e in self.log.events()
@@ -351,6 +357,11 @@ class AgentB:
             f"{known[codec.digest(c['rule'])]['id']}: "
             + ("fits the evidence" if known[codec.digest(c["rule"])]["fits"] else "rejected -- ")
             + known[codec.digest(c["rule"])]["problem"]
+            + (
+                f" -- but refusing to apply: {known[codec.digest(c['rule'])]['layout_problem']}"
+                if known[codec.digest(c["rule"])]["layout_problem"]
+                else ""
+            )
             for c in cands
         ]
         if again:
