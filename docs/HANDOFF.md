@@ -19,7 +19,7 @@ Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-igno
 `docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
 systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offline dry run
 (`results/eval_v2/dryrun-20261016/report.md`, not a model result), and the paid-run gate. Suite 945 on 3.13 and 3.12.
-**Plan 6 (branch `p6-corrections-b-final`, reviewed, 1021 tests on 3.13 and 3.12):** correction scopes without constants,
+**Plan 6 (merged to master 2026-10-17, not pushed; reviewed; 1021 tests on 3.13 and 3.12):** correction scopes without constants,
 a shared layout refusal, a clean battery (battery-v2.5, re-frozen before any final run), B's own correction cycle,
 real-file episodes (with a batch and hash checks), parallel gated final runs, cross-process spend reservations
 (`docs/evaluation/plan6_rulings.md`). Live results: `docs/evaluation/calibration_results.md` (A and B viable; first live
