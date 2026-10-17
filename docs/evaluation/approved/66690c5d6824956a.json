@@ -1,0 +1,49 @@
+{
+ "approved": true,
+ "approved_at": "2026-10-17",
+ "approved_by": "owner (chat 2026-10-17: 'yes start live check now', balance $53.29)",
+ "attempt_ceilings": {
+  "A": 12,
+  "B": 12
+ },
+ "budget_at_writing": {
+  "ceiling_fits": true,
+  "remaining_usd": 37.3409,
+  "spendable_usd": 80.0,
+  "spent_usd": 42.6591
+ },
+ "ceiling_usd": 1.25,
+ "establishes": "prompt and parse viability for A and B and the cost per episode on development episodes; not an A-versus-B result",
+ "estimate_basis": "dry-run mean attempts per episode x $0.041 per call (mean of earlier live teaching calls in spend.jsonl); the fixture B stops early, so B's share is a lower bound",
+ "estimate_calls": 14.83,
+ "estimate_usd": 0.6082,
+ "expected_coverage": 1.0,
+ "kind": "calibration",
+ "manifest_id": "66690c5d6824956a",
+ "note": "Plan 6 post-review live check: B's layout feedback and the tree-built scope patch (neither run live before), parallel workers with cross-process spend reservations",
+ "protected_reserve_usd": 10.0,
+ "repeats": 1,
+ "runs": 6,
+ "split": "dev",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "SpendGuard stops the run when the next call's worst case would pass --cap-usd"
+ },
+ "systems": [
+  "A",
+  "B"
+ ],
+ "task_ids": [
+  "ea5432e5dee",
+  "e9bacad414c",
+  "e6ab691b80f"
+ ],
+ "task_strata": [
+  "unsupported",
+  "sequential",
+  "sequential"
+ ],
+ "worst_case_per_attempt_usd": 0.192,
+ "worst_case_total_usd": 13.824
+}
