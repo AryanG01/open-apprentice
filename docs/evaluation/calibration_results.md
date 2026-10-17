@@ -138,3 +138,34 @@ Run `cal-06215ff627e60f06-20261017T113625` (manifest `06215ff627e60f06`, B only,
   sequential episodes have not been run live yet; nor have the correction calls.
 
 Spend logged: $40.72 total.
+
+## Calibration 2: inconsistent, unsupported, sequential (live, 2026-10-17)
+
+Run `cal-7c5ebc6f173f450c-20261017T115319` (manifest `7c5ebc6f173f450c`, A and B, frozen B design, cap $2.50).
+**Spent $1.070.** The laptop slept with the lid closed from 12:04 to 12:36. The call in flight timed out by itself
+after wake, and the run continued.
+
+| Episode | A | B |
+|---|---|---|
+| inconsistent | appropriate_refusal ("no acceptable program"), 2 calls, $0.135 | appropriate_refusal, but only by exhausting its 8 attempts; 5 turns, $0.481 |
+| unsupported (forced overlap) | **wrong_commit**, 2 calls, $0.106 | **wrong_commit**, 3 calls, $0.076 |
+| sequential (compatible, tall nodes → below) | acquired; correction abstained ("no acceptable interpretation"), 4 calls, $0.145 | acquired; correction abstained, 5 calls, $0.127 |
+
+Findings:
+1. **The correction cycle runs end to end live, and the teacher scores by meaning.** The intended scope was
+   "nodes at least as tall as they are wide" (`object(o.attached).w <= object(o.attached).h`).
+   - Both systems proposed selectors keyed to exact sizes seen in the one corrected document, e.g.
+     `object(o.attached).h == 80` and `... w <= 70 and ... h == 80`.
+   - On the diagnostic grid these differ from the intended scope, so the teacher answered `none`. Both then correctly
+     left the active version unchanged; nothing wrong was committed.
+   - Correction success here is 0/2 for both systems, and the shared scope proposer is the weak point.
+   - Selectors that compare with constants are not filtered the way learning rules are. That is a candidate fix,
+     applied to both systems alike, before the funded tier.
+2. **Forced overlap is committed by both systems on the live model too**, as in the offline dry run. It is the known
+   product gap: no system refuses to apply a demonstrated overlap.
+3. **The refusals differ in kind.** A abstains because no program fits both contradictory demonstrations. B reaches
+   the same score by running out of attempts, which is expensive ($0.48) and is not a surfaced conflict. The scoring
+   cannot tell these apart, and the report should.
+4. **Cost per episode on these strata:** A about $0.13, B about $0.23.
+
+Spend logged after calibration 2: about $41.79.
