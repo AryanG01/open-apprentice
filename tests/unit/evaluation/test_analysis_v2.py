@@ -148,3 +148,15 @@ def test_report_discloses_correction_effort_per_system(tmp_path):
     assert "## Correction effort" in md and "- A: proposer calls 2.0, agent turns 0.0" in md
     assert "- B: proposer calls 3.0, agent turns 5.0" in md
     assert "B's correction cycle may use more provider calls than A's" in md
+
+
+def test_report_lists_episodes_the_adapter_refused(tmp_path):
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in _pairs(2, 1, 0)))
+    (tmp_path / "manifest.json").write_text(json.dumps({"run_id": "x", "split": "final", "mode": "live",
+        "adapter_refused": {"real1": "cell 'a' lies outside the page"}}))  # fmt: skip
+    md = report(tmp_path)
+    assert (
+        "## Not run: refused by the draw.io adapter" in md
+        and "real1" in md
+        and "outside the page" in md
+    )

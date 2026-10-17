@@ -106,6 +106,16 @@ def report(run_dir: Path) -> str:
         f"Split `{manifest.get('split')}`, mode `{manifest.get('mode')}`, systems {', '.join(systems)}.",
         "",
     ]
+    refused = manifest.get("adapter_refused") or {}
+    if refused:
+        out += ["## Not run: refused by the draw.io adapter", ""]
+        out += [f"- `{k}`: {v}" for k, v in sorted(refused.items())]
+        out += [
+            "",
+            "The product's adapter refuses these files, so no system was run on them; the refusal is the same for every "
+            "system and is reported rather than worked around.",
+            "",
+        ]
     stops = sum(1 for r in rows if r.get("failure") == "budget_stop")
     out += [
         f"Coverage: runs with an outcome: {len(rows) - stops} of {len(rows)} ({stops} stopped by the dollar cap).",

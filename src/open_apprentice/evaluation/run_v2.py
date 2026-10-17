@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from open_apprentice.concepts.rules import RuleError, evaluate_rule
+from open_apprentice.drawio.parse import DrawioRefused
 from open_apprentice.evaluation.battery_v2 import (
     REPO,
     SCORING_VERSION,
@@ -534,6 +535,7 @@ def run_live_battery(
 
     run_id = run_id or f"cal-{manifest['manifest_id']}-{time.strftime('%Y%m%dT%H%M%S')}"
     wanted = list(manifest["task_ids"])
+    adapter_refused: dict[str, str] = {}
     expected = None
     if (
         manifest["split"] == "final"
@@ -550,14 +552,21 @@ def run_live_battery(
             if r["id"] in wanted:
                 if engine_url is None:
                     raise RuntimeError("real-file episodes need the engine: give engine_url")
-                by_id[r["id"]] = real_file_episode(
-                    files,
-                    k,
-                    vspec_from_json(r["spec"]),
-                    engine_url,
-                    r["id"],
-                    [x["sha256"] for x in real],
-                )  # every file is hash-checked against the freeze before it is read
+                try:
+                    by_id[r["id"]] = real_file_episode(
+                        files,
+                        k,
+                        vspec_from_json(r["spec"]),
+                        engine_url,
+                        r["id"],
+                        [x["sha256"] for x in real],
+                    )  # every file is hash-checked against the freeze before it is read
+                except DrawioRefused as e:
+                    # the product's adapter refuses this file (release 1 edits only inside the page): the episode
+                    # cannot be built for any system. It is recorded and reported, never worked around, and no
+                    # learner runs on it. (A changed file is a FrozenMismatch and still stops the run.)
+                    adapter_refused[r["id"]] = str(e)[:300]
+        wanted = [i for i in wanted if i not in adapter_refused]
     eps = [by_id[i] for i in wanted]
     out = Path(out_root) / run_id
     out.mkdir(parents=True, exist_ok=True)
@@ -651,6 +660,7 @@ def run_live_battery(
                 "systems": manifest["systems"],
                 "repeats": manifest["repeats"],
                 "episodes": wanted,
+                "adapter_refused": adapter_refused,
                 "approved_manifest": manifest["manifest_id"],
                 "cap_usd": cap_usd,
                 "spent_usd": round(spent_for_run(run_id, Path(budget_root)), 6),

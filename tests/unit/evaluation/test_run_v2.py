@@ -588,3 +588,51 @@ def test_correction_effort_is_recorded_per_row():
                       {"log": "learn", "type": "ActionIssued", "payload": {"kind": "RequestModelProposal"}}]}  # fmt: skip
     d = _diagnostics(out)
     assert d["correction_proposer_calls"] == 2 and d["correction_agent_turns"] == 3
+
+
+def test_real_file_episodes_the_adapter_refuses_are_recorded_and_the_rest_still_run(
+    tmp_path, monkeypatch
+):
+    import open_apprentice.evaluation.run_v2 as rv
+    from open_apprentice.drawio.parse import DrawioRefused
+    from open_apprentice.evaluation.battery_v2 import verify_frozen, vspec_to_json
+    from open_apprentice.evaluation.specs_v2 import VSpec
+
+    d = tmp_path / "final"
+    freeze("dev", d)
+    m = json.loads((d / "manifest.private.json").read_text())
+    spec = vspec_to_json(VSpec("catalogue", (Spec("below", None, "all", 12),)))
+    m["real_files"] = [
+        {"id": f"real{i}", "file": f"x/f{i}.drawio", "sha256": "h", "spec": spec} for i in (1, 2, 3)
+    ]
+    (d / "manifest.private.json").write_text(json.dumps(m))
+    (tmp_path / "hashes.json").write_text(json.dumps({"hashes": verify_frozen(d)}))
+    monkeypatch.setitem(rv.BATTERY_DIRS, "final", d)
+    monkeypatch.setattr(rv, "FINAL_HASHES", tmp_path / "hashes.json")
+
+    def refuse(*a, **k):
+        raise DrawioRefused(
+            "cell 'x' lies outside the page (0, 0, 700, 450); release 1 edits only inside it"
+        )
+
+    monkeypatch.setattr(rv, "real_file_episode", refuse)
+    ran = []
+    monkeypatch.setattr(rv, "run_episode", lambda ep, *a, **k: ran.append(ep.id) or
+                        rv.RowV2(ep.id, 0, "A", ep.id, "x", False, False, None, origin="live"))  # fmt: skip
+    dev_ids = [e.id for e in _dev()[:2]]
+    manifest = {"manifest_id": "m", "split": "final", "task_ids": [*dev_ids, "real1", "real2", "real3"],
+                "systems": ["A"], "repeats": 1}  # fmt: skip
+    # the stand-in "final" folder holds the dev battery, whose ids are the _dev() ids
+    out = rv.run_live_battery(
+        manifest,
+        5.0,
+        out_root=tmp_path,
+        budget_root=tmp_path,
+        model="M",
+        run_id="r",
+        engine_url="http://e",
+    )
+    mj = json.loads((out / "manifest.json").read_text())
+    assert sorted(ran) == sorted(dev_ids) and mj["coverage"] == "2/2"
+    assert set(mj["adapter_refused"]) == {"real1", "real2", "real3"}
+    assert "outside the page" in mj["adapter_refused"]["real1"]
