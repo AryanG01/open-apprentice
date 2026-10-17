@@ -173,7 +173,7 @@ def test_subprocess_round_trip_on_a_sequential_episode(tmp_path):
     finally:
         t.close()
     assert (r.selected, r.source) == ("a", "deterministic_simulator")
-    assert d.output == _full(ep.spec, s)
+    assert d.output == _full(ep.correction["spec"], s)  # once the correction is under way
     lines = [json.loads(x) for x in log.read_text().splitlines()]
     assert [x["request"]["request_id"] for x in lines] == ["q", "q2"]
 

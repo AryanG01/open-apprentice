@@ -26,6 +26,7 @@ from open_apprentice.teaching.accounting import Ledger, OverBudget
 from open_apprentice.teaching.constraints import derive
 from open_apprentice.teaching.events import SessionLog
 from open_apprentice.teaching.executor import TRANSIENT, Executor, failure_kind
+from open_apprentice.teaching.layout import hand_placed, layout_problems, refusal
 from open_apprentice.teaching.probes import Probe, ProbeResult, probe_to_json
 from open_apprentice.teaching.step import (
     AskTeacher,
@@ -236,7 +237,8 @@ class AgentB:
             rejected = any(
                 run_output(p["rule"], ev.scenes[sid]) in outs for sid, outs in ev.rejected.items()
             )
-            if approved and not rejected:
+            evidence = hand_placed(ev.items)
+            if approved and not rejected and not layout_problems(p["rule"], evidence):
                 opts.append({"id": f"commit:{p['id']}", "tool": "commit", "args": {"program": p["id"]},
                              "what": f"save {p['id']} (approved, fits all evidence)"})  # fmt: skip
         if self._requests("RequestDemonstration") < self.b.max_demos and open_docs:
@@ -481,6 +483,9 @@ class AgentB:
         kept, why = _filter([prog], ev)
         if not kept:
             return "refused: " + "; ".join(why)[:300]
+        problems = layout_problems(prog["rule"], hand_placed(ev.items))
+        if problems:
+            return "refused: " + refusal(problems)
         approvals = [
             sid
             for sid, out in ev.preview_approved.items()

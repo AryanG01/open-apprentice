@@ -10,6 +10,7 @@ from open_apprentice.concepts.rules import RuleError, validate_rule
 from open_apprentice.teaching import codec
 from open_apprentice.teaching.corrections import Draft, derive_draft, draft_items
 from open_apprentice.teaching.events import Event
+from open_apprentice.teaching.layout import hand_placed, layout_problems, refusal
 from open_apprentice.teaching.evidence import EvidenceItem, item_fits, item_to_json
 from open_apprentice.teaching.retention import behaviour_diff, retention_report
 from open_apprentice.teaching.scope import SelectorError, members, parse_selector
@@ -272,6 +273,9 @@ def correction_step(events: list[Event], config: CorrectionConfig) -> Correction
             _aid(events, "Abstain"),
             f"checks failed ({misses[:3]}); the active version is unchanged",
         )
+    problems = layout_problems(sel["rule"], hand_placed(items_all))
+    if problems:
+        return Abstain(_aid(events, "Abstain"), refusal(problems))
     base = d.base
     artifact = {
         "skill_id": base["skill_id"],

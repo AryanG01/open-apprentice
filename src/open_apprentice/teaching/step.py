@@ -374,6 +374,17 @@ def step(events: list[Event], config: StepConfig) -> Action:
 
     # rule 6: commit, preview, or abstain
     sel = _selected(cands)
+    from open_apprentice.teaching.layout import (
+        hand_placed,
+        layout_problems,
+        refusal,
+    )  # local: imports step
+
+    # the demonstrated convention itself (where the person placed labels by hand) leaves the page or overlaps: refuse it.
+    # Unlabelled documents where an otherwise valid rule would collide are handled by blocking those items instead.
+    problems = layout_problems(sel["rule"], hand_placed(ev.items))
+    if problems:
+        return Abstain(_aid(events, "Abstain"), refusal(problems))
     approvals = [
         sid
         for sid in ev.batch

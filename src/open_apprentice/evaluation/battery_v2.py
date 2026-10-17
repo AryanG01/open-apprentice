@@ -24,13 +24,17 @@ from open_apprentice.teaching import codec
 from open_apprentice.teaching.constraints import scene_from_payload
 from open_apprentice.teaching.scope import members
 
-GENERATOR_VERSION = "battery-v2.3"
+GENERATOR_VERSION = "battery-v2.4"
 SCORING_VERSION = "score-v2.1"
 TOLERANCE = F(1, 2)
 SEED_BASE = {
     "dev": 110_000
 }  # the final base is drawn at freeze time and recorded only in the private manifest
 ATTEMPTS = 900
+SEQUENTIAL_STRATA = (
+    "columns",
+    "sparse",
+)  # uncrowded: "right of node, no fallback" must be collision-free by hand
 REPO = Path(__file__).resolve().parents[3]
 REAL_FILES = {  # docs/corpus/drawio_provenance.md
     "f1": "cf538204a77dbda9077827c0dceba850748ab032e53d42e3e9fba3c3e0215d40",
@@ -181,18 +185,31 @@ def _cat(spec: Spec) -> VSpec:
 
 
 class _Gen:
-    def __init__(self, seed: int, attempt: int) -> None:
-        self.seed, self.attempt, self.k = seed, attempt, 0
+    def __init__(self, seed: int, attempt: int, strata: tuple[str, ...] = STRATA) -> None:
+        self.seed, self.attempt, self.k, self.strata = seed, attempt, 0, strata
         self.rng = random.Random(seed * 10_000 + attempt)
 
     def scene(self, stratum: Optional[str] = None) -> dict:
         self.k += 1
         # the attempt shifts the layout rotation, so no seed is stuck with strata that cannot satisfy its episode
-        stratum = stratum or STRATA[(self.seed + self.k + self.attempt) % len(STRATA)]
+        stratum = stratum or self.strata[(self.seed + self.k + self.attempt) % len(self.strata)]
         return scene_v(stratum, (self.seed * 10_000 + self.attempt) * 100 + self.k)
 
     def scenes(self, n: int, stratum: Optional[str] = None) -> list[dict]:
         return [self.scene(stratum) for _ in range(n)]
+
+
+def _clean(spec: VSpec, scenes: list[dict]) -> bool:
+    """The behaviour's own layout is valid on every scene: no moved label leaves the page or overlaps another object.
+    Required wherever the teacher places labels by hand (demonstrations, requested demonstrations on batch documents,
+    the corrective edit), since a hand-placed off-page or overlapping layout is refused by every system. Only the
+    forced-overlap episode breaks it on purpose (spec 7). Scoring documents may collide; the scorer excuses collisions
+    the intended behaviour itself makes."""
+    for s in scenes:
+        after = {o["id"]: o for o in _after(spec, s)["objects"]}
+        if _layout_violations(after, oracle_v(spec, s), s["canvas"]):
+            return False
+    return True
 
 
 def _mark(demos: list[tuple[dict, dict]]) -> bool:
@@ -260,6 +277,13 @@ def _learning(stratum: str, variant: Any, g: _Gen) -> dict:
                 raise _Retry
     else:
         raise ValueError(stratum)
+    if meta.get("subtype") != "forced_overlap":
+        if not _clean(spec, [*demo_scenes, *batch]):
+            raise _Retry
+        if meta.get("conflict_spec") and not _clean(
+            vspec_from_json(meta["conflict_spec"]), demo_scenes
+        ):
+            raise _Retry
     return {
         "spec": spec,
         "demo_scenes": demo_scenes,
@@ -283,7 +307,9 @@ def _sequential(variant: tuple[str, str], g: _Gen) -> dict:
         a, b = _final(base, scene), _final(corrected, scene)
         return {k for k in a if a[k] != b[k]}
 
-    demo_scenes = g.scenes(g.rng.choice((1, 2)))
+    # compatible "tall nodes" needs demonstrations without a tall node: only the sparse layout gives those reliably
+    demo_stratum = "sparse" if (kind, template) == ("compatible", "tall_below") else None
+    demo_scenes = g.scenes(g.rng.choice((1, 2)), demo_stratum)
     if kind == "compatible" and template != "tall_below":
         demo_scenes = [_strip_warnings(s) for s in demo_scenes]
     demos = [(s, _after(base, s)) for s in demo_scenes]
@@ -291,8 +317,8 @@ def _sequential(variant: tuple[str, str], g: _Gen) -> dict:
     batch, scoring = g.scenes(3), g.scenes(3)
     if not any(base_spec in v for v in classes.values()):
         raise _Retry
-    if len(classes) >= 2 and not any(separates(s, classes) for s in batch):
-        raise _Retry
+    # no batch-separation requirement here: on the uncrowded layouts "right" and "right else below" never differ, and
+    # these episodes test the correction (A may still separate rules with generated probes)
     demo_changed = any(changed(s) for s in demo_scenes)
     if (kind == "compatible") == demo_changed and kind in ("compatible", "superseding", "conflict"):
         raise _Retry
@@ -324,6 +350,10 @@ def _sequential(variant: tuple[str, str], g: _Gen) -> dict:
         correction = {"spec": corrected, "selector": selector, "diagnostic_scenes": diagnostic}
         correction |= {"scene": target, "corrected_output": _final(corrected, target)}
         correction["mask"] = sorted(changed(target))
+    if not _clean(base, [*demo_scenes, *batch, correction["scene"]]):
+        raise _Retry
+    if correction["spec"] is not None and not _clean(correction["spec"], [correction["scene"]]):
+        raise _Retry
     correction |= {"kind": kind, "template": template}
     return {
         "spec": base,
@@ -350,7 +380,8 @@ def build_battery(split: str, seed_base: Optional[int] = None) -> list[Episode]:
     for i, (stratum, variant) in enumerate(PLAN[split]):
         seed = seed_base + i
         for attempt in range(ATTEMPTS):
-            g = _Gen(seed, attempt)
+            # sequential episodes need clean hand-placed layouts for two behaviours: uncrowded layouts only
+            g = _Gen(seed, attempt, SEQUENTIAL_STRATA if stratum == "sequential" else STRATA)
             try:
                 body = (
                     _sequential(variant, g)

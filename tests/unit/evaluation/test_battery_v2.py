@@ -176,3 +176,32 @@ def test_cli_freeze_prints_hashes_that_verify(tmp_path):
     assert r.exit_code == 0, r.output
     printed = json.loads(r.output)
     assert printed["hashes"] == verify_frozen(tmp_path)
+
+
+def _clean(spec, scenes):
+    from open_apprentice.evaluation.battery_v2 import _clean as clean
+
+    return clean(spec, scenes)
+
+
+def test_truth_layouts_are_clean_everywhere_except_the_forced_overlap_episode():
+    from open_apprentice.evaluation.battery_v2 import vspec_from_json
+
+    for ep in _battery("dev") + _battery("final"):
+        scenes = ep.demo_scenes + ep.batch_scenes  # where the teacher places labels by hand
+        if ep.meta.get("subtype") == "forced_overlap":
+            assert not _clean(ep.spec, ep.demo_scenes), ep.id
+            continue
+        assert _clean(ep.spec, scenes), (ep.id, ep.stratum)
+        if ep.meta.get("conflict_spec"):
+            assert _clean(vspec_from_json(ep.meta["conflict_spec"]), ep.demo_scenes)
+        c = ep.correction
+        if c and c["spec"] is not None:
+            assert _clean(ep.spec, [c["scene"]]) and _clean(c["spec"], [c["scene"]]), ep.id
+
+
+def test_random_final_bases_still_build_the_full_battery():
+    import secrets
+
+    for _ in range(3):
+        assert len(build_battery("final", 10**8 + secrets.randbelow(9 * 10**8))) == 36
