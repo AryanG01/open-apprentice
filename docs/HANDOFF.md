@@ -19,13 +19,14 @@ Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-igno
 `docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
 systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offline dry run
 (`results/eval_v2/dryrun-20261016/report.md`, not a model result), and the paid-run gate. Suite 945 on 3.13 and 3.12.
-**Calibration and B re-checks ran live 2026-10-16/17** (`docs/evaluation/calibration_results.md`): $1.84 spent in
-total. A is viable (2/2 correct, about $0.09 per episode). B is not yet: 1 correct out of 5 episodes, even after the
-option protocol (B picks among legal next steps) and access to A's proposal call. It keeps writing its own rules,
-often with `&&`. Next design: B's `propose` always uses A's proposal call (about $0.50 of cap per test episode).
-**Waiting on the owner:** a top-up (about $0.33 left above the $5 reserve; the funded tier is re-estimated at
-$50-60), and the B decision. Before the funded tier: B's own correction tools, the real-file final episodes. Known
-product gap: no system refuses a demonstrated forced-overlap convention.
+**Plan 6 (branch `p6-corrections-b-final`, reviewed, 1021 tests on 3.13 and 3.12):** correction scopes without constants,
+a shared layout refusal, a clean battery (battery-v2.5, re-frozen before any final run), B's own correction cycle,
+real-file episodes (with a batch and hash checks), parallel gated final runs, cross-process spend reservations
+(`docs/evaluation/plan6_rulings.md`). Live results: `docs/evaluation/calibration_results.md` (A and B viable; first live
+correction success; the layout refusal works for A). Two fixes landed after the last live check and are NOT yet verified
+live: B's layout feedback and the scope proposer's tree-built patch. **Next:** a small live re-check (~$1, cap $1.25), then
+the funded tier as two manifests (`oa eval manifest --funded`; the owner approves them), then the demo (production still
+runs the old badge build). Budget: authorized $90 (raise to $110 for the funded run), reserve $10, ~$37 spendable.
 master is 26 commits ahead of origin (not pushed).
 
 **Money:** `results/redesign/budget.json` = $50 authorized, $10 reserve; about $38.60 already spent → about **$1.40 spendable**.
