@@ -24,7 +24,10 @@ PROMPTS = pathlib.Path(__file__).resolve().parents[3] / "prompts"
 class ScopeOut(BaseModel):
     model_config = {"extra": "ignore"}
     summary: str = ""
-    rule_text: str = ""
+    rule_text: str = ""  # a whole revised program (older replies)
+    patch_text: str = (
+        ""  # only the movement for the selected labels; the system composes the program around it
+    )
     selector: str = ""
 
 
@@ -146,10 +149,23 @@ class ProviderScopeProposer:
             self.max_tokens,
         )
         cands, malformed = [], 0
+        base = list((evidence_json.get("base_program") or {}).get("rule") or [])
         for c in done.parsed.candidates:
-            rule = _rule(c.rule_text) if c.rule_text.strip() else None
+            if c.patch_text.strip() and c.selector.strip() and base:
+                rule = _compose(base, c.selector, c.patch_text)
+            else:
+                rule = _rule(c.rule_text) if c.rule_text.strip() else None
             if rule is None or not c.selector.strip():
                 malformed += 1
                 continue
             cands.append({"rule": rule, "selector": c.selector, "summary": c.summary})
         return cands, {**usage, "malformed": malformed}, cost
+
+
+def _compose(base: list, selector: str, patch: str) -> Optional[list]:
+    """The saved program, then the patch applied only to the selected labels (the later move wins), so nothing outside
+    the selector can change. The same composition the offline enumerator uses."""
+    body = "\n".join("      " + line for line in patch.strip().splitlines())
+    text = f'for o in objects {{\n  if o.kind == "label" {{\n    if {selector} {{\n{body}\n    }}\n  }}\n}}'
+    extra = _rule(text)
+    return None if extra is None else base + extra

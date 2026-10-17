@@ -163,7 +163,9 @@ class AgentB:
                     # the shared layout refusal (spec 7), told to B as A's mechanical feedback: a convention the
                     # person demonstrated that leaves the page or overlaps will not be applied
                     "layout_problem": (
-                        "; ".join(layout_problems(c["rule"], hand_placed(ev.items))[:3]) if kept else ""
+                        "; ".join(layout_problems(c["rule"], hand_placed(ev.items))[:3])
+                        if kept
+                        else ""
                     ),
                 }
             )
