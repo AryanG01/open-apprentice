@@ -230,6 +230,17 @@ class Executor:
                 self.ledger.mark_unknown(attempt)
                 kind = failure_kind(e)
                 terminal = attempt_no == MAX_TRIES or kind not in TRANSIENT
+                if terminal and kind == "truncation" and self.config.tolerate_truncation:
+                    # policy v2: a reply cut at the completion cap is a failed round (its attempt counted, its cost kept
+                    # at worst case), not the end of the session
+                    self._fail(action.action_id, kind, False, f"{type(e).__name__}: {e}")
+                    self.log.append(
+                        "ModelProposalReturned",
+                        "model",
+                        {"action_id": action.action_id, "candidates": [], "malformed": 0,
+                         "usage": {"truncated": True}},
+                    )  # fmt: skip
+                    return
                 self._fail(action.action_id, kind, terminal, f"{type(e).__name__}: {e}")
                 if terminal:
                     return

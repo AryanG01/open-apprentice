@@ -42,6 +42,10 @@ class StepConfig:
     max_probes: int = 128
     question_selection: str = "best"  # "uniform": the system D ablation
     seed: int = 0
+    # policy v2 (post-freeze, Plan 7); both default to the original policy. The spec allows one contradiction revision per
+    # cycle; v2 allows `max_revisions`, and treats a reply cut at the completion cap as an empty round, not a terminal error.
+    max_revisions: int = 1
+    tolerate_truncation: bool = False
 
 
 @dataclass(frozen=True)
@@ -296,9 +300,9 @@ def step(events: list[Event], config: StepConfig) -> Action:
     pool = candidate_pool(events)
     cands, feedback = _filter(pool, ev)
 
-    # rule 2: empty pool -> one contradiction revision per cycle, then abstain
+    # rule 2: empty pool -> up to `max_revisions` contradiction revisions per cycle (spec: one), then abstain
     if not cands:
-        if "revision" not in rounds and attempts < config.max_attempts:
+        if rounds.count("revision") < config.max_revisions and attempts < config.max_attempts:
             return RequestModelProposal(
                 _aid(events, "RequestModelProposal"), "revision", tuple(feedback[-8:])
             )
