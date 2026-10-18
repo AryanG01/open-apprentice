@@ -6,7 +6,7 @@ from fractions import Fraction as F
 import pytest
 
 from open_apprentice.drawio.classify import classify
-from open_apprentice.drawio.parse import DrawioRefused, load_drawio, page_document
+from open_apprentice.drawio.parse import DrawioRefused, load_drawio
 from open_apprentice.drawio.patch import plan_edits
 from open_apprentice.drawio.publish import publish
 from open_apprentice.drawio.scene import build_scene
@@ -46,7 +46,9 @@ def test_diagram_id_cannot_inject_a_second_page_into_the_renderer():
         + model([node("n1", 0, 0)])
         + "</diagram></mxfile>"
     ).encode()
-    with pytest.raises(DrawioRefused):  # unsafe page ids are now refused at load (hardening review M1)
+    with pytest.raises(
+        DrawioRefused
+    ):  # unsafe page ids are now refused at load (hardening review M1)
         load_drawio(raw)
 
 

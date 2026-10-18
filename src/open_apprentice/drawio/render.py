@@ -4,6 +4,7 @@ quantum)."""
 from __future__ import annotations
 
 import base64
+import threading
 from dataclasses import dataclass
 from fractions import Fraction
 from typing import Optional
@@ -65,15 +66,20 @@ def parse_render(body: dict) -> Rendered:
     )
 
 
+MAX_CONCURRENT = 2  # the engine refuses a third simultaneous render with 429; queue here instead
+_SLOTS = threading.BoundedSemaphore(MAX_CONCURRENT)
+
+
 def render_page(
     page: Page, engine_url: str, *, png: bool = True, svg: bool = False, timeout: float = 30.0
 ) -> Rendered:
     try:
-        r = httpx.post(
-            f"{engine_url}/drawio/render",
-            json={"xml": page_document(page), "want_png": png, "want_svg": svg},
-            timeout=timeout,
-        )
+        with _SLOTS:
+            r = httpx.post(
+                f"{engine_url}/drawio/render",
+                json={"xml": page_document(page), "want_png": png, "want_svg": svg},
+                timeout=timeout,
+            )
     except httpx.HTTPError as e:
         raise DrawioRefused(f"the renderer is unavailable ({type(e).__name__})") from e
     try:

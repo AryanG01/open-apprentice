@@ -3,7 +3,9 @@ the session manifest's head pointer is moved to it by compare-and-set. Replay wa
 
 from __future__ import annotations
 
+import threading
 import uuid
+from collections import OrderedDict
 from dataclasses import asdict, dataclass
 from typing import Optional
 
@@ -35,6 +37,11 @@ class Event:
     origin: str
     payload: dict
     caused_by: Optional[str] = None
+
+
+_CHAINS: OrderedDict[str, list[Event]] = OrderedDict()  # head event id (a uuid) -> its whole chain
+_CACHE_LOCK = threading.Lock()
+_CACHE_MAX = 256
 
 
 class SessionLog:
@@ -120,14 +127,30 @@ class SessionLog:
         return ev
 
     def events(self) -> list[Event]:
+        """Events are create-only and the head only moves forward, so a chain read once never changes: walk back from the
+        head only until a head already seen, and reuse the rest."""
         m, _ = self.manifest()
         out: list[Event] = []
         eid = m["head_event_id"]
+        base: list[Event] = []
         while eid is not None:
+            with _CACHE_LOCK:
+                hit = _CHAINS.get(eid)
+                if hit is not None:
+                    _CHAINS.move_to_end(eid)
+            if hit is not None:
+                base = hit
+                break
             b = self.store.get(f"sessions/{self.sid}/events/{eid}.json")
             if b is None:
                 raise RuntimeError(f"committed event {eid} missing")
             d = codec.loads(b.data)
             out.append(Event(**d))
             eid = d["prev_event_id"]
-        return list(reversed(out))
+        chain = base + list(reversed(out))
+        if m["head_event_id"] is not None:
+            with _CACHE_LOCK:
+                _CHAINS[m["head_event_id"]] = chain
+                while len(_CHAINS) > _CACHE_MAX:
+                    _CHAINS.popitem(last=False)
+        return list(chain)

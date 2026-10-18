@@ -9,6 +9,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 import threading
+import uuid
 
 from open_apprentice.api.v2 import identity, records, service, tasks
 from open_apprentice.api.v2.context import V2
@@ -385,7 +386,7 @@ async def post_internal_task(task_id: str, request: Request) -> JSONResponse:
     except ValueError as e:
         return _error(400, "BAD_REQUEST", str(e))
     key = f"tasks/{task_id}.json"
-    claim = records.dumps({"state": "running", "at": int(time.time())})
+    claim = records.dumps({"state": "running", "at": int(time.time()), "nonce": uuid.uuid4().hex})
     if not v.store.create(key, claim):
         b = v.store.get(key)
         d = _json.loads(b.data) if b else {}

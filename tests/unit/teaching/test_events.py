@@ -66,3 +66,29 @@ def test_concurrent_writers_cannot_expose_conflicting_histories(tmp_path):
     with pytest.raises(Conflict):
         b.append("SceneRegistered", "system", {"scene_id": "b"}, expected_revision=rev)
     assert [e.payload["scene_id"] for e in a.events()] == ["a"]
+
+
+def test_repeat_reads_fetch_only_new_events(tmp_path):
+    store = LocalStore(tmp_path)
+    log = SessionLog(store, "s1")
+    log.create(owner="o1")
+    for i in range(5):
+        log.append("SceneRegistered", "system", {"scene_id": str(i)})
+    first = log.events()
+    reads = []
+    real = store.get
+    store.get = lambda k: (reads.append(k), real(k))[1]  # type: ignore[method-assign]
+    assert log.events() == first
+    assert [k for k in reads if "/events/" in k] == []
+    log.append("SceneRegistered", "system", {"scene_id": "x"})
+    reads.clear()
+    assert [e.seq for e in log.events()] == [1, 2, 3, 4, 5, 6]
+    assert len([k for k in reads if "/events/" in k]) == 1
+
+
+def test_event_cache_returns_independent_lists(tmp_path):
+    log = SessionLog(LocalStore(tmp_path), "s1")
+    log.create(owner="o1")
+    log.append("SceneRegistered", "system", {"scene_id": "a"})
+    log.events().clear()
+    assert len(log.events()) == 1

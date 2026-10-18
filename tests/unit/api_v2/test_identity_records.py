@@ -46,3 +46,20 @@ def test_idempotency_replays_and_refuses_a_different_body(tmp_path):
     with pytest.raises(records.IdempotencyConflict):
         records.idempotent(s, "o", "k1", "d2", produce)
     assert records.idempotent(s, "other", "k1", "d2", produce) == {"id": "x"} and len(calls) == 2
+
+
+def test_two_racing_first_requests_do_not_both_produce():
+    """The create record must be unique per caller, or a store that treats identical bytes as 'mine' lets both through."""
+    import tempfile
+    from pathlib import Path
+
+    from open_apprentice.api.v2 import records
+    from open_apprentice.storage.store import LocalStore
+
+    seen = []
+    for name in ("a", "b"):
+        store = LocalStore(Path(tempfile.mkdtemp()) / name)
+        real = store.create
+        store.create = lambda k, data, real=real: (seen.append(data), real(k, data))[1]  # type: ignore[method-assign]
+        records.idempotent(store, "o", "k1", "d", lambda: {"x": 1})
+    assert len(set(seen)) == 2  # same key and digest, different bytes

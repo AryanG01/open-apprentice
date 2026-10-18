@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import uuid
 import json
 import time
 from typing import Callable
@@ -59,7 +60,10 @@ def idempotent(
     for _ in range(600):  # up to ~60 s waiting for an in-flight first request
         b = store.get(k)
         if b is None:
-            if not store.create(k, dumps({"digest": request_digest, "state": "pending"})):
+            pending = {"digest": request_digest, "state": "pending", "nonce": uuid.uuid4().hex}
+            if not store.create(
+                k, dumps(pending)
+            ):  # the nonce keeps a racing twin's bytes from looking like ours
                 continue
             gen = store.get(k).generation  # type: ignore[union-attr]
             return _produce(store, k, request_digest, gen, produce)
