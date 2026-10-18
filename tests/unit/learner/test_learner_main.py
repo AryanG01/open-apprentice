@@ -190,3 +190,33 @@ def test_live_mode_refuses_without_a_live_provider_or_a_cap(tmp_path):
     o, _ = run_learner(tmp_path, ep, mode="live", env=env, extra=[*common, "--cap-usd", "0"])
     assert "cap" in o["reason"]
     assert not (tmp_path / "spend.jsonl").exists()
+
+
+def test_system_a2_runs_offline_to_a_terminal_status_and_is_marked_v2(tmp_path):
+    ep = _ep(lambda e: e.stratum == "catalogue" and not e.clarification_required)
+    o, r = run_learner(tmp_path, ep, system="A2")
+    assert o["system"] == "A2" and o["status"] in ("committed", "abstained"), (
+        o["reason"],
+        r.stderr[-1500:],
+    )
+    assert o["policy_version"] == "v2" and o["question_selection"] == "best"
+
+
+def test_system_d2_is_a2_with_uniform_questions(tmp_path):
+    ep = _ep(lambda e: e.stratum == "sequential" and e.clarification_required)
+    o, _ = run_learner(tmp_path, ep, system="D2")
+    assert (
+        o["system"] == "D2" and o["policy_version"] == "v2" and o["question_selection"] == "uniform"
+    )
+
+
+def test_a2_and_d2_differ_from_a_and_d_only_in_the_two_v2_settings():
+    from open_apprentice.teaching.step import V2_SETTINGS, StepConfig
+
+    assert V2_SETTINGS == {"max_revisions": 3, "tolerate_truncation": True}
+    base = StepConfig(probes=True)
+    v2 = StepConfig(probes=True, **V2_SETTINGS)
+    assert {k for k in vars(base) if getattr(base, k) != getattr(v2, k)} == {
+        "max_revisions",
+        "tolerate_truncation",
+    }

@@ -284,3 +284,14 @@ on the research claim." Entries are append-only; append, never rewrite history.
     Per axis on the 13 (8 ambiguous, 5 unambiguous): `correct` 0.385 (8 committed, 5 of them correct); `held_out` 0.465; `asking` 0.769, i.e. it asked on **all 8 ambiguous** tasks (so `not_confidently_wrong` 1.0) and on 3 of 5 unambiguous ones (over-asking); `economy` 0.28. On the same 13 tasks the scripted policies score correct: never_ask 0.615, always_ask 0.923, calibrated 0.923; those use a symbolic enumerator over the declared grammar and are NOT language-model comparisons.
     Failure modes (the main finding): 5 of 13 tasks ended with neither commit nor abstain, so they scored zero on `correct` for protocol reasons: one badge task repeated a refused `ask` 26 times after the 3-question limit (171k tokens), one spacing task made no tool call, the model called two tools that do not exist (`query`, `submit`), and several tasks burned tokens on invalid commits. Per-task cost ranged from 9k to 171k tokens, so a one-task smoke test (10.8k tokens, $0.015) badly underestimated the average ($0.08).
     **Environment fix made because of this run:** the refusal after the question limit said only "question limit reached (3)"; it now says to stop asking and call commit or abstain. The 13 completed rows were collected with the OLD message, so a rerun with the new message is not comparable with them. Rows: `results/gym_ultra/rows.jsonl`, summary `results/gym_ultra/summary.json` (raw rollouts stay local: they contain full prompts). Not run: Nemotron Super/Nano, the remaining 11 tasks, repeats; nothing here supports a claim about language models in general.
+
+
+## Policy v2 for the apprentice (2026-10-18; Plan 7) — deviation from spec §4 "Allowances per cycle"
+
+The funded final run (`docs/evaluation/final_results.md`) showed A's dominant failure: every proposal rejected after at most
+three proposal rounds, using 2.5 of its 8 allowed attempts. Spec §4 allows "one initial proposal round, at most one
+contrastive round, at most one contradiction revision". **Policy v2 (systems `A2` and `D2`) raises the revision allowance to
+three and treats a reply cut at the completion cap as an empty round instead of a terminal error; nothing else changes**
+(same prompts, same budgets: ≤ 8 attempts, retries counted). It was designed after the final rows were seen, so its
+final-split numbers are post-hoc; the unchanged A, B and D rows stay published. A pre-registered go/no-go rule on development
+episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether it is re-run on the final split.

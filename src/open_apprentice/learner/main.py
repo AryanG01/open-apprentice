@@ -243,6 +243,29 @@ def system_d(ctx: Context) -> None:
     system_a(ctx, config=StepConfig(probes=True, question_selection="uniform", seed=ctx.seed))
 
 
+V2_SETTINGS = {
+    "max_revisions": 3,
+    "tolerate_truncation": True,
+}  # policy v2 (Plan 7), designed after the final rows
+
+
+def system_a2(ctx: Context) -> None:
+    from open_apprentice.teaching.step import V2_SETTINGS, StepConfig
+
+    ctx.result.update(policy_version="v2", question_selection="best")
+    system_a(ctx, config=StepConfig(probes=True, **V2_SETTINGS))
+
+
+def system_d2(ctx: Context) -> None:
+    from open_apprentice.teaching.step import V2_SETTINGS, StepConfig
+
+    ctx.result.update(policy_version="v2", question_selection="uniform")
+    system_a(
+        ctx,
+        config=StepConfig(probes=True, question_selection="uniform", seed=ctx.seed, **V2_SETTINGS),
+    )
+
+
 def system_b(ctx: Context) -> None:
     from open_apprentice.learner.agent_b import AgentB, AgentBudgets, scripted_policy
     from open_apprentice.learner.agent_b_correction import (
@@ -289,9 +312,11 @@ def system_b(ctx: Context) -> None:
 
 SYSTEMS: dict[str, Callable[[Context], None]] = {
     "A": system_a,
+    "A2": system_a2,
     "B": system_b,
     "C": system_c,
     "D": system_d,
+    "D2": system_d2,
 }
 
 
@@ -465,7 +490,7 @@ def run(args: argparse.Namespace) -> dict:
 def cli(argv: Optional[list[str]] = None) -> None:
     p = argparse.ArgumentParser(prog="open_apprentice.learner.main")
     p.add_argument("--episode", required=True)
-    p.add_argument("--system", required=True, choices=["A", "B", "C", "D"])
+    p.add_argument("--system", required=True, choices=["A", "A2", "B", "C", "D", "D2"])
     p.add_argument("--teacher-fds", required=True, help="R,W: inherited pipe ends to the teacher")
     p.add_argument("--mode", default="mock", choices=["mock", "live"])
     p.add_argument("--seed", type=int, default=0)

@@ -79,6 +79,7 @@ class RowV2(Row):
     reason: Optional[str] = None
     correction_policy: Optional[str] = None
     refusal_kind: Optional[str] = None
+    policy_version: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------------------------------- scoring
@@ -440,6 +441,7 @@ def run_episode(
         model=model,
         reason=outcome.get("reason"),
         correction_policy=outcome.get("correction_policy"),
+        policy_version=outcome.get("policy_version"),
     )
 
 

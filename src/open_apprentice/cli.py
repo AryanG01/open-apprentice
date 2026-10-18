@@ -937,8 +937,8 @@ def eval_run(
             raise typer.Exit(int(ExitState.NOT_IMPLEMENTED))
         return
     names = [s.strip() for s in systems.split(",") if s.strip()]
-    if not names or set(names) - {"A", "B", "C", "D"}:
-        raise typer.BadParameter("systems are a comma-separated subset of A,B,C,D")
+    if not names or set(names) - {"A", "A2", "B", "C", "D", "D2"}:
+        raise typer.BadParameter("systems are a comma-separated subset of A,A2,B,C,D,D2")
     run_dir = run_battery(
         split,
         names,

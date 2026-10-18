@@ -160,3 +160,17 @@ def test_report_lists_episodes_the_adapter_refused(tmp_path):
         and "real1" in md
         and "outside the page" in md
     )
+
+
+def test_report_pairs_a2_with_b_and_a_and_labels_it_post_hoc(tmp_path):
+    rows = []
+    for i in range(4):
+        rows += [_row(f"e{i}", "A", "wrong_commit"), _row(f"e{i}", "A2", "correct_complete", policy_version="v2"),
+                 _row(f"e{i}", "B", "correct_complete")]  # fmt: skip
+    (tmp_path / "rows.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+    (tmp_path / "manifest.json").write_text(
+        json.dumps({"run_id": "x", "split": "final", "mode": "live"})
+    )
+    md = report(tmp_path)
+    assert "A2 − B" in md and "A2 − A:" in md
+    assert "post-freeze policy v2 (designed after the final rows were seen)" in md

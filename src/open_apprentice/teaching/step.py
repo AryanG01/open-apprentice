@@ -48,6 +48,12 @@ class StepConfig:
     tolerate_truncation: bool = False
 
 
+V2_SETTINGS = {
+    "max_revisions": 3,
+    "tolerate_truncation": True,
+}  # policy v2 (Plan 7), designed after the final rows
+
+
 @dataclass(frozen=True)
 class WaitForResult:
     action_id: str

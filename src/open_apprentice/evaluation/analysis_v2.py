@@ -106,6 +106,14 @@ def report(run_dir: Path) -> str:
         f"Split `{manifest.get('split')}`, mode `{manifest.get('mode')}`, systems {', '.join(systems)}.",
         "",
     ]
+    have = set(systems)
+    if have & {"A2", "D2"}:
+        out += [
+            "**A2 / D2: post-freeze policy v2 (designed after the final rows were seen).** More revision rounds and "
+            "truncation-tolerant rounds, nothing else; their numbers are post-hoc and are shown next to the unchanged "
+            "A, B and D rows, which stay published.",
+            "",
+        ]
     refused = manifest.get("adapter_refused") or {}
     if refused:
         out += ["## Not run: refused by the draw.io adapter", ""]
@@ -141,8 +149,9 @@ def report(run_dir: Path) -> str:
         "## Primary endpoints",
         "",
     ]
-    pairs = [("A", "B")] if {"A", "B"} <= set(systems) else []
-    pairs += [("A", s) for s in systems if s not in ("A", "B") and "A" in systems]
+    pairs = [("A", "B")] if {"A", "B"} <= have else []
+    pairs += [("A2", b) for b in ("B", "A", "D2") if {"A2", b} <= have]
+    pairs += [("A", s) for s in systems if s not in ("A", "B", "A2", "D2") and "A" in have]
     seq = [r for r in rows if r["stratum"] == "sequential"]
     for name, strata in (
         ("learning success", LEARNING),

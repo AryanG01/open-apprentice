@@ -28,9 +28,11 @@ MAX_COMPLETION_TOKENS = (
 MODEL_ROLES = ("hypotheses", "agent", "agent_b", "correction_scope")
 ATTEMPTS = {
     "A": 8 + 4,
+    "A2": 8 + 4,
     "B": 8 + 4,
     "C": 8 + 4,
     "D": 8 + 4,
+    "D2": 8 + 4,
 }  # learning + one correction cycle (spec 3.7)
 STRATA_ORDER = ("catalogue", "beyond", "inconsistent", "unsupported", "sequential")
 
