@@ -4,6 +4,14 @@ import type { DocumentInfo, PageInfo } from "./types";
 
 type Props = { docs: DocumentInfo[]; setDocs: (f: (d: DocumentInfo[]) => DocumentInfo[]) => void };
 
+/** Owner-authored draw.io diagrams (provenance: docs/corpus/drawio_provenance.md) so a visitor can try the product
+ *  without a file of their own. They go through exactly the same import as an upload. */
+export const SAMPLES = [
+  { file: "training-workflow.drawio", title: "Training workflow" },
+  { file: "checkout-service.drawio", title: "Checkout service" },
+  { file: "microservices.drawio", title: "Microservices" },
+] as const;
+
 export const firstOkPage = (d: DocumentInfo): PageInfo | undefined => d.pages.find((p) => p.status === "ok");
 
 /** Step 1: add .drawio files, wait for the locked engine to render them, confirm which node each label describes. */
@@ -27,6 +35,20 @@ export function ImportMap({ docs, setDocs }: Props) {
     return () => clearInterval(t);
   }, [pending, setDocs]);
 
+  const addSample = async (file: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/samples/${file}`);
+      if (!res.ok) throw new Error(`the sample could not be loaded (HTTP ${res.status})`);
+      const d = await upload<DocumentInfo>("/documents", new File([await res.blob()], file));
+      setDocs((all) => [...all, d]);
+    } catch (e) {
+      setError(`${file}: ${e instanceof ApiError ? e.message : String(e)}`);
+    }
+    setBusy(false);
+  };
+
   const add = async (files: FileList | null) => {
     if (!files) return;
     setBusy(true);
@@ -48,6 +70,15 @@ export function ImportMap({ docs, setDocs }: Props) {
       <label className="file">
         Add .drawio files <input type="file" accept=".drawio,.xml" multiple disabled={busy} onChange={(e) => void add(e.target.files)} />
       </label>
+      <p className="samples">
+        No diagram handy?{" "}
+        {SAMPLES.map((x) => (
+          <button key={x.file} type="button" disabled={busy || docs.some((d) => d.name === x.file)}
+            aria-label={`Try a sample: ${x.title}`} onClick={() => void addSample(x.file)}>
+            {x.title}
+          </button>
+        ))}
+      </p>
       {error ? <p className="err" role="alert">{error}</p> : null}
       <div className="cards">
         {docs.map((d) => (

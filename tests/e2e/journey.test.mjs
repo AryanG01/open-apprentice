@@ -377,4 +377,16 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     }
     await ctx.close();
   });
+  test("a sample diagram imports with one click and renders", async () => {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
+    const page = await ctx.newPage();
+    const problems = [];
+    page.on("pageerror", (e) => problems.push(`pageerror: ${e.message.slice(0, 160)}`));
+    await page.goto(`${API}/#apprentice`, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Try a sample: Checkout service" }).click();
+    await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 1, "the sample rendered");
+    assert.ok(await page.getByRole("heading", { name: "checkout-service.drawio" }).isVisible());
+    assert.deepEqual(problems, []);
+    await ctx.close();
+  });
 });

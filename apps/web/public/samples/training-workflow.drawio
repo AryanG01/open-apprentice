@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="LZlZ-pm35J_h2YK4pyFp">
+    <mxGraphModel dx="894" dy="732" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="500" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-11" edge="1" parent="1" source="SWpWR8rACQ8ULERWOvOb-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="SWpWR8rACQ8ULERWOvOb-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;rotation=0;" value="Dataset" vertex="1">
+          <mxGeometry height="50" width="120" x="60" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-12" edge="1" parent="1" source="SWpWR8rACQ8ULERWOvOb-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="SWpWR8rACQ8ULERWOvOb-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;rotation=0;" value="Preprocess" vertex="1">
+          <mxGeometry height="50" width="120" x="60" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-13" edge="1" parent="1" source="SWpWR8rACQ8ULERWOvOb-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="SWpWR8rACQ8ULERWOvOb-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;rotation=0;" value="Train" vertex="1">
+          <mxGeometry height="50" width="120" x="60" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-14" edge="1" parent="1" source="SWpWR8rACQ8ULERWOvOb-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="SWpWR8rACQ8ULERWOvOb-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;rotation=0;" value="Evaluate" vertex="1">
+          <mxGeometry height="50" width="120" x="60" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;rotation=0;" value="Registry" vertex="1">
+          <mxGeometry height="50" width="120" x="300" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=0;" value="parquet, 2 TB" vertex="1">
+          <mxGeometry height="20" width="103" x="60" y="94" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=0;" value="dedupe + split" vertex="1">
+          <mxGeometry height="20" width="110" x="60" y="234" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=0;" value="8x GPU, 6 h" vertex="1">
+          <mxGeometry height="20" width="89" x="60" y="374" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-9" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=0;" value="warning: drift check" vertex="1">
+          <mxGeometry height="20" width="152" x="60" y="514" as="geometry" />
+        </mxCell>
+        <mxCell id="SWpWR8rACQ8ULERWOvOb-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=0;" value="signed models" vertex="1">
+          <mxGeometry height="20" width="103" x="300" y="514" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

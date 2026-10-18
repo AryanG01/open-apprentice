@@ -397,3 +397,6 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .results .result.blocked, .results .result.failed { border-color: #a40000; }
 .checks { list-style: none; padding-left: 0; }
 .pick { display: block; }
+
+.samples { margin: 0.5rem 0 1rem; }
+.samples button { margin-right: 0.5rem; }
