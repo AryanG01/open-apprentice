@@ -54,14 +54,14 @@ const n = (s) => (String(s).includes("/") ? Number(s.split("/")[0]) / Number(s.s
 const state = (page) => page.locator("[data-state]").getAttribute("data-state");
 
 /** Answer whatever question is open with the first acceptable choice until the session ends. */
-async function answerUntilDone(page) {
+async function answerUntilDone(page, waitMs = 90_000) {
   for (let i = 0; i < 12; i++) {
     const s = await until(async () => {
       const st = await state(page).catch(() => null);
       if (st && TERMINAL.includes(st)) return st;
       if (await page.locator("section.question").count()) return "question";
       return null;
-    }, "a question or the end of the session", 90_000);
+    }, "a question or the end of the session", waitMs);
     if (s !== "question") return s;
     const before = await page.locator("section.question").getAttribute("data-request-id");
     if (await page.locator("fieldset[data-item]").count()) {
@@ -80,7 +80,7 @@ async function answerUntilDone(page) {
       if (st && TERMINAL.includes(st)) return true;
       const now = await page.locator("section.question").getAttribute("data-request-id").catch(() => null);
       return now !== before;
-    }, "the next step after answering", 90_000);
+    }, "the next step after answering", waitMs);
   }
   throw new Error("too many questions");
 }
@@ -285,7 +285,7 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     await until(async () => submit.isEnabled(), "the corrected render to be seen");
     await submit.click();
     await until(async () => (/#apprentice\/s\/[0-9a-f]+/.test(page.url()) && page.url().match(/s\/([0-9a-f]+)/)[1] !== sid), "the correction session");
-    const end = await answerUntilDone(page);
+    const end = await answerUntilDone(page, 300_000); // a live model reply plus a probe render takes minutes
     assert.ok(["activated", "override", "dismissed", "failed"].includes(end), end);
 
     // 9. cancel a fresh session from its first question
@@ -402,6 +402,41 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 1, "the sample rendered");
     assert.ok(await page.getByRole("heading", { name: "checkout-service.drawio" }).isVisible());
     assert.deepEqual(problems, []);
+    await ctx.close();
+  });
+  // Spends real money (about $0.1-0.3): only against a deployment and only when asked for with OA_E2E_LIVE=1.
+  test("one live-model story on a deployment, with the spend recorded", { skip: !(REMOTE && process.env.OA_E2E_LIVE === "1") && "set OA_E2E_URL and OA_E2E_LIVE=1" }, async () => {
+    const health = async () => (await (await fetch(`${API}/health/ready`)).json()).model;
+    const before = await health();
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
+    const page = await ctx.newPage();
+    await page.goto(`${API}/#apprentice`, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Try a sample: Training workflow" }).click();
+    await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 1, "the first sample rendered");
+    await page.getByRole("button", { name: "Try a sample: Checkout service" }).click();
+    await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "both samples rendered");
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole("button", { name: "Confirm mapping" }).first().click();
+      await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === i + 1, `confirmation ${i + 1}`);
+    }
+    await page.getByLabel("Document to edit").selectOption({ label: "training-workflow.drawio" });
+    const d = await docInfo(page, "training-workflow.drawio");
+    const p1 = d.pages.find((p) => p.status === "ok");
+    const scene = await (await page.request.get(`${API}/api/v2/documents/${d.doc_id}/pages/${p1.page_id}/scene?mapping_hash=${p1.mapping_hash}`)).json();
+    await page.waitForSelector("button[data-label]");
+    await placeBelow(page, p1, Object.fromEntries(scene.objects.map((o) => [o.id, o])));
+    const confirm = page.getByRole("button", { name: "This whole document is right" });
+    await until(async () => confirm.isEnabled(), "the draft render to be seen");
+    assert.ok(await page.getByLabel("Use the live model").isEnabled(), "the live model is on offer");
+    await page.getByLabel("Use the live model").check();
+    await confirm.click();
+    await until(async () => /#apprentice\/s\/[0-9a-f]+/.test(page.url()), "the session in the URL");
+    const end = await answerUntilDone(page);
+    assert.ok(["committed", "activated"].includes(end), `the live story ended ${end}`);
+    const after = await health();
+    assert.ok(after.spend_usd > before.spend_usd, `spend recorded: ${before.spend_usd} -> ${after.spend_usd}`);
+    assert.ok(after.spend_usd <= after.cap_usd, "spend stays under the durable cap");
+    console.log(`live story ended ${end}; spend ${before.spend_usd} -> ${after.spend_usd} of cap ${after.cap_usd}`);
     await ctx.close();
   });
 });

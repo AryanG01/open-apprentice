@@ -124,6 +124,18 @@ def ready() -> dict:
             engine_ok = False
         if not engine_ok:
             engine_error = "the graphics engine is not responding (its browser may have crashed); restart the server"
+    # The live cap on a deployment is the v2 storage-backed ledger, shared by every instance and surviving restarts; the
+    # old in-memory counter only meters the earlier badge demo. Report the ledger whenever v2 runs the live model.
+    v2 = getattr(app.state, "v2", None)
+    if v2 is not None and v2.model == "Live":
+        spend, cap, can_start = (
+            float(v2.ledger.exposure()["total"]),
+            float(v2.ledger.cap),
+            bool(v2.live_available()),
+        )
+    else:
+        spend, cap = app.state.spend["usd"], _cap_usd()
+        can_start = p is not None and spend + RESERVE_USD <= cap
     return {
         "engine": engine_ok,
         "engine_error": engine_error,
@@ -136,10 +148,10 @@ def ready() -> dict:
         "model": {
             "available": p is not None,
             # would a NEW live model session be admitted right now (cap headroom for its worst case)?
-            "can_start": p is not None and app.state.spend["usd"] + RESERVE_USD <= _cap_usd(),
+            "can_start": can_start,
             "id": getattr(p, "requested_model", "") if p else "",
-            "spend_usd": round(app.state.spend["usd"], 4),
-            "cap_usd": _cap_usd(),
+            "spend_usd": round(spend, 4),
+            "cap_usd": cap,
             "error": app.state.model_error,
         },
     }

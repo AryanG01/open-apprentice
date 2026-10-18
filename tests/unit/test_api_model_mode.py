@@ -188,3 +188,32 @@ def test_ready_says_whether_a_new_live_session_would_be_admitted(client, monkeyp
     app.state.spend["usd"] = 1.2  # within the cap, but no room for a whole new session's worst case
     ready = client.get("/health/ready").json()["model"]
     assert ready["available"] is True and ready["can_start"] is False
+
+
+def test_health_reports_the_durable_v2_ledger_when_the_live_model_is_v2(client):
+    """On a deployment the live cap is the storage-backed ledger; /health/ready used to show the old in-memory counter
+    (always $0), so a judge looking at it saw no spend while real money was going out."""
+    from fractions import Fraction
+
+    from open_apprentice.api.app import app
+    from open_apprentice.storage.store import LocalStore
+    from open_apprentice.teaching.accounting import Ledger
+
+    import tempfile
+
+    store = LocalStore(tempfile.mkdtemp())
+    ledger = Ledger(store, Fraction(5))
+    ledger.reserve("a1", "act", Fraction(1, 5))
+    ledger.dispatched("a1")
+    ledger.settle("a1", Fraction(27, 250))  # $0.108
+    v2 = app.state.v2
+    saved = (v2.model, v2.ledger, v2.worst_usd, v2.live_available)
+    v2.model, v2.ledger, v2.worst_usd = "Live", ledger, Fraction(1, 5)
+    v2.live_available = lambda: ledger.exposure()["total"] + v2.worst_usd <= ledger.cap
+    try:
+        m = client.get("/health/ready").json()["model"]
+        assert m["spend_usd"] == 0.108 and m["cap_usd"] == 5.0 and m["can_start"] is True
+        ledger.cap = Fraction(3, 10)  # headroom for one more worst-case call is gone
+        assert client.get("/health/ready").json()["model"]["can_start"] is False
+    finally:
+        v2.model, v2.ledger, v2.worst_usd, v2.live_available = saved
