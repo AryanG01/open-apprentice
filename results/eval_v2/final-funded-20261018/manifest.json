@@ -1,0 +1,30 @@
+{
+ "run_id": "final-funded-20261018",
+ "split": "final",
+ "mode": "live",
+ "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+ "systems": [
+  "A",
+  "B",
+  "D"
+ ],
+ "repeats": 3,
+ "approved_manifests": [
+  "e4ea884834edb06a",
+  "0927857b4f1ea46b"
+ ],
+ "runs": {
+  "AB": "cal-e4ea884834edb06a-20261017T192049",
+  "D": "cal-0927857b4f1ea46b-20261017T185133"
+ },
+ "spent_usd": 41.384,
+ "coverage": "240/240",
+ "stopped": null,
+ "scoring_version": "score-v2.2",
+ "adapter_refused": {
+  "ea8e1486ac8": "cell 'btscb2uyhEqkDoFNjr_6-9' lies outside the page (0, 0, 700, 450); release 1 edits only inside it",
+  "e8d706a6917": "cell 'btscb2uyhEqkDoFNjr_6-9' lies outside the page (0, 0, 700, 450); release 1 edits only inside it",
+  "e74e24dfbc3": "cell 'btscb2uyhEqkDoFNjr_6-9' lies outside the page (0, 0, 700, 450); release 1 edits only inside it"
+ },
+ "note": "A and B x 3 on the 36 synthetic final episodes (216 runs) and D x 3 on 8 clarification-required episodes (24 runs); the 3 real-file episodes were refused by the draw.io adapter and not run."
+}
