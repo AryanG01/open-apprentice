@@ -19,14 +19,18 @@ Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-igno
 `docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
 systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offline dry run
 (`results/eval_v2/dryrun-20261016/report.md`, not a model result), and the paid-run gate. Suite 945 on 3.13 and 3.12.
-**Production cutover staged 2026-10-18 (traffic NOT moved):** image `demo:prod-590c34f` (master `590c34f`); bucket `oa-prod-46697f`
-(versioned, no expiry), queue `oa-prod`, service account `oa-prod@…`; revisions `open-apprentice-00005-qiw` (tag `candidate`,
-task target = its tag URL) and `00006-maz` (tag `final`, task target = the main URL, durable cap $5). **Live traffic is still
-100% on `open-apprentice-00002-8lx` (the old badge build) = the rollback target.** The full browser journey passed against the
-candidate (Cloud Tasks + GCS + engine). To cut over: `gcloud run services update-traffic open-apprentice --project
-oa-demo-1013-19737 --region us-central1 --to-revisions open-apprentice-00006-maz=100` (and `--min-instances 1` for the judging
-window); then run `OA_E2E=1 OA_E2E_URL=https://open-apprentice-md76de375q-uc.a.run.app node --test tests/e2e/journey.test.mjs`.
-Rollback: `… update-traffic … --to-revisions open-apprentice-00002-8lx=100`.
+**PRODUCTION IS LIVE with the new product (2026-10-18).** https://open-apprentice-md76de375q-uc.a.run.app now serves revision
+`open-apprentice-00008-keq` (image `demo:prod-f4c1457`, master `f4c1457`) at 100% of traffic, min 1 / max 3 instances, bucket
+`oa-prod-46697f`, queue `oa-prod`, durable live cap $5 in the storage-backed ledger (also shown in `/health/ready`). **Rollback
+(one command, instant, data untouched):** `gcloud run services update-traffic open-apprentice --project oa-demo-1013-19737
+--region us-central1 --to-revisions open-apprentice-00002-8lx=100` (the old badge build; `00006-maz` is the previous new-product
+revision). The full browser journey passes against the public URL (`OA_E2E=1 OA_E2E_URL=<url> node --test
+tests/e2e/journey.test.mjs`; add `OA_E2E_LIVE=1` for the one paid live story, about $0.1-0.3). **Honest live finding:** one live
+story ended `failed` (the apprentice abstained: "unresolved disagreement" after two proposal rounds), so a live demo can fail
+on any take; the labelled recording is the fallback, and a recorded video should say so. **Known quirks:** a skill polled the
+instant its session commits can 404 once (the page retries); the SGD 1 budget alert (billing account 019589-14D134-77B39F)
+still emails at about US$0.75: raise it in the console (Billing > Budgets & alerts) to about SGD 20, I cannot (billing API
+not enabled for the CLI). **Not yet done:** the demo video, the written four-axis report/README polish.
 
 **Funded tier ran 2026-10-17/18 on the frozen final battery** (`docs/evaluation/final_results.md`): 240 live runs, $41.4 ledger
 (about $46.8 real), 0 boundary violations. **A did not beat B on either primary endpoint** (learning 22/48 vs 28/48;
