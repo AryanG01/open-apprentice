@@ -444,6 +444,8 @@ def run(args: argparse.Namespace) -> dict:
         if live:
             ctx.factory, ctx.worst = live, LIVE_WORST_USD
         ctx.result = result
+        if args.system in ("A2", "D2"):
+            result["policy_version"] = "v2"  # also on runs that stop before the policy starts
         reason = _unsupported(episode)
         if reason:
             log = open_learning_log(ctx)

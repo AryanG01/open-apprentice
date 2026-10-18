@@ -259,3 +259,12 @@ def test_d_runs_on_the_catalogue_clarification_episodes_plus_the_first_sequentia
     ]
     eps += [{"id": "b0", "stratum": "beyond", "clarification_required": False}]
     assert d_episode_ids(eps) == ["c0", "c1", "c2", "c3", "s01", "s02", "s03", "s05"]
+
+
+def test_policy_v2_systems_are_priced_from_their_base_system_with_more_calls():
+    from open_apprentice.evaluation.manifests_v2 import V2_CALL_FACTOR, _estimate
+
+    tokens = {"per_system": {"A": {"attempts_mean": 2.0}, "D": {"attempts_mean": 2.0}}}
+    calls, usd = _estimate({"A": 10, "A2": 10, "D2": 5}, tokens, 0.05)
+    assert calls == round(10 * 2.0 + 10 * 2.0 * V2_CALL_FACTOR + 5 * 2.0 * V2_CALL_FACTOR, 2)
+    assert usd == round(calls * 0.05, 4) and V2_CALL_FACTOR > 1

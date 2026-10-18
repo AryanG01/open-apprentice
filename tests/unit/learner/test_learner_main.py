@@ -220,3 +220,9 @@ def test_a2_and_d2_differ_from_a_and_d_only_in_the_two_v2_settings():
         "max_revisions",
         "tolerate_truncation",
     }
+
+
+def test_an_early_refusal_still_carries_the_policy_version(tmp_path):
+    ep = _ep(lambda e: e.meta.get("subtype") == "unsupported_structure")
+    o, _ = run_learner(tmp_path, ep, system="A2")
+    assert o["status"] == "abstained" and o["policy_version"] == "v2"

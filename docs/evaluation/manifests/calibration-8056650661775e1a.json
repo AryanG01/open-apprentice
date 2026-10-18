@@ -1,0 +1,67 @@
+{
+ "approved": false,
+ "attempt_ceilings": {
+  "A2": 12
+ },
+ "budget_at_writing": {
+  "ceiling_fits": true,
+  "remaining_usd": 5.3952,
+  "spendable_usd": 90.36,
+  "spent_usd": 84.9648
+ },
+ "ceiling_usd": 4.5,
+ "establishes": "prompt and parse viability for A and B and the cost per episode on development episodes; not an A-versus-B result",
+ "estimate_basis": "dry-run mean attempts per episode x $0.0398 per call (mean of earlier live teaching calls in spend.jsonl); the fixture B stops early, so B's share is a lower bound",
+ "estimate_calls": 52.27,
+ "estimate_usd": 2.0802,
+ "expected_coverage": 1.0,
+ "kind": "calibration",
+ "manifest_id": "8056650661775e1a",
+ "note": "Plan 7 stage 1: policy v2 (A2) on 14 development episodes; pre-registered rule: >= 6/8 learning success on catalogue+beyond and <= 1 wrong commit",
+ "protected_reserve_usd": 10.0,
+ "repeats": 1,
+ "runs": 14,
+ "split": "dev",
+ "stop_conditions": {
+  "boundary_violation": "any information-boundary violation stops the run and is reported",
+  "global_ceiling": "SpendGuard stops when the shared spend would pass min(authorized, funded) - reserve",
+  "run_cap": "SpendGuard stops the run when the next call's worst case would pass --cap-usd"
+ },
+ "systems": [
+  "A2"
+ ],
+ "task_ids": [
+  "e88727066d3",
+  "eb33f9716f9",
+  "e3593b0aec5",
+  "e79c145bad5",
+  "e5a01549872",
+  "e7cd70b2ba8",
+  "ef3c47b95b1",
+  "e5b3fceadac",
+  "e9bacad414c",
+  "e6ab691b80f",
+  "ee894d854af",
+  "ea9778a73fb",
+  "ee519fbf496",
+  "e41d8ce1132"
+ ],
+ "task_strata": [
+  "catalogue",
+  "catalogue",
+  "catalogue",
+  "catalogue",
+  "beyond",
+  "beyond",
+  "beyond",
+  "beyond",
+  "sequential",
+  "sequential",
+  "sequential",
+  "sequential",
+  "sequential",
+  "sequential"
+ ],
+ "worst_case_per_attempt_usd": 0.192,
+ "worst_case_total_usd": 32.256
+}

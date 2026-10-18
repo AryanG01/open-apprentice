@@ -61,9 +61,20 @@ def measured_call_usd(budget_root: Path = BUDGET_ROOT) -> float:
     return round(sum(usd) / len(usd), 4) if usd else 0.0
 
 
+V2_CALL_FACTOR = 1.6  # policy v2 (A2, D2) makes more proposal calls than A and D: estimated, replaced by measurement
+
+
+def _attempts(tokens: dict, system: str) -> float:
+    """Mean attempts per episode of a system; A2 and D2 are priced from A and D with V2_CALL_FACTOR more calls."""
+    per = tokens["per_system"]
+    if system in per:
+        return per[system]["attempts_mean"]
+    return per[system.rstrip("2")]["attempts_mean"] * V2_CALL_FACTOR
+
+
 def _estimate(counts: dict[str, int], tokens: dict, call_usd: float) -> tuple[float, float]:
     """(expected calls, dollars): runs x the dry run's mean attempts per episode x the measured cost per call."""
-    calls = sum(n * tokens["per_system"][s]["attempts_mean"] for s, n in counts.items())
+    calls = sum(n * _attempts(tokens, s) for s, n in counts.items())
     return round(calls, 2), round(calls * call_usd, 4)
 
 
