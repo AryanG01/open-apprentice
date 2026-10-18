@@ -19,7 +19,7 @@ and offers the offline learner; it never silently downgrades. The first request 
 
 ## How well does it work? (read before judging)
 
-Frozen, pre-registered battery (36 synthetic label-placement episodes, 3 repeats, live Nemotron, 240 runs, $41 of model spend), scored by an
+Frozen, pre-registered battery (36 synthetic label-placement episodes, 3 repeats, live Nemotron, 240 runs, about $47 of real model spend), scored by an
 independent oracle on documents the learner never saw. The learner runs in an isolated process that cannot read the private manifests
 (0 boundary violations). Full tables, intervals and failure analysis: [`docs/evaluation/final_results.md`](docs/evaluation/final_results.md).
 
