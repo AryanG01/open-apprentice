@@ -1,21 +1,71 @@
 # Open Apprentice
 
-**Teach a layout rule once. It asks when it is unsure, reuses the rule across graphics backends, and repairs only the part that broke.**
+**Teach a visual layout rule by demonstration on a real `.drawio` file. It asks when your example is ambiguous, applies the rule to other documents through checked edits, and takes corrections.**
 
-You show it one example, such as a badge in a card's top-right corner. Several different rules fit that example equally well, so Open Apprentice
-finds an input where they disagree, draws each outcome, and asks you which one you meant. The rule you pick is sealed with a hash. It is then
-carried to a second graphics engine (Konva to Fabric) through a checked native procedure. When the tool underneath changes silently, the
-mismatch is reproduced with real numbers and **only the native procedure is repaired. Your rule and its hash do not change.**
+You move a few labels to where they belong on one diagram. Several different rules usually fit that example, so Open Apprentice finds a
+case where they disagree, renders each outcome and asks which one you meant. The agreed rule becomes a versioned skill. You preview it on other
+documents (a result that would break a layout is shown as blocked and cannot be approved), apply it, download the edited `.drawio`, and correct
+any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and four independent checks gate every publish.
 
-Built for the Nebius x NVIDIA Global AI Hackathon. Models: NVIDIA Nemotron through Nebius Token Factory (live runs); everything else runs offline.
+Built for the Nebius x NVIDIA Global AI Hackathon. Live model: NVIDIA Nemotron-3-Ultra through Nebius Token Factory. Everything else runs offline.
 
 ## Live demo
 
-**https://open-apprentice-664860383135.us-central1.run.app** (Google Cloud Run). Open *Try it live*: the default learner is **NVIDIA Nemotron-3-Ultra called live through Nebius Token Factory**,
-and "Watch the story with live Nemotron" runs the whole flow in about 90 seconds (teach, reuse on Konva and Fabric, silent tool change, repair, stress test), all checked on real graphics engines.
-Each visitor gets a few live sessions per hour under a global dollar cap; when the cap is reached the page offers a clearly labelled recording of an earlier real run instead. The first request after the
-service has been idle can be slow while the instance starts. A free static copy (no live engine) is at https://huggingface.co/spaces/AryanG01/open-apprentice-static.
-Hosting, cost guard and a known limitation (the dollar cap resets when the instance restarts) are in `docs/deploy.md`, section 4.
+**https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
+Open *Apprentice*, press **Try a sample** (three owner-authored diagrams) or upload a `.drawio` file, confirm which node each label describes, and teach.
+The default learner is Nemotron called live; a session and every run states `Model: … · Teacher: …`. Live use runs under a **durable** dollar cap
+(`DEMO_MODEL_MAX_USD`, shared by all instances and surviving restarts) and 3 live sessions per visitor per hour. When the cap is reached the page says so
+and offers the offline learner; it never silently downgrades. The first request after idle can take a few seconds.
+
+## How well does it work? (read before judging)
+
+Frozen, pre-registered battery (36 synthetic label-placement episodes, 3 repeats, live Nemotron, 240 runs, $41 of model spend), scored by an
+independent oracle on documents the learner never saw. The learner runs in an isolated process that cannot read the private manifests
+(0 boundary violations). Full tables, intervals and failure analysis: [`docs/evaluation/final_results.md`](docs/evaluation/final_results.md).
+
+| Question | Apprentice (A) | Same model acting freely (B) |
+|---|---|---|
+| Learns the rule (16 episodes x 3) | 22/48 | 28/48 |
+| Corrects a wrong result end to end (12 x 3) | 18/36 | 22/36 |
+| Refuses when the task is inconsistent or unsupported | **18/24** | 9/24 |
+| Surfaces a conflicting demonstration | **12/12** | 6/12 |
+| Ambiguous demonstrations (must ask) | **2/12** | 0/12 |
+| Identifiable rules (no question needed) | 7/12 | **12/12** |
+| Cost per run | **$0.17** | $0.26 |
+| Wrong commits (of 108 runs each) | 3 | 3 |
+
+**What this says, honestly.**
+- The hypothesis that the asking policy beats the same model acting freely is **not supported**: both primary endpoints point to B and neither differs from zero.
+- The apprentice wins where stopping matters (conflicting or unsupported demonstrations, ambiguous ones, cost). It loses on easy identifiable rules because it gives up after its
+  proposal rounds where B just proposes again. 94.5% of the programs it committed were correct on fresh documents, so it is not safer per commit, only more willing to abstain.
+- A second policy (v2: more revision rounds) was tried with a rule fixed in advance on the development split, did not meet it, and was **not adopted** ([`docs/evaluation/policy_v2_dev_check.md`](docs/evaluation/policy_v2_dev_check.md)).
+- Scope: one synthetic task family (label placement), one model, small n. The 3 real-file episodes could not be run (the product's adapter refuses the frozen file), so there is no
+  held-out real-file generalisation result. The live product can and does abstain.
+- The four evidence axes (intent, symbolic, native, held-out) are reported separately everywhere; there is no combined score or single "Verified" badge.
+
+## Run it locally
+
+```bash
+uv sync                                   # Python 3.12 (the project and image target 3.12)
+npm ci && npx playwright install chromium # the engine renders real draw.io in a locked headless Chromium
+npm run build:web
+uv run uvicorn open_apprentice.api.app:app --port 8000     # http://localhost:8000
+```
+
+No key is needed: without `DEMO_MODEL_ENABLED=1` the offline learner is used and nothing is spent. For the live model copy `.env.example` to `.env`, add `NEBIUS_API_KEY`,
+and start with `DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=5`. Deployment, rollback and cost controls: `docs/deploy.md`, `docs/HANDOFF.md`.
+
+```bash
+uv run pytest tests/unit tests/integration tests/contracts tests/evaluation   # OA_ENGINE_TESTS=1 for the real-engine tests
+uv run lint-imports                                                           # the agent never imports the evaluator
+npm test -w services/engine && npm run build:web && npm run test:e2e          # browser journeys (real Chromium)
+uv run oa eval report --help                                                  # rebuild the evaluation report from stored rows
+```
+
+## Earlier work in this repository
+
+The sections below describe the earlier badge/Konva-Fabric prototype, the NeMo Gym environment and the label-program research line. They are still true of the code
+they describe but are not the current product.
 
 ## Also in this repository: a NeMo Gym environment
 
