@@ -1,0 +1,15 @@
+{
+ "run_id": "cal-8056650661775e1a-20261018T183639",
+ "split": "dev",
+ "mode": "live",
+ "model": "nvidia/Nemotron-3-Ultra-550b-a55b",
+ "systems": [
+  "A2"
+ ],
+ "repeats": 1,
+ "approved_manifest": "8056650661775e1a",
+ "cap_usd": 4.5,
+ "coverage": "9/14",
+ "stopped": "stopped by hand after the 8 learning episodes: the pre-registered rule could no longer be met",
+ "note": "policy v2 (A2) dev check; verdict: rule not met (5/8 learning success, 1 wrong commit)"
+}
