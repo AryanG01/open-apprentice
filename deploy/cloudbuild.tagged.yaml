@@ -1,0 +1,11 @@
+# Build the demo image under a pinned tag (never :latest): gcloud builds submit --config deploy/cloudbuild.tagged.yaml
+#   --substitutions _TAG=prod-<commit> --project <project> --region us-central1 .
+# Cloud Run revisions pin an image digest, so pushing a new tag never changes what is running.
+substitutions:
+  _TAG: "dev"
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "docker/demo.Dockerfile", "-t", "us-central1-docker.pkg.dev/$PROJECT_ID/oa/demo:${_TAG}", "."]
+images:
+  - us-central1-docker.pkg.dev/$PROJECT_ID/oa/demo:${_TAG}
+timeout: 3000s

@@ -11,7 +11,7 @@ node_modules/
 dist/
 apps/web/dist/
 results/
-benchmarks/final/
+benchmarks/
 **/__pycache__/
 *.pyc
 .pytest_cache/
@@ -30,3 +30,5 @@ tests/fixtures/drawio_corpus/*
 .hypothesis/
 .claude/
 .github/
+skills-lock.json
+.import_linter_cache/
