@@ -19,14 +19,15 @@ Frozen battery (36 final + 18 dev, battery-v2.3; final private files in git-igno
 `docs/evaluation/battery_final.md`), isolated learner process (teacher over inherited pipes; import/file/spawn audit hook),
 systems A/B/C/D, scoring, analysis (`oa eval freeze|run|report|manifest`), offline dry run
 (`results/eval_v2/dryrun-20261016/report.md`, not a model result), and the paid-run gate. Suite 945 on 3.13 and 3.12.
-**Plan 6 (merged to master 2026-10-17, not pushed; reviewed; 1021 tests on 3.13 and 3.12):** correction scopes without constants,
-a shared layout refusal, a clean battery (battery-v2.5, re-frozen before any final run), B's own correction cycle,
-real-file episodes (with a batch and hash checks), parallel gated final runs, cross-process spend reservations
-(`docs/evaluation/plan6_rulings.md`). Live results: `docs/evaluation/calibration_results.md` (A and B viable; first live
-correction success; the layout refusal works for A). Two fixes landed after the last live check and are NOT yet verified
-live: B's layout feedback and the scope proposer's tree-built patch. **Next:** a small live re-check (~$1, cap $1.25), then
-the funded tier as two manifests (`oa eval manifest --funded`; the owner approves them), then the demo (production still
-runs the old badge build). Budget: authorized $90 (raise to $110 for the funded run), reserve $10, ~$37 spendable.
+**Funded tier ran 2026-10-17/18 on the frozen final battery** (`docs/evaluation/final_results.md`): 240 live runs, $41.4, 0
+boundary violations. **A did not beat B on either primary endpoint** (learning 22/48 vs 28/48; correction 18/36 vs 22/36,
+neither distinguishable from zero). A is cheaper ($0.17 vs $0.26 per run), refuses conflicting/unsupported cases far more
+often (18/24 vs 9/24) and wins the ambiguous catalogue episodes 2/12 vs 0/12 (small n); B wins identifiable rules (12/12 vs
+7/12). A's failure is running out of proposal rounds (3 of its 8 attempts); 10 A runs hit provider truncation. The 3
+real-file episodes were not run (the adapter refuses the frozen final file). Spent $84.96 of $95.77; ~$0.8 spendable above
+the $10 reserve; balance ~$10.8. **Open decisions:** whether to build A's policy v2 (more proposal rounds with mechanical
+feedback, truncation handling), dev-check it (~$3) and re-run A on the final split as a new version (~$20, needs a top-up);
+the production cutover (`docs/deploy_production_proposal.md`, awaiting approval); the demo video.
 master is 26 commits ahead of origin (not pushed).
 
 **Money:** `results/redesign/budget.json` = $50 authorized, $10 reserve; about $38.60 already spent → about **$1.40 spendable**.
