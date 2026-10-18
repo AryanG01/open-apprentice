@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import uuid
+from open_apprentice.concepts.rules import RuleError, parse_rational
 from fractions import Fraction
 from typing import Any, Optional
 
@@ -245,8 +246,8 @@ def page_scene(
 
 def _boxes(raw: dict[str, Any]) -> dict[str, tuple[Fraction, Fraction]]:
     try:
-        return {k: (Fraction(str(v[0])), Fraction(str(v[1]))) for k, v in raw.items()}
-    except (ValueError, TypeError, IndexError, ZeroDivisionError) as e:
+        return {k: (parse_rational(str(v[0])), parse_rational(str(v[1]))) for k, v in raw.items()}
+    except (RuleError, AttributeError, TypeError, IndexError) as e:
         raise Conflict("BAD_BOXES", f"label positions must be [x, y] numbers ({e})") from e
 
 

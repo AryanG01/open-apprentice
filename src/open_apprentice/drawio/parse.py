@@ -4,6 +4,7 @@ fetches or evaluates anything: it only reads bytes with expat and returns page m
 from __future__ import annotations
 
 import base64
+import re
 import hashlib
 import urllib.parse
 import xml.parsers.expat as expat
@@ -13,6 +14,9 @@ from html.parser import HTMLParser
 from typing import Optional
 
 MAX_UPLOAD = 2 * 1024 * 1024
+MAX_PAGES = 20
+MAX_TOTAL_DECODED = 8 * 1024 * 1024
+PAGE_ID = re.compile(r"[A-Za-z0-9_-]{1,64}")
 MAX_DECODED = 4 * 1024 * 1024
 MAX_DEPTH = 32
 MAX_CELLS = 2000
@@ -293,8 +297,20 @@ def load_drawio(raw: bytes) -> DrawioFile:
     if "encoding=" in decl and "utf-8" not in decl:
         raise DrawioRefused("the file declares a non-UTF-8 encoding")
     pages = []
+    seen: set[str] = set()
+    total = 0
     for i, (pid, name, compressed, s, e) in enumerate(_diagrams(raw)):
+        if i >= MAX_PAGES:
+            raise DrawioRefused(f"the file has more than {MAX_PAGES} pages")
+        if not PAGE_ID.fullmatch(pid) or pid in seen:
+            raise DrawioRefused(
+                "a page id is missing, duplicated or not made of letters, digits, - and _"
+            )
+        seen.add(pid)
         xml = _decode(raw[s:e]) if compressed else raw[s:e]
+        total += len(xml)
+        if total > MAX_TOTAL_DECODED:
+            raise DrawioRefused("the pages decode to more than 8 MB in total")
         model, cells = _cells(xml)
         pages.append(Page(i, pid, name, compressed, xml, (s, e), model, cells))
     return DrawioFile(raw, hashlib.sha256(raw).hexdigest(), tuple(pages))

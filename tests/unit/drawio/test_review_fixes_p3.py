@@ -46,10 +46,8 @@ def test_diagram_id_cannot_inject_a_second_page_into_the_renderer():
         + model([node("n1", 0, 0)])
         + "</diagram></mxfile>"
     ).encode()
-    page = load_drawio(raw).pages[0]
-    doc = load_drawio(page_document(page).encode())
-    assert len(doc.pages) == 1
-    assert [c.id for c in doc.pages[0].cells] == [c.id for c in page.cells]
+    with pytest.raises(DrawioRefused):  # unsafe page ids are now refused at load (hardening review M1)
+        load_drawio(raw)
 
 
 def test_benign_ampersand_in_page_id_still_renders_as_one_page():
@@ -58,7 +56,8 @@ def test_benign_ampersand_in_page_id_still_renders_as_one_page():
         + model([node("n1", 0, 0)])
         + "</diagram></mxfile>"
     ).encode()
-    assert len(load_drawio(page_document(load_drawio(raw).pages[0]).encode()).pages) == 1
+    with pytest.raises(DrawioRefused):
+        load_drawio(raw)
 
 
 def test_userobject_placeholder_attributes_are_checked_like_labels():

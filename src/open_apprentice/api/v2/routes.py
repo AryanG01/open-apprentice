@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, FastAPI, Request, Response
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 import threading
@@ -152,7 +153,7 @@ async def post_document(
     raw = await request.body()
     if len(raw) > MAX_UPLOAD:
         raise DrawioRefused(f"the file is {len(raw)} bytes; the limit is 2 MB")
-    return service.import_document(_v2(request), who, name, raw)
+    return await run_in_threadpool(service.import_document, _v2(request), who, name, raw)
 
 
 @router.get("/documents/{doc_id}")

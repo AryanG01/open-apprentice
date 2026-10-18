@@ -20,6 +20,7 @@ The concrete evaluator accepts variable*variable (`mul`); the SYMBOLIC compiler 
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from fractions import Fraction
 from typing import Any
 
@@ -46,11 +47,26 @@ class RuleError(Exception):
     """Malformed or unsupported rule/program. Never silently repaired."""
 
 
+RATIONAL = re.compile(
+    r"-?\d{1,18}(\.\d{1,18}|/\d{1,18})?"
+)  # no exponents: Fraction("1e9999999") never returns
+MAX_BITS = 256
+
+
 def parse_rational(s: str) -> Fraction:
+    if not isinstance(s, str) or not RATIONAL.fullmatch(s):
+        raise RuleError(f"bad rational {s!r}")
     try:
         return Fraction(s)
-    except (ValueError, ZeroDivisionError) as e:
+    except ZeroDivisionError as e:
         raise RuleError(f"bad rational {s!r}") from e
+
+
+def _cap(x: Fraction) -> Fraction:
+    """Statement counting does not bound number size: repeated squaring doubles the digits each step."""
+    if x.numerator.bit_length() > MAX_BITS or x.denominator.bit_length() > MAX_BITS:
+        raise RuleError("a number in the rule grew too large")
+    return x
 
 
 def validate_rule(body: list) -> None:
@@ -278,15 +294,15 @@ class _Run:
             }[op]
         x, y = _num(x), _num(y)
         if op == "add":
-            return x + y
+            return _cap(x + y)
         if op == "sub":
-            return x - y
+            return _cap(x - y)
         if op == "mul":
-            return x * y
+            return _cap(x * y)
         if op == "div":
             if y == 0:
                 raise RuleError("division by zero")
-            return x / y
+            return _cap(x / y)
         raise RuleError(f"unknown op {op!r}")
 
     def block(self, stmts: list) -> None:
