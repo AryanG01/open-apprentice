@@ -48,7 +48,7 @@ Reference mode needs nothing else. To enable Nemotron mode (optional, capped), a
 Cost: host $0; reference mode $0; Nemotron mode is bounded by `DEMO_MODEL_MAX_USD` (measured $0.09-0.28 per full session). Unverified until the first real build: Space build memory limits and Chromium behaviour on Hugging Face's runtime. The static Vercel build remains the fallback link.
 
 ## Behind a proxy (Cloud Run, a load balancer)
-- Per-visitor rate limits use the client address. Behind a proxy every request arrives from the proxy's address, so all visitors would share one budget. uvicorn already honours `X-Forwarded-For`, but only from addresses listed in `FORWARDED_ALLOW_IPS` (default `127.0.0.1`). Set it to the proxy's address range at deploy time. Avoid `*` unless the service can only be reached through the proxy: with `*` a direct client can fake its address and bypass the per-visitor limit. The global spend cap (`DEMO_MODEL_MAX_USD`) is the real protection either way.
+- Per-visitor rate limits key on the rightmost `X-Forwarded-For` entry (the address Cloud Run's front end appended, which a visitor cannot choose), not on `FORWARDED_ALLOW_IPS`; the limiter is in memory per instance, so the global spend cap (`DEMO_MODEL_MAX_USD`) is the real protection.
 - Teaching sessions live in memory: run a single instance (`--max-instances=1` on Cloud Run) or requests for a session can land on another instance and 404.
 - Memory: measured ~335 MiB peak for one visitor (section 3); allow 1-2 GiB for several. CPU: no longer changes results (decisions #51) but sets speed; 1 vCPU recommended.
 

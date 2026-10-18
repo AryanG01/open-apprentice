@@ -93,6 +93,14 @@ def _v2(request: Request) -> V2:
     return v
 
 
+def client_key(request: Request) -> str:
+    """Rate-limit key. Cloud Run's front end appends the real client address to X-Forwarded-For, so the RIGHTMOST entry is
+    the one a visitor cannot choose; the leftmost is whatever they sent."""
+    xff = request.headers.get("x-forwarded-for", "")
+    last = xff.rsplit(",", 1)[-1].strip()
+    return last or (request.client.host if request.client else "?")
+
+
 def owner(request: Request, response: Response) -> str:
     v = _v2(request)
     who = identity.verify(request.cookies.get(identity.COOKIE), v.secret)
@@ -103,7 +111,8 @@ def owner(request: Request, response: Response) -> str:
             identity.sign(who, v.secret),
             httponly=True,
             samesite="lax",
-            secure=request.url.scheme == "https",
+            secure=request.url.scheme == "https"
+            or request.headers.get("x-forwarded-proto") == "https",
             max_age=30 * 24 * 3600,
         )
     return who
@@ -221,9 +230,7 @@ def post_session(
     request: Request, body: dict = Body(default={}), who: str = Depends(owner)
 ) -> dict:
     v = _v2(request)
-    if body.get("live") and not v.live_limiter.allow(
-        request.client.host if request.client else "?"
-    ):
+    if body.get("live") and not v.live_limiter.allow(client_key(request)):
         raise RateLimited(
             "too many live sessions from this address; try again later or use the offline learner"
         )
