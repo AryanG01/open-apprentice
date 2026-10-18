@@ -13,7 +13,10 @@ import { chromium } from "playwright";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const PORT = Number(process.env.OA_E2E_JOURNEY_PORT ?? 8767);
-const API = `http://127.0.0.1:${PORT}`;
+// OA_E2E_URL points the journey at an already running deployment (a Cloud Run candidate): no local server, and the
+// offline learner is used, so it costs nothing. Without it the test starts its own server as before.
+const REMOTE = process.env.OA_E2E_URL?.replace(/\/$/, "");
+const API = REMOTE ?? `http://127.0.0.1:${PORT}`;
 const CORPUS = path.join(ROOT, "tests/fixtures/drawio_corpus/dev");
 const enabled = process.env.OA_E2E === "1";
 const LIVE_UNAVAILABLE = "Live inference is unavailable. Open the recorded example.";
@@ -104,14 +107,16 @@ async function docInfo(page, name) {
 
 describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E=1 to run browser tests" }, () => {
   before(async () => {
-    assert.ok(fs.existsSync(path.join(ROOT, "apps/web/dist/index.html")), "build the web app first: npm run build:web");
-    store = fs.mkdtempSync(path.join(os.tmpdir(), "oa-journey-"));
-    const py = process.env.OA_PYTHON ?? path.join(ROOT, ".venv/bin/python");
-    server = spawn(py, ["-m", "uvicorn", "open_apprentice.api.app:app", "--port", String(PORT)], {
-      cwd: ROOT,
-      env: { ...process.env, PYTHONPATH: path.join(ROOT, "src"), DEMO_MODEL_ENABLED: "0", OA_STORE_DIR: store },
-      stdio: "ignore",
-    });
+    if (!REMOTE) {
+      assert.ok(fs.existsSync(path.join(ROOT, "apps/web/dist/index.html")), "build the web app first: npm run build:web");
+      store = fs.mkdtempSync(path.join(os.tmpdir(), "oa-journey-"));
+      const py = process.env.OA_PYTHON ?? path.join(ROOT, ".venv/bin/python");
+      server = spawn(py, ["-m", "uvicorn", "open_apprentice.api.app:app", "--port", String(PORT)], {
+        cwd: ROOT,
+        env: { ...process.env, PYTHONPATH: path.join(ROOT, "src"), DEMO_MODEL_ENABLED: "0", OA_STORE_DIR: store },
+        stdio: "ignore",
+      });
+    }
     await waitReady(`${API}/health/ready`);
     browser = await chromium.launch();
   });
@@ -143,12 +148,18 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     await page.goto(`${API}/#apprentice`, { waitUntil: "networkidle" });
     await page.getByLabel("Add .drawio files").setInputFiles([path.join(CORPUS, "d1.drawio"), path.join(CORPUS, "d2.drawio")]);
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "two rendered documents");
-    for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Confirm mapping" }).first().click(), await page.waitForTimeout(400);
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole("button", { name: "Confirm mapping" }).first().click();
+      // wait for this confirmation to land before the next click: over a real network the page updates later than 400 ms
+      await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === i + 1, `confirmation ${i + 1}`);
+    }
     await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === 2, "two confirmed mappings");
 
     // 8. live unavailable wording (no live model on this server)
-    assert.ok(await page.getByText(LIVE_UNAVAILABLE).isVisible());
-    assert.ok(await page.getByLabel("Use the live model").isDisabled());
+    if (!REMOTE) {  // a deployment with a live model enabled legitimately offers the toggle
+      assert.ok(await page.getByText(LIVE_UNAVAILABLE).isVisible());
+      assert.ok(await page.getByLabel("Use the live model").isDisabled());
+    }
 
     // 2. teach on d1: every mapped label centred below its node, gap 8, typed into the label's x/y fields
     await page.getByLabel("Document to edit").selectOption({ label: "d1.drawio" });
@@ -317,7 +328,11 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     await page.reload({ waitUntil: "networkidle" });
     await page.getByLabel("Add .drawio files").setInputFiles([path.join(CORPUS, "d1.drawio"), path.join(CORPUS, "d2.drawio")]);
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "two rendered documents");
-    for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Confirm mapping" }).first().click(), await page.waitForTimeout(400);
+    for (let i = 0; i < 2; i++) {
+      await page.getByRole("button", { name: "Confirm mapping" }).first().click();
+      // wait for this confirmation to land before the next click: over a real network the page updates later than 400 ms
+      await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === i + 1, `confirmation ${i + 1}`);
+    }
     await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === 2, "two confirmed mappings");
     await page.getByLabel("Document to edit").selectOption({ label: "d1.drawio" });
     await page.waitForSelector("button[data-label]");
