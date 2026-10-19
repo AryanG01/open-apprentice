@@ -119,7 +119,7 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
           <span className="meter" style={{ ["--done" as string]: total ? all.length / total : 0 }} aria-hidden="true" />
           <span>{all.length} of {total} checked</span>
           <span className="t-published">{count("published")} published</span>
-          <span className="t-blocked">{count("blocked")} blocked by a check</span>
+          {count("blocked") ? <span className="t-blocked">{count("blocked")} blocked by a check</span> : null}
           {count("unchanged") ? <span>{count("unchanged")} already right</span> : null}
           {count("failed") ? <span className="t-blocked">{count("failed")} failed</span> : null}
         </div>

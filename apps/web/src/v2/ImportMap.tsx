@@ -55,6 +55,8 @@ export function ImportMap({ docs, setDocs }: Props) {
   };
 
   const [progress, setProgress] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const SHOWN = 12;
   /** The generated demo library (docs/corpus/library_provenance.md): uploaded through the same import, four at a time. */
   const addLibrary = async () => {
     setBusy(true);
@@ -141,10 +143,15 @@ export function ImportMap({ docs, setDocs }: Props) {
       </p>
       {error ? <p className="err" role="alert">{error}</p> : null}
       <div className={`cards${docs.length > 6 ? " many" : ""}`}>
-        {docs.map((d) => (
+        {(showAll ? docs : docs.slice(0, SHOWN)).map((d) => (
           <DocCard key={d.doc_id} doc={d} compact={docs.length > 6} onUpdate={(nd) => setDocs((all) => all.map((x) => (x.doc_id === nd.doc_id ? nd : x)))} />
         ))}
       </div>
+      {docs.length > SHOWN ? (
+        <button type="button" className="quiet more" onClick={() => setShowAll((v) => !v)}>
+          {showAll ? "Show fewer" : `Show all ${docs.length} diagrams`}
+        </button>
+      ) : null}
     </section>
   );
 }

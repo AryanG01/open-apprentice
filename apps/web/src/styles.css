@@ -431,6 +431,7 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .apprentice .samples { color: var(--a-ink-2); }
 
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 18px; }
+.apprentice .more { margin-top: 12px; }
 .cards.many { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
 .card.doc { background: var(--table-2); border: 1px solid var(--a-line); border-radius: 8px; padding: 14px; color: var(--a-ink); box-shadow: none; }
 .card.doc h3 { font-size: 1rem; word-break: break-all; }
@@ -460,7 +461,7 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .docview { margin: 0 0 16px; }
 .docview-stage { position: relative; display: inline-block; max-width: 100%; line-height: 0; background: var(--sheet); border-radius: 6px; box-shadow: 0 0 0 1px var(--a-line), 0 18px 40px rgb(0 0 0 / 0.35); }
 .docview-stage img { max-width: 100%; height: auto; display: block; user-select: none; border-radius: 6px; }
-.docview .lab { position: absolute; padding: 0; margin: 0; background: rgb(57 198 255 / 0.08); border: 1.5px solid rgb(57 198 255 / 0.75); border-radius: 3px; cursor: grab; touch-action: none; transition: left .18s ease, top .18s ease; }
+.docview .lab { position: absolute; padding: 0; margin: 0; background: rgb(57 198 255 / 0.08); border: 1.5px solid rgb(57 198 255 / 0.75); border-radius: 3px; cursor: grab; touch-action: none; }
 .docview .lab:hover { background: rgb(57 198 255 / 0.18); }
 .docview .lab:focus-visible, .docview .lab.sel { outline: 2px solid #ff5fa2; outline-offset: 2px; }
 .docview .lab.moved { border: 2px solid #ff5fa2; background: rgb(255 95 162 / 0.1); }
@@ -552,5 +553,5 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
   .notebook { position: static; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .docview .lab, .tally .meter::after { transition: none; }
+  .tally .meter::after { transition: none; }
 }
