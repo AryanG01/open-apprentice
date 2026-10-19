@@ -1,0 +1,61 @@
+// Turns script.json + the capture's marks + the measured voice lengths into a timeline. Pure: the same inputs give the same
+// edit. A clip is never slowed down; when it is shorter than its narration, its last frame is held.
+import script from "../script.json";
+import marks from "../public/marks.json";
+import captions from "../public/captions/index.json";
+
+export const FPS = 30;
+const PAD = 0.9; // seconds of air after each line
+const MIN_CARD = 4;
+
+export type Word = { text: string; startMs: number; endMs: number };
+export type Box = { x: number; y: number; width: number; height: number } | null;
+
+export type Beat = {
+  id: string;
+  text: string;
+  start: number; // seconds into the video
+  dur: number;
+  voSec: number;
+  words: Word[];
+  card?: "title" | "results";
+  clip?: { from: number; to: number; rate: number; held: number };
+  focus: Box;
+  live: boolean;
+  onScreen?: string;
+};
+
+type ScriptBeat = { id: string; text: string; clip?: [string, string]; card?: "title" | "results"; focus?: string; live?: boolean; onScreen?: string };
+type Mark = { name: string; t: number; box: Box };
+
+const markList = (marks as { marks: Mark[]; frameOffset: number }).marks;
+const offset = (marks as { frameOffset: number }).frameOffset ?? 0;
+const at = (name: string): Mark => {
+  const m = markList.find((x) => x.name === name);
+  if (!m) throw new Error(`no mark '${name}' in marks.json`);
+  return m;
+};
+
+export function timeline() {
+  let start = 0;
+  const beats: Beat[] = [];
+  for (const b of (script as { beats: ScriptBeat[] }).beats) {
+    const c = (captions as Record<string, { seconds: number; words: Word[] }>)[b.id] ?? { seconds: 0, words: [] };
+    let dur = Math.max(c.seconds + PAD, b.card ? MIN_CARD : 2);
+    let clip: Beat["clip"];
+    if (b.clip) {
+      const from = Math.max(0, at(b.clip[0]).t - offset);
+      const to = Math.max(from + 0.5, at(b.clip[1]).t - offset);
+      const len = to - from;
+      const rate = Math.max(1, len / dur);
+      clip = { from, to, rate, held: Math.max(0, dur - len / rate) };
+    }
+    if (b.card === "results") dur += 3;
+    beats.push({
+      id: b.id, text: b.text, start, dur, voSec: c.seconds, words: c.words, card: b.card, clip,
+      focus: b.focus ? at(b.focus).box : null, live: !!b.live, onScreen: b.onScreen,
+    });
+    start += dur;
+  }
+  return { beats, total: start };
+}

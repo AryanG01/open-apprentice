@@ -65,11 +65,12 @@ export function ImportMap({ docs, setDocs }: Props) {
       const index = (await (await fetch("/samples/library/index.json")).json()) as { files: { file: string }[] };
       const todo = index.files.map((f) => f.file).filter((f) => !docs.some((d) => d.name === f));
       let done = 0;
+      const total = todo.length;
       const one = async (f: string) => {
         const res = await fetch(`/samples/library/${f}`);
         const d = await upload<DocumentInfo>("/documents", new File([await res.blob()], f));
         setDocs((all) => [...all, d]);
-        setProgress(`${++done} of ${index.files.length} diagrams imported`);
+        setProgress(`${++done} of ${total} diagrams imported`);
       };
       const worker = async () => {
         for (let f = todo.shift(); f; f = todo.shift()) await one(f);

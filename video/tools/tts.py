@@ -48,6 +48,8 @@ def main() -> None:
         sf.write(vo / f"{b['id']}.wav", wav, RATE)
         meta.write_text(json.dumps({"tag": tag, "seconds": round(len(wav) / RATE, 3), "words": words}, indent=1))
         print(f"{b['id']}: {len(wav) / RATE:.1f}s")
+    index = {b["id"]: json.loads((cap / f"{b['id']}.json").read_text()) for b in beats if (cap / f"{b['id']}.json").exists()}
+    (cap / "index.json").write_text(json.dumps(index))
 
 
 if __name__ == "__main__":
