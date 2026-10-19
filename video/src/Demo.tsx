@@ -128,7 +128,7 @@ function Captions({ b }: { b: Beat }) {
   const groups: (typeof b.words)[] = [];
   for (const w of b.words) {
     const g = groups[groups.length - 1];
-    if (!g || g.length >= 7 || /[.,]$/.test(g[g.length - 1].text)) groups.push([w]);
+    if (!g || g.length >= 9 || /[.,;:!?]$/.test(g[g.length - 1].text)) groups.push([w]);
     else g.push(w);
   }
   const g = groups.find((x) => ms <= x[x.length - 1].endMs + 250) ?? groups[groups.length - 1];

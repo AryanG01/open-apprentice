@@ -39,7 +39,10 @@ def main() -> None:
         for r in pipe(b.get("say", b["text"]), voice=a.voice, speed=a.speed):
             chunk = r.audio.numpy()
             for t in r.tokens or []:
-                if t.start_ts is not None and t.text.strip() and t.text not in ".,;:!?":
+                if t.text in ".,;:!?" and words:
+                    words[-1]["text"] += t.text  # keep sentence punctuation so captions can break on it
+                    continue
+                if t.start_ts is not None and t.text.strip():
                     words.append({"text": t.text, "startMs": round((t0 + t.start_ts) * 1000),
                                   "endMs": round((t0 + (t.end_ts or t.start_ts)) * 1000)})
             audio.append(chunk)
