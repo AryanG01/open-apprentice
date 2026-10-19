@@ -30,16 +30,17 @@ type Mark = { name: string; t: number; box: Box };
 
 const markList = (marks as { marks: Mark[]; frameOffset: number }).marks;
 const offset = (marks as { frameOffset: number }).frameOffset ?? 0;
-const at = (name: string): Mark => {
-  const m = markList.find((x) => x.name === name);
-  if (!m) throw new Error(`no mark '${name}' in marks.json`);
-  return m;
-};
+const SCALE = (marks as { scale?: number }).scale ?? 1; // CSS pixels of the capture → video pixels
+const at = (name: string): Mark => markList.find((x) => x.name === name) as Mark;
+const has = (name: string) => markList.some((x) => x.name === name);
+
+const scaleBox = (b: Box): Box => (b ? { x: b.x * SCALE, y: b.y * SCALE, width: b.width * SCALE, height: b.height * SCALE } : null);
 
 export function timeline() {
   let start = 0;
   const beats: Beat[] = [];
   for (const b of (script as { beats: ScriptBeat[] }).beats) {
+    if (b.clip && !(has(b.clip[0]) && has(b.clip[1]))) continue; // e.g. an offline dry run has no question to show
     const c = (captions as Record<string, { seconds: number; words: Word[] }>)[b.id] ?? { seconds: 0, words: [] };
     let dur = Math.max(c.seconds + PAD, b.card ? MIN_CARD : 2);
     let clip: Beat["clip"];
@@ -53,7 +54,7 @@ export function timeline() {
     if (b.card === "results") dur += 3;
     beats.push({
       id: b.id, text: b.text, start, dur, voSec: c.seconds, words: c.words, card: b.card, clip,
-      focus: b.focus ? at(b.focus).box : null, live: !!b.live, onScreen: b.onScreen,
+      focus: b.focus && has(b.focus) && at(b.focus).box ? scaleBox(at(b.focus).box) : null, live: !!b.live, onScreen: b.onScreen,
     });
     start += dur;
   }

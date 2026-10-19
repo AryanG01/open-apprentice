@@ -133,6 +133,9 @@ export function ImportMap({ docs, setDocs }: Props) {
       ) : null}
       </div>
       {progress ? <p role="status" className="muted">{progress}</p> : null}
+      {docs.filter((d) => d.render === "pending").length > 1 ? (
+        <p role="status" className="muted rendering-count">{docs.filter((d) => d.render === "pending").length} diagrams still rendering in the locked engine…</p>
+      ) : null}
       <p className="samples">
         Or try a sample:{" "}
         {SAMPLES.map((x) => (

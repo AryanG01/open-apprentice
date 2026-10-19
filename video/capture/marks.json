@@ -1,0 +1,147 @@
+{
+ "url": "http://localhost:8781",
+ "live": false,
+ "marks": [
+  {
+   "name": "home",
+   "t": 2.083,
+   "box": null
+  },
+  {
+   "name": "samples",
+   "t": 6.539,
+   "box": null
+  },
+  {
+   "name": "mapping-table",
+   "t": 9.56,
+   "box": {
+    "x": 63,
+    "y": 159.828125,
+    "width": 340.984375,
+    "height": 1006.109375
+   }
+  },
+  {
+   "name": "mapped",
+   "t": 14.45,
+   "box": null
+  },
+  {
+   "name": "teach-start",
+   "t": 16.304,
+   "box": {
+    "x": 48,
+    "y": 367.015625,
+    "width": 806,
+    "height": 428
+   }
+  },
+  {
+   "name": "taught",
+   "t": 26.414,
+   "box": {
+    "x": 48,
+    "y": 332.015625,
+    "width": 806,
+    "height": 415
+   }
+  },
+  {
+   "name": "session-start",
+   "t": 30.009,
+   "box": {
+    "x": 1492,
+    "y": 791.078125,
+    "width": 380,
+    "height": 147.78125
+   }
+  },
+  {
+   "name": "preview",
+   "t": 31.945,
+   "box": null
+  },
+  {
+   "name": "answered",
+   "t": 36.778,
+   "box": null
+  },
+  {
+   "name": "session-committed",
+   "t": 67.043,
+   "box": {
+    "x": 1492,
+    "y": 359.078125,
+    "width": 380,
+    "height": 329.8125
+   }
+  },
+  {
+   "name": "library-loading",
+   "t": 73.794,
+   "box": null
+  },
+  {
+   "name": "library-loaded",
+   "t": 78.391,
+   "box": {
+    "x": 48,
+    "y": 294.1875,
+    "width": 1824,
+    "height": 365.59375
+   }
+  },
+  {
+   "name": "library-confirmed",
+   "t": 79.574,
+   "box": null
+  },
+  {
+   "name": "apply",
+   "t": 83.163,
+   "box": {
+    "x": 48,
+    "y": 1015.328125,
+    "width": 1824,
+    "height": 24.46875
+   }
+  },
+  {
+   "name": "wall-done",
+   "t": 119.451,
+   "box": {
+    "x": 48,
+    "y": 921.328125,
+    "width": 1824,
+    "height": 24.46875
+   }
+  },
+  {
+   "name": "compare",
+   "t": 128.612,
+   "box": {
+    "x": 479,
+    "y": 377.71875,
+    "width": 962,
+    "height": 337.765625
+   }
+  },
+  {
+   "name": "compare-closed",
+   "t": 135.82,
+   "box": null
+  },
+  {
+   "name": "prototype",
+   "t": 143.008,
+   "box": null
+  },
+  {
+   "name": "prototype-done",
+   "t": 165.942,
+   "box": null
+  }
+ ],
+ "frameOffset": 0.016
+}

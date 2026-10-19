@@ -20,7 +20,7 @@ const n = (s) => (String(s).includes("/") ? Number(s.split("/")[0]) / Number(s.s
 const TERMINAL = ["committed", "failed", "cancelled", "activated", "activation_rejected", "override", "dismissed"];
 
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1.5 });
 await ctx.addInitScript(() => {
   // a visible cursor for the recording (headless Chrome draws none)
   const make = () => {
@@ -73,7 +73,7 @@ const until = async (fn, what, ms = 300_000) => {
     await sleep(250);
   }
 };
-let mouse = { x: 960, y: 540 };
+let mouse = { x: 640, y: 360 };
 const moveTo = async (x, y, steps = 28) => {
   await page.mouse.move(x, y, { steps });
   mouse = { x, y };
@@ -155,7 +155,7 @@ async function answerAll(waitMs) {
 await cdp.send("Page.startScreencast", { format: "png", everyNthFrame: 1, maxWidth: 1920, maxHeight: 1080 });
 try {
   await page.goto(`${URL_}/#apprentice`, { waitUntil: "networkidle" });
-  await moveTo(900, 500, 1);
+  await moveTo(600, 330, 1);
   await sleep(1500);
   await mark("home");
 
@@ -233,7 +233,7 @@ try {
     const m = (await page.locator("text=/diagrams imported/").innerText()).match(/(\d+) of (\d+)/);
     return m && m[1] === m[2];
   }, "library import", 600_000);
-  await until(async () => (await page.getByRole("button", { name: /Confirm all \d+ suggested/ }).count()) === 1 && (await page.locator("text=Rendering in the locked engine").count()) === 0, "renders", 600_000);
+  await until(async () => (await page.getByRole("button", { name: /Confirm all \d+ suggested/ }).count()) === 1 && (await page.locator(".rendering-count").count()) === 0 && (await page.locator("text=Rendering in the locked engine").count()) === 0, "renders", 600_000);
   await mark("library-loaded", ".cards");
   await click(page.getByRole("button", { name: /Confirm all \d+ suggested/ }));
   await until(async () => !(await page.getByRole("button", { name: /Confirm all \d+ suggested/ }).count()), "confirm all", 600_000);
@@ -295,7 +295,7 @@ try {
   await cdp.send("Page.stopScreencast").catch(() => {});
   await sleep(300);
   fs.writeFileSync(path.join(HERE, "frames.json"), JSON.stringify(frames));
-  fs.writeFileSync(path.join(HERE, "marks.json"), JSON.stringify({ url: URL_, live: LIVE, marks, frameOffset: firstFrameWall ? (firstFrameWall - wall0) / 1000 : 0 }, null, 1));
+  fs.writeFileSync(path.join(HERE, "marks.json"), JSON.stringify({ url: URL_, live: LIVE, scale: 1.5, marks, frameOffset: firstFrameWall ? (firstFrameWall - wall0) / 1000 : 0 }, null, 1));
   console.log(`${frames.length} frames, ${marks.length} marks`);
   await browser.close();
 }
