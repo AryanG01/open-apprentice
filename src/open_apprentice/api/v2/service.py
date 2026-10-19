@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import uuid
+from collections import OrderedDict
 from open_apprentice.concepts.rules import RuleError, parse_rational
 from fractions import Fraction
 from typing import Any, Optional
@@ -14,6 +15,7 @@ from open_apprentice.api.v2.context import V2
 from open_apprentice.api.v2.tasks import Job
 from open_apprentice.drawio import mapping as mp
 from open_apprentice.drawio.classify import Classified, classify
+from open_apprentice.teaching.step import thinking_trace
 from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, display, load_drawio
 from open_apprentice.drawio.patch import apply_edits, plan_edits
 from open_apprentice.drawio.render import Rendered, parse_render
@@ -580,7 +582,25 @@ def session_state(v: V2, owner: str, sid: str) -> dict:
         "manifest_revision": manifest["manifest_revision"],
         "provenance": {"model": meta["model"], "teacher": meta["teacher"]},
         "result": result,
+        "thinking": _thinking(evs, meta["model"]),
     }
+
+
+_TRACES: "OrderedDict[tuple[str, str], list[dict]]" = OrderedDict()
+
+
+def _thinking(evs: list, model: str) -> list[dict]:
+    """The display trace, cached by the log's head event (events never change once written)."""
+    if not evs:
+        return []
+    key = (evs[-1].event_id, model)
+    if key not in _TRACES:
+        _TRACES[key] = thinking_trace(
+            evs, "offline enumerator" if model == "Fixture" else f"model ({model})"
+        )
+        while len(_TRACES) > 256:
+            _TRACES.popitem(last=False)
+    return _TRACES[key]
 
 
 CANCELLED = "cancelled by the user"
