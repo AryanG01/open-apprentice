@@ -300,7 +300,7 @@ def get_export(
     who: str = Depends(owner),
 ) -> Response:  # fmt: skip
     data, media = service.export(_v2(request), who, run_id, doc_id, page_id, format)
-    name = f"{doc_id[:8]}-{page_id}.{ {'drawio': 'drawio', 'svg': 'svg', 'receipt': 'json'}.get(format, 'bin') }"
+    name = f"{doc_id[:8]}-{page_id}.{ {'drawio': 'drawio', 'png': 'png', 'svg': 'svg', 'receipt': 'json'}.get(format, 'bin') }"
     return Response(
         data, media_type=media, headers={"content-disposition": f'attachment; filename="{name}"'}
     )

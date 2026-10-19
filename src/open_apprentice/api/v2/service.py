@@ -876,6 +876,16 @@ def export(
         raise records.NotFound(res["key"])
     if fmt == "drawio":
         return data.data, "application/vnd.jgraph.mxfile"
+    if fmt == "png":  # the published file as the engine renders it, cached beside it
+        cached = v.store.get(res["key"] + ".png")
+        if cached is not None:
+            return cached.data, "image/png"
+        page = next(p for p in load_drawio(data.data).pages if p.id == page_id)
+        png = v.render(page).png
+        if not png:
+            raise Conflict("PNG_UNAVAILABLE", "the renderer returned no image")
+        v.store.create(res["key"] + ".png", png)
+        return png, "image/png"
     if fmt == "svg":
         if v.render_svg is None:
             raise Conflict("SVG_UNAVAILABLE", "SVG export is not available on this server")
@@ -885,7 +895,7 @@ def export(
         if svg is None:
             raise Conflict("SVG_UNAVAILABLE", "the renderer returned no SVG")
         return svg.encode(), "image/svg+xml"
-    raise Conflict("BAD_FORMAT", "format must be drawio, svg or receipt")
+    raise Conflict("BAD_FORMAT", "format must be drawio, png, svg or receipt")
 
 
 # ---- corrections and activation ------------------------------------------------------------------------------------------
