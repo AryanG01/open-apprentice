@@ -1,4 +1,16 @@
-# CURRENT STATE — 2026-10-16 (read this section first; the rest of the file is the 2026-10-13 snapshot)
+# CURRENT STATE — 2026-10-19 (read first)
+
+**Production (2026-10-19):** https://open-apprentice-md76de375q-uc.a.run.app serves revision `open-apprentice-00013-keq`
+(image `demo:prod-d2d42ef`, branch `p8-legendary-demo`) at 100%. It has the drafting-table redesign, the 100-diagram library,
+the "watch it think" notebook, the reuse wall with before/after, and live sessions on **Nemotron-3-Super**
+(`NEBIUS_MODEL=nvidia/nemotron-3-super-120b-a12b`, adopted by the pre-registered rule in
+`docs/evaluation/product_model_check.md`) under policy **product-1** (`docs/evaluation/product_policy.md`).
+`OA_TASKS_SERVICE_URL` is the `next---` tag URL, so keep the `next` tag on this revision.
+**Rollback:** `gcloud run services update-traffic open-apprentice --project oa-demo-1013-19737 --region us-central1
+--to-revisions open-apprentice-00007-zvk=100` (the previous product revision). Work in progress: spec
+`docs/superpowers/specs/2026-10-19-legendary-demo-design.md` (product upgrade plus a Remotion video in `video/`).
+
+# EARLIER STATE — 2026-10-16/18
 
 **Direction (since 15 Oct):** the product is the teach → clarify → correct → reuse flow on real `.drawio` files, validated internally.
 Spec: `docs/superpowers/specs/2026-10-15-teach-correct-reuse-design.md`. Roadmap: `docs/superpowers/plans/2026-10-15-roadmap.md`.
