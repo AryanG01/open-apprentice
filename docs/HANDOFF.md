@@ -7,7 +7,7 @@ the "watch it think" notebook, the reuse wall with before/after, and live sessio
 `docs/evaluation/product_model_check.md`) under policy **product-1** (`docs/evaluation/product_policy.md`).
 `OA_TASKS_SERVICE_URL` is the `next---` tag URL, so keep the `next` tag on this revision.
 **Rollback:** `gcloud run services update-traffic open-apprentice --project oa-demo-1013-19737 --region us-central1
---to-revisions open-apprentice-00007-zvk=100` (the previous product revision). Work in progress: spec
+--to-revisions open-apprentice-00015-feq=100` (the previous revision; `00007-zvk` is the pre-redesign product). Work in progress: spec
 `docs/superpowers/specs/2026-10-19-legendary-demo-design.md` (product upgrade plus a Remotion video in `video/`).
 
 # EARLIER STATE — 2026-10-16/18
