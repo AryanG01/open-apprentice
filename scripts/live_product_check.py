@@ -160,7 +160,7 @@ def main(base: str, label: str) -> None:
         for ref in held:
             res = r["results"].get(f"{ref['doc_id']}:{ref['page_id']}", {})
             want = intended(api.scene(ref))
-            exact = {k: v["exact"] for k, v in ((res.get("receipt") or {}).get("conformance") or {}).get("labels", {}).items()}
+            exact = {k: v["measured"] for k, v in ((res.get("receipt") or {}).get("conformance") or {}).get("labels", {}).items()}
             ok += bool(exact) and matches(exact, want)
         row.update(held_correct=ok, held_total=len(held), outcome="success" if ok == len(held) else "wrong commit")
     out = Path("results/product_model_check")

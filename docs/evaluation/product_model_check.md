@@ -40,3 +40,32 @@ its first question and then failed. This check is about the **product**. It is n
   demonstration, and the product page keeps saying a live run can abstain.
 
 Either way, the results are written to this file, failures included.
+
+## Results (2026-10-19)
+
+Run with `scripts/live_product_check.py`, 3 sessions per model; raw rows in `results/product_model_check/rows.jsonl`.
+
+**Scoring bug, fixed before this verdict.** The script first scored the receipt's `exact` values, which are the geometry
+targets, instead of `measured`, the rendered note boxes. On these files the two differ by the notes' fixed 5-unit text
+offset, so every commit at first showed as a wrong commit (0/6). I re-scored every stored run from its receipts against the
+pre-registered definition and fixed the script. The table below is the corrected score.
+
+| Session | Ended | Unseen diagrams placed as intended | Time | First question | Ledger spend |
+|---|---|---|---|---|---|
+| ultra-1 | committed | 6/6 | 57.8 s | 20.3 s | $0.066 |
+| ultra-2 | committed | 6/6 | 57.7 s | 20.4 s | $0.066 |
+| ultra-3 | committed | 6/6 | 45.2 s | 20.3 s | $0.054 |
+| super-1 | committed | 6/6 | 22.4 s | 18.2 s | ≤ $0.014 |
+| super-2 | committed | 6/6 | 27.3 s | 12.1 s | ≤ $0.018 |
+| super-3 | abstained ("unresolved disagreement") | none | 18.3 s | none | ≤ $0.014 |
+
+- **Ultra:** 3/3 successes, 0 wrong commits, median 57.7 s.
+- **Super:** 2/3 successes, 0 wrong commits, median 22.4 s. The ledger prices Super at Ultra's rates, so its real cost is
+  roughly a third of the figure shown.
+
+**Verdict under the pre-registered rule: Super meets all three conditions (2/3, 0 wrong, median ≤ 120 s), so the rule
+says adopt it for live sessions.** On this scenario Ultra is more reliable (3/3) and still about a minute per session. The
+5-minute session of 2026-10-18 did not recur: both models reached their first question in about 20 s on this scenario.
+
+This is one scenario with 3 sessions per model, so it is evidence about the demo flow, not about the battery. The
+evaluated results stay as published.
