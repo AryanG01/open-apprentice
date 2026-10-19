@@ -4,7 +4,10 @@
     {
       "id": "hook",
       "text": "Every team has a hundred diagrams that should look the same. Fix one by hand, and Open Apprentice fixes the rest, and proves every edit.",
-      "clip": ["wall-done", "compare-closed"],
+      "clip": [
+        "wall-done",
+        "compare-closed"
+      ],
       "onScreen": "Fix one diagram. It fixes the other hundred."
     },
     {
@@ -15,57 +18,102 @@
     {
       "id": "import",
       "text": "Start with real draw dot io files. The apprentice reads which note belongs to which box, and you check its guess.",
-      "clip": ["home", "mapped"],
-      "onScreen": "Real .drawio files · real draw.io engine"
+      "clip": [
+        "home",
+        "mapped"
+      ],
+      "onScreen": "Real .drawio files \u00b7 real draw.io engine"
     },
     {
       "id": "teach",
       "text": "Then show it once. I drag each note under its box, left aligned. Every move is redrawn by the real draw dot io engine.",
-      "clip": ["teach-start", "taught"],
+      "clip": [
+        "teach-start",
+        "taught"
+      ],
       "focus": "teach-start",
       "onScreen": "Show it once"
     },
     {
       "id": "think",
       "text": "Now Nemotron, live on Nebius, writes small programs that could explain my example. Several fit. Instead of guessing, the apprentice draws a test diagram where those programs disagree.",
-      "clip": ["session-start", "question"],
+      "clip": [
+        "session-start",
+        "question"
+      ],
       "focus": "session-start",
       "live": true,
-      "onScreen": "Live · NVIDIA Nemotron on Nebius Token Factory"
+      "onScreen": "Live \u00b7 NVIDIA Nemotron on Nebius Token Factory",
+      "explain": [
+        "Nemotron proposes programs",
+        "Each is run on your example",
+        "Survivors are compared",
+        "A test diagram where they disagree"
+      ]
     },
     {
       "id": "ask",
       "text": "And it asks me one question, with a picture of each answer. I pick the one I meant.",
-      "clip": ["question", "answered"],
+      "clip": [
+        "question",
+        "answered"
+      ],
       "focus": "question",
       "live": true,
-      "onScreen": "It asks instead of guessing"
+      "onScreen": "It asks instead of guessing",
+      "explain": [
+        "One question",
+        "A picture per answer",
+        "Your pick removes the wrong rules"
+      ]
     },
     {
       "id": "commit",
       "text": "It previews the rule on diagrams I never touched, and keeps it as a versioned skill.",
-      "clip": ["answered", "session-committed"],
+      "clip": [
+        "answered",
+        "session-committed"
+      ],
       "live": true,
-      "onScreen": "Preview, then commit"
+      "onScreen": "Preview, then commit",
+      "explain": [
+        "Preview on unseen diagrams",
+        "Versioned skill"
+      ]
     },
     {
       "id": "scale",
       "text": "Now the payoff. A hundred diagrams: GPU clusters, inference stacks, data platforms. One click applies the skill to every one of them. Each edit is a byte exact patch of the file, and it must pass three independent checks before it is published.",
-      "clip": ["library-loading", "wall-done"],
-      "onScreen": "100 diagrams · 3 independent checks each"
+      "clip": [
+        "library-loading",
+        "wall-done"
+      ],
+      "onScreen": "100 diagrams \u00b7 3 independent checks each",
+      "explain": [
+        "Byte-exact x/y patch",
+        "Conformance check",
+        "Preservation check",
+        "Layout safety check"
+      ]
     },
     {
       "id": "compare",
       "text": "Before, and after. Nothing else in the file changes.",
-      "clip": ["compare", "compare-closed"],
+      "clip": [
+        "compare",
+        "compare-closed"
+      ],
       "focus": "compare",
       "onScreen": "Only the note positions change"
     },
     {
       "id": "world",
       "text": "The same show, ask, and check loop also works on other layouts. Here, an earlier prototype places badges on UI cards, across two different graphics engines.",
-      "clip": ["prototype", "prototype-done"],
-      "onScreen": "Earlier prototype · UI components · Konva and Fabric"
+      "clip": [
+        "prototype",
+        "prototype-done"
+      ],
+      "onScreen": "Earlier prototype \u00b7 UI components \u00b7 Konva and Fabric"
     },
     {
       "id": "close",

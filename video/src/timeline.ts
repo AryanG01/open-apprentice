@@ -23,9 +23,10 @@ export type Beat = {
   focus: Box;
   live: boolean;
   onScreen?: string;
+  explain?: string[];
 };
 
-type ScriptBeat = { id: string; text: string; clip?: [string, string]; card?: "title" | "results"; focus?: string; live?: boolean; onScreen?: string };
+type ScriptBeat = { id: string; text: string; clip?: [string, string]; card?: "title" | "results"; focus?: string; live?: boolean; onScreen?: string; explain?: string[] };
 type Mark = { name: string; t: number; box: Box };
 
 const markList = (marks as { marks: Mark[]; frameOffset: number }).marks;
@@ -54,7 +55,7 @@ export function timeline() {
     if (b.card === "results") dur += 3;
     beats.push({
       id: b.id, text: b.text, start, dur, voSec: c.seconds, words: c.words, card: b.card, clip,
-      focus: b.focus && has(b.focus) && at(b.focus).box ? scaleBox(at(b.focus).box) : null, live: !!b.live, onScreen: b.onScreen,
+      focus: b.focus && has(b.focus) && at(b.focus).box ? scaleBox(at(b.focus).box) : null, live: !!b.live, onScreen: b.onScreen, explain: b.explain,
     });
     start += dur;
   }

@@ -37,6 +37,7 @@ function Scene({ b }: { b: Beat }) {
       {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.clip ? <Clip b={b} /> : null}
       {b.onScreen ? <Headline text={b.onScreen} /> : null}
       {b.clip && (b.clip.rate > 1.15 || b.live) ? <Tags b={b} /> : null}
+      {b.explain ? <Explainer steps={b.explain} dur={b.dur} /> : null}
       <Captions b={b} />
     </AbsoluteFill>
   );
@@ -94,6 +95,27 @@ function Tags({ b }: { b: Beat }) {
           Sped up ×{b.clip.rate < 10 ? b.clip.rate.toFixed(1) : Math.round(b.clip.rate)}
         </span>
       ) : null}
+    </div>
+  );
+}
+
+/** What the system is doing while the screen works: steps that light up in order across the beat. */
+function Explainer({ steps, dur }: { steps: string[]; dur: number }) {
+  const frame = useCurrentFrame();
+  const t = frame / FPS;
+  const each = Math.max(0.8, (dur - 1) / steps.length);
+  return (
+    <div style={{ position: "absolute", left: 48, bottom: 170, display: "flex", gap: 10, alignItems: "center" }}>
+      {steps.map((s, i) => {
+        const on = interpolate(t, [0.4 + i * each, 0.8 + i * each], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+        return (
+          <div key={s} style={{ display: "flex", alignItems: "center", gap: 10, opacity: 0.25 + 0.75 * on }}>
+            <span style={{ background: `rgba(8,20,38,${0.7 + 0.2 * on})`, border: `2px solid ${on > 0.5 ? C.green : "#2a4670"}`, color: "#fff",
+              padding: "10px 16px", borderRadius: 10, fontSize: 28, fontWeight: 600, transform: `translateY(${(1 - on) * 6}px)` }}>{s}</span>
+            {i < steps.length - 1 ? <span style={{ color: C.cyan, fontSize: 30 }}>→</span> : null}
+          </div>
+        );
+      })}
     </div>
   );
 }
