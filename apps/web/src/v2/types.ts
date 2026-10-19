@@ -1,7 +1,10 @@
 // Response shapes of /api/v2 (numbers are exact rationals sent as strings).
 export type Num = string;
 
-export type Provenance = { model: "Live" | "Recorded" | "Fixture"; teacher: "You" | "Simulated" };
+export type Provenance = { model: "Live" | "Recorded" | "Fixture"; teacher: "You" | "Simulated"; policy?: string };
+
+/** Readable name and colours of a box or text, for display only (never sent to the learner). */
+export type Display = Record<string, { text: string; fill: string; stroke: string; font_color: string }>;
 
 export type PageInfo = {
   page_id: string;
@@ -15,6 +18,7 @@ export type PageInfo = {
   mapping: { labels: Record<string, { node_id: string; role: string }>; proposed: string[]; confirmed: boolean } | null;
   mapping_hash: string | null;
   scene_hash: string | null;
+  display?: Display;
 };
 
 export type DocumentInfo = {
@@ -36,6 +40,7 @@ export type SceneView = {
   image_offset: { x: Num; y: Num };
   objects: SceneObject[];
   movable: string[];
+  display?: Display;
 };
 
 export type Output = Record<string, [Num | number, Num | number]>;
@@ -70,7 +75,17 @@ export type SessionState = {
   manifest_revision: number;
   provenance: Provenance;
   result: { skill_id?: string; version?: number; activated?: boolean; reason?: string };
+  thinking?: ThinkingStep[];
 };
+
+export type ThinkingStep =
+  | { kind: "round"; round_kind: string; source: string; proposed: number; malformed: number; survivors: number; summaries: string[]; truncated: boolean }
+  | { kind: "probe"; probe_id: string; ok: boolean; scene_id: string | null }
+  | { kind: "question"; request_id: string; scene_id: string; candidates: number; groups: Record<string, string[]> }
+  | { kind: "preview"; items: number }
+  | { kind: "answer"; survivors: number }
+  | { kind: "commit"; summary: string }
+  | { kind: "stopped"; reason: string };
 
 export type Receipt = {
   published: boolean;

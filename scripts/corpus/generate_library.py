@@ -322,7 +322,7 @@ def diagram(i: int) -> tuple[str, str, int]:
             _cell(
                 f"{slug}-note",
                 text,
-                "text;html=1;align=center;verticalAlign=middle;whiteSpace=nowrap;"
+                "text;html=1;align=left;verticalAlign=top;whiteSpace=nowrap;spacing=0;spacingTop=0;"
                 "strokeColor=none;fillColor=none;fontSize=12;fontColor=#455a64;",
                 lx,
                 ly,

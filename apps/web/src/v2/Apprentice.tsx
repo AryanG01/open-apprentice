@@ -7,6 +7,8 @@ import { useSession } from "./useSession";
 import { Correct } from "./Correct";
 import { provenanceLine } from "./provenance";
 import { Reuse } from "./Reuse";
+import { Thinking } from "./Thinking";
+import { firstOkPage } from "./ImportMap";
 import { TERMINAL, type DocRef, type DocumentInfo, type RunInfo, type RunResult } from "./types";
 
 const DOCS_KEY = "oa.v2.docs";
@@ -103,8 +105,20 @@ export function Apprentice() {
     setSid(id);
   };
 
+  const confirmed = docs.filter((d) => firstOkPage(d)?.mapping_hash).length;
+  const stage = state && TERMINAL.has(state.state) && skillId ? 4 : sid ? 3 : confirmed >= 2 ? 2 : docs.length ? 1 : 0;
+  const question = state?.thinking?.filter((t) => t.kind === "question").at(-1);
+  const groups = question && question.kind === "question" && state?.outstanding?.request_id === question.request_id ? question.groups : undefined;
+
   return (
     <main className="page apprentice" id="stage">
+      <ol className="rail" aria-label="Steps">
+        {["Import", "Map labels", "Teach by example", "Watch it think", "Reuse everywhere"].map((t, i) => (
+          <li key={t} className={i < stage ? "done" : i === stage ? "now" : ""} aria-current={i === stage ? "step" : undefined}>
+            <span className="dot" aria-hidden="true">{i < stage ? "✓" : i + 1}</span> {t}
+          </li>
+        ))}
+      </ol>
       {backend === "no" ? (
         <div className="banner" role="note">
           <span className="pill recorded">NOT AVAILABLE IN THIS COPY</span>
@@ -114,8 +128,10 @@ export function Apprentice() {
       <ImportMap docs={docs} setDocs={setDocs} />
       {!sid ? <Teach docs={docs} onSession={openSession} /> : null}
       {sid ? (
-        <section className="v2-step" aria-labelledby="h-session">
-          <h2 id="h-session">Session</h2>
+        <section className="v2-step session" aria-labelledby="h-session">
+          <h2 id="h-session">The apprentice at work</h2>
+          <div className="session-grid">
+          <div className="session-main">
           {error ? <p className="err" role="alert">{error}</p> : null}
           {state ? (
             <>
@@ -123,7 +139,7 @@ export function Apprentice() {
               <p role="status" data-state={state.state}>State: {STATE_TEXT[state.state] ?? state.state}</p>
               {state.result.reason ? <p className="err">{state.result.reason}</p> : null}
               {state.outstanding ? <Question key={state.outstanding.request_id} sid={state.session_id} q={state.outstanding} onAnswered={refresh}
-                  names={Object.fromEntries(docs.map((d) => [d.doc_id, d.name]))} /> : null}
+                  names={Object.fromEntries(docs.map((d) => [d.doc_id, d.name]))} groups={groups} /> : null}
               {["teaching", "waiting_for_model", "draft"].includes(state.state) ? <p role="status">Working…</p> : null}
               <details>
                 <summary>Evidence</summary>
@@ -133,10 +149,15 @@ export function Apprentice() {
           ) : (
             <p role="status">Loading…</p>
           )}
+          <div className="actions">
           {state && !TERMINAL.has(state.state) ? (
-            <button type="button" onClick={() => void post(`/sessions/${sid}/cancel`).then(refresh)}>Cancel session</button>
+            <button type="button" className="quiet" onClick={() => void post(`/sessions/${sid}/cancel`).then(refresh)}>Cancel session</button>
           ) : null}
-          <button type="button" onClick={() => { window.location.hash = "apprentice"; setSid(null); }}>Start over with these documents</button>
+          <button type="button" className="quiet" onClick={() => { window.location.hash = "apprentice"; setSid(null); }}>Start over with these documents</button>
+          </div>
+          </div>
+          {state ? <Thinking steps={state.thinking ?? []} working={["teaching", "waiting_for_model", "draft"].includes(state.state)} /> : null}
+          </div>
         </section>
       ) : null}
       {correcting && skillId ? (

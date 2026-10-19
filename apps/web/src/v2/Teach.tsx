@@ -5,6 +5,8 @@ import { fmt, type Point } from "./geometry";
 import { firstOkPage } from "./ImportMap";
 import type { Config, DocumentInfo } from "./types";
 
+const SESSION_OTHERS = 5;
+
 export const LIVE_UNAVAILABLE = "Live inference is unavailable. Open the recorded example.";
 
 type Props = { docs: DocumentInfo[]; onSession: (sid: string) => void };
@@ -43,7 +45,9 @@ export function Teach({ docs, onSession }: Props) {
     setError(null);
     const boxes: Record<string, [string, string]> = {};
     for (const [k, p] of Object.entries(moved)) boxes[k] = [fmt(p.x), fmt(p.y)];
-    const documents = ready.map((d) => {
+    // the session previews on a handful of other documents; reuse on the whole library comes after the skill is kept
+    const others = ready.filter((d) => d.doc_id !== demo.doc_id).slice(0, SESSION_OTHERS);
+    const documents = [demo, ...others].map((d) => {
       const p = firstOkPage(d);
       return { doc_id: d.doc_id, page_id: p?.page_id ?? "", mapping_hash: p?.mapping_hash ?? "" };
     });
@@ -65,15 +69,16 @@ export function Teach({ docs, onSession }: Props) {
   if (ready.length < 2) {
     return (
       <section className="v2-step" aria-labelledby="h-teach">
-        <h2 id="h-teach">2 · Teach</h2>
-        <p>Import and confirm at least two documents: you edit one, and the learned rule is previewed on the others before it is kept.</p>
+        <h2 id="h-teach">Show it once</h2>
+        <p className="lede">Import and confirm at least two documents: you tidy one by hand, and the apprentice previews what it learned on the others before keeping it.</p>
       </section>
     );
   }
   return (
     <section className="v2-step" aria-labelledby="h-teach">
-      <h2 id="h-teach">2 · Teach</h2>
-      <label>
+      <h2 id="h-teach">Show it once</h2>
+      <p className="lede">Drag the notes on one diagram to where they belong. Every move is redrawn by the real draw.io engine.</p>
+      <label className="docpick">
         Document to edit{" "}
         <select aria-label="Document to edit" value={demoId} onChange={(e) => { setDemoId(e.target.value); setMoved({}); setSeen(false); }}>
           {ready.map((d) => (
@@ -95,7 +100,7 @@ export function Teach({ docs, onSession }: Props) {
           </p>
         ) : null}
       </div>
-      <button type="button" disabled={busy || !seen || Object.keys(moved).length === 0} onClick={() => void submit()}>
+      <button type="button" className="primary" disabled={busy || !seen || Object.keys(moved).length === 0} onClick={() => void submit()}>
         This whole document is right
       </button>
       {!seen && Object.keys(moved).length ? <p role="status">Wait for the engine's render of your edit.</p> : null}

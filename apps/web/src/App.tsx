@@ -357,20 +357,33 @@ export function App() {
       >
         {area === "apprentice" ? "Skip to the content" : "Skip to the canvas"}
       </a>
-      <nav aria-label="Areas" className="areas">
-        <ul className="tabs" role="tablist">
-          <li>
-            <button role="tab" aria-selected={area === "apprentice"} className={area === "apprentice" ? "tab on" : "tab"} onClick={() => pick("apprentice")}>
-              Apprentice
-            </button>
-          </li>
-          <li>
-            <button role="tab" aria-selected={area === "prototype"} className={area === "prototype" ? "tab on" : "tab"} onClick={() => pick("prototype")}>
-              Earlier prototype
-            </button>
-          </li>
-        </ul>
-      </nav>
+      <header className="shell">
+        <div className="mark">
+          <svg viewBox="0 0 32 32" aria-hidden="true" className="logo">
+            <rect x="3" y="5" width="15" height="10" rx="2" />
+            <rect x="14" y="19" width="15" height="9" rx="2" />
+            <path d="M6 18h8M17 31h9" />
+          </svg>
+          <div>
+            <p className="name">Open Apprentice</p>
+            <p className="tagline">Show it once. It asks when unsure, then fixes every diagram and proves each edit.</p>
+          </div>
+        </div>
+        <nav aria-label="Areas" className="areas">
+          <ul className="tabs" role="tablist">
+            <li>
+              <button role="tab" aria-selected={area === "apprentice"} className={area === "apprentice" ? "tab on" : "tab"} onClick={() => pick("apprentice")}>
+                Diagrams
+              </button>
+            </li>
+            <li>
+              <button role="tab" aria-selected={area === "prototype"} className={area === "prototype" ? "tab on" : "tab"} onClick={() => pick("prototype")}>
+                UI components · Earlier prototype
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </header>
       {area === "apprentice" ? <Apprentice /> : <Prototype />}
     </>
   );
