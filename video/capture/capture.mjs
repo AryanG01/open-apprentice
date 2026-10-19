@@ -132,7 +132,7 @@ async function answerAll(waitMs) {
       await mark("question", "section.question");
       await sleep(4500); // time to read the alternatives
       // the person's intent: every note left-aligned, 8 below its box; pick the option the trace says matches it
-      const opts = page.locator("label.v2-option.alt");
+      const opts = page.locator("label.v2-option.choice");
       let pick = 0;
       for (let k = 0; k < (await opts.count()); k++) {
         const why = (await opts.nth(k).innerText()).toLowerCase();

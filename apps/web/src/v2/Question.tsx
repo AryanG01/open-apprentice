@@ -49,7 +49,7 @@ export function Question({ sid, q, onAnswered, names = {}, groups }: Props) {
           <p className="muted">These are the same diagram laid out by each rule that still fits. Pick the one you would have drawn.</p>
           <div className="v2-options">
             {req.alternatives.map(([id]) => (
-              <label key={id} className={`v2-option alt${choice === id ? " picked" : ""}`} style={{ borderColor: ALT_COLOURS[id] }}>
+              <label key={id} className={`v2-option choice${choice === id ? " picked" : ""}`} style={{ borderColor: ALT_COLOURS[id] }}>
                 <span className="opt-head">
                   <input type="radio" name="alt" value={id} checked={choice === id} onChange={() => setChoice(id)} />
                   <span className="alt" style={{ background: ALT_COLOURS[id] }}>{id}</span> Option {id}

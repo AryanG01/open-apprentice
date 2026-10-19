@@ -1,147 +1,163 @@
 {
- "url": "http://localhost:8781",
- "live": false,
+ "url": "https://open-apprentice-md76de375q-uc.a.run.app",
+ "live": true,
+ "scale": 1.5,
  "marks": [
   {
    "name": "home",
-   "t": 2.083,
+   "t": 16.896,
    "box": null
   },
   {
    "name": "samples",
-   "t": 6.539,
+   "t": 32.058,
    "box": null
   },
   {
    "name": "mapping-table",
-   "t": 9.56,
+   "t": 35.083,
    "box": {
     "x": 63,
-    "y": 159.828125,
-    "width": 340.984375,
-    "height": 1006.109375
+    "y": 176.96875,
+    "width": 352.65625,
+    "height": 945.640625
    }
   },
   {
    "name": "mapped",
-   "t": 14.45,
+   "t": 46.105,
    "box": null
   },
   {
    "name": "teach-start",
-   "t": 16.304,
+   "t": 53.437,
    "box": {
     "x": 48,
-    "y": 367.015625,
+    "y": 140.15625,
     "width": 806,
     "height": 428
    }
   },
   {
    "name": "taught",
-   "t": 26.414,
+   "t": 69.171,
    "box": {
     "x": 48,
-    "y": 332.015625,
+    "y": 140.15625,
     "width": 806,
     "height": 415
    }
   },
   {
    "name": "session-start",
-   "t": 30.009,
+   "t": 80.27,
    "box": {
-    "x": 1492,
-    "y": 791.078125,
+    "x": 852,
+    "y": 536.21875,
     "width": 380,
     "height": 147.78125
    }
   },
   {
+   "name": "question",
+   "t": 94.299,
+   "box": {
+    "x": 48,
+    "y": 119.75,
+    "width": 780,
+    "height": 246.859375
+   }
+  },
+  {
+   "name": "answered",
+   "t": 101.563,
+   "box": null
+  },
+  {
    "name": "preview",
-   "t": 31.945,
+   "t": 117.454,
    "box": null
   },
   {
    "name": "answered",
-   "t": 36.778,
+   "t": 122.274,
    "box": null
   },
   {
    "name": "session-committed",
-   "t": 67.043,
+   "t": 126.387,
    "box": {
-    "x": 1492,
-    "y": 359.078125,
+    "x": 852,
+    "y": 49.21875,
     "width": 380,
-    "height": 329.8125
+    "height": 1053.84375
    }
   },
   {
    "name": "library-loading",
-   "t": 73.794,
+   "t": 133.141,
    "box": null
   },
   {
    "name": "library-loaded",
-   "t": 78.391,
+   "t": 377.922,
    "box": {
     "x": 48,
     "y": 294.1875,
-    "width": 1824,
-    "height": 365.59375
+    "width": 1184,
+    "height": 558
    }
   },
   {
    "name": "library-confirmed",
-   "t": 79.574,
+   "t": 696.736,
    "box": null
   },
   {
    "name": "apply",
-   "t": 83.163,
+   "t": 707.146,
    "box": {
     "x": 48,
-    "y": 1015.328125,
-    "width": 1824,
+    "y": 633.90625,
+    "width": 1184,
     "height": 24.46875
    }
   },
   {
    "name": "wall-done",
-   "t": 119.451,
+   "t": 905.554,
    "box": {
     "x": 48,
-    "y": 921.328125,
-    "width": 1824,
+    "y": 475.90625,
+    "width": 1184,
     "height": 24.46875
    }
   },
   {
    "name": "compare",
-   "t": 128.612,
+   "t": 914.73,
    "box": {
-    "x": 479,
-    "y": 377.71875,
+    "x": 159,
+    "y": 118.953125,
     "width": 962,
-    "height": 337.765625
+    "height": 495.3125
    }
   },
   {
    "name": "compare-closed",
-   "t": 135.82,
+   "t": 921.964,
    "box": null
   },
   {
    "name": "prototype",
-   "t": 143.008,
+   "t": 929.716,
    "box": null
   },
   {
    "name": "prototype-done",
-   "t": 165.942,
+   "t": 952.647,
    "box": null
   }
  ],
- "frameOffset": 0.016
+ "frameOffset": 0.013
 }
