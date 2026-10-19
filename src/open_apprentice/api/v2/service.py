@@ -14,7 +14,7 @@ from open_apprentice.api.v2.context import V2
 from open_apprentice.api.v2.tasks import Job
 from open_apprentice.drawio import mapping as mp
 from open_apprentice.drawio.classify import Classified, classify
-from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, load_drawio
+from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, display, load_drawio
 from open_apprentice.drawio.patch import apply_edits, plan_edits
 from open_apprentice.drawio.render import Rendered, parse_render
 from open_apprentice.drawio.scene import DrawioScene, build_scene
@@ -165,9 +165,12 @@ def get_document(v: V2, owner: str, doc_id: str) -> dict:
     if "probe_of" in doc:
         out["probe_of"] = doc["probe_of"]
     pages = []
+    f = _source(v, doc_id) if any(e["status"] == "ok" for e in doc["pages"]) else None
     for entry in doc["pages"]:
         p = dict(entry)
         p.update(mapping=None, mapping_hash=None, scene_hash=None)
+        if f is not None and entry["status"] == "ok":
+            p["display"] = display(next(pg for pg in f.pages if pg.id == entry["page_id"]))
         if entry["status"] == "ok" and doc["render"] == "done":
             m, _ = _stored_mapping(v, doc_id, entry["page_id"])
             p["mapping"] = {
@@ -1029,7 +1032,7 @@ def activate(
 
 def page_scene_view(v: V2, owner: str, doc_id: str, page_id: str, mapping_hash: str) -> dict:
     """Scene geometry for the overlay, plus where document coordinates land in the preview image."""
-    _, _, _, sc = page_scene(v, owner, doc_id, page_id, mapping_hash)
+    f, idx, _, sc = page_scene(v, owner, doc_id, page_id, mapping_hash)
     r = _stored_render(v, doc_id, page_id)
     keys = ("id", "kind", "role", "attached")
     return {
@@ -1041,6 +1044,7 @@ def page_scene_view(v: V2, owner: str, doc_id: str, page_id: str, mapping_hash: 
             for o in sc.scene["objects"]
         ],
         "movable": list(sc.movable),
+        "display": display(f.pages[idx]),
     }
 
 
