@@ -39,3 +39,23 @@ def test_the_library_is_reproducible_from_its_seed(tmp_path):
     generate(tmp_path, count=3)
     for f in INDEX["files"][:3]:
         assert (tmp_path / f["file"]).read_bytes() == (LIB / f["file"]).read_bytes()
+
+
+@pytest.mark.parametrize("entry", INDEX["files"], ids=lambda f: f["file"])
+def test_the_demo_rule_fits_every_library_diagram(entry):
+    """Every note left-aligned 8 below its box stays on the page and overlaps nothing (geometry upper bounds)."""
+    c = classify(load_drawio((LIB / entry["file"]).read_bytes()).pages[0])
+    boxes = {k: v for k, v in c.absolute.items() if k not in c.movable and k != "title"}
+    placed = {}
+    for lid in c.movable:
+        ax, ay, aw, ah = c.absolute[lid.removesuffix("-note")]
+        _, _, w, h = c.absolute[lid]
+        placed[lid] = (ax, ay + ah + 8, w, h)
+    every = list(boxes.values()) + list(placed.values())
+    for lid, (x, y, w, h) in placed.items():
+        assert 0 <= x and x + w <= c.width and y + h <= c.height, lid
+        for o in every:
+            if o == (x, y, w, h):
+                continue
+            ox, oy, ow, oh = o
+            assert x + w <= ox or ox + ow <= x or y + h <= oy or oy + oh <= y, (lid, o)

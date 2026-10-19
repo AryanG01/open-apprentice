@@ -88,17 +88,21 @@ export function ImportMap({ docs, setDocs }: Props) {
   const unconfirmed = docs.filter((d) => d.render === "done" && firstOkPage(d)?.mapping && !firstOkPage(d)?.mapping_hash);
   const confirmAll = async () => {
     setBusy(true);
-    for (const d of unconfirmed) {
-      const p = firstOkPage(d);
-      if (!p) continue;
-      try {
-        await post(`/documents/${d.doc_id}/mapping`, { page_id: p.page_id, labels: {}, confirm: true });
-        const nd = await get<DocumentInfo>(`/documents/${d.doc_id}`);
-        setDocs((all) => all.map((x) => (x.doc_id === nd.doc_id ? nd : x)));
-      } catch (e) {
-        setError(`${d.name}: ${e instanceof ApiError ? e.message : String(e)}`);
+    const todo = [...unconfirmed];
+    const worker = async () => {
+      for (let d = todo.shift(); d; d = todo.shift()) {
+        const p = firstOkPage(d);
+        if (!p) continue;
+        try {
+          await post(`/documents/${d.doc_id}/mapping`, { page_id: p.page_id, labels: {}, confirm: true });
+          const nd = await get<DocumentInfo>(`/documents/${d.doc_id}`);
+          setDocs((all) => all.map((x) => (x.doc_id === nd.doc_id ? nd : x)));
+        } catch (e) {
+          setError(`${d.name}: ${e instanceof ApiError ? e.message : String(e)}`);
+        }
       }
-    }
+    };
+    await Promise.all([worker(), worker(), worker(), worker()]);
     setBusy(false);
   };
 

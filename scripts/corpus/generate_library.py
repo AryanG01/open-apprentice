@@ -29,6 +29,9 @@ PALETTE = {
     "data": ("#dff6f3", "#00897b", "#00332d"),
     "ctrl": ("#eceff1", "#546e7a", "#1c2a31"),
     "edge": ("#e8eaf6", "#3949ab", "#1a237e"),
+    "rack": ("#f1f8e9", "#558b2f", "#1b3a07"),
+    "people": ("#fff8e1", "#f9a825", "#4a3500"),
+    "plan": ("#e3f2fd", "#1565c0", "#0b2a4a"),
     "guard": ("#fde7ec", "#d81b60", "#5c0d27"),
 }
 
@@ -79,6 +82,9 @@ NOTES = {
         "Iceberg tables",
     ],
     "ctrl": ["Base Command", "Slurm", "Kubernetes", "Prometheus", "GitOps", "RBAC", "audit log"],
+    "rack": ["32 kW", "liquid", "NVL72", "spare", "A/B feeds", "hot aisle", "40 kW", "burn-in"],
+    "people": ["on-call", "EMEA", "hiring", "SRE", "PhD intern", "lead", "US-West"],
+    "plan": ["shipped", "at risk", "beta", "GA", "blocked: GPUs", "in review", "planned"],
     "edge": ["web + mobile", "12k RPS", "SSO login", "EU + US", "REST + gRPC"],
     "guard": ["NeMo Guardrails", "policy v3", "jailbreak filter", "PII redaction", "warning: beta"],
 }
@@ -239,6 +245,51 @@ THEMES = [
             ("lake", "bi"),
         ],
     ),
+    (
+        "GPU data hall floor plan",
+        [
+            *[(f"rack-a{k + 1}", f"Rack A{k + 1}", "rack", k, 0, k >= 4) for k in range(5)],
+            *[(f"rack-b{k + 1}", f"Rack B{k + 1}", "rack", k, 1, k >= 4) for k in range(5)],
+            ("cdu", "Cooling CDU", "ctrl", 0, 2, False), ("pdu", "Power PDU", "ctrl", 1, 2, False),
+            ("storage", "Storage", "store", 2, 2, True), ("spine", "Spine switch", "net", 3, 2, False),
+        ],
+        [],
+        {"w": 104, "h": 120, "col": 170, "row": 196, "rounded": 0},
+    ),
+    (
+        "AI platform org chart",
+        [
+            ("head", "Head of AI", "people", 1, 0, False), ("ml-lead", "ML lead", "people", 0, 1, False),
+            ("infra-lead", "Infra lead", "people", 1, 1, False), ("data-lead", "Data lead", "people", 2, 1, False),
+            ("pm", "Product", "people", 3, 1, True), ("researcher", "Researcher", "people", 0, 2, False),
+            ("sre", "SRE", "people", 1, 2, False), ("data-eng", "Data engineer", "people", 2, 2, False),
+            ("designer", "Designer", "people", 3, 2, True),
+        ],
+        [("head", "ml-lead"), ("head", "infra-lead"), ("head", "data-lead"), ("head", "pm"),
+         ("ml-lead", "researcher"), ("infra-lead", "sre"), ("data-lead", "data-eng"), ("pm", "designer")],
+    ),
+    (
+        "Model release roadmap",
+        [
+            ("q1-data", "Q1 · data refresh", "plan", 0, 0, False), ("q2-train", "Q2 · pretrain", "plan", 1, 0, False),
+            ("q3-tune", "Q3 · alignment", "plan", 2, 0, False), ("q4-ship", "Q4 · launch", "plan", 3, 0, False),
+            ("q1-eval", "Q1 · eval suite", "plan", 0, 1, False), ("q2-safety", "Q2 · red team", "plan", 1, 1, True),
+            ("q3-serve", "Q3 · serving", "plan", 2, 1, False), ("q4-docs", "Q4 · docs", "plan", 3, 1, True),
+        ],
+        [("q1-data", "q2-train"), ("q2-train", "q3-tune"), ("q3-tune", "q4-ship"), ("q1-eval", "q2-safety"),
+         ("q2-safety", "q3-serve"), ("q3-serve", "q4-docs")],
+        {"w": 170, "h": 44, "col": 210, "row": 120},
+    ),
+    (
+        "Spine-leaf network",
+        [
+            ("spine-1", "Spine 1", "net", 1, 0, False), ("spine-2", "Spine 2", "net", 2, 0, False),
+            *[(f"leaf-{k + 1}", f"Leaf {k + 1}", "net", k, 1, k == 3) for k in range(4)],
+            *[(f"node-{k + 1}", f"GPU node {k + 1}", "gpu", k, 2, k == 3) for k in range(4)],
+        ],
+        [*[(f"spine-{a}", f"leaf-{b}") for a in (1, 2) for b in range(1, 5)],
+         *[(f"leaf-{k}", f"node-{k}") for k in range(1, 5)]],
+    ),
 ]
 
 NODE_W, NODE_H, COL, ROW, MARGIN, TOP = 150, 56, 210, 132, 40, 64
@@ -255,12 +306,14 @@ def _cell(cid: str, value: str, style: str, x: int, y: int, w: int, h: int) -> s
 def diagram(i: int) -> tuple[str, str, int]:
     """(file name, xml, label count) of library diagram i."""
     rng = random.Random(SEED * 1000 + i)
-    title, nodes, edges = THEMES[i % len(THEMES)]
+    title, nodes, edges, *extra = THEMES[i % len(THEMES)]
+    g = extra[0] if extra else {}
+    NW, NH, CP, RP = g.get("w", NODE_W), g.get("h", NODE_H), g.get("col", COL), g.get("row", ROW)
     keep = [n for n in nodes if not n[5] or rng.random() < 0.6]
     slugs = {n[0] for n in keep}
     cols = max(n[3] for n in keep) + 1
     rows = max(n[4] for n in keep) + 1
-    width, height = MARGIN * 2 + cols * COL - (COL - NODE_W), TOP + MARGIN + rows * ROW
+    width, height = MARGIN * 2 + cols * CP - (CP - NW), TOP + MARGIN + rows * RP
     site = rng.choice(["us-west", "eu-north", "ap-south", "us-east", "eu-central", "ap-east"])
     cells = [
         _cell(
@@ -277,18 +330,18 @@ def diagram(i: int) -> tuple[str, str, int]:
     pos = {}
     for slug, name, tier, col, row, _ in keep:
         fill, stroke, font = PALETTE[tier]
-        x, y = MARGIN + col * COL, TOP + row * ROW
+        x, y = MARGIN + col * CP, TOP + row * RP
         pos[slug] = (x, y)
         cells.append(
             _cell(
                 slug,
                 name,
-                f"rounded=1;arcSize=18;whiteSpace=wrap;html=1;fillColor={fill};"
+                f"rounded={g.get('rounded', 1)};arcSize=18;whiteSpace=wrap;html=1;fillColor={fill};"
                 f"strokeColor={stroke};strokeWidth=2;fontColor={font};fontStyle=1;",
                 x,
                 y,
-                NODE_W,
-                NODE_H,
+                NW,
+                NH,
             )
         )
     grid = {n[0]: (n[3], n[4]) for n in keep}
@@ -314,9 +367,9 @@ def diagram(i: int) -> tuple[str, str, int]:
         if (
             row == 0 or rng.random() < 0.65
         ):  # untidy: below (row 0 keeps clear of the title), off-centre, uneven gap
-            lx, ly = x + rng.randint(-30, 30) + (NODE_W - w) // 2, y + NODE_H + rng.randint(2, 18)
+            lx, ly = x + rng.randint(-30, 30) + (NW - w) // 2, y + NH + rng.randint(2, 18)
         else:  # untidy: above the box
-            lx, ly = x + rng.randint(-20, 20) + (NODE_W - w) // 2, y - LABEL_H - rng.randint(4, 12)
+            lx, ly = x + rng.randint(-20, 20) + (NW - w) // 2, y - LABEL_H - rng.randint(4, 12)
         lx = max(2, min(lx, width - w - 2))
         cells.append(
             _cell(

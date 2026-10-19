@@ -1,8 +1,8 @@
 # Demo library: provenance
 
 `apps/web/public/samples/library/` holds 100 diagrams written by `scripts/corpus/generate_library.py` (seed 20261019),
-authored for this project by its generator: six AI-infrastructure themes (AI factory pipeline, DGX SuperPOD, LLM inference
-serving, RAG assistant, Kubernetes GPU cluster, data lakehouse), seeded variation of which boxes appear, their notes and site
+authored for this project by its generator: ten themes (AI factory pipeline, DGX SuperPOD, LLM inference serving, RAG assistant, Kubernetes GPU
+cluster, data lakehouse, GPU data-hall floor plan, AI platform org chart, model release roadmap, spine-leaf network), seeded variation of which boxes appear, their notes and site
 names, and deliberately untidy note positions so a taught layout rule has work to do.
 
 - **No external assets:** no images, stencils, data URIs, links or fonts other than draw.io's default (Helvetica); colours are

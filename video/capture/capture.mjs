@@ -251,6 +251,23 @@ try {
     return m && m[1] === m[2] && !(await page.getByText(/Run running/).count());
   }, "the wall", 900_000);
   await mark("wall-done", ".tally");
+  // real before/after renders of the first published documents, for the opening montage
+  const MONT = path.join(HERE, "..", "public", "montage");
+  fs.rmSync(MONT, { recursive: true, force: true });
+  fs.mkdirSync(MONT, { recursive: true });
+  const tiles = await page.locator("article.result.published").evaluateAll((els) =>
+    els.slice(0, 40).map((e) => ({ name: e.getAttribute("data-result"), after: e.querySelector(".tile-img img")?.getAttribute("src") })));
+  const montage = [];
+  for (const [i, t] of tiles.entries()) {
+    const q = new URL(t.after, URL_).searchParams;
+    const before = `/api/v2/documents/${q.get("doc_id")}/pages/${q.get("page_id")}/preview.png`;
+    const [b, a] = await Promise.all([page.request.get(`${URL_}${before}`), page.request.get(new URL(t.after, URL_).href)]);
+    if (!b.ok() || !a.ok()) continue;
+    fs.writeFileSync(path.join(MONT, `${i}-before.png`), await b.body());
+    fs.writeFileSync(path.join(MONT, `${i}-after.png`), await a.body());
+    montage.push({ i, name: t.name });
+  }
+  fs.writeFileSync(path.join(MONT, "index.json"), JSON.stringify(montage));
   await sleep(2500);
   await page.mouse.wheel(0, 700);
   await sleep(2500);
