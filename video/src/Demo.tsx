@@ -1,4 +1,6 @@
-import { AbsoluteFill, Audio, Freeze, OffthreadVideo, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import montage from "../public/montage/index.json";
+import marks from "../public/marks.json";
+import { AbsoluteFill, Audio, Freeze, Img, OffthreadVideo, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { FPS, timeline, type Beat, type Box } from "./timeline";
 
 const C = { navy: "#0c1c33", table: "#0f2440", ink: "#e8eef7", ink2: "#9fb3cf", cyan: "#7fd3ff", green: "#9be15d", amber: "#ffc35c", pink: "#ff5fa2" };
@@ -34,9 +36,9 @@ export const Demo = () => {
 function Scene({ b }: { b: Beat }) {
   return (
     <AbsoluteFill>
-      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.clip ? <Clip b={b} /> : null}
+      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.clip ? <Clip b={b} /> : null}
       {b.onScreen ? <Headline text={b.onScreen} /> : null}
-      {b.clip && (b.clip.rate > 1.15 || b.live) ? <Tags b={b} /> : null}
+      {b.live ? <Tags b={b} /> : null}
       {b.explain ? <Explainer steps={b.explain} dur={b.dur} /> : null}
       <Captions b={b} />
     </AbsoluteFill>
@@ -90,11 +92,7 @@ function Tags({ b }: { b: Beat }) {
   return (
     <div style={{ position: "absolute", top: 40, right: 48, display: "flex", gap: 12, fontSize: 26, fontWeight: 600 }}>
       {b.live ? <span style={{ background: C.green, color: "#0b1d05", padding: "8px 14px", borderRadius: 8 }}>● Live run</span> : null}
-      {b.clip && b.clip.rate > 1.15 ? (
-        <span style={{ background: "rgba(8,20,38,.86)", color: C.amber, border: `1px solid ${C.amber}`, padding: "8px 14px", borderRadius: 8 }}>
-          Sped up ×{b.clip.rate < 10 ? b.clip.rate.toFixed(1) : Math.round(b.clip.rate)}
-        </span>
-      ) : null}
+
     </div>
   );
 }
@@ -201,6 +199,78 @@ function ResultsCard() {
       <div style={{ fontSize: 30, color: C.amber, marginTop: 30 }}>
         On plain learning the free agent scores higher. We publish that too, with every failure.
       </div>
+      <div style={{ fontSize: 22, color: C.ink2, marginTop: 18 }}>Every screen in this video is a real session; waiting time is shortened in the edit.</div>
+    </AbsoluteFill>
+  );
+}
+
+type MTile = { i: number; name: string };
+
+/** Real before/after renders from the run: a wave sweeps across the wall, turning each untidy diagram into its published one. */
+function Montage() {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const tiles = (montage as MTile[]).slice(0, 32);
+  const cols = 8;
+  const real = Number(((marks as { marks: { name: string }[] }).marks.find((m) => m.name.startsWith("published-"))?.name ?? "published-0").split("-")[1]);
+  const published = Math.round(interpolate(frame, [fps * 1.2, fps * 6.5], [0, real], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
+  return (
+    <AbsoluteFill style={{ ...grid, padding: "120px 60px 60px" }}>
+      <div style={{ position: "absolute", top: 36, left: 60, color: "#fff", fontSize: 48, fontWeight: 600 }}>
+        Fix one diagram. It fixes the other hundred.
+      </div>
+      <div style={{ position: "absolute", top: 46, right: 60, color: C.green, fontSize: 40, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+        {published} / 100 published
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 14 }}>
+        {tiles.map((t, k) => {
+          const r = Math.floor(k / cols), c = k % cols;
+          const p = interpolate(frame, [fps * (1.2 + (r + c) * 0.42), fps * (1.7 + (r + c) * 0.42)], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          return (
+            <div key={t.i} style={{ position: "relative", background: "#fff", borderRadius: 6, overflow: "hidden", aspectRatio: "16 / 10",
+              boxShadow: p >= 100 ? `0 0 0 3px ${C.green}` : "0 0 0 1px #2a4670" }}>
+              <Img src={staticFile(`montage/${t.i}-after.png`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
+              <Img src={staticFile(`montage/${t.i}-before.png`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", clipPath: `inset(0 0 0 ${p}%)` }} />
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+const ARCH: [string, string][] = [
+  ["Your .drawio files", "parsed, never executed"],
+  ["Real draw.io engine", "locked headless Chromium, offline"],
+  ["NVIDIA Nemotron", "on Nebius Token Factory, proposes rules"],
+  ["Sandboxed interpreter", "exact arithmetic, no eval"],
+  ["Probe search", "draws the diagram that splits the rules"],
+  ["Byte-exact patch", "three independent checks, then publish"],
+];
+
+/** The pipeline, lit step by step as the narration walks through it. */
+function Architecture({ dur }: { dur: number }) {
+  const frame = useCurrentFrame();
+  const t = frame / FPS;
+  const each = (dur - 2) / ARCH.length;
+  return (
+    <AbsoluteFill style={{ ...grid, padding: "120px 90px", color: C.ink }}>
+      <div style={{ fontSize: 60, fontWeight: 600, color: "#fff" }}>Under the hood</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "56px 70px", marginTop: 60 }}>
+        {ARCH.map(([h, sub], i) => {
+          const on = interpolate(t, [0.6 + i * each, 1.1 + i * each], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          return (
+            <div key={h} style={{ position: "relative", border: `2px solid ${on > 0.5 ? (i === 2 ? C.green : C.cyan) : "#2a4670"}`, borderRadius: 14,
+              padding: "26px 28px", background: `rgba(8,20,38,${0.55 + 0.35 * on})`, opacity: 0.3 + 0.7 * on, transform: `translateY(${(1 - on) * 12}px)` }}>
+              <div style={{ fontSize: 22, color: C.ink2 }}>{i + 1}</div>
+              <div style={{ fontSize: 40, fontWeight: 600, color: "#fff" }}>{h}</div>
+              <div style={{ fontSize: 28, color: C.ink2, marginTop: 6 }}>{sub}</div>
+              {i % 3 !== 2 ? <div style={{ position: "absolute", right: -52, top: "42%", color: C.cyan, fontSize: 40, opacity: on }}>→</div> : null}
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ fontSize: 28, color: C.ink2, marginTop: 56 }}>Google Cloud Run · Cloud Tasks · Cloud Storage · a durable spending cap on every live call</div>
     </AbsoluteFill>
   );
 }

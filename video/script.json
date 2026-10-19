@@ -4,11 +4,7 @@
     {
       "id": "hook",
       "text": "Every team has a hundred diagrams that should look the same. Fix one by hand, and Open Apprentice fixes the rest, and proves every edit.",
-      "clip": [
-        "wall-done",
-        "compare-closed"
-      ],
-      "onScreen": "Fix one diagram. It fixes the other hundred."
+      "card": "montage"
     },
     {
       "id": "title",
@@ -16,8 +12,13 @@
       "card": "title"
     },
     {
+      "id": "arch",
+      "card": "arch",
+      "text": "Under the hood, every file is drawn by the real draw dot io viewer, in a locked, offline browser. Nemotron writes candidate rules in a tiny, exact rule language, and a sandboxed interpreter runs them. Nothing the model writes is ever executed as code."
+    },
+    {
       "id": "import",
-      "text": "Start with real draw dot io files. The apprentice reads which note belongs to which box, and you check its guess.",
+      "text": "Start with real draw dot io files. The apprentice measures every box the engine actually draws, matches each note to its box, and you check its guess.",
       "clip": [
         "home",
         "mapped"
@@ -36,7 +37,7 @@
     },
     {
       "id": "think",
-      "text": "Now Nemotron, live on Nebius, writes small programs that could explain my example. Several fit. Instead of guessing, the apprentice draws a test diagram where those programs disagree.",
+      "text": "Now Nemotron, live on Nebius, proposes programs that could explain my example, and each one is replayed against what I did. Several fit. Instead of guessing, a bounded search draws a test diagram where those programs disagree.",
       "clip": [
         "session-start",
         "question"
@@ -69,7 +70,7 @@
     },
     {
       "id": "commit",
-      "text": "It previews the rule on diagrams I never touched, and keeps it as a versioned skill.",
+      "text": "It previews the rule on diagrams I never touched, and stores it as a versioned skill. Every step goes into an event log that can be replayed exactly.",
       "clip": [
         "answered",
         "session-committed"
@@ -83,7 +84,7 @@
     },
     {
       "id": "scale",
-      "text": "Now the payoff. A hundred diagrams: GPU clusters, inference stacks, data platforms. One click applies the skill to every one of them. Each edit is a byte exact patch of the file, and it must pass three independent checks before it is published.",
+      "text": "Now the payoff. A hundred diagrams, one click. Each edit is a byte exact patch of just the note positions, and every file is re-parsed, re-rendered and measured, passing three independent checks before it is published.",
       "clip": [
         "library-loading",
         "wall-done"
@@ -95,6 +96,15 @@
         "Preservation check",
         "Layout safety check"
       ]
+    },
+    {
+      "id": "breadth",
+      "clip": [
+        "wall-done",
+        "compare"
+      ],
+      "onScreen": "Floor plans \u00b7 org charts \u00b7 roadmaps \u00b7 networks",
+      "text": "And it is not just flowcharts. Floor plans, org charts, roadmaps and network maps are fixed by the same skill, because it learned how notes relate to their boxes, not what one picture looks like."
     },
     {
       "id": "compare",

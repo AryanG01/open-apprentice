@@ -108,6 +108,23 @@ async function docInfo(name) {
   throw new Error(`document ${name} not found`);
 }
 
+/** Which alternative of the open question places every note left-aligned, 8 below its box (within 0.5)? */
+async function intendedChoice() {
+  const sid = page.url().match(/s\/([0-9a-f]+)/)[1];
+  const st = await (await page.request.get(`${URL_}/api/v2/sessions/${sid}`)).json();
+  const req = st.outstanding?.request;
+  if (!req || req.type !== "ChooseOutput") return null;
+  const [docId, pageId] = req.scene_id.split(":");
+  const d = await (await page.request.get(`${URL_}/api/v2/documents/${docId}`)).json();
+  const p = d.pages.find((x) => x.page_id === pageId);
+  const sc = await (await page.request.get(`${URL_}/api/v2/documents/${docId}/pages/${pageId}/scene?mapping_hash=${p.mapping_hash}`)).json();
+  const objs = Object.fromEntries(sc.objects.map((o) => [o.id, o]));
+  const want = Object.fromEntries(sc.objects.filter((o) => o.kind === "label" && sc.movable.includes(o.id))
+    .map((o) => [o.id, [n(objs[o.attached].x), n(objs[o.attached].y) + n(objs[o.attached].h) + 8]]));
+  const ok = (out) => Object.entries(want).every(([k, [x, y]]) => out[k] && Math.abs(n(out[k][0]) - x) <= 0.5 && Math.abs(n(out[k][1]) - y) <= 0.5);
+  return req.alternatives.find(([, out]) => ok(out))?.[0] ?? null;
+}
+
 async function answerAll(waitMs) {
   for (let i = 0; i < 10; i++) {
     const s = await until(async () => {
@@ -131,13 +148,15 @@ async function answerAll(waitMs) {
     } else {
       await mark("question", "section.question");
       await sleep(4500); // time to read the alternatives
-      // the person's intent: every note left-aligned, 8 below its box; pick the option the trace says matches it
+      // the person's intent: every note left-aligned, 8 below its box. Pick the option whose rendered outcome matches it on
+      // the diagram shown (the same test the product check scores with), never by the wording of the rule.
       const opts = page.locator("label.v2-option.choice");
+      const want = await intendedChoice();
       let pick = 0;
       for (let k = 0; k < (await opts.count()); k++) {
-        const why = (await opts.nth(k).innerText()).toLowerCase();
-        if (/left/.test(why) && !/role|note.? only|'note'/.test(why)) { pick = k; break; }
+        if ((await opts.nth(k).locator('input[name="alt"]').getAttribute("value")) === want) pick = k;
       }
+      console.log(`  question: picking ${want ?? "(no match: first)"}`);
       await click(opts.nth(pick).locator('input[name="alt"]'));
       await sleep(900);
       await click(page.getByRole("button", { name: "Submit answer" }));
@@ -251,6 +270,8 @@ try {
     return m && m[1] === m[2] && !(await page.getByText(/Run running/).count());
   }, "the wall", 900_000);
   await mark("wall-done", ".tally");
+  const tally = (await page.locator(".tally").innerText()).match(/(\d+) published/);
+  marks.push({ name: `published-${tally ? tally[1] : 0}`, t: now(), box: null });
   // real before/after renders of the first published documents, for the opening montage
   const MONT = path.join(HERE, "..", "public", "montage");
   fs.rmSync(MONT, { recursive: true, force: true });

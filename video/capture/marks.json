@@ -5,17 +5,17 @@
  "marks": [
   {
    "name": "home",
-   "t": 4.126,
+   "t": 3.928,
    "box": null
   },
   {
    "name": "samples",
-   "t": 14.701,
+   "t": 14.527,
    "box": null
   },
   {
    "name": "mapping-table",
-   "t": 17.711,
+   "t": 17.545,
    "box": {
     "x": 63,
     "y": 176.96875,
@@ -25,12 +25,12 @@
   },
   {
    "name": "mapped",
-   "t": 24.862,
+   "t": 24.485,
    "box": null
   },
   {
    "name": "teach-start",
-   "t": 27.79,
+   "t": 27.288,
    "box": {
     "x": 48,
     "y": 140.15625,
@@ -40,7 +40,7 @@
   },
   {
    "name": "taught",
-   "t": 50.159,
+   "t": 54.896,
    "box": {
     "x": 48,
     "y": 140.15625,
@@ -50,7 +50,7 @@
   },
   {
    "name": "session-start",
-   "t": 57.45,
+   "t": 62.195,
    "box": {
     "x": 852,
     "y": 536.21875,
@@ -60,7 +60,7 @@
   },
   {
    "name": "question",
-   "t": 76.294,
+   "t": 77.286,
    "box": {
     "x": 48,
     "y": 178.75,
@@ -70,12 +70,12 @@
   },
   {
    "name": "answered",
-   "t": 83.556,
+   "t": 84.563,
    "box": null
   },
   {
    "name": "question",
-   "t": 92.342,
+   "t": 92.099,
    "box": {
     "x": 48,
     "y": 119.75,
@@ -85,37 +85,37 @@
   },
   {
    "name": "answered",
-   "t": 99.605,
+   "t": 99.363,
    "box": null
   },
   {
    "name": "preview",
-   "t": 112.911,
+   "t": 111.192,
    "box": null
   },
   {
    "name": "answered",
-   "t": 117.736,
+   "t": 116.011,
    "box": null
   },
   {
    "name": "session-committed",
-   "t": 149.797,
+   "t": 147.575,
    "box": {
     "x": 852,
     "y": 49.21875,
     "width": 380,
-    "height": 993.65625
+    "height": 1015.96875
    }
   },
   {
    "name": "library-loading",
-   "t": 156.465,
+   "t": 154.311,
    "box": null
   },
   {
    "name": "library-loaded",
-   "t": 258.86,
+   "t": 258.724,
    "box": {
     "x": 48,
     "y": 294.1875,
@@ -125,32 +125,32 @@
   },
   {
    "name": "library-confirmed",
-   "t": 364.026,
+   "t": 285.158,
    "box": null
   },
   {
    "name": "apply",
-   "t": 371.9,
+   "t": 292.042,
    "box": {
     "x": 48,
-    "y": 633.71875,
+    "y": 634.03125,
     "width": 1184,
     "height": 24.46875
    }
   },
   {
    "name": "wall-done",
-   "t": 487.644,
+   "t": 458.41,
    "box": {
     "x": 48,
-    "y": 59.71875,
+    "y": 60.03125,
     "width": 1184,
     "height": 24.46875
    }
   },
   {
    "name": "compare",
-   "t": 496.81,
+   "t": 486.326,
    "box": {
     "x": 159,
     "y": 118.953125,
@@ -160,19 +160,19 @@
   },
   {
    "name": "compare-closed",
-   "t": 504.025,
+   "t": 493.564,
    "box": null
   },
   {
    "name": "prototype",
-   "t": 511.474,
+   "t": 501.046,
    "box": null
   },
   {
    "name": "prototype-done",
-   "t": 534.409,
+   "t": 523.98,
    "box": null
   }
  ],
- "frameOffset": 0.01
+ "frameOffset": 0.008
 }
