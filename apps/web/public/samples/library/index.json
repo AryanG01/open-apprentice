@@ -1,0 +1,606 @@
+{
+ "generator": "scripts/corpus/generate_library.py",
+ "seed": 20261019,
+ "files": [
+  {
+   "file": "000-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "ab4a480c104336ec61d0d92abba9933252ba9182b44c1633cc9d811b4d60d2f8"
+  },
+  {
+   "file": "001-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "443723eb9e1b6bf2a9eef413f2b3b5669cef03dade3f3356b493496db0b6447e"
+  },
+  {
+   "file": "002-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "d4c91863dcb74ebb9fd7052ecba2e9dece1e2d5cab91206db58694b04987df1a"
+  },
+  {
+   "file": "003-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "5dcddcdae40592decfb86033e67a968817b6e4d5296f32ba31c8fd0f92e07131"
+  },
+  {
+   "file": "004-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "fd013ca2b31f0fb3f83526d26f783521d46499f995da54a6361eee0f32289c51"
+  },
+  {
+   "file": "005-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "5667193530e40c07c7159764de9e9945477de1b840a122d204cb7b080721b0f5"
+  },
+  {
+   "file": "006-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "310935b9b2723ded08eed0ed4d05f453c6e875c241cf3191ad4faf6ea4f10ad5"
+  },
+  {
+   "file": "007-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "69e50d0535592047465f1cefec13f844dbaf1409f115eabb947b87e6d2041f5f"
+  },
+  {
+   "file": "008-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "97fa1e23d42318148a52303f624c431cff2985ffe06dffc4f34f95271df4edd0"
+  },
+  {
+   "file": "009-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "4342c1548777771c33653d792c09b8f3bd49703459785a41aa193d25597be9c6"
+  },
+  {
+   "file": "010-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "e951ff3f34ade16ac3dedaffc3b57105168b23af98924f1713c1afddd1f04402"
+  },
+  {
+   "file": "011-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "272f92be0c38a511aded7f9c70148fcef28c629b82c1fdeb7da8db74f715e510"
+  },
+  {
+   "file": "012-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "0255d04c78f0c98583562f43c38a2c665334d2ac497aaeeadc1918f0bee195d3"
+  },
+  {
+   "file": "013-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "daa368a978f04302c30135b58d67ffbb7e21351d3722d1644a0097f30a2faeb8"
+  },
+  {
+   "file": "014-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 10,
+   "sha256": "5534c7da48dfa3dca85588bbbe39d57de2d2a8d575be4ea1614be5b616b61844"
+  },
+  {
+   "file": "015-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 9,
+   "sha256": "99343e4f0d12bef6311db042035d5db0b3661d2ac2e81c21d409da546d0afbf5"
+  },
+  {
+   "file": "016-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "298e5b4b08c00baee151b4cbd4bc5a31859c43381fcf9e091ea04ef48ff87bc4"
+  },
+  {
+   "file": "017-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "eae8cc67af317e5ceace061ec8fba926e8eb939a8433599c1d2af1433be99a7e"
+  },
+  {
+   "file": "018-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "c3dc30a833f5ab442b6ce9a30a3508e8e6c0903e891481fa65e121e52b13b879"
+  },
+  {
+   "file": "019-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 8,
+   "sha256": "ea07d1fec7009751a4a71d48bf57c2cfa9aef449ffeb2b82ad51b767dfb94517"
+  },
+  {
+   "file": "020-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "bc260c2b268be5acc7335a291037f2a58f05cf0d92b0c6f3c1f8a96f99820324"
+  },
+  {
+   "file": "021-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 9,
+   "sha256": "85eb1d888f5c84af7a8ad46fad7ab91f8fc7ca25453fd1ab3af0167afd5700e8"
+  },
+  {
+   "file": "022-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "9850ed8d3856e8eba092fed09c34b38a8b5701671c8d920642784b1b7604069c"
+  },
+  {
+   "file": "023-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 9,
+   "sha256": "dd046e4a64a8c33ce60e07a9f034ab404cd9720c8e643cef1c615806c0a2a37a"
+  },
+  {
+   "file": "024-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "e4467d9ac8cb9f567aeff103d5bd5c06d5cf5460386f1b78c563dec68c83c7f6"
+  },
+  {
+   "file": "025-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "d82746ec2fc8a2c89f9689d3e3661e3ed3d6f2dacc65f8c35c8988b0d450a8e7"
+  },
+  {
+   "file": "026-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "e40855057b12c0e38ae07a53cbe38e5e792abdc7ab8f2e5fde829473fc236790"
+  },
+  {
+   "file": "027-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "be34809efdf06bd019501244dfbc9e4fa37c096b69215e58a48fa787e30ed40d"
+  },
+  {
+   "file": "028-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "4a42891776590711624d3c937f8775ea3f5159b2079142306a158b0bcd962f24"
+  },
+  {
+   "file": "029-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "b38d7962807032ee2aa195d9f697aa86a6a8a2ce2fccb3062bc5ceff06c74fcd"
+  },
+  {
+   "file": "030-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "a993eaece27cffff11ab6a883184da42f16c5fa60dd85ed30f0c4cc1b26b7fb1"
+  },
+  {
+   "file": "031-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "7855586e03a2f75ac95e81d727ac6c5ce5e2528a8a686bf4164ab3dadcc02883"
+  },
+  {
+   "file": "032-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "7868dc70f7e5fc159ec100480734a74cdcb7fede6a715853f6de47c1e42f5176"
+  },
+  {
+   "file": "033-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "050936c469397842a5f0e226e3283cd218c7dc4ef886cfd076e8677e5d2711e5"
+  },
+  {
+   "file": "034-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "b79621ae07a9821a2f33f0b34c356ee19455d018cc170d3cd2e39360e98d81bb"
+  },
+  {
+   "file": "035-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "fe9a268bfcc73a12eda82d16825e121a096dc700486d25cd7bf0d0dc79e8479d"
+  },
+  {
+   "file": "036-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "35563977e18c74c507aba2dbe5e2b1afc9e85b8f343f821aac123a395197d9b1"
+  },
+  {
+   "file": "037-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "4e4798d6ab129042f41c668d04b5b879918cd59ae53aa5cbe471d04364174145"
+  },
+  {
+   "file": "038-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 10,
+   "sha256": "c4309c19a30197dcef83f86c3311f257964dd052213af2f47a8025cee658a738"
+  },
+  {
+   "file": "039-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 9,
+   "sha256": "0c6759d414b7f412656d3acf487e1f0b6746b87fa9f6ea8a4b3553f40145f4fb"
+  },
+  {
+   "file": "040-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "0774bd86f9677aed663ef90c2051c3572168b8f73e1df382a76d1df9c85a2d7f"
+  },
+  {
+   "file": "041-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 6,
+   "sha256": "4d4d1c42d6ff83a8f631839a61fe4a4ea4dd6f361ebce31e972b778082b3484c"
+  },
+  {
+   "file": "042-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "01c4b23cae42d65f224dce3aaa5144b5ba8f8184b0b43c5b1d4f00b0c49bb180"
+  },
+  {
+   "file": "043-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "2f5794d97d57231837d83cd4cf91456e57d716d9923419a2f5b1237021ce69de"
+  },
+  {
+   "file": "044-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "7151db6ba0b113f832626a3177d8dc3a36272e5603911845cdda819fe63f99e2"
+  },
+  {
+   "file": "045-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "f01a92c296073534c538e14c05e26d698f0c2c8fbae1c2924ba7aaee49c0f9f9"
+  },
+  {
+   "file": "046-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "0ce7ceb36eb8fc8e06c7274eef645112408f4e292c8a73f83b8297b7d2aaaf76"
+  },
+  {
+   "file": "047-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "27c705ef01f5df62c334599d9d15a561d40f7348f98cbe0f98f53d96e6ffc874"
+  },
+  {
+   "file": "048-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "8682237bc139891bfe55d2c56e8788ceea1bb43b6aaedb570af07edcc10ec2d3"
+  },
+  {
+   "file": "049-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "b1cde5e4057ac5fdc5750e461bbddf5dea1279f72d41e6868754656a3daa0454"
+  },
+  {
+   "file": "050-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "76b98a968e29c6ec5725576f7ed953833c461de3eb3beda62878cbc41b947ef4"
+  },
+  {
+   "file": "051-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 9,
+   "sha256": "23d151ad609057a37aa59e109c868ac9f4ea6c6de8e85fd18284cd4b9beab9d1"
+  },
+  {
+   "file": "052-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "f6b41624d95b6ac05af965b75f1471b45b4803009564751997ae85e365c13f79"
+  },
+  {
+   "file": "053-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "8b4591609fc54318d943f4c6f540469732f3f59cd59ebd9a82330ab5f1d833d5"
+  },
+  {
+   "file": "054-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "7b1d79b37858eb7ef437aa86a6fb5b278477e15198649c65f7aefff8b603e1ec"
+  },
+  {
+   "file": "055-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 11,
+   "sha256": "cd313c643058f7999179a4bd2c546ed6c82dd9c20be340ea8ebe1eb9461c3cb5"
+  },
+  {
+   "file": "056-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "9d1c1676d3dfe51b0150a6fd3c86a4f79e5671975bb61cb11c9eb01656b88e17"
+  },
+  {
+   "file": "057-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "1f4f938e75575895703f848b6e37b9d02ca156c16804958e4f899f8b6163adf7"
+  },
+  {
+   "file": "058-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "bc8b5e4009280e93ed3bd9a1acd0aa86c2b976b8f28d0bc8075145240c70b3ad"
+  },
+  {
+   "file": "059-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "ac332e1e1d36384f60e1348a1e04142cb1326205c2a51f037d4323d80ee9d180"
+  },
+  {
+   "file": "060-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "45bdefd94c0a2607af5a099b446c6040293df63780576b03750f6acb716150b6"
+  },
+  {
+   "file": "061-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "e27b4a7de30ef3ffb72b1859f15bfa857c3e28aeced44444d83ede3b2463e6eb"
+  },
+  {
+   "file": "062-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 10,
+   "sha256": "194dbe4aa4152aba0752d31d3f5d4c0f9033c956af92e767ecab3e15f0cf6998"
+  },
+  {
+   "file": "063-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "a88ed7d05db401458d5905e4aae44a6867636ee23ac9a082af76d053ea0ebb0c"
+  },
+  {
+   "file": "064-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "69fe051a86984c22a740674dd0eb30307b9f244c7debc5742ed263ad3ca0f280"
+  },
+  {
+   "file": "065-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "f5f1371b1b78182e895cb53e05f72d8ba7da38f27f67202e6c79e0601bdddc5f"
+  },
+  {
+   "file": "066-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "331232abb845ffbec2eb48db0de13324cd08170d48224b4d244ab78954052334"
+  },
+  {
+   "file": "067-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "ce6278d0e377d551b2f87c517ea76cbebc41bf0a9b5bc15fe7ef3fc957129268"
+  },
+  {
+   "file": "068-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "0b03c04596187705f776d393bb14580eeac9ea929e0a6fc66743b4e69695d304"
+  },
+  {
+   "file": "069-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "e8e728679ad32702af76a42c9aca0393c5d2d1ddb91e1c00384b4eb2b1cd0579"
+  },
+  {
+   "file": "070-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "c9f09cc9d114237dee8fe8bae12d40249c94b5ac7a90bf5d64f9faa877f76876"
+  },
+  {
+   "file": "071-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "3ce70dc26c627fb3ceaffc706f04e752dc43b805916f1b09dd1ad0364cf639d6"
+  },
+  {
+   "file": "072-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 7,
+   "sha256": "4f690508b24aca7b18369186f4ebc5f2285d9cf9f5a4d97c8fbb15772560b760"
+  },
+  {
+   "file": "073-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "63a87da2911db3458e1f4c4fff064823b8efe6d2a1b6136ab4c6ab335cda647c"
+  },
+  {
+   "file": "074-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "ab32f4ed50098f76c96db196b54a48beed710339a73b0fda57719781196428cb"
+  },
+  {
+   "file": "075-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "90220900ea4cc7da7f65e66bccd9a59434f29f4a3aa57edd9f653dc39a7ca74c"
+  },
+  {
+   "file": "076-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 10,
+   "sha256": "930ce5fdf6900946bf91eb9b46ca73a9230f53d34d79680a5ff2e17ba14002ee"
+  },
+  {
+   "file": "077-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 9,
+   "sha256": "3b538d83f6572d14214e064e872d113151fee4178158c1c882eacd5f0a7037aa"
+  },
+  {
+   "file": "078-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "5e1c7dee00013af1d7d519fa0d56d544d6964773d4c2badd74e69b8a51193fc0"
+  },
+  {
+   "file": "079-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 11,
+   "sha256": "aea6df1478e7081fb906bbd9871968ef7738924b62a1d01acb91c5165121c2d0"
+  },
+  {
+   "file": "080-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 10,
+   "sha256": "b11775d0377d99a7f506d2ff7af6d50a8b86c09b3149c6c7b5ae887cc44d13e0"
+  },
+  {
+   "file": "081-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "1354ebba6d24f244afbff3a271e773a73852b9bb2b1d4c62cd97270c91d3b737"
+  },
+  {
+   "file": "082-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "d758d46d53291578aade235d8d5e1c76c72440ff077439163c751829f8d1f844"
+  },
+  {
+   "file": "083-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "c7f0466730e6e42c9d76d7d023d789073e28ae778aaa269335ddc3fa8e66e4eb"
+  },
+  {
+   "file": "084-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "bc263198cde3d9ba4c6b8fb0a42ef5613c6977d1c93045b1850829007b0d4e00"
+  },
+  {
+   "file": "085-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "6235144d00c3dfcb1afcdfe2e0d490bcd1c7908a0f9fb119f6a5ff3acc69c544"
+  },
+  {
+   "file": "086-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "9a8b129e930506e9fde3dacbb562d06c5e3c67615a0ef228b63f08f0409dd085"
+  },
+  {
+   "file": "087-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "fc719207c776ca25e143856214efc5d85b92f274743961e41b33c01d8d5fe88d"
+  },
+  {
+   "file": "088-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "952769579bc9979f0b2b3ee40f19944ff6342e2aa2cc6b2b2778a129a49dbc15"
+  },
+  {
+   "file": "089-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "591cf9ae3472ecb8d2190eed0c41c71abf06b09a83c99af535eef4daaf7b97a8"
+  },
+  {
+   "file": "090-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "4a85ca8ac14f151df222e5642064f8328de6596a79cf6a8864ee05437a1662b9"
+  },
+  {
+   "file": "091-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "0cef81734b151a0861f1e3aeb322a863300939e45b4d0a6212b0d8c657c8a598"
+  },
+  {
+   "file": "092-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "08e0b240302a46286b0c4622f068775bab528c05d6e02081e92c99c500ed4633"
+  },
+  {
+   "file": "093-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "ffc69b4036f05050f63ca9a75ffaf9a7abe1c30eb8021a5bcb39ed8151a1c864"
+  },
+  {
+   "file": "094-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "16a24d2eefc3a3e1115dbeaf38416df018ec9ea414ea118c4d20b81f5f4e4eea"
+  },
+  {
+   "file": "095-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "11b345a5fbf728237b1c93f1ac509b337589a72d3eb2459c704f3c44e0834f78"
+  },
+  {
+   "file": "096-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "a9c31d46abeb0c9ad670e7d2a0fc7bd42cd374cf8d3117973a4516a64d6fe91f"
+  },
+  {
+   "file": "097-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 11,
+   "sha256": "62eb754405c42a10d6b4268ed359684fa9b782ee7bc48918b3d5e0e0e78509da"
+  },
+  {
+   "file": "098-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "4804e18959fd0ae7070d0432606acb6fa978d7b37089e5ef6edb897a0267804a"
+  },
+  {
+   "file": "099-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "685a00413d47a3e0b1d087e021ded298e147b0922c01b09fba7a0249dec96b81"
+  }
+ ]
+}
