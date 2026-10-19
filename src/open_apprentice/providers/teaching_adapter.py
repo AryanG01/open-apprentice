@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import time
 import pathlib
 from fractions import Fraction
 from typing import Callable, Optional
@@ -77,7 +78,9 @@ def _call(
             if close is not None:
                 await close()
 
+    started = time.monotonic()
     done = asyncio.run(go())
+    elapsed = round(time.monotonic() - started, 1)
     usd = _usd(done)
     if usd is None:
         raise ValueError("cost unknown: the provider did not report usage")
@@ -87,6 +90,7 @@ def _call(
         "usage_estimated": done.usage_estimated,
         "provider_label": done.provider_label,
         "model_id": done.model_id,
+        "elapsed_s": elapsed,  # diagnostic only: wall time of the call
     }
     return done, usage, Fraction(str(usd))
 

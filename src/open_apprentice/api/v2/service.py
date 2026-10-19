@@ -394,6 +394,7 @@ def _create_session(
         "model": v.model if live else "Fixture",
         "teacher": "You",
         "live": live,
+        "policy": PRODUCT_POLICY if live else "A",
     }
     records.put_new(v.store, _meta_key(sid), owner, meta)
     v.dispatcher.submit(Job("advance", sid, {"sid": sid}))
@@ -407,12 +408,24 @@ def _raw_meta(v: V2, sid: str) -> dict:
     return json.loads(b.data)
 
 
+PRODUCT_POLICY = "product-1"  # A plus truncation tolerance; not the evaluated policy A (docs/evaluation/product_policy.md)
+
+
+def step_config(meta: dict) -> Any:
+    """Live product sessions tolerate a reply cut at the completion cap (an empty round, not a terminal error); everything
+    else, including every evaluated run, is policy A."""
+    from open_apprentice.teaching.step import StepConfig
+
+    if meta.get("live") and meta.get("policy") == PRODUCT_POLICY:
+        return StepConfig(probes=True, tolerate_truncation=True)
+    return StepConfig(probes=True)
+
+
 def advance(v: V2, sid: str) -> None:
     """Run the session's executor until it needs a person, a result, or ends; activate a new skill's first version."""
     from open_apprentice.skills.versions import ActivationRejected, SkillStore
     from open_apprentice.teaching.events import SessionLog
     from open_apprentice.teaching.executor import Executor
-    from open_apprentice.teaching.step import StepConfig
 
     meta = _raw_meta(v, sid)
     log = SessionLog(v.store, sid)
@@ -421,7 +434,7 @@ def advance(v: V2, sid: str) -> None:
     owner = log.manifest()[0]["owner"]
     status = Executor(
         v.store, log, v.proposer if meta["live"] else _offline(v), _Deferred(), v.ledger,
-        StepConfig(probes=True), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
+        step_config(meta), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
         probe_renderer=make_probe_renderer(v, owner, sid),
     ).run()  # fmt: skip
     if status != "committed":
@@ -580,7 +593,11 @@ def session_state(v: V2, owner: str, sid: str) -> dict:
             "uncertain": _s(spend["uncertain"]),
         },
         "manifest_revision": manifest["manifest_revision"],
-        "provenance": {"model": meta["model"], "teacher": meta["teacher"]},
+        "provenance": {
+            "model": meta["model"],
+            "teacher": meta["teacher"],
+            "policy": meta.get("policy", "A"),
+        },
         "result": result,
         "thinking": _thinking(evs, meta["model"]),
     }
