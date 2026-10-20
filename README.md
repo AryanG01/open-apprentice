@@ -8,16 +8,18 @@ documents (a result that would break a layout is shown as blocked and cannot be 
 any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and three independent checks (measured conformance,
 preservation of everything else in the file, layout safety) gate every publish.
 
-Built for the Nebius x NVIDIA Global AI Hackathon. Live model: NVIDIA Nemotron through Nebius Token Factory (Nemotron-3-Ultra in the evaluation;
+Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents; submission text in `docs/submission.md`). Live model: NVIDIA Nemotron through Nebius Token Factory (Nemotron-3-Ultra in the evaluation;
 Nemotron-3-Super on the live site, chosen by a pre-registered check, `docs/evaluation/product_model_check.md`). Everything else runs offline.
 
 ## Live demo
 
 **https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
-Press **Try a sample** or **Load the 100-diagram library** (generated AI-infrastructure diagrams, `docs/corpus/library_provenance.md`), or upload
-your own `.drawio`. Confirm which box each note describes, place the notes on one diagram, and tick *Use the live model*. The apprentice's
-notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks. Then apply the skill to all 100
-diagrams and compare before and after. Every session and run states `Model: … · Teacher: …` (and `· Policy: product-1` for live sessions, a
+Video (2:37): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
+diagrams), confirm which box each note describes, drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
+document is right*. The apprentice's notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks.
+Then apply the skill to **the 100-diagram library** (ten kinds: flowcharts, architecture maps, org charts, roadmaps, network maps, floor plans;
+`docs/corpus/library_provenance.md`) and to **The big one**, a 217-object platform map, and compare before and after. Teaching works on pages of up
+to 32 objects; a learned skill applies to pages of up to 400 objects and 200 notes. Every session and run states `Model: … · Teacher: …` (and `· Policy: product-1` for live sessions, a
 disclosed difference from the evaluated policy: `docs/evaluation/product_policy.md`). Live use runs under a **durable** dollar cap
 (`DEMO_MODEL_MAX_USD`, shared by all instances and surviving restarts) and 3 live sessions per visitor per hour. When the cap is reached the page says so
 and offers the offline learner; it never silently downgrades. The first request after idle can take a few seconds.
