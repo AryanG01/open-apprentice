@@ -169,11 +169,11 @@ function TitleCard() {
 }
 
 function ResultsCard() {
-  const rows: [string, string, string][] = [
-    ["Refuses when the examples conflict", "12/12", "6/12"],
-    ["Asks when the examples are ambiguous", "2/12", "0/12"],
-    ["Learns the rule (frozen battery)", "22/48", "28/48"],
-    ["Cost per run", "$0.17", "$0.26"],
+  const rows: [string, string, string, "a" | "b"][] = [
+    ["Refuses when the examples conflict", "12/12", "6/12", "a"],
+    ["Asks when the examples are ambiguous", "2/12", "0/12", "a"],
+    ["Learns the rule (frozen battery)", "22/48", "28/48", "b"],
+    ["Cost per run", "$0.17", "$0.26", "a"],
   ];
   return (
     <AbsoluteFill style={{ ...grid, padding: "90px 140px", color: C.ink }}>
@@ -190,11 +190,11 @@ function ResultsCard() {
           </tr>
         </thead>
         <tbody>
-          {rows.map(([q, a, b]) => (
+          {rows.map(([q, a, b, win]) => (
             <tr key={q} style={{ borderTop: "1px solid #2a4670" }}>
               <td style={{ padding: "16px 10px" }}>{q}</td>
-              <td style={{ color: C.green, fontWeight: 600 }}>{a}</td>
-              <td>{b}</td>
+              <td style={win === "a" ? { color: C.green, fontWeight: 600 } : undefined}>{a}</td>
+              <td style={win === "b" ? { color: C.green, fontWeight: 600 } : undefined}>{b}</td>
             </tr>
           ))}
         </tbody>
