@@ -326,6 +326,8 @@ try {
   await click(page.getByRole("button", { name: "Apply" }));
   await mark("finale-apply");
   await until(async () => (await page.locator('article.result[data-result="ai-platform-map.drawio"] h3').innerText().catch(() => "")).match(/Published|Blocked|Failed|Unchanged/), "the big result", 300_000);
+  const bigStatus = await page.locator('article.result[data-result="ai-platform-map.drawio"] h3').innerText();
+  if (!/Published/.test(bigStatus)) throw new Error(`the big map was not published: ${bigStatus}`); // the narration says it was
   await scrollTo('article.result[data-result="ai-platform-map.drawio"]', 120);
   await sleep(2500);
   await mark("finale-result", 'article.result[data-result="ai-platform-map.drawio"]');

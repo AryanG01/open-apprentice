@@ -68,9 +68,13 @@ export function ImportMap({ docs, setDocs }: Props) {
       let done = 0;
       const total = todo.length;
       const one = async (f: string) => {
-        const res = await fetch(`/samples/library/${f}`);
-        const d = await upload<DocumentInfo>("/documents", new File([await res.blob()], f));
-        setDocs((all) => [...all, d]);
+        try {
+          const res = await fetch(`/samples/library/${f}`);
+          const d = await upload<DocumentInfo>("/documents", new File([await res.blob()], f));
+          setDocs((all) => [...all, d]);
+        } catch (e) {
+          setError(`${f}: ${e instanceof ApiError ? e.message : String(e)}`); // one failure must not stop the others
+        }
         setProgress(`${++done} of ${total} diagrams imported`);
       };
       const worker = async () => {

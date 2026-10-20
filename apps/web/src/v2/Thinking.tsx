@@ -43,8 +43,8 @@ export function Thinking({ steps, working }: { steps: ThinkingStep[]; working: b
                 {s.truncated ? " (the reply was cut off and counted as an empty round)" : ""}
                 {s.summaries.length ? (
                   <ul className="rules">
-                    {s.summaries.map((r) => (
-                      <li key={r}>{r}</li>
+                    {s.summaries.map((r, k) => (
+                      <li key={k}>{r}</li>
                     ))}
                   </ul>
                 ) : null}
@@ -55,7 +55,7 @@ export function Thinking({ steps, working }: { steps: ThinkingStep[]; working: b
               </>
             ) : s.kind === "question" ? (
               <>
-                <b>Asked you</b> because {s.candidates} rules disagree here
+                <b>Asked you</b>: here the {s.candidates} rules that fit give {Object.keys(s.groups).length} different results
                 <ul className="groups">
                   {Object.entries(s.groups).map(([alt, rules]) => (
                     <li key={alt} style={{ borderColor: ALT_COLOURS[alt] }}>

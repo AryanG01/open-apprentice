@@ -202,7 +202,7 @@ function ResultsCard() {
       <div style={{ fontSize: 30, color: C.amber, marginTop: 30 }}>
         On plain learning the free agent scores higher. We publish that too, with every failure.
       </div>
-      <div style={{ fontSize: 22, color: C.ink2, marginTop: 18 }}>Every screen in this video is a real session; waiting time is shortened in the edit.</div>
+      <div style={{ fontSize: 22, color: C.ink2, marginTop: 18 }}>Every screen in this video is a real session; waiting time is shortened in the edit. Live runs shown: Nemotron-3-Super with the product policy (product-1); benchmark: Nemotron-3-Ultra with the evaluated policy (A).</div>
     </AbsoluteFill>
   );
 }
@@ -248,7 +248,7 @@ const ARCH: [string, string][] = [
   ["NVIDIA Nemotron", "on Nebius Token Factory, proposes rules"],
   ["Sandboxed interpreter", "exact arithmetic, no eval"],
   ["Probe search", "draws the diagram that splits the rules"],
-  ["Byte-exact patch", "three independent checks, then publish"],
+  ["Byte-exact patch", "three separate checks, then publish"],
 ];
 
 /** The pipeline, lit step by step as the narration walks through it. */

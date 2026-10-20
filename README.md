@@ -5,7 +5,7 @@
 You move a few labels to where they belong on one diagram. Several different rules usually fit that example, so Open Apprentice finds a
 case where they disagree, renders each outcome and asks which one you meant. The agreed rule becomes a versioned skill. You preview it on other
 documents (a result that would break a layout is shown as blocked and cannot be approved), apply it, download the edited `.drawio`, and correct
-any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and three independent checks (measured conformance,
+any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and three separate checks (measured conformance,
 preservation of everything else in the file, layout safety) gate every publish.
 
 Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents; submission text in `docs/submission.md`). Live model: NVIDIA Nemotron through Nebius Token Factory (Nemotron-3-Ultra in the evaluation;

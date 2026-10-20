@@ -69,3 +69,8 @@ says adopt it for live sessions.** On this scenario Ultra is more reliable (3/3)
 
 This is one scenario with 3 sessions per model, so it is evidence about the demo flow, not about the battery. The
 evaluated results stay as published.
+
+Note added in review: the design spec's draft rule asked for Super's success to be at least Ultra's. The rule actually
+registered above, committed before the run, asks for at least 2/3. Under the stricter draft, Super (2/3) would not have
+beaten Ultra (3/3). We kept the registered rule. On this demo flow Ultra is the more reliable model, and Super is the
+faster and cheaper one.

@@ -6,6 +6,7 @@ import { firstOkPage } from "./ImportMap";
 import type { Config, DocumentInfo } from "./types";
 
 const SESSION_OTHERS = 5;
+const TEACH_MAX_OBJECTS = 32;
 
 export const LIVE_UNAVAILABLE = "Live inference is unavailable. Open the recorded example.";
 
@@ -13,7 +14,11 @@ type Props = { docs: DocumentInfo[]; onSession: (sid: string) => void };
 
 /** Step 2: drag labels on one document, see the engine's render, then confirm the whole document is right. */
 export function Teach({ docs, onSession }: Props) {
-  const ready = docs.filter((d) => firstOkPage(d)?.mapping_hash);
+  const confirmed = docs.filter((d) => firstOkPage(d)?.mapping_hash);
+  // teaching works on pages of up to 32 objects; larger pages take the skill afterwards (Reuse)
+  const size = (d: DocumentInfo) => { const p = firstOkPage(d); return (p?.fixed?.length ?? 0) + (p?.movable?.length ?? 0); };
+  const ready = confirmed.filter((d) => size(d) <= TEACH_MAX_OBJECTS);
+  const reuseOnly = confirmed.length - ready.length;
   const [demoId, setDemoId] = useState<string>("");
   const [moved, setMoved] = useState<Record<string, Point>>({});
   const [seen, setSeen] = useState(false);
@@ -78,6 +83,7 @@ export function Teach({ docs, onSession }: Props) {
     <section className="v2-step" aria-labelledby="h-teach">
       <h2 id="h-teach">Show it once</h2>
       <p className="lede">Drag the notes on one diagram to where they belong. Every move is redrawn by the real draw.io engine.</p>
+      {reuseOnly ? <p className="muted">{reuseOnly} large document{reuseOnly === 1 ? "" : "s"} (over {TEACH_MAX_OBJECTS} objects) will take the skill once it is learned.</p> : null}
       <label className="docpick">
         Document to edit{" "}
         <select aria-label="Document to edit" value={demoId} onChange={(e) => { setDemoId(e.target.value); setMoved({}); setSeen(false); }}>

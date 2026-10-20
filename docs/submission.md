@@ -38,7 +38,7 @@ never changes a file it can't prove it changed correctly.
    layout is shown as blocked and cannot be approved. Then it is stored as a versioned skill.
 5. **Reuse everywhere.** Apply the skill to the whole library in one click, then to a 217-object company platform map.
    Each edit is a byte-exact patch of just the note positions. Before anything is published, the file is re-parsed,
-   re-rendered and measured. Three independent checks must pass: the measured positions match the rule, nothing else in
+   re-rendered and measured. Three separate checks must pass: the measured positions match the rule, nothing else in
    the file changed, and nothing leaves the page or overlaps. Each result gets its own receipt and a before/after slider,
    and can be downloaded as `.drawio` or SVG.
 6. **Correct it.** Nudge a result you dislike. The apprentice asks whether you meant to change the skill, keep a one-off

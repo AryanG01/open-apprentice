@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import uuid
 from collections import OrderedDict
 from open_apprentice.concepts.rules import RuleError, parse_rational
@@ -454,7 +455,14 @@ def advance(v: V2, sid: str) -> None:
             v.store,
             f"skills/{meta['skill_id']}/owner.json",
             log.manifest()[0]["owner"],
-            {"provenance": {"model": meta["model"], "teacher": meta["teacher"]}, "session_id": sid},
+            {
+                "provenance": {
+                    "model": meta["model"],
+                    "teacher": meta["teacher"],
+                    "policy": meta.get("policy", "A"),
+                },
+                "session_id": sid,
+            },
         )
     except FileExistsError:
         pass
@@ -617,14 +625,23 @@ def _thinking(evs: list, model: str) -> list[dict]:
     if not evs:
         return []
     key = (evs[-1].event_id, model)
-    if key not in _TRACES:
-        _TRACES[key] = thinking_trace(
+    hit = _TRACES.get(key)
+    if hit is not None:
+        return hit
+    try:
+        trace = thinking_trace(
             evs, "offline enumerator" if model == "Fixture" else f"model ({model})"
         )
-        while len(_TRACES) > 256:
-            _TRACES.popitem(last=False)
-    return _TRACES[key]
+    except Exception:  # a display aid must never break the session view
+        log.exception("thinking trace failed")
+        return []
+    _TRACES[key] = trace
+    while len(_TRACES) > 256:
+        _TRACES.popitem(last=False)
+    return trace
 
+
+log = logging.getLogger(__name__)
 
 CANCELLED = "cancelled by the user"
 
@@ -992,6 +1009,12 @@ def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
     if ref is None:
         raise records.NotFound(f"{req['doc_id']}:{req['page_id']}")
     _, _, _, scene = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+    if len(scene.scene["objects"]) > TEACH_MAX_OBJECTS:
+        raise Conflict(
+            "TOO_LARGE_TO_TEACH",
+            f"corrections teach the skill, so they work on documents with at most {TEACH_MAX_OBJECTS} objects; "
+            "correct a smaller document that shows the same problem",
+        )
     rule = _version(v, skill_id, version)["program"]["rule"]
     produced = run_output(rule, scene.scene) or {}
     boxes = _boxes(req["boxes"] or {})
@@ -1004,9 +1027,9 @@ def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
     for d in run["documents"]:
         if (d["doc_id"], d["page_id"]) != (ref["doc_id"], ref["page_id"]):
             try:
-                extra[_scene_id(d)] = page_scene(
-                    v, owner, d["doc_id"], d["page_id"], d["mapping_hash"]
-                )[3].scene
+                other = page_scene(v, owner, d["doc_id"], d["page_id"], d["mapping_hash"])[3].scene
+                if len(other["objects"]) <= TEACH_MAX_OBJECTS:
+                    extra[_scene_id(d)] = other
             except (Conflict, DrawioRefused, records.NotFound):
                 continue  # a document that can no longer be read is left out of the checks
     sid = uuid.uuid4().hex

@@ -14,7 +14,7 @@ def test_apply_publishes_and_blocks_per_document(
     v2.dispatcher.drain()
     run = client.get(f"/api/v2/runs/{r.json()['run_id']}").json()
     res = run["results"]
-    assert run["status"] == "done" and run["provenance"] == {"model": "Fixture", "teacher": "You"}
+    assert run["status"] == "done" and run["provenance"] == {"model": "Fixture", "teacher": "You", "policy": "A"}
     assert res[f"{ok['doc_id']}:{ok['page_id']}"]["status"] == "published", res
     blocked = res[f"{bad['doc_id']}:{bad['page_id']}"]
     assert blocked["status"] == "blocked" and blocked["reasons"], blocked

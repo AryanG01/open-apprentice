@@ -84,12 +84,12 @@
     },
     {
       "id": "scale",
-      "text": "Then the payoff. A hundred diagrams, one click. Each edit is a byte exact patch of just the note positions, re-rendered and measured, and it must pass three independent checks.",
+      "text": "Then the payoff. A hundred diagrams, one click. Each edit is a byte exact patch of just the note positions, re-rendered and measured, and it must pass three separate checks.",
       "clip": [
         "library-loading",
         "wall-done"
       ],
-      "onScreen": "100 diagrams \u00b7 3 independent checks each",
+      "onScreen": "100 diagrams \u00b7 3 separate checks each",
       "explain": [
         "Byte-exact x/y patch",
         "Conformance check",
