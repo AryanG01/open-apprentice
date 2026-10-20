@@ -5,17 +5,17 @@
  "marks": [
   {
    "name": "home",
-   "t": 8.496,
+   "t": 4.491,
    "box": null
   },
   {
    "name": "samples",
-   "t": 20.593,
+   "t": 15.306,
    "box": null
   },
   {
    "name": "mapping-table",
-   "t": 23.612,
+   "t": 19.612,
    "box": {
     "x": 63,
     "y": 161.203125,
@@ -25,12 +25,12 @@
   },
   {
    "name": "mapped",
-   "t": 31.289,
+   "t": 26.52,
    "box": null
   },
   {
    "name": "teach-start",
-   "t": 35.192,
+   "t": 29.313,
    "box": {
     "x": 48,
     "y": 174.390625,
@@ -40,7 +40,7 @@
   },
   {
    "name": "taught",
-   "t": 50.157,
+   "t": 39.18,
    "box": {
     "x": 48,
     "y": 174.390625,
@@ -50,7 +50,7 @@
   },
   {
    "name": "session-start",
-   "t": 57.445,
+   "t": 46.219,
    "box": {
     "x": 852,
     "y": 535.453125,
@@ -60,44 +60,159 @@
   },
   {
    "name": "question",
-   "t": 70.142,
+   "t": 64.065,
    "box": {
     "x": 48,
-    "y": 210.984375,
+    "y": 178.984375,
     "width": 780,
     "height": 312.65625
    }
   },
   {
    "name": "answered",
-   "t": 79.037,
+   "t": 72.844,
+   "box": null
+  },
+  {
+   "name": "question",
+   "t": 81.373,
+   "box": {
+    "x": 48,
+    "y": 119.984375,
+    "width": 780,
+    "height": 312.65625
+   }
+  },
+  {
+   "name": "answered",
+   "t": 90.193,
    "box": null
   },
   {
    "name": "preview",
-   "t": 89.307,
+   "t": 103.241,
    "box": null
   },
   {
    "name": "answered",
-   "t": 94.119,
+   "t": 108.06,
    "box": null
   },
   {
    "name": "session-committed",
-   "t": 125.659,
+   "t": 139.862,
    "box": {
     "x": 852,
-    "y": 54.453125,
+    "y": 49.453125,
     "width": 380,
-    "height": 693.125
+    "height": 993.65625
    }
   },
   {
    "name": "library-loading",
-   "t": 132.4,
+   "t": 146.607,
+   "box": null
+  },
+  {
+   "name": "library-loaded",
+   "t": 248.504,
+   "box": {
+    "x": 48,
+    "y": 341.875,
+    "width": 1184,
+    "height": 553.6875
+   }
+  },
+  {
+   "name": "library-confirmed",
+   "t": 284.597,
+   "box": null
+  },
+  {
+   "name": "apply",
+   "t": 292.492,
+   "box": {
+    "x": 48,
+    "y": 634.09375,
+    "width": 1184,
+    "height": 24.46875
+   }
+  },
+  {
+   "name": "wall-done",
+   "t": 392.189,
+   "box": {
+    "x": 48,
+    "y": 113.09375,
+    "width": 1184,
+    "height": 24.46875
+   }
+  },
+  {
+   "name": "published-102",
+   "t": 392.19,
+   "box": null
+  },
+  {
+   "name": "compare",
+   "t": 401.367,
+   "box": {
+    "x": 159,
+    "y": 118.953125,
+    "width": 962,
+    "height": 495.3125
+   }
+  },
+  {
+   "name": "compare-closed",
+   "t": 408.584,
+   "box": null
+  },
+  {
+   "name": "finale-start",
+   "t": 409.386,
+   "box": null
+  },
+  {
+   "name": "finale-apply",
+   "t": 419.281,
+   "box": null
+  },
+  {
+   "name": "finale-result",
+   "t": 429.525,
+   "box": {
+    "x": 48,
+    "y": 294.890625,
+    "width": 285.5,
+    "height": 320.65625
+   }
+  },
+  {
+   "name": "finale-compare",
+   "t": 437.583,
+   "box": {
+    "x": 159,
+    "y": 133.828125,
+    "width": 962,
+    "height": 465.5625
+   }
+  },
+  {
+   "name": "finale-compare-end",
+   "t": 445.101,
+   "box": null
+  },
+  {
+   "name": "prototype",
+   "t": 453.438,
+   "box": null
+  },
+  {
+   "name": "prototype-done",
+   "t": 476.38,
    "box": null
   }
  ],
- "frameOffset": 0.015
+ "frameOffset": 0.012
 }

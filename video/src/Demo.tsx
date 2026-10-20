@@ -36,7 +36,7 @@ export const Demo = () => {
 function Scene({ b }: { b: Beat }) {
   return (
     <AbsoluteFill>
-      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.clip ? <Clip b={b} /> : null}
+      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.card === "finale" ? <Finale b={b} /> : b.clip ? <Clip b={b} /> : null}
       {b.onScreen ? <Headline text={b.onScreen} /> : null}
       {b.live ? <Tags b={b} /> : null}
       {b.explain ? <Explainer steps={b.explain} dur={b.dur} /> : null}
@@ -223,7 +223,7 @@ function Montage() {
         Fix one diagram. It fixes the other hundred.
       </div>
       <div style={{ position: "absolute", top: 46, right: 60, color: C.green, fontSize: 40, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-        {published} / 100 published
+        {published} diagrams published
       </div>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 14 }}>
         {tiles.map((t, k) => {
@@ -309,6 +309,52 @@ function Breadth({ dur }: { dur: number }) {
             </div>
           );
         })}
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+/** The finale: a few seconds of the real one-click apply, then the 217-object map itself, wiping from the file as imported to
+ *  the file as published (both are the engine's own renders, saved during the run). */
+function Finale({ b }: { b: Beat }) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const intro = Math.round(Math.min(4, b.dur * 0.25) * fps);
+  const t = (frame - intro) / fps;
+  const rest = b.dur - intro / fps;
+  const wipe = interpolate(t, [rest * 0.28, rest * 0.72], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const zoomIn = interpolate(t, [0, rest], [1.18, 1.0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const ticks = ["Conformance", "Preservation", "Layout safety"];
+  const clip = b.clip!;
+  if (frame < intro) {
+    return (
+      <AbsoluteFill style={{ background: C.table }}>
+        <OffthreadVideo src={staticFile("capture.mp4")} startFrom={Math.round(clip.from * fps)} muted
+          playbackRate={Math.max(1, (clip.to - clip.from) / (intro / fps))} style={{ width: 1920, height: 1080 }} />
+      </AbsoluteFill>
+    );
+  }
+  return (
+    <AbsoluteFill style={{ background: "#fff" }}>
+      <AbsoluteFill style={{ transform: `scale(${zoomIn})`, transformOrigin: "50% 45%" }}>
+        <Img src={staticFile("finale-after.png")} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
+        <Img src={staticFile("finale-before.png")} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", clipPath: `inset(0 0 0 ${wipe}%)` }} />
+        {wipe > 0 && wipe < 100 ? <div style={{ position: "absolute", top: 0, bottom: 0, left: `${wipe}%`, width: 4, background: C.pink, boxShadow: `0 0 24px ${C.pink}` }} /> : null}
+      </AbsoluteFill>
+      <div style={{ position: "absolute", left: 40, bottom: 160, display: "flex", gap: 14 }}>
+        {ticks.map((k, i) => {
+          const on = interpolate(t, [rest * 0.74 + i * 0.35, rest * 0.74 + i * 0.35 + 0.3], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          return (
+            <span key={k} style={{ opacity: on, background: "rgba(8,20,38,.92)", color: "#fff", fontSize: 32, fontWeight: 600, padding: "10px 18px",
+              borderRadius: 10, border: `2px solid ${C.green}` }}>
+              <span style={{ color: C.green }}>✓</span> {k}
+            </span>
+          );
+        })}
+      </div>
+      <div style={{ position: "absolute", right: 40, bottom: 160, background: "rgba(8,20,38,.92)", color: "#fff", fontSize: 32, fontWeight: 600,
+        padding: "10px 18px", borderRadius: 10 }}>
+        {wipe < 50 ? "As imported: 108 notes out of place" : "Published: 108 notes under their boxes"}
       </div>
     </AbsoluteFill>
   );

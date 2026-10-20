@@ -74,6 +74,7 @@ const until = async (fn, what, ms = 300_000) => {
   }
 };
 let mouse = { x: 640, y: 360 };
+let bigId = null;
 const moveTo = async (x, y, steps = 28) => {
   await page.mouse.move(x, y, { steps });
   mouse = { x, y };
@@ -184,6 +185,12 @@ try {
   await click(page.getByRole("button", { name: "Try a sample: Hiring process" }));
   await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "second sample");
   await mark("samples");
+  // the finale's big map renders in the background while the rest is filmed (uploaded through the same API, same owner)
+  {
+    const raw = fs.readFileSync(path.join(HERE, "../../apps/web/public/samples/hero/ai-platform-map.drawio"));
+    const up = await page.request.post(`${URL_}/api/v2/documents?name=ai-platform-map.drawio`, { data: raw, headers: { "content-type": "application/octet-stream" } });
+    bigId = (await up.json()).doc_id;
+  }
   await sleep(1200);
   await page.mouse.wheel(0, 520);
   await sleep(1800);
@@ -302,16 +309,14 @@ try {
   await sleep(800);
 
   // the finale: a 217-object platform map, fixed with the same skill in one click
-  await scrollTo("#h-import", 30);
-  await click(page.getByRole("button", { name: /Try a sample: The big one/ }));
   await mark("finale-start");
-  await until(async () => {
-    const d = await docInfo("ai-platform-map.drawio").catch(() => null);
-    return d && d.render === "done";
-  }, "the big map", 300_000);
-  await sleep(1500);
-  const big = await docInfo("ai-platform-map.drawio");
+  await until(async () => (await (await page.request.get(`${URL_}/api/v2/documents/${bigId}`)).json()).render === "done", "the big map", 900_000);
+  const big = await (await page.request.get(`${URL_}/api/v2/documents/${bigId}`)).json();
   await page.request.post(`${URL_}/api/v2/documents/${big.doc_id}/mapping`, { data: { page_id: big.pages[0].page_id, labels: {}, confirm: true } });
+  await page.evaluate((id) => {
+    const ids = JSON.parse(localStorage.getItem("oa.v2.docs") ?? "[]");
+    localStorage.setItem("oa.v2.docs", JSON.stringify([...ids, id]));
+  }, big.doc_id);
   await page.reload({ waitUntil: "networkidle" });
   await scrollTo("#h-reuse", 30);
   await until(async () => (await page.getByRole("button", { name: /Select all/ }).count()) === 1, "the reuse step", 120_000);

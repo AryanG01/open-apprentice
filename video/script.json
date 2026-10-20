@@ -115,11 +115,11 @@
       "id": "finale",
       "clip": [
         "finale-apply",
-        "finale-compare-end"
+        "finale-result"
       ],
-      "focus": "finale-compare",
       "onScreen": "The big one: 108 services, 108 notes",
-      "text": "And now the big one. A company platform map: a hundred and eight services, a tangle of connections, and every note out of place. Nobody fixes this by hand. One click, and every note lands under its box, with all three checks passing."
+      "text": "And now the big one. A company platform map: a hundred and eight services, a tangle of connections, and every note out of place. Nobody fixes this by hand. One click, and every note lands under its box, with all three checks passing.",
+      "card": "finale"
     },
     {
       "id": "close",
