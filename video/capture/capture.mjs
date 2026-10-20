@@ -324,10 +324,22 @@ try {
   await sleep(2500);
   await mark("finale-result", 'article.result[data-result="ai-platform-map.drawio"]');
   const bigTile = page.locator('article.result[data-result="ai-platform-map.drawio"] .tile-img');
+  {
+    // the finale's real before/after renders, full size, for the edit
+    const src = await bigTile.locator("img").getAttribute("src");
+    const q = new URL(src, URL_).searchParams;
+    const a = await page.request.get(new URL(src, URL_).href, { timeout: 300_000 });
+    const b = await page.request.get(`${URL_}/api/v2/documents/${q.get("doc_id")}/pages/${q.get("page_id")}/preview.png`, { timeout: 300_000 });
+    if (a.ok() && b.ok()) {
+      fs.writeFileSync(path.join(HERE, "..", "public", "finale-after.png"), await a.body());
+      fs.writeFileSync(path.join(HERE, "..", "public", "finale-before.png"), await b.body());
+    }
+  }
   if (await bigTile.isEnabled()) {
     await click(bigTile);
     await page.waitForSelector(".beforeafter img");
-    await sleep(2500);
+    await until(async () => page.evaluate(() => [...document.querySelectorAll(".beforeafter img")].every((i) => i.complete && i.naturalWidth > 0)), "the big images", 120_000);
+    await sleep(1000);
     await mark("finale-compare", ".slider");
     const r2 = await page.locator(".range input").boundingBox();
     await moveTo(r2.x + r2.width * 0.5, r2.y + r2.height / 2);
