@@ -14,20 +14,20 @@
     {
       "id": "arch",
       "card": "arch",
-      "text": "Under the hood, every file is drawn by the real draw dot io viewer, in a locked, offline browser. Nemotron writes candidate rules in a tiny, exact rule language, and a sandboxed interpreter runs them. Nothing the model writes is ever executed as code."
+      "text": "Under the hood: the real draw dot io engine draws every file in a locked, offline browser. Nemotron writes candidate rules in a tiny exact language, and a sandboxed interpreter runs them, never as code."
     },
     {
       "id": "import",
-      "text": "Start with real draw dot io files. The apprentice measures every box the engine actually draws, matches each note to its box, and you check its guess.",
+      "text": "Start with an everyday diagram: an online order, from checkout to delivery. Each box has a note beside it, but the notes are scattered. The apprentice works out which note belongs to which box, and you check its guess.",
       "clip": [
         "home",
         "mapped"
       ],
-      "onScreen": "Real .drawio files \u00b7 real draw.io engine"
+      "onScreen": "An everyday diagram, notes scattered"
     },
     {
       "id": "teach",
-      "text": "Then show it once. I drag each note under its box, left aligned. Every move is redrawn by the real draw dot io engine.",
+      "text": "Now show it once. I drag each note under its box, lined up on the left. Every move is redrawn by the real draw dot io engine.",
       "clip": [
         "teach-start",
         "taught"
@@ -37,7 +37,7 @@
     },
     {
       "id": "think",
-      "text": "Now Nemotron, live on Nebius, proposes programs that could explain my example, and each one is replayed against what I did. Several fit. Instead of guessing, a bounded search draws a test diagram where those programs disagree.",
+      "text": "Now Nemotron, live on Nebius, proposes programs that could explain my example, and replays each one against what I did. Several fit, so it draws a test diagram where they disagree.",
       "clip": [
         "session-start",
         "question"
@@ -84,7 +84,7 @@
     },
     {
       "id": "scale",
-      "text": "Now the payoff. A hundred diagrams, one click. Each edit is a byte exact patch of just the note positions, and every file is re-parsed, re-rendered and measured, passing three independent checks before it is published.",
+      "text": "Then the payoff. A hundred diagrams, one click. Each edit is a byte exact patch of just the note positions, re-rendered and measured, and it must pass three independent checks.",
       "clip": [
         "library-loading",
         "wall-done"
@@ -99,27 +99,27 @@
     },
     {
       "id": "breadth",
-      "text": "And it is not just flowcharts. Floor plans, org charts, roadmaps and network maps are fixed by the same skill, because it learned how notes relate to their boxes, not what one picture looks like.",
+      "text": "And it is not just flowcharts. Floor plans, org charts, roadmaps and network maps get the same treatment, because it learned how notes relate to their boxes, not what one picture looks like.",
       "card": "breadth"
     },
     {
-      "id": "compare",
-      "text": "Before, and after. Nothing else in the file changes.",
-      "clip": [
-        "compare",
-        "compare-closed"
-      ],
-      "focus": "compare",
-      "onScreen": "Only the note positions change"
-    },
-    {
       "id": "world",
-      "text": "The same show, ask, and check loop also works on other layouts. Here, an earlier prototype places badges on UI cards, across two different graphics engines.",
+      "text": "The same show, ask and check loop also works beyond diagrams: an earlier prototype places badges on UI cards across two graphics engines.",
       "clip": [
         "prototype",
         "prototype-done"
       ],
       "onScreen": "Earlier prototype \u00b7 UI components \u00b7 Konva and Fabric"
+    },
+    {
+      "id": "finale",
+      "clip": [
+        "finale-apply",
+        "finale-compare-end"
+      ],
+      "focus": "finale-compare",
+      "onScreen": "The big one: 108 services, 108 notes",
+      "text": "And now the big one. A company platform map: a hundred and eight services, a tangle of connections, and every note out of place. Nobody fixes this by hand. One click, and every note lands under its box, with all three checks passing."
     },
     {
       "id": "close",

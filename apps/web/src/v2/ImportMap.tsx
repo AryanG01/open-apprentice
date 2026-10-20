@@ -7,9 +7,10 @@ type Props = { docs: DocumentInfo[]; setDocs: (f: (d: DocumentInfo[]) => Documen
 /** Owner-authored draw.io diagrams (provenance: docs/corpus/drawio_provenance.md) so a visitor can try the product
  *  without a file of their own. They go through exactly the same import as an upload. */
 export const SAMPLES = [
-  { file: "library/000-ai-factory-pipeline.drawio", title: "AI factory pipeline" },
-  { file: "library/001-dgx-superpod.drawio", title: "DGX SuperPOD" },
-  { file: "library/002-llm-inference-serving.drawio", title: "LLM inference serving" },
+  { file: "hero/order-journey.drawio", title: "Online order journey" },
+  { file: "hero/hiring-process.drawio", title: "Hiring process" },
+  { file: "hero/support-tickets.drawio", title: "Support tickets" },
+  { file: "hero/ai-platform-map.drawio", title: "The big one: AI platform map (217 objects)" },
   { file: "training-workflow.drawio", title: "Training workflow" },
   { file: "checkout-service.drawio", title: "Checkout service" },
   { file: "microservices.drawio", title: "Microservices" },

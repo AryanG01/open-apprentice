@@ -59,3 +59,23 @@ def test_the_demo_rule_fits_every_library_diagram(entry):
                 continue
             ox, oy, ow, oh = o
             assert x + w <= ox or ox + ow <= x or y + h <= oy or oy + oh <= y, (lid, o)
+
+
+HERO = Path("apps/web/public/samples/hero")
+HEROES = json.loads((HERO / "index.json").read_text())["files"] if (HERO / "index.json").exists() else []
+
+
+@pytest.mark.parametrize("entry", HEROES, ids=lambda f: f["file"])
+def test_hero_diagrams_import_and_take_the_demo_rule(entry):
+    raw = (HERO / entry["file"]).read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
+    c = classify(load_drawio(raw).pages[0])
+    assert len(c.movable) == entry["labels"] and not c.reasons
+    placed = []
+    for lid in c.movable:
+        ax, ay, aw, ah = c.absolute[lid.removesuffix("-note")]
+        placed.append((ax, ay + ah + 8, c.absolute[lid][2], c.absolute[lid][3]))
+    boxes = [v for k, v in c.absolute.items() if k not in c.movable and k != "title"] + placed
+    for x, y, w, h in placed:
+        assert x + w <= c.width and y + h <= c.height
+        assert all(o == (x, y, w, h) or x + w <= o[0] or o[0] + o[2] <= x or y + h <= o[1] or o[1] + o[3] <= y for o in boxes)

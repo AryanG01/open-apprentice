@@ -103,6 +103,9 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
             Select all {ready.length}
           </button>
         ) : null}
+        {ready.length > 3 && chosen.length ? (
+          <button type="button" className="quiet" onClick={() => { setPicked({}); key.current = newKey(); }}>Select none</button>
+        ) : null}
         <div className={ready.length > 6 ? "pick-grid" : ""}>
           {ready.map((d) => (
             <label key={d.doc_id} className="pick">

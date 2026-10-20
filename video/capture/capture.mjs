@@ -179,9 +179,9 @@ try {
   await mark("home");
 
   // 1 · bring diagrams: two hero samples, then the whole library
-  await click(page.getByRole("button", { name: "Try a sample: AI factory pipeline" }));
+  await click(page.getByRole("button", { name: "Try a sample: Online order journey" }));
   await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 1, "first sample");
-  await click(page.getByRole("button", { name: "Try a sample: DGX SuperPOD" }));
+  await click(page.getByRole("button", { name: "Try a sample: Hiring process" }));
   await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "second sample");
   await mark("samples");
   await sleep(1200);
@@ -197,7 +197,7 @@ try {
   await scrollTo("#h-teach", 40);
 
   // 2 · show it once: real drags, each note left-aligned, 8 below its box
-  const d = await docInfo("000-ai-factory-pipeline.drawio");
+  const d = await docInfo("order-journey.drawio");
   const pg = d.pages.find((p) => p.status === "ok");
   const sc = await (await page.request.get(`${URL_}/api/v2/documents/${d.doc_id}/pages/${pg.page_id}/scene?mapping_hash=${pg.mapping_hash}`)).json();
   const objs = Object.fromEntries(sc.objects.map((o) => [o.id, o]));
@@ -298,6 +298,49 @@ try {
   await sleep(1200);
   await click(page.getByRole("button", { name: "Close" }));
   await mark("compare-closed");
+  await sleep(800);
+
+  // the finale: a 217-object platform map, fixed with the same skill in one click
+  await scrollTo("#h-import", 30);
+  await click(page.getByRole("button", { name: /Try a sample: The big one/ }));
+  await mark("finale-start");
+  await until(async () => {
+    const d = await docInfo("ai-platform-map.drawio").catch(() => null);
+    return d && d.render === "done";
+  }, "the big map", 300_000);
+  await sleep(1500);
+  const big = await docInfo("ai-platform-map.drawio");
+  await page.request.post(`${URL_}/api/v2/documents/${big.doc_id}/mapping`, { data: { page_id: big.pages[0].page_id, labels: {}, confirm: true } });
+  await page.reload({ waitUntil: "networkidle" });
+  await scrollTo("#h-reuse", 30);
+  await until(async () => (await page.getByRole("button", { name: /Select all/ }).count()) === 1, "the reuse step", 120_000);
+  if (await page.getByRole("button", { name: "Select none" }).count()) await click(page.getByRole("button", { name: "Select none" }));
+  await click(page.locator("label.pick", { hasText: "ai-platform-map.drawio" }).locator("input"));
+  await sleep(600);
+  await click(page.getByRole("button", { name: "Apply" }));
+  await mark("finale-apply");
+  await until(async () => (await page.locator('article.result[data-result="ai-platform-map.drawio"] h3').innerText().catch(() => "")).match(/Published|Blocked|Failed|Unchanged/), "the big result", 300_000);
+  await scrollTo('article.result[data-result="ai-platform-map.drawio"]', 120);
+  await sleep(2500);
+  await mark("finale-result", 'article.result[data-result="ai-platform-map.drawio"]');
+  const bigTile = page.locator('article.result[data-result="ai-platform-map.drawio"] .tile-img');
+  if (await bigTile.isEnabled()) {
+    await click(bigTile);
+    await page.waitForSelector(".beforeafter img");
+    await sleep(2500);
+    await mark("finale-compare", ".slider");
+    const r2 = await page.locator(".range input").boundingBox();
+    await moveTo(r2.x + r2.width * 0.5, r2.y + r2.height / 2);
+    await page.mouse.down();
+    for (const f of [0.02, 0.98, 0.5]) {
+      await moveTo(r2.x + r2.width * f, r2.y + r2.height / 2, 70);
+      await sleep(700);
+    }
+    await page.mouse.up();
+    await sleep(1500);
+    await mark("finale-compare-end");
+    await click(page.getByRole("button", { name: "Close" }));
+  }
   await sleep(800);
 
   // 5 · another world: the same apprentice approach on UI components (earlier prototype, reference learner, no model)

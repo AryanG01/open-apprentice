@@ -69,11 +69,14 @@ function Clip({ b }: { b: Beat }) {
 }
 
 function zoom(box: Box, frame: number, fps: number) {
-  if (!box) return { transform: "none", origin: "50% 50%" };
-  const s = 1 + 0.22 * spring({ frame, fps, config: { damping: 200 }, durationInFrames: 40 });
-  const cx = Math.min(1700, Math.max(220, box.x + box.width / 2));
-  const cy = Math.min(900, Math.max(180, box.y + box.height / 2));
-  return { transform: `scale(${s})`, origin: `${cx}px ${cy}px` };
+  // scale only as far as keeps the whole focus box in view, centre it, never reveal an edge of the frame
+  if (!box) return { transform: "none", origin: "0 0" };
+  const target = Math.max(1, Math.min(1.35, (1920 * 0.92) / box.width, (1080 * 0.82) / box.height));
+  const s = 1 + (target - 1) * spring({ frame, fps, config: { damping: 200 }, durationInFrames: 40 });
+  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
+  const tx = Math.min(0, Math.max(1920 - 1920 * s, 960 - cx * s));
+  const ty = Math.min(0, Math.max(1080 - 1080 * s, 540 - cy * s));
+  return { transform: `translate(${tx}px, ${ty}px) scale(${s})`, origin: "0 0" };
 }
 
 function Headline({ text }: { text: string }) {

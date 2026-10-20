@@ -12,12 +12,15 @@ from open_apprentice.drawio.render import render_page
 from open_apprentice.drawio.scene import build_scene
 
 LIB = Path("apps/web/public/samples/library")
-FILES = [f["file"] for f in json.loads((LIB / "index.json").read_text())["files"]][:18]
+FILES = [str(LIB / f["file"]) for f in json.loads((LIB / "index.json").read_text())["files"]][:18] + [
+    str(Path("apps/web/public/samples/hero") / f["file"])
+    for f in json.loads(Path("apps/web/public/samples/hero/index.json").read_text())["files"]
+]
 
 
-@pytest.mark.parametrize("name", FILES)
+@pytest.mark.parametrize("name", FILES, ids=lambda p: Path(p).name)
 def test_library_diagram_maps_each_note_to_its_box(engine_url, name):
-    f = load_drawio((LIB / name).read_bytes())
+    f = load_drawio(Path(name).read_bytes())
     c = classify(f.pages[0])
     r = render_page(f.pages[0], engine_url)
     m = mp.propose(c, r, f.doc_hash)

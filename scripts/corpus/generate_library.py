@@ -35,58 +35,18 @@ PALETTE = {
     "guard": ("#fde7ec", "#d81b60", "#5c0d27"),
 }
 
-NOTES = {
-    "gpu": [
-        "8x H100 SXM",
-        "8x B200",
-        "FP8 training",
-        "TP=8 PP=4",
-        "NVLink 900 GB/s",
-        "92% MFU",
-        "8x GB200",
-        "1.2M tok/s",
-    ],
-    "net": [
-        "400 Gb/s NDR",
-        "InfiniBand",
-        "rail-optimised",
-        "Spectrum-X",
-        "RoCE v2",
-        "2:1 oversub",
-        "BlueField-3",
-    ],
-    "store": [
-        "2.1 PB NVMe",
-        "GPUDirect",
-        "120 GB/s read",
-        "S3 compatible",
-        "3 replicas",
-        "hot tier",
-        "nightly backup",
-    ],
-    "serve": [
-        "p99 38 ms",
-        "NIM",
-        "Triton",
-        "batch 64",
-        "autoscale 2-12",
-        "99.95% SLO",
-        "TensorRT-LLM",
-    ],
-    "data": [
-        "parquet, 40 TB",
-        "dedupe + filter",
-        "NeMo Curator",
-        "PII scrubbed",
-        "streaming",
-        "Iceberg tables",
-    ],
-    "ctrl": ["Base Command", "Slurm", "Kubernetes", "Prometheus", "GitOps", "RBAC", "audit log"],
-    "rack": ["32 kW", "liquid", "NVL72", "spare", "A/B feeds", "hot aisle", "40 kW", "burn-in"],
-    "people": ["on-call", "EMEA", "hiring", "SRE", "PhD intern", "lead", "US-West"],
-    "plan": ["shipped", "at risk", "beta", "GA", "blocked: GPUs", "in review", "planned"],
-    "edge": ["web + mobile", "12k RPS", "SSO login", "EU + US", "REST + gRPC"],
-    "guard": ["NeMo Guardrails", "policy v3", "jailbreak filter", "PII redaction", "warning: beta"],
+NOTES = {  # plain language: a note says what the box does or who owns it, not jargon
+    "gpu": ["8 GPUs per server", "trains the model", "runs every night", "busiest at noon", "owned by ML team", "shared by 4 teams"],
+    "net": ["fast network", "links the servers", "backup link ready", "owned by network team", "doubles as failover"],
+    "store": ["kept for 1 year", "backed up nightly", "holds raw data", "read by every job", "owned by data team"],
+    "serve": ["answers in 40 ms", "scales up at peak", "3 copies running", "public endpoint", "owned by platform"],
+    "data": ["cleans the data", "removes duplicates", "runs hourly", "owned by data team", "checks for privacy"],
+    "ctrl": ["sends alerts", "owned by SRE", "dashboards here", "logs kept 30 days", "reviewed weekly"],
+    "edge": ["web and mobile", "signs users in", "rate limited", "owned by frontend"],
+    "rack": ["full", "half empty", "liquid cooled", "spare", "under repair", "new this month"],
+    "people": ["on call", "hiring", "in London", "team lead", "joins Monday", "part time"],
+    "plan": ["done", "at risk", "on track", "waiting on GPUs", "in review", "planned"],
+    "guard": ["blocks unsafe replies", "checks every answer", "policy owner: legal"],
 }
 
 # theme: title, nodes [(slug, name, tier, col, row, optional)], edges [(a, b)]
@@ -303,22 +263,25 @@ def _cell(cid: str, value: str, style: str, x: int, y: int, w: int, h: int) -> s
     )
 
 
-def diagram(i: int) -> tuple[str, str, int]:
-    """(file name, xml, label count) of library diagram i."""
+def diagram(
+    i: int, theme: tuple | None = None, title_text: str | None = None, notes: dict | None = None, tangle: bool = False
+) -> tuple[str, str, int]:
+    """(file name, xml, label count) of library diagram i, or of a hero diagram when `theme` is given (fixed note texts,
+    every box kept; `tangle` keeps every edge however it routes)."""
     rng = random.Random(SEED * 1000 + i)
-    title, nodes, edges, *extra = THEMES[i % len(THEMES)]
+    title, nodes, edges, *extra = theme or THEMES[i % len(THEMES)]
     g = extra[0] if extra else {}
     NW, NH, CP, RP = g.get("w", NODE_W), g.get("h", NODE_H), g.get("col", COL), g.get("row", ROW)
     keep = [n for n in nodes if not n[5] or rng.random() < 0.6]
     slugs = {n[0] for n in keep}
     cols = max(n[3] for n in keep) + 1
     rows = max(n[4] for n in keep) + 1
-    width, height = MARGIN * 2 + cols * CP - (CP - NW), TOP + MARGIN + rows * RP
+    width, height = MARGIN * 2 + cols * CP, TOP + MARGIN + rows * RP  # the last column keeps a full pitch for its notes
     site = rng.choice(["us-west", "eu-north", "ap-south", "us-east", "eu-central", "ap-east"])
     cells = [
         _cell(
             "title",
-            f"{title} · {site}-{i:03d}",
+            title_text or f"{title} · {site}-{i:03d}",
             "rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontSize=16;fontStyle=1;"
             "align=left;fontColor=#1c2a31;",
             MARGIN,
@@ -350,7 +313,7 @@ def diagram(i: int) -> tuple[str, str, int]:
         a: str, b: str
     ) -> bool:  # only edges that route cleanly between neighbouring rows or columns
         (ca, ra), (cb, rb) = grid[a], grid[b]
-        return abs(ra - rb) == 1 or (ra == rb and abs(ca - cb) == 1)
+        return tangle or abs(ra - rb) == 1 or (ra == rb and abs(ca - cb) == 1)
 
     links = [
         f'<mxCell id="edge-{k}" edge="1" parent="1" source="{a}" target="{b}" '
@@ -361,7 +324,7 @@ def diagram(i: int) -> tuple[str, str, int]:
     cells[1:1] = links  # edges first, so they are drawn beneath the boxes
     labels = 0
     for slug, name, tier, col, row, _ in keep:
-        text = rng.choice(NOTES[tier])
+        text = (notes or {}).get(slug) or rng.choice(NOTES[tier])
         w = CHAR_W * len(text) + 12
         x, y = pos[slug]
         if (
@@ -413,7 +376,74 @@ def generate(out: Path = OUT, count: int = 100) -> list[dict]:
     return index
 
 
+HERO_OUT = Path("apps/web/public/samples/hero")
+
+ORDER = (
+    "Online order journey",
+    [("order", "Customer orders", "edge", 0, 0, False), ("payment", "Payment", "serve", 1, 0, False),
+     ("pack", "Warehouse packs", "data", 2, 0, False), ("courier", "Courier picks up", "net", 3, 0, False),
+     ("delivered", "Delivered", "gpu", 3, 1, False), ("returns", "Returns", "guard", 2, 1, False),
+     ("help", "Help desk", "ctrl", 1, 1, False)],
+    [("order", "payment"), ("payment", "pack"), ("pack", "courier"), ("courier", "delivered"),
+     ("delivered", "returns"), ("returns", "help")],
+)
+ORDER_NOTES = {"order": "takes 1 minute", "payment": "card or PayPal", "pack": "within 2 hours", "courier": "tracked by text",
+               "delivered": "by 6 pm", "returns": "free for 30 days", "help": "owner: support team"}
+HIRING = (
+    "Hiring process",
+    [("posted", "Job posted", "plan", 0, 0, False), ("apply", "Applications", "people", 1, 0, False),
+     ("screen", "Phone screen", "people", 2, 0, False), ("interview", "Interview day", "people", 3, 0, False),
+     ("offer", "Offer", "serve", 3, 1, False), ("start", "First day", "gpu", 2, 1, False)],
+    [("posted", "apply"), ("apply", "screen"), ("screen", "interview"), ("interview", "offer"), ("offer", "start")],
+)
+HIRING_NOTES = {"posted": "on 3 job boards", "apply": "about 200 a week", "screen": "15 minutes", "interview": "half a day",
+                "offer": "within 48 hours", "start": "laptop ready"}
+TICKETS = (
+    "Support ticket flow",
+    [("write", "Customer writes in", "edge", 0, 0, False), ("bot", "Bot replies", "serve", 1, 0, False),
+     ("agent", "Agent picks up", "people", 2, 0, False), ("fixed", "Fixed", "gpu", 3, 0, False),
+     ("escalate", "Escalated", "guard", 2, 1, False), ("engineer", "Engineer", "people", 3, 1, False)],
+    [("write", "bot"), ("bot", "agent"), ("agent", "fixed"), ("agent", "escalate"), ("escalate", "engineer")],
+)
+TICKETS_NOTES = {"write": "email or chat", "bot": "answers in seconds", "agent": "within 1 hour", "fixed": "survey sent",
+                 "escalate": "if still stuck", "engineer": "owner: product team"}
+
+
+def platform_map() -> tuple:
+    """The finale: a company-wide AI platform map, 12 x 9 services with a tangle of dependencies and a note on each."""
+    rng = random.Random(SEED)
+    words = ["auth", "search", "billing", "checkout", "catalog", "feature store", "trainer", "GPU pool", "vector DB",
+             "reranker", "guardrails", "gateway", "metrics", "logs", "scheduler", "data lake", "curator", "eval",
+             "registry", "inference", "cache", "queue", "notifier", "profiles"]
+    tiers = ["serve", "data", "gpu", "store", "net", "ctrl", "guard", "edge"]
+    nodes = [(f"svc-{c}-{r}", f"{words[(c * 9 + r) % len(words)]} {c * 9 + r + 1}", tiers[(c + r) % len(tiers)], c, r, False)
+             for c in range(12) for r in range(9)]
+    edges = []
+    for _ in range(160):
+        a, b = rng.sample(nodes, 2)
+        edges.append((a[0], b[0]))
+    return ("Company AI platform map", nodes, edges)
+
+
+def heroes() -> list[dict]:
+    HERO_OUT.mkdir(parents=True, exist_ok=True)
+    made = []
+    for k, (file, theme, title, notes, tangle) in enumerate([
+        ("order-journey.drawio", ORDER, "Online order journey", ORDER_NOTES, False),
+        ("hiring-process.drawio", HIRING, "Hiring process", HIRING_NOTES, False),
+        ("support-tickets.drawio", TICKETS, "Support ticket flow", TICKETS_NOTES, False),
+        ("ai-platform-map.drawio", platform_map(), "Company AI platform map · 108 services", {}, True),
+    ]):
+        _, xml, labels = diagram(900 + k, theme, title, notes, tangle)
+        data = xml.encode()
+        (HERO_OUT / file).write_bytes(data)
+        made.append({"file": file, "title": title, "labels": labels, "sha256": hashlib.sha256(data).hexdigest()})
+    (HERO_OUT / "index.json").write_text(json.dumps({"generator": "scripts/corpus/generate_library.py", "files": made}, indent=1) + "\n")
+    return made
+
+
 if __name__ == "__main__":
+    heroes()
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 100
     files = generate(OUT, n)
     (OUT / "index.json").write_text(

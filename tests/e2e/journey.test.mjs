@@ -414,16 +414,16 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
     const page = await ctx.newPage();
     await page.goto(`${API}/#apprentice`, { waitUntil: "networkidle" });
-    await page.getByRole("button", { name: "Try a sample: AI factory pipeline" }).click();
+    await page.getByRole("button", { name: "Try a sample: Online order journey" }).click();
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 1, "the first sample rendered");
-    await page.getByRole("button", { name: "Try a sample: DGX SuperPOD" }).click();
+    await page.getByRole("button", { name: "Try a sample: Hiring process" }).click();
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "both samples rendered");
     for (let i = 0; i < 2; i++) {
       await page.getByRole("button", { name: "Confirm mapping" }).first().click();
       await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === i + 1, `confirmation ${i + 1}`);
     }
-    await page.getByLabel("Document to edit").selectOption({ label: "000-ai-factory-pipeline.drawio" });
-    const d = await docInfo(page, "000-ai-factory-pipeline.drawio");
+    await page.getByLabel("Document to edit").selectOption({ label: "order-journey.drawio" });
+    const d = await docInfo(page, "order-journey.drawio");
     const p1 = d.pages.find((p) => p.status === "ok");
     const scene = await (await page.request.get(`${API}/api/v2/documents/${d.doc_id}/pages/${p1.page_id}/scene?mapping_hash=${p1.mapping_hash}`)).json();
     await page.waitForSelector("button[data-label]");
