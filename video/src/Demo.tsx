@@ -36,7 +36,7 @@ export const Demo = () => {
 function Scene({ b }: { b: Beat }) {
   return (
     <AbsoluteFill>
-      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.clip ? <Clip b={b} /> : null}
+      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.clip ? <Clip b={b} /> : null}
       {b.onScreen ? <Headline text={b.onScreen} /> : null}
       {b.live ? <Tags b={b} /> : null}
       {b.explain ? <Explainer steps={b.explain} dur={b.dur} /> : null}
@@ -271,6 +271,42 @@ function Architecture({ dur }: { dur: number }) {
         })}
       </div>
       <div style={{ fontSize: 28, color: C.ink2, marginTop: 56 }}>Google Cloud Run · Cloud Tasks · Cloud Storage · a durable spending cap on every live call</div>
+    </AbsoluteFill>
+  );
+}
+
+const KINDS: [string, string][] = [
+  ["gpu-data-hall-floor-plan", "Data-hall floor plan"],
+  ["ai-platform-org-chart", "Org chart"],
+  ["model-release-roadmap", "Roadmap"],
+  ["spine-leaf-network", "Network topology"],
+];
+
+/** Not just flowcharts: one real published file of each other kind, each wiping from the untidy original to the fixed one. */
+function Breadth({ dur }: { dur: number }) {
+  const frame = useCurrentFrame();
+  const t = frame / FPS;
+  const each = (dur - 1.5) / KINDS.length;
+  const pick = KINDS.map(([kind, label]) => ({ label, tile: (montage as MTile[]).find((m) => m.name.includes(kind)) })).filter((x) => x.tile);
+  return (
+    <AbsoluteFill style={{ ...grid, padding: "110px 70px 150px" }}>
+      <div style={{ position: "absolute", top: 34, left: 70, color: "#fff", fontSize: 50, fontWeight: 600 }}>Not just flowcharts. Same skill, every file.</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 26, height: "100%" }}>
+        {pick.map(({ label, tile }, i) => {
+          const show = interpolate(t, [i * each * 0.6, i * each * 0.6 + 0.4], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          const wipe = interpolate(t, [i * each * 0.6 + 0.8, i * each * 0.6 + 2.2], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          return (
+            <div key={label} style={{ position: "relative", background: "#fff", borderRadius: 10, overflow: "hidden", opacity: show,
+              transform: `scale(${0.96 + 0.04 * show})`, boxShadow: wipe >= 100 ? `0 0 0 4px ${C.green}` : "0 0 0 1px #2a4670" }}>
+              <Img src={staticFile(`montage/${tile!.i}-after.png`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain" }} />
+              <Img src={staticFile(`montage/${tile!.i}-before.png`)} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "contain", clipPath: `inset(0 0 0 ${wipe}%)` }} />
+              <div style={{ position: "absolute", left: 14, bottom: 12, background: "rgba(8,20,38,.88)", color: "#fff", fontSize: 30, fontWeight: 600, padding: "6px 14px", borderRadius: 8 }}>
+                {label}{wipe >= 100 ? <span style={{ color: C.green }}>  ✓ published</span> : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 }

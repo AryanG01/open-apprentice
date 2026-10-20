@@ -272,23 +272,9 @@ try {
   await mark("wall-done", ".tally");
   const tally = (await page.locator(".tally").innerText()).match(/(\d+) published/);
   marks.push({ name: `published-${tally ? tally[1] : 0}`, t: now(), box: null });
-  // real before/after renders of the first published documents, for the opening montage
-  const MONT = path.join(HERE, "..", "public", "montage");
-  fs.rmSync(MONT, { recursive: true, force: true });
-  fs.mkdirSync(MONT, { recursive: true });
   const tiles = await page.locator("article.result.published").evaluateAll((els) =>
     els.slice(0, 40).map((e) => ({ name: e.getAttribute("data-result"), after: e.querySelector(".tile-img img")?.getAttribute("src") })));
-  const montage = [];
-  for (const [i, t] of tiles.entries()) {
-    const q = new URL(t.after, URL_).searchParams;
-    const before = `/api/v2/documents/${q.get("doc_id")}/pages/${q.get("page_id")}/preview.png`;
-    const [b, a] = await Promise.all([page.request.get(`${URL_}${before}`), page.request.get(new URL(t.after, URL_).href)]);
-    if (!b.ok() || !a.ok()) continue;
-    fs.writeFileSync(path.join(MONT, `${i}-before.png`), await b.body());
-    fs.writeFileSync(path.join(MONT, `${i}-after.png`), await a.body());
-    montage.push({ i, name: t.name });
-  }
-  fs.writeFileSync(path.join(MONT, "index.json"), JSON.stringify(montage));
+
   await sleep(2500);
   await page.mouse.wheel(0, 700);
   await sleep(2500);
@@ -329,6 +315,29 @@ try {
   }
   await mark("prototype-done");
   await sleep(1500);
+  await cdp.send("Page.stopScreencast").catch(() => {});
+  // real before/after renders of published documents, for the opening montage (after the recording; slow renders are skipped)
+  const MONT = path.join(HERE, "..", "public", "montage");
+  fs.rmSync(MONT, { recursive: true, force: true });
+  fs.mkdirSync(MONT, { recursive: true });
+  const montage = [];
+  for (const [i, t] of tiles.entries()) {
+    try {
+      const q = new URL(t.after, URL_).searchParams;
+      const before = `${URL_}/api/v2/documents/${q.get("doc_id")}/pages/${q.get("page_id")}/preview.png`;
+      const b = await page.request.get(before, { timeout: 120_000 });
+      const a = await page.request.get(new URL(t.after, URL_).href, { timeout: 120_000 });
+      if (!b.ok() || !a.ok()) continue;
+      fs.writeFileSync(path.join(MONT, `${i}-before.png`), await b.body());
+      fs.writeFileSync(path.join(MONT, `${i}-after.png`), await a.body());
+      montage.push({ i, name: t.name });
+    } catch (e) {
+      console.log(`  montage ${i}: skipped (${e.message.split("\n")[0]})`);
+    }
+  }
+  fs.writeFileSync(path.join(MONT, "index.json"), JSON.stringify(montage));
+  console.log(`${montage.length} montage pairs`);
+
 } finally {
   await cdp.send("Page.stopScreencast").catch(() => {});
   await sleep(300);

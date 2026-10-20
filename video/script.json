@@ -99,12 +99,8 @@
     },
     {
       "id": "breadth",
-      "clip": [
-        "wall-done",
-        "compare"
-      ],
-      "onScreen": "Floor plans \u00b7 org charts \u00b7 roadmaps \u00b7 networks",
-      "text": "And it is not just flowcharts. Floor plans, org charts, roadmaps and network maps are fixed by the same skill, because it learned how notes relate to their boxes, not what one picture looks like."
+      "text": "And it is not just flowcharts. Floor plans, org charts, roadmaps and network maps are fixed by the same skill, because it learned how notes relate to their boxes, not what one picture looks like.",
+      "card": "breadth"
     },
     {
       "id": "compare",
