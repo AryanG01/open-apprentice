@@ -1,0 +1,29 @@
+{
+ "generator": "scripts/corpus/generate_library.py",
+ "files": [
+  {
+   "file": "order-journey.drawio",
+   "title": "Online order journey",
+   "labels": 7,
+   "sha256": "e03e6ada2952cc0a3650de33372cadbe6077ed8453ea7d0c02eb009f1e718ecd"
+  },
+  {
+   "file": "hiring-process.drawio",
+   "title": "Hiring process",
+   "labels": 6,
+   "sha256": "5a92b278006941f5e6e93af61272d77cf8e589cc76223430f15183aad0e47617"
+  },
+  {
+   "file": "support-tickets.drawio",
+   "title": "Support ticket flow",
+   "labels": 6,
+   "sha256": "d4f53b522e89b7ecc356e6e4d051f6a778a800b80d8fd0b10fea5087fc0b660e"
+  },
+  {
+   "file": "ai-platform-map.drawio",
+   "title": "Company AI platform map \u00b7 108 services",
+   "labels": 108,
+   "sha256": "94549c90a1863ad46dad729d43bebc6ab34e77f125940712449e45fe36d13689"
+  }
+ ]
+}

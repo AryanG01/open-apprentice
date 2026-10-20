@@ -138,6 +138,10 @@ def publish(
     }
     passed = conf_ok and pres["ok"] and layout["ok"]
     published = passed and store.create(key, new)
+    if published and r.png:
+        store.create(
+            key + ".png", r.png
+        )  # the render the checks measured, kept for the export (no second render)
     return Receipt(
         published,
         key if published else None,

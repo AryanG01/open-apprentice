@@ -27,7 +27,7 @@ def test_session_runs_and_reports_state_provenance_and_spend(client, v2, doc_byt
     v2.dispatcher.drain()
     s = client.get(f"/api/v2/sessions/{sid}").json()
     assert s["state"] in ("waiting_for_answer", "preview_ready", "committed"), s
-    assert s["provenance"] == {"model": "Fixture", "teacher": "You"}
+    assert s["provenance"] == {"model": "Fixture", "teacher": "You", "policy": "A"}
     assert set(s["spend"]) == {"recorded", "reserved", "uncertain"}
     assert s["budgets"]["attempts_used"] >= 1 and s["manifest_revision"] >= 1
 

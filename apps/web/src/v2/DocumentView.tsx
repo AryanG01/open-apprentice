@@ -217,13 +217,14 @@ export function DocumentView({ docId, pageId, mappingHash, editable, title, star
       </div>
       {editable && selected && pos[selected] ? (
         <div className="fields">
+          <span className="sel-name">{scene?.display?.[selected]?.text || selected}</span>
           <label>
-            x of {selected}{" "}
+            x{" "}
             <input aria-label={`x of ${selected}`} type="number" step={1 / 64} value={pos[selected].x}
               onChange={(e) => place(selected, { x: Number(e.target.value), y: pos[selected].y })} />
           </label>
           <label>
-            y of {selected}{" "}
+            y{" "}
             <input aria-label={`y of ${selected}`} type="number" step={1 / 64} value={pos[selected].y}
               onChange={(e) => place(selected, { x: pos[selected].x, y: Number(e.target.value) })} />
           </label>

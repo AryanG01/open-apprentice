@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { ApiError, post, url } from "./api";
 import { SAFETY_LINE } from "./DocumentView";
+import { ALT_COLOURS } from "./Thinking";
 import type { Outstanding } from "./types";
 
-type Props = { sid: string; q: Outstanding; onAnswered: () => void; names?: Record<string, string> };
+type Props = { sid: string; q: Outstanding; onAnswered: () => void; names?: Record<string, string>; groups?: Record<string, string[]> };
 
 function ItemImage({ sid, q, item, alt }: { sid: string; q: Outstanding; item: string; alt: string }) {
   return <img className="item" src={url(`/sessions/${sid}/requests/${q.request_id}/items/${encodeURIComponent(item)}.png`)} alt={alt} />;
 }
 
 /** Renders the open question by type and submits one answer per click (spec 8 Clarify, Preview, Review revision). */
-export function Question({ sid, q, onAnswered, names = {} }: Props) {
+export function Question({ sid, q, onAnswered, names = {}, groups }: Props) {
   const docName = (sceneId: string): string => {
     const id = sceneId.split(":")[0];
     return names[id] ?? id.slice(0, 8);
@@ -44,12 +45,17 @@ export function Question({ sid, q, onAnswered, names = {} }: Props) {
     <section className="question" data-request-id={q.request_id} aria-live="polite">
       {req.type === "ChooseOutput" ? (
         <>
-          <h3>Which result did you mean?</h3>
+          <h3>Your example fits more than one rule. Which result did you mean?</h3>
+          <p className="muted">These are the same diagram laid out by each rule that still fits. Pick the one you would have drawn.</p>
           <div className="v2-options">
             {req.alternatives.map(([id]) => (
-              <label key={id} className="v2-option">
-                <input type="radio" name="alt" value={id} checked={choice === id} onChange={() => setChoice(id)} /> Option {id}
+              <label key={id} className={`v2-option choice${choice === id ? " picked" : ""}`} style={{ borderColor: ALT_COLOURS[id] }}>
+                <span className="opt-head">
+                  <input type="radio" name="alt" value={id} checked={choice === id} onChange={() => setChoice(id)} />
+                  <span className="alt" style={{ background: ALT_COLOURS[id] }}>{id}</span> Option {id}
+                </span>
                 <ItemImage sid={sid} q={q} item={id} alt={`Option ${id} on document ${docName(req.scene_id)}`} />
+                {groups?.[id]?.length ? <small className="why">Rule: {groups[id].join(" / ")}</small> : null}
               </label>
             ))}
           </div>

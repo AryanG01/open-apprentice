@@ -445,3 +445,78 @@ def step(events: list[Event], config: StepConfig) -> Action:
     return Abstain(
         _aid(events, "Abstain"), "preview rejected" if unresolved_reject else "no approved preview"
     )
+
+
+def thinking_trace(events: list[Event], source: str) -> list[dict]:
+    """What the apprentice considered, for display: each proposal round with how many programs survived the evidence,
+    each generated probe, each question with which programs stand behind each alternative, and the outcome. Recomputed
+    from the log with the same filter the policy uses (pure, deterministic); `source` names who proposed (model or the
+    offline enumerator)."""
+    rounds = {
+        e.payload["action_id"]: e.payload.get("round_kind", "initial")
+        for e in events
+        if e.type == "ActionIssued" and e.payload.get("kind") == "RequestModelProposal"
+    }
+    out: list[dict] = []
+
+    def survivors(upto: int) -> list[dict]:
+        evs = events[: upto + 1]
+        return _filter(candidate_pool(evs), derive(evs))[0]
+
+    for i, e in enumerate(events):
+        if e.type == "ModelProposalReturned":
+            keep = survivors(i)
+            out.append(
+                {
+                    "kind": "round",
+                    "round_kind": rounds.get(e.payload.get("action_id"), "initial"),
+                    "source": source,
+                    "proposed": len(e.payload["candidates"]),
+                    "malformed": int(e.payload.get("malformed") or 0),
+                    "survivors": len(keep),
+                    "summaries": [c["summary"] for c in keep[:6]],
+                    "truncated": bool((e.payload.get("usage") or {}).get("truncated")),
+                }
+            )
+        elif e.type == "ProbeRendered":
+            out.append(
+                {
+                    "kind": "probe",
+                    "probe_id": e.payload.get("probe_id"),
+                    "ok": bool(e.payload.get("ok")),
+                    "scene_id": e.payload.get("scene_id"),
+                }
+            )
+        elif e.type == "RequestIssued":
+            req = e.payload["request"]
+            if req["type"] == "ChooseOutput":
+                keep = survivors(i)
+                scene = derive(events[: i + 1]).scenes.get(req["scene_id"])
+                groups: dict[str, list[str]] = {}
+                if scene is not None:
+                    by_out = _groups(keep, scene)
+                    typed = request_from_json(req)
+                    for alt, alt_out in typed.alternatives:  # type: ignore[union-attr]
+                        groups[alt] = next(
+                            ([c["summary"] for c in cs] for o, cs in by_out if o == alt_out), []
+                        )
+                out.append(
+                    {"kind": "question", "request_id": req["request_id"], "scene_id": req["scene_id"],
+                     "candidates": len(keep), "groups": groups}
+                )  # fmt: skip
+            elif req["type"] == "ConfirmPreview":
+                out.append({"kind": "preview", "items": len(req.get("items", []))})
+        elif e.type == "ResponseRecorded":
+            out.append({"kind": "answer", "survivors": len(survivors(i))})
+        elif e.type == "VersionStored":
+            h = e.payload.get("program_hash")
+            pool = {c["hash"]: c for c in candidate_pool(events[: i + 1])}
+            out.append(
+                {
+                    "kind": "commit",
+                    "summary": pool.get(h, {}).get("summary", "") or "program " + str(h)[:8],
+                }
+            )
+        elif e.type in ("Abstained", "Errored"):
+            out.append({"kind": "stopped", "reason": e.payload.get("reason", "")})
+    return out

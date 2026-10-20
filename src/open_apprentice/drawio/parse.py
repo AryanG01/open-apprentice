@@ -84,6 +84,41 @@ class _LabelHtml(HTMLParser):
             raise DrawioRefused("unsupported label content: styles that load resources")
 
 
+class _Text(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
+        if tag in ("br", "div", "p"):
+            self.parts.append(" ")
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+
+def plain_text(value: str) -> str:
+    """A label's visible text for display (tags dropped, entities decoded, whitespace collapsed); never fed to a learner."""
+    p = _Text()
+    p.feed(value)
+    p.close()
+    return " ".join("".join(p.parts).split())
+
+
+def display(page: "Page") -> dict[str, dict[str, str]]:
+    """Readable name and colours of every box and text on a page, for the interface only."""
+    return {
+        c.id: {
+            "text": plain_text(c.value),
+            "fill": c.style.get("fillColor", ""),
+            "stroke": c.style.get("strokeColor", ""),
+            "font_color": c.style.get("fontColor", ""),
+        }
+        for c in page.cells
+        if c.vertex
+    }
+
+
 def _check_label_html(value: str) -> None:
     p = _LabelHtml(convert_charrefs=True)
     p.feed(value)

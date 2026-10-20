@@ -5,13 +5,20 @@ import { fmt, type Point } from "./geometry";
 import { firstOkPage } from "./ImportMap";
 import type { Config, DocumentInfo } from "./types";
 
+const SESSION_OTHERS = 5;
+const TEACH_MAX_OBJECTS = 32;
+
 export const LIVE_UNAVAILABLE = "Live inference is unavailable. Open the recorded example.";
 
 type Props = { docs: DocumentInfo[]; onSession: (sid: string) => void };
 
 /** Step 2: drag labels on one document, see the engine's render, then confirm the whole document is right. */
 export function Teach({ docs, onSession }: Props) {
-  const ready = docs.filter((d) => firstOkPage(d)?.mapping_hash);
+  const confirmed = docs.filter((d) => firstOkPage(d)?.mapping_hash);
+  // teaching works on pages of up to 32 objects; larger pages take the skill afterwards (Reuse)
+  const size = (d: DocumentInfo) => { const p = firstOkPage(d); return (p?.fixed?.length ?? 0) + (p?.movable?.length ?? 0); };
+  const ready = confirmed.filter((d) => size(d) <= TEACH_MAX_OBJECTS);
+  const reuseOnly = confirmed.length - ready.length;
   const [demoId, setDemoId] = useState<string>("");
   const [moved, setMoved] = useState<Record<string, Point>>({});
   const [seen, setSeen] = useState(false);
@@ -43,7 +50,9 @@ export function Teach({ docs, onSession }: Props) {
     setError(null);
     const boxes: Record<string, [string, string]> = {};
     for (const [k, p] of Object.entries(moved)) boxes[k] = [fmt(p.x), fmt(p.y)];
-    const documents = ready.map((d) => {
+    // the session previews on a handful of other documents; reuse on the whole library comes after the skill is kept
+    const others = ready.filter((d) => d.doc_id !== demo.doc_id).slice(0, SESSION_OTHERS);
+    const documents = [demo, ...others].map((d) => {
       const p = firstOkPage(d);
       return { doc_id: d.doc_id, page_id: p?.page_id ?? "", mapping_hash: p?.mapping_hash ?? "" };
     });
@@ -65,15 +74,17 @@ export function Teach({ docs, onSession }: Props) {
   if (ready.length < 2) {
     return (
       <section className="v2-step" aria-labelledby="h-teach">
-        <h2 id="h-teach">2 · Teach</h2>
-        <p>Import and confirm at least two documents: you edit one, and the learned rule is previewed on the others before it is kept.</p>
+        <h2 id="h-teach">Show it once</h2>
+        <p className="lede">Import and confirm at least two documents: you tidy one by hand, and the apprentice previews what it learned on the others before keeping it.</p>
       </section>
     );
   }
   return (
     <section className="v2-step" aria-labelledby="h-teach">
-      <h2 id="h-teach">2 · Teach</h2>
-      <label>
+      <h2 id="h-teach">Show it once</h2>
+      <p className="lede">Drag the notes on one diagram to where they belong. Every move is redrawn by the real draw.io engine.</p>
+      {reuseOnly ? <p className="muted">{reuseOnly} large document{reuseOnly === 1 ? "" : "s"} (over {TEACH_MAX_OBJECTS} objects) will take the skill once it is learned.</p> : null}
+      <label className="docpick">
         Document to edit{" "}
         <select aria-label="Document to edit" value={demoId} onChange={(e) => { setDemoId(e.target.value); setMoved({}); setSeen(false); }}>
           {ready.map((d) => (
@@ -95,7 +106,7 @@ export function Teach({ docs, onSession }: Props) {
           </p>
         ) : null}
       </div>
-      <button type="button" disabled={busy || !seen || Object.keys(moved).length === 0} onClick={() => void submit()}>
+      <button type="button" className="primary" disabled={busy || !seen || Object.keys(moved).length === 0} onClick={() => void submit()}>
         This whole document is right
       </button>
       {!seen && Object.keys(moved).length ? <p role="status">Wait for the engine's render of your edit.</p> : null}

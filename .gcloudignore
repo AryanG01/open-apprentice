@@ -32,3 +32,4 @@ tests/fixtures/drawio_corpus/*
 .github/
 skills-lock.json
 .import_linter_cache/
+video/

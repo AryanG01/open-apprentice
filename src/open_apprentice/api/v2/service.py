@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import uuid
+from collections import OrderedDict
 from open_apprentice.concepts.rules import RuleError, parse_rational
 from fractions import Fraction
 from typing import Any, Optional
@@ -13,8 +15,9 @@ from open_apprentice.api.v2 import records
 from open_apprentice.api.v2.context import V2
 from open_apprentice.api.v2.tasks import Job
 from open_apprentice.drawio import mapping as mp
-from open_apprentice.drawio.classify import Classified, classify
-from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, load_drawio
+from open_apprentice.drawio.classify import TEACH_MAX_OBJECTS, Classified, classify
+from open_apprentice.teaching.step import thinking_trace
+from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, display, load_drawio
 from open_apprentice.drawio.patch import apply_edits, plan_edits
 from open_apprentice.drawio.render import Rendered, parse_render
 from open_apprentice.drawio.scene import DrawioScene, build_scene
@@ -165,9 +168,12 @@ def get_document(v: V2, owner: str, doc_id: str) -> dict:
     if "probe_of" in doc:
         out["probe_of"] = doc["probe_of"]
     pages = []
+    f = _source(v, doc_id) if any(e["status"] == "ok" for e in doc["pages"]) else None
     for entry in doc["pages"]:
         p = dict(entry)
         p.update(mapping=None, mapping_hash=None, scene_hash=None)
+        if f is not None and entry["status"] == "ok":
+            p["display"] = display(next(pg for pg in f.pages if pg.id == entry["page_id"]))
         if entry["status"] == "ok" and doc["render"] == "done":
             m, _ = _stored_mapping(v, doc_id, entry["page_id"])
             p["mapping"] = {
@@ -332,6 +338,12 @@ def _create_session(
     scenes = []
     for ref in documents:
         _, _, _, sc = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+        if len(sc.scene["objects"]) > TEACH_MAX_OBJECTS:
+            raise Conflict(
+                "TOO_LARGE_TO_TEACH",
+                f"teach on documents with at most {TEACH_MAX_OBJECTS} objects; a page this large "
+                f"({len(sc.scene['objects'])} objects) can take the skill once it is learned",
+            )
         scenes.append(sc)
     demo_outputs: dict[int, dict] = {}
     for d in demonstrations:
@@ -389,6 +401,7 @@ def _create_session(
         "model": v.model if live else "Fixture",
         "teacher": "You",
         "live": live,
+        "policy": PRODUCT_POLICY if live else "A",
     }
     records.put_new(v.store, _meta_key(sid), owner, meta)
     v.dispatcher.submit(Job("advance", sid, {"sid": sid}))
@@ -402,12 +415,24 @@ def _raw_meta(v: V2, sid: str) -> dict:
     return json.loads(b.data)
 
 
+PRODUCT_POLICY = "product-1"  # A plus truncation tolerance; not the evaluated policy A (docs/evaluation/product_policy.md)
+
+
+def step_config(meta: dict) -> Any:
+    """Live product sessions tolerate a reply cut at the completion cap (an empty round, not a terminal error); everything
+    else, including every evaluated run, is policy A."""
+    from open_apprentice.teaching.step import StepConfig
+
+    if meta.get("live") and meta.get("policy") == PRODUCT_POLICY:
+        return StepConfig(probes=True, tolerate_truncation=True)
+    return StepConfig(probes=True)
+
+
 def advance(v: V2, sid: str) -> None:
     """Run the session's executor until it needs a person, a result, or ends; activate a new skill's first version."""
     from open_apprentice.skills.versions import ActivationRejected, SkillStore
     from open_apprentice.teaching.events import SessionLog
     from open_apprentice.teaching.executor import Executor
-    from open_apprentice.teaching.step import StepConfig
 
     meta = _raw_meta(v, sid)
     log = SessionLog(v.store, sid)
@@ -416,7 +441,7 @@ def advance(v: V2, sid: str) -> None:
     owner = log.manifest()[0]["owner"]
     status = Executor(
         v.store, log, v.proposer if meta["live"] else _offline(v), _Deferred(), v.ledger,
-        StepConfig(probes=True), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
+        step_config(meta), worst_usd=v.worst_usd if meta["live"] else Fraction(0), skill_id=meta["skill_id"],
         probe_renderer=make_probe_renderer(v, owner, sid),
     ).run()  # fmt: skip
     if status != "committed":
@@ -430,7 +455,14 @@ def advance(v: V2, sid: str) -> None:
             v.store,
             f"skills/{meta['skill_id']}/owner.json",
             log.manifest()[0]["owner"],
-            {"provenance": {"model": meta["model"], "teacher": meta["teacher"]}, "session_id": sid},
+            {
+                "provenance": {
+                    "model": meta["model"],
+                    "teacher": meta["teacher"],
+                    "policy": meta.get("policy", "A"),
+                },
+                "session_id": sid,
+            },
         )
     except FileExistsError:
         pass
@@ -575,10 +607,41 @@ def session_state(v: V2, owner: str, sid: str) -> dict:
             "uncertain": _s(spend["uncertain"]),
         },
         "manifest_revision": manifest["manifest_revision"],
-        "provenance": {"model": meta["model"], "teacher": meta["teacher"]},
+        "provenance": {
+            "model": meta["model"],
+            "teacher": meta["teacher"],
+            "policy": meta.get("policy", "A"),
+        },
         "result": result,
+        "thinking": _thinking(evs, meta["model"]),
     }
 
+
+_TRACES: "OrderedDict[tuple[str, str], list[dict]]" = OrderedDict()
+
+
+def _thinking(evs: list, model: str) -> list[dict]:
+    """The display trace, cached by the log's head event (events never change once written)."""
+    if not evs:
+        return []
+    key = (evs[-1].event_id, model)
+    hit = _TRACES.get(key)
+    if hit is not None:
+        return hit
+    try:
+        trace = thinking_trace(
+            evs, "offline enumerator" if model == "Fixture" else f"model ({model})"
+        )
+    except Exception:  # a display aid must never break the session view
+        log.exception("thinking trace failed")
+        return []
+    _TRACES[key] = trace
+    while len(_TRACES) > 256:
+        _TRACES.popitem(last=False)
+    return trace
+
+
+log = logging.getLogger(__name__)
 
 CANCELLED = "cancelled by the user"
 
@@ -873,6 +936,16 @@ def export(
         raise records.NotFound(res["key"])
     if fmt == "drawio":
         return data.data, "application/vnd.jgraph.mxfile"
+    if fmt == "png":  # the published file as the engine renders it, cached beside it
+        cached = v.store.get(res["key"] + ".png")
+        if cached is not None:
+            return cached.data, "image/png"
+        page = next(p for p in load_drawio(data.data).pages if p.id == page_id)
+        png = v.render(page).png
+        if not png:
+            raise Conflict("PNG_UNAVAILABLE", "the renderer returned no image")
+        v.store.create(res["key"] + ".png", png)
+        return png, "image/png"
     if fmt == "svg":
         if v.render_svg is None:
             raise Conflict("SVG_UNAVAILABLE", "SVG export is not available on this server")
@@ -882,7 +955,7 @@ def export(
         if svg is None:
             raise Conflict("SVG_UNAVAILABLE", "the renderer returned no SVG")
         return svg.encode(), "image/svg+xml"
-    raise Conflict("BAD_FORMAT", "format must be drawio, svg or receipt")
+    raise Conflict("BAD_FORMAT", "format must be drawio, png, svg or receipt")
 
 
 # ---- corrections and activation ------------------------------------------------------------------------------------------
@@ -936,6 +1009,12 @@ def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
     if ref is None:
         raise records.NotFound(f"{req['doc_id']}:{req['page_id']}")
     _, _, _, scene = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+    if len(scene.scene["objects"]) > TEACH_MAX_OBJECTS:
+        raise Conflict(
+            "TOO_LARGE_TO_TEACH",
+            f"corrections teach the skill, so they work on documents with at most {TEACH_MAX_OBJECTS} objects; "
+            "correct a smaller document that shows the same problem",
+        )
     rule = _version(v, skill_id, version)["program"]["rule"]
     produced = run_output(rule, scene.scene) or {}
     boxes = _boxes(req["boxes"] or {})
@@ -948,9 +1027,9 @@ def _start_correction(v: V2, owner: str, skill_id: str, req: dict) -> dict:
     for d in run["documents"]:
         if (d["doc_id"], d["page_id"]) != (ref["doc_id"], ref["page_id"]):
             try:
-                extra[_scene_id(d)] = page_scene(
-                    v, owner, d["doc_id"], d["page_id"], d["mapping_hash"]
-                )[3].scene
+                other = page_scene(v, owner, d["doc_id"], d["page_id"], d["mapping_hash"])[3].scene
+                if len(other["objects"]) <= TEACH_MAX_OBJECTS:
+                    extra[_scene_id(d)] = other
             except (Conflict, DrawioRefused, records.NotFound):
                 continue  # a document that can no longer be read is left out of the checks
     sid = uuid.uuid4().hex
@@ -1029,7 +1108,7 @@ def activate(
 
 def page_scene_view(v: V2, owner: str, doc_id: str, page_id: str, mapping_hash: str) -> dict:
     """Scene geometry for the overlay, plus where document coordinates land in the preview image."""
-    _, _, _, sc = page_scene(v, owner, doc_id, page_id, mapping_hash)
+    f, idx, _, sc = page_scene(v, owner, doc_id, page_id, mapping_hash)
     r = _stored_render(v, doc_id, page_id)
     keys = ("id", "kind", "role", "attached")
     return {
@@ -1041,6 +1120,7 @@ def page_scene_view(v: V2, owner: str, doc_id: str, page_id: str, mapping_hash: 
             for o in sc.scene["objects"]
         ],
         "movable": list(sc.movable),
+        "display": display(f.pages[idx]),
     }
 
 

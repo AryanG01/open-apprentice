@@ -5,15 +5,22 @@
 You move a few labels to where they belong on one diagram. Several different rules usually fit that example, so Open Apprentice finds a
 case where they disagree, renders each outcome and asks which one you meant. The agreed rule becomes a versioned skill. You preview it on other
 documents (a result that would break a layout is shown as blocked and cannot be approved), apply it, download the edited `.drawio`, and correct
-any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and four independent checks gate every publish.
+any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and three separate checks (measured conformance,
+preservation of everything else in the file, layout safety) gate every publish.
 
-Built for the Nebius x NVIDIA Global AI Hackathon. Live model: NVIDIA Nemotron-3-Ultra through Nebius Token Factory. Everything else runs offline.
+Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents; submission text in `docs/submission.md`). Live model: NVIDIA Nemotron through Nebius Token Factory (Nemotron-3-Ultra in the evaluation;
+Nemotron-3-Super on the live site, chosen by a pre-registered check, `docs/evaluation/product_model_check.md`). Everything else runs offline.
 
 ## Live demo
 
 **https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
-Open *Apprentice*, press **Try a sample** (three owner-authored diagrams) or upload a `.drawio` file, confirm which node each label describes, and teach.
-The default learner is Nemotron called live; a session and every run states `Model: … · Teacher: …`. Live use runs under a **durable** dollar cap
+Video (2:37): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
+diagrams), confirm which box each note describes, drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
+document is right*. The apprentice's notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks.
+Then apply the skill to **the 100-diagram library** (ten kinds: flowcharts, architecture maps, org charts, roadmaps, network maps, floor plans;
+`docs/corpus/library_provenance.md`) and to **The big one**, a 217-object platform map, and compare before and after. Teaching works on pages of up
+to 32 objects; a learned skill applies to pages of up to 400 objects and 200 notes. Every session and run states `Model: … · Teacher: …` (and `· Policy: product-1` for live sessions, a
+disclosed difference from the evaluated policy: `docs/evaluation/product_policy.md`). Live use runs under a **durable** dollar cap
 (`DEMO_MODEL_MAX_USD`, shared by all instances and surviving restarts) and 3 live sessions per visitor per hour. When the cap is reached the page says so
 and offers the offline learner; it never silently downgrades. The first request after idle can take a few seconds.
 

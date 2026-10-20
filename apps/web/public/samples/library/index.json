@@ -1,0 +1,606 @@
+{
+ "generator": "scripts/corpus/generate_library.py",
+ "seed": 20261019,
+ "files": [
+  {
+   "file": "000-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "f7ae9cf26920a6fe89aced626afa2c6ef555963f53cd8390e8b6c0e6cf2db337"
+  },
+  {
+   "file": "001-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "4a30f17f03eb806cdc2bcde989904088ecdbb62671a55ff9600f0d664177881a"
+  },
+  {
+   "file": "002-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "56c898055d24425cf12b16d67608b7343a7aa8db2528bac27eb3ae2d7e7eaf31"
+  },
+  {
+   "file": "003-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "0c0e607d399fbe03cb1781c25d3d13eba8ff93256155ef7f2a79e62d61a89c44"
+  },
+  {
+   "file": "004-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "91d5b2af52c880394f77667607c493d03f4f45b502ce1df9341680386a8d717f"
+  },
+  {
+   "file": "005-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "c6f2a57f5c57bd574d4b96d07ab34ec00e3220a143fc56f857b322620410121e"
+  },
+  {
+   "file": "006-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 12,
+   "sha256": "fac96b9c863782882f1846074a1a5dd1a7a34f60c8ecceaf581c2a678bc0e383"
+  },
+  {
+   "file": "007-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 8,
+   "sha256": "8491a984321eedc236423f1b25f730f77c155066e6b9badd4853fb0ab18bbc94"
+  },
+  {
+   "file": "008-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 7,
+   "sha256": "f94fe0cbc1ff114fb26f759431b51425ae5bdb4062fe2d072c7d557f9c1cbfb5"
+  },
+  {
+   "file": "009-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 9,
+   "sha256": "b46cdf1394e2d2e2c1230ebd44c20dfb2f07a3fd2ab7306f1ebf290da933be78"
+  },
+  {
+   "file": "010-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "449439c05331958f94ee167bae7bd90bbff688eb3bff6d5ef7e534464a52f182"
+  },
+  {
+   "file": "011-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "3a592cf086d3d3fa0b24aadc2b108fc36f88635008ee58cc5518dbec2a878036"
+  },
+  {
+   "file": "012-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 10,
+   "sha256": "a1e478e6bfed9626f1d70210e2319266fe1d4f1308cd6faa7f4c361b48c3b716"
+  },
+  {
+   "file": "013-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "c631d4550d74ea3cf0550e4e5a92c883b7ce512b7a462ce804c457d2e9e9612c"
+  },
+  {
+   "file": "014-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 10,
+   "sha256": "a49949fc11ab435d724a45ff8444e6b448ad2ca048555e0ee1deb1403fc9e88f"
+  },
+  {
+   "file": "015-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 9,
+   "sha256": "72c8018bd4012e0c31b4a95c933aeaf9a8bf8070f90b03c06e1c4734ce902eca"
+  },
+  {
+   "file": "016-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 13,
+   "sha256": "ebac8a3fa748b6040a7bfe48a09fad6c291d177357a16fabcc9d29223cbc543f"
+  },
+  {
+   "file": "017-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 8,
+   "sha256": "95c2e3cd3dfc9d4715eb3747af800a394107304f580e26c293256efc29514a59"
+  },
+  {
+   "file": "018-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 7,
+   "sha256": "2c979c1638ffe14eec62ab4baad86923e18bbbad4c7c3528c629ccdca3105cbb"
+  },
+  {
+   "file": "019-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 8,
+   "sha256": "fc2a1b9b4916e848bd57331d605fb6115fff290463c8d5350fdd415e375af86e"
+  },
+  {
+   "file": "020-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "48fd66a4194ca669398b70833b6b1cce22e16b378e70aebca66c65fdec0c3920"
+  },
+  {
+   "file": "021-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 11,
+   "sha256": "fbc8234a68831d89884de06a0a9247475f01c2be990706fc574f7c63a998f574"
+  },
+  {
+   "file": "022-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "5b7315302b185d6efa809ca05a99b15d7b129d24190fbf0eae22bd6549182d31"
+  },
+  {
+   "file": "023-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 9,
+   "sha256": "5c47daff719bd6717c2b002660eac0e0f0360fd1c35c37720f1bb582c8922803"
+  },
+  {
+   "file": "024-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 10,
+   "sha256": "daa7fddbd5aa57e04c48c63785370e965c2629ed2c48aa123c462da07584ee79"
+  },
+  {
+   "file": "025-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "cfee4c938c75900c5d9fc55cc8cad39d8a91165e37d2a5e1053857f513ebc299"
+  },
+  {
+   "file": "026-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 12,
+   "sha256": "1b549fb41ae3e6738f5f725924d5b364b6dd7f08b82e550b1147b6eb2848265e"
+  },
+  {
+   "file": "027-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 8,
+   "sha256": "f426699319d8fc31a9395b3d66038bf7253b6fc1bd72d08869845fcf9c1b6727"
+  },
+  {
+   "file": "028-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 6,
+   "sha256": "268ccbebdcbefdc16bf19415b6bddbebb1320973280de28402cdcc5c48b90f65"
+  },
+  {
+   "file": "029-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 10,
+   "sha256": "6054e9c6ad1b66df93dbd2ffb1c5742fde65a244fa27ac59d2595451de6eaa76"
+  },
+  {
+   "file": "030-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "46d4ba0b4df84df88e90466e1ed921adbdcc285bc5eb07ea83c0406a1e85241f"
+  },
+  {
+   "file": "031-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "481d7aeb4d287dd36eaf8bd7e03f1bfb04e67222269ff8ee4914629a602380e8"
+  },
+  {
+   "file": "032-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "a20f5da75d0dc1553424938b32defdb484c9e19648551ae78fcfa21821bfd5ed"
+  },
+  {
+   "file": "033-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "efbb04348907d8ba506da684c236da72008da475606cb26afa50c0c845cd39ba"
+  },
+  {
+   "file": "034-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "5723fc4e0c619ed49d9a5ebd18a7ebc090121f4356b4d336ee603fca25003b75"
+  },
+  {
+   "file": "035-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "513e049a79681b8ea054f41156e71229f2737870d61f72a6972101b430957cd7"
+  },
+  {
+   "file": "036-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 13,
+   "sha256": "601e63da6c9304b4feb42f78b5de9f07f21c7dd17b54a10e419ac0c7b39e8ed0"
+  },
+  {
+   "file": "037-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 9,
+   "sha256": "18a188091abff2075ebcc3705752de67bdff2719088787bf665abe08f6403d0c"
+  },
+  {
+   "file": "038-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 8,
+   "sha256": "303f1a60ac799d85a72a5a74f034062592a363a57f75de118c562845d446141b"
+  },
+  {
+   "file": "039-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 10,
+   "sha256": "101f16fd9d604c282a0337a79d6812ab1b0496771297a6d802c76f69006671e3"
+  },
+  {
+   "file": "040-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "541d16e6de240344c5374e87c19b4994df81e5ffeda2978ea192a29d4da0c863"
+  },
+  {
+   "file": "041-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 8,
+   "sha256": "60cb9a53d45f7581126cf1d15e9b374f95cdecbab2a1631a74167b9e8b305226"
+  },
+  {
+   "file": "042-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "61c216379d32e4625d79d0ee5f42d1228b2b82786f1eeb3d27c8ba1bc39fa96d"
+  },
+  {
+   "file": "043-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "ad86062626ffff775b0ecd7eb73b528fd2314ee8821849512fb3528f1f451e03"
+  },
+  {
+   "file": "044-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "7fa927723671d9fd4f07b9bf844ad7e189e353c1a66897c3bb63cdacc455b458"
+  },
+  {
+   "file": "045-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "92ed53dbf80e7a3cba94393431ebb7bd258ee399276096badb2c73e603d45b39"
+  },
+  {
+   "file": "046-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 12,
+   "sha256": "05d7fa7d9bdb9ec7dc08bbff2cf8edb8e54c0824d2f785a3e744a146aeb94e3a"
+  },
+  {
+   "file": "047-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 8,
+   "sha256": "1629ec348ef38e92db8a91cd85f75814938fe7b1040ace483d9935f21a6ddfe2"
+  },
+  {
+   "file": "048-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 8,
+   "sha256": "cb57f2a10797da5f965bdd8d9d6fc574c25276bbd48f0f8b97cd6d77dded5056"
+  },
+  {
+   "file": "049-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 9,
+   "sha256": "0b18ba2b8477b73741ce9a9099a4a50d534ac6885e5951d6b79e79b5da054777"
+  },
+  {
+   "file": "050-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 9,
+   "sha256": "3dba29f8787d254272799805a2c8ec75babb409e36f84ac1a9eabad64c492b40"
+  },
+  {
+   "file": "051-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 11,
+   "sha256": "ef30c4e381cd349babffbed92ab6d7bff60838625bb21a23b8a1c909e9382f30"
+  },
+  {
+   "file": "052-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "d1e73ca583fa14c7aa09cef9938abb9252365b8034a446d9504362facb70fb68"
+  },
+  {
+   "file": "053-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "254bf9877ddbb05d9c3d9c845bedd0c460bfe335f97752c84094fc340adaa632"
+  },
+  {
+   "file": "054-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "eea6d3d8c563335056b7d686235ec833fec90bd1fc83947aa62980bf447bb6a5"
+  },
+  {
+   "file": "055-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 9,
+   "sha256": "379d8ff7c10d4bb47c63b8f1bd7fd1cf2f01fdbe1f7e1e6613cbd060cae7d683"
+  },
+  {
+   "file": "056-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 12,
+   "sha256": "52d12239918ceb3f7cd238a3f3f6d457806fdc694b3f8bf5a8961eca82fcfd67"
+  },
+  {
+   "file": "057-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 7,
+   "sha256": "a9dc6383385c6fe74a1ae8c7d4b45d225a91eed24fb6725bf2d9a47521dd1267"
+  },
+  {
+   "file": "058-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 7,
+   "sha256": "632e52922e892c6b7761e89f023be19d61a5c2c03c88b5cd197565f9935e97b8"
+  },
+  {
+   "file": "059-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 9,
+   "sha256": "c9d7d5726b907fec393d15523b66b346a707ba4908c51bc8ea0efa7f86c22f65"
+  },
+  {
+   "file": "060-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "c236bc92ddaa75783d0bb339353403f02d1d4b1444fd566d7853ae3f257af0ea"
+  },
+  {
+   "file": "061-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "9535924d483cea8eda5bc789b2a5bc5a265de1b9676e717e99910394de14e6b1"
+  },
+  {
+   "file": "062-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 10,
+   "sha256": "7130356135e0c97090d2c9eb1b02f2cde9d815a815d3334d21216e57fe7e8ff4"
+  },
+  {
+   "file": "063-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "d9b4b512b634ed3e698d99c747a6b62f7d18be7c0983c24185b0296bf1c5cc5f"
+  },
+  {
+   "file": "064-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "3b9b2a8749525615c6dc940518b8255a265c3706e764be877e3bffb47c710880"
+  },
+  {
+   "file": "065-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "7284cd56341224c4409be6d6dde96510790b9a13757c0d504ac9fbb9f470a312"
+  },
+  {
+   "file": "066-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 12,
+   "sha256": "5cfb45fa2de4d6ced6478b0b9d4451321ffd1989a9b96b839410f4db411ca953"
+  },
+  {
+   "file": "067-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 8,
+   "sha256": "dfb7aa6d9170b60b81c9de871f47e8c78a5a1a58dbc0b4529642d449bfb7892d"
+  },
+  {
+   "file": "068-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 7,
+   "sha256": "4a4acaf46f58cbe667ede18434badebfe90f316301f01644b2d8b4ab56cb57e0"
+  },
+  {
+   "file": "069-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 9,
+   "sha256": "7ab9449e257428a17bd194c746fc052e7f9136862ec088b234709c6629ece199"
+  },
+  {
+   "file": "070-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "9f3d5d6b50a58f83480751fb2814e1b7cf6aef193a36da4858cb8067f7599e01"
+  },
+  {
+   "file": "071-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "5da487a3904a528b5f5226ae4ebd566fb5ffac9f729efc58881f31564282f64c"
+  },
+  {
+   "file": "072-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 7,
+   "sha256": "c52d4037a38759a0d7765d3998d87e0828510d84f0aff08362d5254423566d0e"
+  },
+  {
+   "file": "073-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 7,
+   "sha256": "4ab76ebb0487b9d533e19cf2b22f9ea428c62baad72ff615e092cc591ac2430d"
+  },
+  {
+   "file": "074-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "a948c42bbfced615629b3b89f5c78bd5ad64fbef6dbc9ff2ef280d506acc88e2"
+  },
+  {
+   "file": "075-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "42938741660ace42f9309e4237ce9ca3fc52ff1f2b05427dddd05bbe4cdfb794"
+  },
+  {
+   "file": "076-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 14,
+   "sha256": "923558635faa410d99570d3772a9c93ab5f82044116efe47bfe327c8557bbf1f"
+  },
+  {
+   "file": "077-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 9,
+   "sha256": "129d667608c232c072f2987968f5956a632985df7b3c795755a278b2b3fdb92b"
+  },
+  {
+   "file": "078-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 7,
+   "sha256": "eafcd982b59f29f5343d838f81da14c0ffbe38061c04fbace2eca00b8c0b404a"
+  },
+  {
+   "file": "079-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 10,
+   "sha256": "7bef4120e17aad08a89571affc914df87ee6098eb78bad2b22ffb4c19813b9e3"
+  },
+  {
+   "file": "080-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 10,
+   "sha256": "0f05ca79f4f8863f8b5f39ca19f4aced656275e5f8ab2b31b01621f8221cd392"
+  },
+  {
+   "file": "081-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 10,
+   "sha256": "6e3f3f94d8be9ec7fabf36f78a9d7aeb2c338660641d0557be786da834603384"
+  },
+  {
+   "file": "082-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 8,
+   "sha256": "78c8516ff52475441bc33652f5f55d401a01507a874e48c92caa499c4451fd80"
+  },
+  {
+   "file": "083-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "7509e707b0bbedbc8fc54ed227bd6a8c37107f2d211fb2d2acd35c913775ab9e"
+  },
+  {
+   "file": "084-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 8,
+   "sha256": "48f85126871774fb1aa03dca11f461ddd6734a9cc785a0fcb7ae9ffacfc52492"
+  },
+  {
+   "file": "085-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 8,
+   "sha256": "58496b3339c44e7dc7d017ce3ed98b6771d46bb49a863c41206a28419a5ebc01"
+  },
+  {
+   "file": "086-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 12,
+   "sha256": "e9843a9c97d50ed2b9530a2927efda57e83f3d84cedeb66217fe643bd5f7faaa"
+  },
+  {
+   "file": "087-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 9,
+   "sha256": "f2f7b87ca75bff4fea5985650272c758a5e15a16931c72389f0534a6ad5f894f"
+  },
+  {
+   "file": "088-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 8,
+   "sha256": "1088edd886ac5d07e70b8d961416a362f476e854ec9722b3866322f00850877a"
+  },
+  {
+   "file": "089-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 10,
+   "sha256": "ec977d3929f8068e72d41f6ebd8aed783f0ef803b9283dcf6e46f5358b4193bd"
+  },
+  {
+   "file": "090-ai-factory-pipeline.drawio",
+   "title": "AI factory pipeline",
+   "labels": 8,
+   "sha256": "b0eda5cad62d89aabba84ae0715431533fa7af1b3b771e8bc42563c9805fb543"
+  },
+  {
+   "file": "091-dgx-superpod.drawio",
+   "title": "DGX SuperPOD",
+   "labels": 9,
+   "sha256": "71a49ecbfcc2698b219a0267abd8ebf811af930e92ad8febea896162ce98aac0"
+  },
+  {
+   "file": "092-llm-inference-serving.drawio",
+   "title": "LLM inference serving",
+   "labels": 9,
+   "sha256": "8e2228786c2d852a7f831137b4466834844ae5f4c3d9d596ed2e21e547e5ca29"
+  },
+  {
+   "file": "093-rag-assistant.drawio",
+   "title": "RAG assistant",
+   "labels": 8,
+   "sha256": "1651bb0553f26f8d0fec401a88b39647b6da66ab90a61c9d83602b4c69f4933a"
+  },
+  {
+   "file": "094-kubernetes-gpu-cluster.drawio",
+   "title": "Kubernetes GPU cluster",
+   "labels": 9,
+   "sha256": "6eab0bd21eecc8a43125bd40e2d5a181bc78bf06a80867693d80b02b5b81e8b4"
+  },
+  {
+   "file": "095-data-lakehouse-for-training.drawio",
+   "title": "Data lakehouse for training",
+   "labels": 7,
+   "sha256": "91861b3f0f4e2051ef96dadfc3ebe42b219a892a3feeea5a05a9cdcda6744f33"
+  },
+  {
+   "file": "096-gpu-data-hall-floor-plan.drawio",
+   "title": "GPU data hall floor plan",
+   "labels": 14,
+   "sha256": "a87d434aadd87bd2e9dee984ae1f05dfccf68a62775263687ae466ef9fa43d76"
+  },
+  {
+   "file": "097-ai-platform-org-chart.drawio",
+   "title": "AI platform org chart",
+   "labels": 9,
+   "sha256": "7ac589eb91a6c2e7aa453a5db9d85c507475b87dd180a17473a42cd8c347ce92"
+  },
+  {
+   "file": "098-model-release-roadmap.drawio",
+   "title": "Model release roadmap",
+   "labels": 8,
+   "sha256": "de20ae1f1063d40cebd312f998616cf4665cce30ffdeb5cad9ddfb90c7984f62"
+  },
+  {
+   "file": "099-spine-leaf-network.drawio",
+   "title": "Spine-leaf network",
+   "labels": 9,
+   "sha256": "deefd43bfc89cf079b6a51788ba0b9ac08f53e9993f8ee98befd07f9b8574d51"
+  }
+ ]
+}

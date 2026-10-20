@@ -1,0 +1,130 @@
+{
+  "note": "Each beat: what is said (Kokoro), what is on screen, and which part of the real capture plays (between two marks from capture/marks.json). 'speed' is filled in by the edit so the clip fits the voice; anything sped up shows a 'sped up' tag.",
+  "beats": [
+    {
+      "id": "hook",
+      "text": "Every team has a hundred diagrams that should look the same. Fix one by hand, and Open Apprentice fixes the rest, and proves every edit.",
+      "card": "montage"
+    },
+    {
+      "id": "title",
+      "text": "Teach by showing. Powered by NVIDIA Nemotron, running on Nebius Token Factory.",
+      "card": "title"
+    },
+    {
+      "id": "arch",
+      "card": "arch",
+      "text": "Under the hood: the real draw dot io engine draws every file in a locked, offline browser. Nemotron writes candidate rules in a tiny exact language, and a sandboxed interpreter runs them, never as code."
+    },
+    {
+      "id": "import",
+      "text": "Start with an everyday diagram: an online order, from checkout to delivery. Each box has a note beside it, but the notes are scattered. The apprentice works out which note belongs to which box, and you check its guess.",
+      "clip": [
+        "home",
+        "mapped"
+      ],
+      "onScreen": "An everyday diagram, notes scattered"
+    },
+    {
+      "id": "teach",
+      "text": "Now show it once. I drag each note under its box, lined up on the left. Every move is redrawn by the real draw dot io engine.",
+      "clip": [
+        "teach-start",
+        "taught"
+      ],
+      "focus": "teach-start",
+      "onScreen": "Show it once"
+    },
+    {
+      "id": "think",
+      "text": "Now Nemotron, live on Nebius, proposes programs that could explain my example, and replays each one against what I did. Several fit, so it draws a test diagram where they disagree.",
+      "clip": [
+        "session-start",
+        "question"
+      ],
+      "focus": "session-start",
+      "live": true,
+      "onScreen": "Live \u00b7 NVIDIA Nemotron on Nebius Token Factory",
+      "explain": [
+        "Nemotron proposes programs",
+        "Each is run on your example",
+        "Survivors are compared",
+        "A test diagram where they disagree"
+      ]
+    },
+    {
+      "id": "ask",
+      "text": "And it asks me one question, with a picture of each answer. I pick the one I meant.",
+      "clip": [
+        "question",
+        "answered"
+      ],
+      "focus": "question",
+      "live": true,
+      "onScreen": "It asks instead of guessing",
+      "explain": [
+        "One question",
+        "A picture per answer",
+        "Your pick removes the wrong rules"
+      ]
+    },
+    {
+      "id": "commit",
+      "text": "It previews the rule on diagrams I never touched, and stores it as a versioned skill. Every step goes into an event log that can be replayed exactly.",
+      "clip": [
+        "answered",
+        "session-committed"
+      ],
+      "live": true,
+      "onScreen": "Preview, then commit",
+      "explain": [
+        "Preview on unseen diagrams",
+        "Versioned skill"
+      ]
+    },
+    {
+      "id": "scale",
+      "text": "Then the payoff. A hundred diagrams, one click. Each edit is a byte exact patch of just the note positions, re-rendered and measured, and it must pass three separate checks.",
+      "clip": [
+        "library-loading",
+        "wall-done"
+      ],
+      "onScreen": "100 diagrams \u00b7 3 separate checks each",
+      "explain": [
+        "Byte-exact x/y patch",
+        "Conformance check",
+        "Preservation check",
+        "Layout safety check"
+      ]
+    },
+    {
+      "id": "breadth",
+      "text": "And it is not just flowcharts. Floor plans, org charts, roadmaps and network maps get the same treatment, because it learned how notes relate to their boxes, not what one picture looks like.",
+      "card": "breadth"
+    },
+    {
+      "id": "world",
+      "text": "The same show, ask and check loop also works beyond diagrams: an earlier prototype places badges on UI cards across two graphics engines.",
+      "clip": [
+        "prototype",
+        "prototype-done"
+      ],
+      "onScreen": "Earlier prototype \u00b7 UI components \u00b7 Konva and Fabric"
+    },
+    {
+      "id": "finale",
+      "clip": [
+        "finale-apply",
+        "finale-result"
+      ],
+      "onScreen": "The big one: 108 services, 108 notes",
+      "text": "And now the big one. A company platform map: a hundred and eight services, a tangle of connections, and every note out of place. Nobody fixes this by hand. One click, and every note lands under its box, with all three checks passing.",
+      "card": "finale"
+    },
+    {
+      "id": "close",
+      "text": "We tested it on a frozen benchmark, and we publish where it wins and where it does not. It refuses when your examples conflict, it asks when they are ambiguous, and it never silently breaks your files. Open Apprentice.",
+      "card": "results"
+    }
+  ]
+}

@@ -86,11 +86,11 @@ async function answerUntilDone(page, waitMs = 90_000) {
 }
 
 /** Type "centred below its node, gap 8" into every mapped label's x/y fields. */
-async function placeBelow(page, pageInfo, objs) {
+async function placeBelow(page, pageInfo, objs, align = "centre") {
   for (const [lid, m] of Object.entries(pageInfo.mapping.labels)) {
     const a = objs[m.node_id], o = objs[lid];
     await page.getByRole("button", { name: `label ${lid}`, exact: true }).click();
-    await page.getByLabel(`x of ${lid}`).fill(String(n(a.x) + (n(a.w) - n(o.w)) / 2));
+    await page.getByLabel(`x of ${lid}`).fill(String(align === "left" ? n(a.x) : n(a.x) + (n(a.w) - n(o.w)) / 2));
     await page.getByLabel(`y of ${lid}`).fill(String(n(a.y) + n(a.h) + 8));
   }
 }
@@ -414,20 +414,20 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } });
     const page = await ctx.newPage();
     await page.goto(`${API}/#apprentice`, { waitUntil: "networkidle" });
-    await page.getByRole("button", { name: "Try a sample: Training workflow" }).click();
+    await page.getByRole("button", { name: "Try a sample: Online order journey" }).click();
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 1, "the first sample rendered");
-    await page.getByRole("button", { name: "Try a sample: Checkout service" }).click();
+    await page.getByRole("button", { name: "Try a sample: Hiring process" }).click();
     await until(async () => (await page.getByRole("button", { name: "Confirm mapping" }).count()) === 2, "both samples rendered");
     for (let i = 0; i < 2; i++) {
       await page.getByRole("button", { name: "Confirm mapping" }).first().click();
       await until(async () => (await page.getByText("Mapping confirmed ✓").count()) === i + 1, `confirmation ${i + 1}`);
     }
-    await page.getByLabel("Document to edit").selectOption({ label: "training-workflow.drawio" });
-    const d = await docInfo(page, "training-workflow.drawio");
+    await page.getByLabel("Document to edit").selectOption({ label: "order-journey.drawio" });
+    const d = await docInfo(page, "order-journey.drawio");
     const p1 = d.pages.find((p) => p.status === "ok");
     const scene = await (await page.request.get(`${API}/api/v2/documents/${d.doc_id}/pages/${p1.page_id}/scene?mapping_hash=${p1.mapping_hash}`)).json();
     await page.waitForSelector("button[data-label]");
-    await placeBelow(page, p1, Object.fromEntries(scene.objects.map((o) => [o.id, o])));
+    await placeBelow(page, p1, Object.fromEntries(scene.objects.map((o) => [o.id, o])), "left"); // the demo scenario: left-aligned, 8 below
     const confirm = page.getByRole("button", { name: "This whole document is right" });
     await until(async () => confirm.isEnabled(), "the draft render to be seen");
     assert.ok(await page.getByLabel("Use the live model").isEnabled(), "the live model is on offer");
@@ -435,7 +435,8 @@ describe("Apprentice journey in a real browser", { skip: !enabled && "set OA_E2E
     await confirm.click();
     await until(async () => /#apprentice\/s\/[0-9a-f]+/.test(page.url()), "the session in the URL");
     const end = await answerUntilDone(page);
-    assert.ok(["committed", "activated"].includes(end), `the live story ended ${end}`);
+    const why = await page.locator("[data-state]").locator("..").innerText().catch(() => "");
+    assert.ok(["committed", "activated"].includes(end), `the live story ended ${end}: ${why.slice(0, 300)}`);
     const after = await health();
     assert.ok(after.spend_usd > before.spend_usd, `spend recorded: ${before.spend_usd} -> ${after.spend_usd}`);
     assert.ok(after.spend_usd <= after.cap_usd, "spend stays under the durable cap");

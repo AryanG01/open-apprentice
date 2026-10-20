@@ -29,7 +29,8 @@ MAX_DEPTH = 8  # was 4: a nested for_each (obstacle scan) inside for_each > if n
 MAX_STEPS = (
     300_000  # statements executed per run: nested loops over 20+ objects otherwise never finish
 )
-MAX_OBJECTS = 32  # was 8: label-placement documents hold up to 16 movable labels + their nodes
+MAX_ITERATIONS = 1_000_000  # loop iterations per evaluation: an empty triple loop over 400 objects must not run for minutes
+MAX_OBJECTS = 400  # a learned skill also runs on large pages (drawio/classify.MAX_OBJECTS); teaching scenes stay at 32
 MAX_EXPR_NODES = 500
 FIELDS = ("x", "y", "w", "h")
 BIN_ARITH = {"add", "sub", "mul", "div", "min", "max"}
@@ -221,6 +222,7 @@ class _Run:
         self.canvas = {"w": Fraction(canvas["w"]), "h": Fraction(canvas["h"])}
         self.locals: dict[str, Any] = {}
         self.steps = 0
+        self.iterations = 0
         self.state: dict[str, dict[str, Fraction]] = {
             o.id: {f: getattr(o, f) for f in FIELDS} for o in objects
         }
@@ -316,10 +318,17 @@ class _Run:
             elif op == "if":
                 self.block(s.get("then", []) if _bool(self.ev(s["cond"])) else s.get("else", []))
             elif op == "for_each":
-                for o in list(self.objects):
+                for i, o in enumerate(list(self.objects)):
+                    self.iterations += (
+                        1  # counted apart from statements (whose count budgets the probe search)
+                    )
+                    if self.iterations > MAX_ITERATIONS:
+                        raise RuleError(
+                            "rule takes too many steps (nested loops over too many objects)"
+                        )
                     self.locals[s["var"]] = o
                     if "index_var" in s:
-                        self.locals[s["index_var"]] = Fraction(self.objects.index(o))
+                        self.locals[s["index_var"]] = Fraction(i)
                     self.block(s["body"])
             elif op == "emit_target":
                 self.emit(s)
