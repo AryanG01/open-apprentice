@@ -5,17 +5,17 @@
  "marks": [
   {
    "name": "home",
-   "t": 4.303,
+   "t": 8.496,
    "box": null
   },
   {
    "name": "samples",
-   "t": 15.927,
+   "t": 20.593,
    "box": null
   },
   {
    "name": "mapping-table",
-   "t": 18.947,
+   "t": 23.612,
    "box": {
     "x": 63,
     "y": 161.203125,
@@ -25,12 +25,12 @@
   },
   {
    "name": "mapped",
-   "t": 26.126,
+   "t": 31.289,
    "box": null
   },
   {
    "name": "teach-start",
-   "t": 29.067,
+   "t": 35.192,
    "box": {
     "x": 48,
     "y": 174.390625,
@@ -40,7 +40,7 @@
   },
   {
    "name": "taught",
-   "t": 48.925,
+   "t": 50.157,
    "box": {
     "x": 48,
     "y": 174.390625,
@@ -50,7 +50,7 @@
   },
   {
    "name": "session-start",
-   "t": 56.22,
+   "t": 57.445,
    "box": {
     "x": 852,
     "y": 535.453125,
@@ -60,7 +60,7 @@
   },
   {
    "name": "question",
-   "t": 72.047,
+   "t": 70.142,
    "box": {
     "x": 48,
     "y": 210.984375,
@@ -70,149 +70,34 @@
   },
   {
    "name": "answered",
-   "t": 80.788,
-   "box": null
-  },
-  {
-   "name": "question",
-   "t": 90.088,
-   "box": {
-    "x": 48,
-    "y": 119.984375,
-    "width": 780,
-    "height": 312.65625
-   }
-  },
-  {
-   "name": "answered",
-   "t": 99.673,
+   "t": 79.037,
    "box": null
   },
   {
    "name": "preview",
-   "t": 111.237,
+   "t": 89.307,
    "box": null
   },
   {
    "name": "answered",
-   "t": 116.056,
+   "t": 94.119,
    "box": null
   },
   {
    "name": "session-committed",
-   "t": 148.375,
+   "t": 125.659,
    "box": {
     "x": 852,
-    "y": 49.453125,
+    "y": 54.453125,
     "width": 380,
-    "height": 948.71875
+    "height": 693.125
    }
   },
   {
    "name": "library-loading",
-   "t": 155.119,
-   "box": null
-  },
-  {
-   "name": "library-loaded",
-   "t": 284.554,
-   "box": {
-    "x": 48,
-    "y": 341.875,
-    "width": 1184,
-    "height": 556.9375
-   }
-  },
-  {
-   "name": "library-confirmed",
-   "t": 318.072,
-   "box": null
-  },
-  {
-   "name": "apply",
-   "t": 327.466,
-   "box": {
-    "x": 48,
-    "y": 634.40625,
-    "width": 1184,
-    "height": 24.46875
-   }
-  },
-  {
-   "name": "wall-done",
-   "t": 462.881,
-   "box": {
-    "x": 48,
-    "y": 60.40625,
-    "width": 1184,
-    "height": 24.46875
-   }
-  },
-  {
-   "name": "published-101",
-   "t": 462.884,
-   "box": null
-  },
-  {
-   "name": "compare",
-   "t": 472.043,
-   "box": {
-    "x": 159,
-    "y": 118.953125,
-    "width": 962,
-    "height": 495.3125
-   }
-  },
-  {
-   "name": "compare-closed",
-   "t": 479.287,
-   "box": null
-  },
-  {
-   "name": "finale-start",
-   "t": 481.944,
-   "box": null
-  },
-  {
-   "name": "finale-apply",
-   "t": 724.62,
-   "box": null
-  },
-  {
-   "name": "finale-result",
-   "t": 733.861,
-   "box": {
-    "x": 48,
-    "y": 295.203125,
-    "width": 285.5,
-    "height": 320.65625
-   }
-  },
-  {
-   "name": "finale-compare",
-   "t": 738.082,
-   "box": {
-    "x": 159,
-    "y": 133.828125,
-    "width": 962,
-    "height": 465.5625
-   }
-  },
-  {
-   "name": "finale-compare-end",
-   "t": 745.613,
-   "box": null
-  },
-  {
-   "name": "prototype",
-   "t": 753.947,
-   "box": null
-  },
-  {
-   "name": "prototype-done",
-   "t": 776.895,
+   "t": 132.4,
    "box": null
   }
  ],
- "frameOffset": 0.011
+ "frameOffset": 0.015
 }

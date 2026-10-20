@@ -29,7 +29,7 @@ export function ImportMap({ docs, setDocs }: Props) {
   useEffect(() => {
     if (!pending) return;
     const t = setInterval(async () => {
-      for (const id of pending.split(",")) {
+      for (const id of pending.split(",").slice(0, 8)) { // a few per tick: a 100-document import must not flood the server
         try {
           const d = await get<DocumentInfo>(`/documents/${id}`);
           if (d.render !== "pending") setDocs((all) => all.map((x) => (x.doc_id === id ? d : x)));
