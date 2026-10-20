@@ -14,7 +14,7 @@ from open_apprentice.api.v2 import records
 from open_apprentice.api.v2.context import V2
 from open_apprentice.api.v2.tasks import Job
 from open_apprentice.drawio import mapping as mp
-from open_apprentice.drawio.classify import Classified, classify
+from open_apprentice.drawio.classify import TEACH_MAX_OBJECTS, Classified, classify
 from open_apprentice.teaching.step import thinking_trace
 from open_apprentice.drawio.parse import DrawioFile, DrawioRefused, display, load_drawio
 from open_apprentice.drawio.patch import apply_edits, plan_edits
@@ -337,6 +337,12 @@ def _create_session(
     scenes = []
     for ref in documents:
         _, _, _, sc = page_scene(v, owner, ref["doc_id"], ref["page_id"], ref["mapping_hash"])
+        if len(sc.scene["objects"]) > TEACH_MAX_OBJECTS:
+            raise Conflict(
+                "TOO_LARGE_TO_TEACH",
+                f"teach on documents with at most {TEACH_MAX_OBJECTS} objects; a page this large "
+                f"({len(sc.scene['objects'])} objects) can take the skill once it is learned",
+            )
         scenes.append(sc)
     demo_outputs: dict[int, dict] = {}
     for d in demonstrations:

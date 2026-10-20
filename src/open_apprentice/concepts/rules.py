@@ -29,7 +29,7 @@ MAX_DEPTH = 8  # was 4: a nested for_each (obstacle scan) inside for_each > if n
 MAX_STEPS = (
     300_000  # statements executed per run: nested loops over 20+ objects otherwise never finish
 )
-MAX_OBJECTS = 32  # was 8: label-placement documents hold up to 16 movable labels + their nodes
+MAX_OBJECTS = 400  # a learned skill also runs on large pages (drawio/classify.MAX_OBJECTS); teaching scenes stay at 32
 MAX_EXPR_NODES = 500
 FIELDS = ("x", "y", "w", "h")
 BIN_ARITH = {"add", "sub", "mul", "div", "min", "max"}

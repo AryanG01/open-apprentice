@@ -9,8 +9,9 @@ from typing import Optional
 
 from open_apprentice.drawio.parse import Cell, DrawioRefused, Page
 
-MAX_OBJECTS = 32
-MAX_MOVABLE = 16
+MAX_OBJECTS = 400  # a learned skill can be applied to large pages; teaching sessions stay at TEACH_MAX_OBJECTS
+MAX_MOVABLE = 200
+TEACH_MAX_OBJECTS = 32  # what a teaching session (and its model prompt) handles
 FONTS = frozenset({"", "Helvetica"})
 
 
@@ -109,11 +110,11 @@ def classify(page: Page) -> Classified:
             )
     if len(movable) + len(fixed) > MAX_OBJECTS:
         raise DrawioRefused(
-            f"the page has {len(movable) + len(fixed)} objects; release 1 supports up to 32 objects"
+            f"the page has {len(movable) + len(fixed)} objects; release 1 supports up to {MAX_OBJECTS} objects"
         )
     if len(movable) > MAX_MOVABLE:
         raise DrawioRefused(
-            f"the page has {len(movable)} movable labels; release 1 supports up to 16 movable labels"
+            f"the page has {len(movable)} movable labels; release 1 supports up to {MAX_MOVABLE} movable labels"
         )
     return Classified(
         page, tuple(movable), tuple(fixed), tuple(edges), reasons, width, height, absolute

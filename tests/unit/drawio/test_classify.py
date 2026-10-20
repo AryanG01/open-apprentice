@@ -59,10 +59,10 @@ def test_missing_coordinates_count_as_zero():
         ({"w": 100}, [node("n1", 50, 0)], "outside the page"),
         (
             {},
-            [node(f"n{i}", (i % 6) * 90, (i // 6) * 60, 80, 50) for i in range(33)],
-            "32 objects",
+            [node(f"n{i}", (i % 20) * 12, (i // 20) * 12, 10, 10) for i in range(401)],
+            "400 objects",
         ),
-        ({}, [label(f"l{i}", (i % 6) * 90, (i // 6) * 30) for i in range(17)], "16 movable labels"),
+        ({}, [label(f"l{i}", (i % 20) * 12, (i // 20) * 25, w=10) for i in range(201)], "200 movable labels"),
         (
             {},
             [label("l1", 0, 0, style=LABEL.format(align="left") + "fontFamily=Comic Sans MS;")],
