@@ -62,7 +62,11 @@ def test_missing_coordinates_count_as_zero():
             [node(f"n{i}", (i % 20) * 12, (i // 20) * 12, 10, 10) for i in range(401)],
             "400 objects",
         ),
-        ({}, [label(f"l{i}", (i % 20) * 12, (i // 20) * 25, w=10) for i in range(201)], "200 movable labels"),
+        (
+            {},
+            [label(f"l{i}", (i % 20) * 12, (i // 20) * 25, w=10) for i in range(201)],
+            "200 movable labels",
+        ),
         (
             {},
             [label("l1", 0, 0, style=LABEL.format(align="left") + "fontFamily=Comic Sans MS;")],

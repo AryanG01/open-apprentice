@@ -12,7 +12,9 @@ from open_apprentice.drawio.render import render_page
 from open_apprentice.drawio.scene import build_scene
 
 LIB = Path("apps/web/public/samples/library")
-FILES = [str(LIB / f["file"]) for f in json.loads((LIB / "index.json").read_text())["files"]][:18] + [
+FILES = [str(LIB / f["file"]) for f in json.loads((LIB / "index.json").read_text())["files"]][
+    :18
+] + [
     str(Path("apps/web/public/samples/hero") / f["file"])
     for f in json.loads(Path("apps/web/public/samples/hero/index.json").read_text())["files"]
 ]

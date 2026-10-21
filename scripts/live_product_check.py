@@ -18,7 +18,11 @@ from pathlib import Path
 import httpx
 
 LIB = Path("apps/web/public/samples/library")
-DEMO, BATCH, HELD = ["000"], ["001", "002", "003", "004", "005"], ["006", "007", "008", "009", "010", "011"]
+DEMO, BATCH, HELD = (
+    ["000"],
+    ["001", "002", "003", "004", "005"],
+    ["006", "007", "008", "009", "010", "011"],
+)
 GAP = 8
 TERMINAL = {"committed", "failed", "cancelled"}
 
@@ -47,7 +51,11 @@ class Api:
         return r.json()
 
     def upload(self, f: Path) -> str:
-        r = self.c.post(f"/documents?name={f.name}", content=f.read_bytes(), headers={"content-type": "application/octet-stream"})
+        r = self.c.post(
+            f"/documents?name={f.name}",
+            content=f.read_bytes(),
+            headers={"content-type": "application/octet-stream"},
+        )
         r.raise_for_status()
         return r.json()["doc_id"]
 
@@ -59,11 +67,19 @@ class Api:
                 break
             time.sleep(0.5)
         p = d["pages"][0]
-        mh = p["mapping_hash"] or self.post(f"/documents/{doc_id}/mapping", {"page_id": p["page_id"], "labels": {}, "confirm": True})["mapping_hash"]
+        mh = (
+            p["mapping_hash"]
+            or self.post(
+                f"/documents/{doc_id}/mapping",
+                {"page_id": p["page_id"], "labels": {}, "confirm": True},
+            )["mapping_hash"]
+        )
         return {"doc_id": doc_id, "page_id": p["page_id"], "mapping_hash": mh}
 
     def scene(self, ref: dict) -> dict:
-        return self.get(f"/documents/{ref['doc_id']}/pages/{ref['page_id']}/scene?mapping_hash={ref['mapping_hash']}")
+        return self.get(
+            f"/documents/{ref['doc_id']}/pages/{ref['page_id']}/scene?mapping_hash={ref['mapping_hash']}"
+        )
 
 
 def intended(scene: dict) -> dict[str, tuple[F, F]]:
@@ -78,7 +94,9 @@ def intended(scene: dict) -> dict[str, tuple[F, F]]:
 
 def matches(output: dict, want: dict[str, tuple[F, F]]) -> bool:
     return all(
-        k in output and abs(num(str(output[k][0])) - x) <= F(1, 2) and abs(num(str(output[k][1])) - y) <= F(1, 2)
+        k in output
+        and abs(num(str(output[k][0])) - x) <= F(1, 2)
+        and abs(num(str(output[k][1])) - y) <= F(1, 2)
         for k, (x, y) in want.items()
     )
 
@@ -119,11 +137,23 @@ def main(base: str, label: str) -> None:
     sc = api.scene(demo)
     boxes = {k: [str(x), str(y)] for k, (x, y) in intended(sc).items()}
     docs = [demo] + [refs[p] for p in BATCH]
-    print(f"[{label}] imported in {time.monotonic() - t_import:.0f}s; starting the live session", flush=True)
+    print(
+        f"[{label}] imported in {time.monotonic() - t_import:.0f}s; starting the live session",
+        flush=True,
+    )
     t0 = time.monotonic()
     teacher = 0.0
-    sid = api.post("/sessions", {"documents": docs, "demonstrations": [{"document_ref": 0, "before_scene_hash": sc["scene_hash"], "boxes": boxes}],
-                                 "live": os.environ.get("CHECK_LIVE", "1") == "1", "idempotency_key": f"check-{label}-{int(time.time())}"})["session_id"]
+    sid = api.post(
+        "/sessions",
+        {
+            "documents": docs,
+            "demonstrations": [
+                {"document_ref": 0, "before_scene_hash": sc["scene_hash"], "boxes": boxes}
+            ],
+            "live": os.environ.get("CHECK_LIVE", "1") == "1",
+            "idempotency_key": f"check-{label}-{int(time.time())}",
+        },
+    )["session_id"]
     first_q = None
     answers = []
     while True:
@@ -136,13 +166,26 @@ def main(base: str, label: str) -> None:
             ta = time.monotonic()
             body = answer(api, q["request"], by_doc)
             answers.append({"type": q["request"]["type"], "answer": body["kind"]})
-            api.post(f"/sessions/{sid}/responses", {"request_id": q["request_id"], "intent_revision": q["intent_revision"], **body})
+            api.post(
+                f"/sessions/{sid}/responses",
+                {"request_id": q["request_id"], "intent_revision": q["intent_revision"], **body},
+            )
             teacher += time.monotonic() - ta
         time.sleep(2)
     seconds = round(time.monotonic() - t0 - teacher, 1)
-    row = {"label": label, "session": sid, "state": s["state"], "reason": s["result"].get("reason"), "seconds": seconds,
-           "first_question_s": first_q, "answers": answers, "spend_recorded": s["spend"]["recorded"],
-           "spend_uncertain": s["spend"]["uncertain"], "thinking": s.get("thinking"), "outcome": "no commit"}
+    row = {
+        "label": label,
+        "session": sid,
+        "state": s["state"],
+        "reason": s["result"].get("reason"),
+        "seconds": seconds,
+        "first_question_s": first_q,
+        "answers": answers,
+        "spend_recorded": s["spend"]["recorded"],
+        "spend_uncertain": s["spend"]["uncertain"],
+        "thinking": s.get("thinking"),
+        "outcome": "no commit",
+    }
     if s["state"] == "committed":
         skill = s["result"]["skill_id"]
         for _ in range(60):
@@ -150,7 +193,10 @@ def main(base: str, label: str) -> None:
                 break
             time.sleep(1)
         held = [refs[p] for p in HELD]
-        run = api.post(f"/skills/{skill}/versions/1/apply", {"documents": held, "idempotency_key": f"held-{sid}"})
+        run = api.post(
+            f"/skills/{skill}/versions/1/apply",
+            {"documents": held, "idempotency_key": f"held-{sid}"},
+        )
         for _ in range(300):
             r = api.get(f"/runs/{run['run_id']}")
             if r["status"] != "running":
@@ -160,9 +206,18 @@ def main(base: str, label: str) -> None:
         for ref in held:
             res = r["results"].get(f"{ref['doc_id']}:{ref['page_id']}", {})
             want = intended(api.scene(ref))
-            exact = {k: v["measured"] for k, v in ((res.get("receipt") or {}).get("conformance") or {}).get("labels", {}).items()}
+            exact = {
+                k: v["measured"]
+                for k, v in ((res.get("receipt") or {}).get("conformance") or {})
+                .get("labels", {})
+                .items()
+            }
             ok += bool(exact) and matches(exact, want)
-        row.update(held_correct=ok, held_total=len(held), outcome="success" if ok == len(held) else "wrong commit")
+        row.update(
+            held_correct=ok,
+            held_total=len(held),
+            outcome="success" if ok == len(held) else "wrong commit",
+        )
     out = Path("results/product_model_check")
     out.mkdir(parents=True, exist_ok=True)
     with (out / "rows.jsonl").open("a") as f:

@@ -36,12 +36,49 @@ PALETTE = {
 }
 
 NOTES = {  # plain language: a note says what the box does or who owns it, not jargon
-    "gpu": ["8 GPUs per server", "trains the model", "runs every night", "busiest at noon", "owned by ML team", "shared by 4 teams"],
-    "net": ["fast network", "links the servers", "backup link ready", "owned by network team", "doubles as failover"],
-    "store": ["kept for 1 year", "backed up nightly", "holds raw data", "read by every job", "owned by data team"],
-    "serve": ["answers in 40 ms", "scales up at peak", "3 copies running", "public endpoint", "owned by platform"],
-    "data": ["cleans the data", "removes duplicates", "runs hourly", "owned by data team", "checks for privacy"],
-    "ctrl": ["sends alerts", "owned by SRE", "dashboards here", "logs kept 30 days", "reviewed weekly"],
+    "gpu": [
+        "8 GPUs per server",
+        "trains the model",
+        "runs every night",
+        "busiest at noon",
+        "owned by ML team",
+        "shared by 4 teams",
+    ],
+    "net": [
+        "fast network",
+        "links the servers",
+        "backup link ready",
+        "owned by network team",
+        "doubles as failover",
+    ],
+    "store": [
+        "kept for 1 year",
+        "backed up nightly",
+        "holds raw data",
+        "read by every job",
+        "owned by data team",
+    ],
+    "serve": [
+        "answers in 40 ms",
+        "scales up at peak",
+        "3 copies running",
+        "public endpoint",
+        "owned by platform",
+    ],
+    "data": [
+        "cleans the data",
+        "removes duplicates",
+        "runs hourly",
+        "owned by data team",
+        "checks for privacy",
+    ],
+    "ctrl": [
+        "sends alerts",
+        "owned by SRE",
+        "dashboards here",
+        "logs kept 30 days",
+        "reviewed weekly",
+    ],
     "edge": ["web and mobile", "signs users in", "rate limited", "owned by frontend"],
     "rack": ["full", "half empty", "liquid cooled", "spare", "under repair", "new this month"],
     "people": ["on call", "hiring", "in London", "team lead", "joins Monday", "part time"],
@@ -210,8 +247,10 @@ THEMES = [
         [
             *[(f"rack-a{k + 1}", f"Rack A{k + 1}", "rack", k, 0, k >= 4) for k in range(5)],
             *[(f"rack-b{k + 1}", f"Rack B{k + 1}", "rack", k, 1, k >= 4) for k in range(5)],
-            ("cdu", "Cooling CDU", "ctrl", 0, 2, False), ("pdu", "Power PDU", "ctrl", 1, 2, False),
-            ("storage", "Storage", "store", 2, 2, True), ("spine", "Spine switch", "net", 3, 2, False),
+            ("cdu", "Cooling CDU", "ctrl", 0, 2, False),
+            ("pdu", "Power PDU", "ctrl", 1, 2, False),
+            ("storage", "Storage", "store", 2, 2, True),
+            ("spine", "Spine switch", "net", 3, 2, False),
         ],
         [],
         {"w": 104, "h": 120, "col": 170, "row": 196, "rounded": 0},
@@ -219,36 +258,61 @@ THEMES = [
     (
         "AI platform org chart",
         [
-            ("head", "Head of AI", "people", 1, 0, False), ("ml-lead", "ML lead", "people", 0, 1, False),
-            ("infra-lead", "Infra lead", "people", 1, 1, False), ("data-lead", "Data lead", "people", 2, 1, False),
-            ("pm", "Product", "people", 3, 1, True), ("researcher", "Researcher", "people", 0, 2, False),
-            ("sre", "SRE", "people", 1, 2, False), ("data-eng", "Data engineer", "people", 2, 2, False),
+            ("head", "Head of AI", "people", 1, 0, False),
+            ("ml-lead", "ML lead", "people", 0, 1, False),
+            ("infra-lead", "Infra lead", "people", 1, 1, False),
+            ("data-lead", "Data lead", "people", 2, 1, False),
+            ("pm", "Product", "people", 3, 1, True),
+            ("researcher", "Researcher", "people", 0, 2, False),
+            ("sre", "SRE", "people", 1, 2, False),
+            ("data-eng", "Data engineer", "people", 2, 2, False),
             ("designer", "Designer", "people", 3, 2, True),
         ],
-        [("head", "ml-lead"), ("head", "infra-lead"), ("head", "data-lead"), ("head", "pm"),
-         ("ml-lead", "researcher"), ("infra-lead", "sre"), ("data-lead", "data-eng"), ("pm", "designer")],
+        [
+            ("head", "ml-lead"),
+            ("head", "infra-lead"),
+            ("head", "data-lead"),
+            ("head", "pm"),
+            ("ml-lead", "researcher"),
+            ("infra-lead", "sre"),
+            ("data-lead", "data-eng"),
+            ("pm", "designer"),
+        ],
     ),
     (
         "Model release roadmap",
         [
-            ("q1-data", "Q1 · data refresh", "plan", 0, 0, False), ("q2-train", "Q2 · pretrain", "plan", 1, 0, False),
-            ("q3-tune", "Q3 · alignment", "plan", 2, 0, False), ("q4-ship", "Q4 · launch", "plan", 3, 0, False),
-            ("q1-eval", "Q1 · eval suite", "plan", 0, 1, False), ("q2-safety", "Q2 · red team", "plan", 1, 1, True),
-            ("q3-serve", "Q3 · serving", "plan", 2, 1, False), ("q4-docs", "Q4 · docs", "plan", 3, 1, True),
+            ("q1-data", "Q1 · data refresh", "plan", 0, 0, False),
+            ("q2-train", "Q2 · pretrain", "plan", 1, 0, False),
+            ("q3-tune", "Q3 · alignment", "plan", 2, 0, False),
+            ("q4-ship", "Q4 · launch", "plan", 3, 0, False),
+            ("q1-eval", "Q1 · eval suite", "plan", 0, 1, False),
+            ("q2-safety", "Q2 · red team", "plan", 1, 1, True),
+            ("q3-serve", "Q3 · serving", "plan", 2, 1, False),
+            ("q4-docs", "Q4 · docs", "plan", 3, 1, True),
         ],
-        [("q1-data", "q2-train"), ("q2-train", "q3-tune"), ("q3-tune", "q4-ship"), ("q1-eval", "q2-safety"),
-         ("q2-safety", "q3-serve"), ("q3-serve", "q4-docs")],
+        [
+            ("q1-data", "q2-train"),
+            ("q2-train", "q3-tune"),
+            ("q3-tune", "q4-ship"),
+            ("q1-eval", "q2-safety"),
+            ("q2-safety", "q3-serve"),
+            ("q3-serve", "q4-docs"),
+        ],
         {"w": 170, "h": 44, "col": 210, "row": 120},
     ),
     (
         "Spine-leaf network",
         [
-            ("spine-1", "Spine 1", "net", 1, 0, False), ("spine-2", "Spine 2", "net", 2, 0, False),
+            ("spine-1", "Spine 1", "net", 1, 0, False),
+            ("spine-2", "Spine 2", "net", 2, 0, False),
             *[(f"leaf-{k + 1}", f"Leaf {k + 1}", "net", k, 1, k == 3) for k in range(4)],
             *[(f"node-{k + 1}", f"GPU node {k + 1}", "gpu", k, 2, k == 3) for k in range(4)],
         ],
-        [*[(f"spine-{a}", f"leaf-{b}") for a in (1, 2) for b in range(1, 5)],
-         *[(f"leaf-{k}", f"node-{k}") for k in range(1, 5)]],
+        [
+            *[(f"spine-{a}", f"leaf-{b}") for a in (1, 2) for b in range(1, 5)],
+            *[(f"leaf-{k}", f"node-{k}") for k in range(1, 5)],
+        ],
     ),
 ]
 
@@ -264,7 +328,11 @@ def _cell(cid: str, value: str, style: str, x: int, y: int, w: int, h: int) -> s
 
 
 def diagram(
-    i: int, theme: tuple | None = None, title_text: str | None = None, notes: dict | None = None, tangle: bool = False
+    i: int,
+    theme: tuple | None = None,
+    title_text: str | None = None,
+    notes: dict | None = None,
+    tangle: bool = False,
 ) -> tuple[str, str, int]:
     """(file name, xml, label count) of library diagram i, or of a hero diagram when `theme` is given (fixed note texts,
     every box kept; `tangle` keeps every edge however it routes)."""
@@ -276,7 +344,10 @@ def diagram(
     slugs = {n[0] for n in keep}
     cols = max(n[3] for n in keep) + 1
     rows = max(n[4] for n in keep) + 1
-    width, height = MARGIN * 2 + cols * CP, TOP + MARGIN + rows * RP  # the last column keeps a full pitch for its notes
+    width, height = (
+        MARGIN * 2 + cols * CP,
+        TOP + MARGIN + rows * RP,
+    )  # the last column keeps a full pitch for its notes
     site = rng.choice(["us-west", "eu-north", "ap-south", "us-east", "eu-central", "ap-east"])
     cells = [
         _cell(
@@ -380,44 +451,129 @@ HERO_OUT = Path("apps/web/public/samples/hero")
 
 ORDER = (
     "Online order journey",
-    [("order", "Customer orders", "edge", 0, 0, False), ("payment", "Payment", "serve", 1, 0, False),
-     ("pack", "Warehouse packs", "data", 2, 0, False), ("courier", "Courier picks up", "net", 3, 0, False),
-     ("delivered", "Delivered", "gpu", 3, 1, False), ("returns", "Returns", "guard", 2, 1, False),
-     ("help", "Help desk", "ctrl", 1, 1, False)],
-    [("order", "payment"), ("payment", "pack"), ("pack", "courier"), ("courier", "delivered"),
-     ("delivered", "returns"), ("returns", "help")],
+    [
+        ("order", "Customer orders", "edge", 0, 0, False),
+        ("payment", "Payment", "serve", 1, 0, False),
+        ("pack", "Warehouse packs", "data", 2, 0, False),
+        ("courier", "Courier picks up", "net", 3, 0, False),
+        ("delivered", "Delivered", "gpu", 3, 1, False),
+        ("returns", "Returns", "guard", 2, 1, False),
+        ("help", "Help desk", "ctrl", 1, 1, False),
+    ],
+    [
+        ("order", "payment"),
+        ("payment", "pack"),
+        ("pack", "courier"),
+        ("courier", "delivered"),
+        ("delivered", "returns"),
+        ("returns", "help"),
+    ],
 )
-ORDER_NOTES = {"order": "takes 1 minute", "payment": "card or PayPal", "pack": "within 2 hours", "courier": "tracked by text",
-               "delivered": "by 6 pm", "returns": "free for 30 days", "help": "owner: support team"}
+ORDER_NOTES = {
+    "order": "takes 1 minute",
+    "payment": "card or PayPal",
+    "pack": "within 2 hours",
+    "courier": "tracked by text",
+    "delivered": "by 6 pm",
+    "returns": "free for 30 days",
+    "help": "owner: support team",
+}
 HIRING = (
     "Hiring process",
-    [("posted", "Job posted", "plan", 0, 0, False), ("apply", "Applications", "people", 1, 0, False),
-     ("screen", "Phone screen", "people", 2, 0, False), ("interview", "Interview day", "people", 3, 0, False),
-     ("offer", "Offer", "serve", 3, 1, False), ("start", "First day", "gpu", 2, 1, False)],
-    [("posted", "apply"), ("apply", "screen"), ("screen", "interview"), ("interview", "offer"), ("offer", "start")],
+    [
+        ("posted", "Job posted", "plan", 0, 0, False),
+        ("apply", "Applications", "people", 1, 0, False),
+        ("screen", "Phone screen", "people", 2, 0, False),
+        ("interview", "Interview day", "people", 3, 0, False),
+        ("offer", "Offer", "serve", 3, 1, False),
+        ("start", "First day", "gpu", 2, 1, False),
+    ],
+    [
+        ("posted", "apply"),
+        ("apply", "screen"),
+        ("screen", "interview"),
+        ("interview", "offer"),
+        ("offer", "start"),
+    ],
 )
-HIRING_NOTES = {"posted": "on 3 job boards", "apply": "about 200 a week", "screen": "15 minutes", "interview": "half a day",
-                "offer": "within 48 hours", "start": "laptop ready"}
+HIRING_NOTES = {
+    "posted": "on 3 job boards",
+    "apply": "about 200 a week",
+    "screen": "15 minutes",
+    "interview": "half a day",
+    "offer": "within 48 hours",
+    "start": "laptop ready",
+}
 TICKETS = (
     "Support ticket flow",
-    [("write", "Customer writes in", "edge", 0, 0, False), ("bot", "Bot replies", "serve", 1, 0, False),
-     ("agent", "Agent picks up", "people", 2, 0, False), ("fixed", "Fixed", "gpu", 3, 0, False),
-     ("escalate", "Escalated", "guard", 2, 1, False), ("engineer", "Engineer", "people", 3, 1, False)],
-    [("write", "bot"), ("bot", "agent"), ("agent", "fixed"), ("agent", "escalate"), ("escalate", "engineer")],
+    [
+        ("write", "Customer writes in", "edge", 0, 0, False),
+        ("bot", "Bot replies", "serve", 1, 0, False),
+        ("agent", "Agent picks up", "people", 2, 0, False),
+        ("fixed", "Fixed", "gpu", 3, 0, False),
+        ("escalate", "Escalated", "guard", 2, 1, False),
+        ("engineer", "Engineer", "people", 3, 1, False),
+    ],
+    [
+        ("write", "bot"),
+        ("bot", "agent"),
+        ("agent", "fixed"),
+        ("agent", "escalate"),
+        ("escalate", "engineer"),
+    ],
 )
-TICKETS_NOTES = {"write": "email or chat", "bot": "answers in seconds", "agent": "within 1 hour", "fixed": "survey sent",
-                 "escalate": "if still stuck", "engineer": "owner: product team"}
+TICKETS_NOTES = {
+    "write": "email or chat",
+    "bot": "answers in seconds",
+    "agent": "within 1 hour",
+    "fixed": "survey sent",
+    "escalate": "if still stuck",
+    "engineer": "owner: product team",
+}
 
 
 def platform_map() -> tuple:
     """The finale: a company-wide AI platform map, 12 x 9 services with a tangle of dependencies and a note on each."""
     rng = random.Random(SEED)
-    words = ["auth", "search", "billing", "checkout", "catalog", "feature store", "trainer", "GPU pool", "vector DB",
-             "reranker", "guardrails", "gateway", "metrics", "logs", "scheduler", "data lake", "curator", "eval",
-             "registry", "inference", "cache", "queue", "notifier", "profiles"]
+    words = [
+        "auth",
+        "search",
+        "billing",
+        "checkout",
+        "catalog",
+        "feature store",
+        "trainer",
+        "GPU pool",
+        "vector DB",
+        "reranker",
+        "guardrails",
+        "gateway",
+        "metrics",
+        "logs",
+        "scheduler",
+        "data lake",
+        "curator",
+        "eval",
+        "registry",
+        "inference",
+        "cache",
+        "queue",
+        "notifier",
+        "profiles",
+    ]
     tiers = ["serve", "data", "gpu", "store", "net", "ctrl", "guard", "edge"]
-    nodes = [(f"svc-{c}-{r}", f"{words[(c * 9 + r) % len(words)]} {c * 9 + r + 1}", tiers[(c + r) % len(tiers)], c, r, False)
-             for c in range(12) for r in range(9)]
+    nodes = [
+        (
+            f"svc-{c}-{r}",
+            f"{words[(c * 9 + r) % len(words)]} {c * 9 + r + 1}",
+            tiers[(c + r) % len(tiers)],
+            c,
+            r,
+            False,
+        )
+        for c in range(12)
+        for r in range(9)
+    ]
     edges = []
     for _ in range(160):
         a, b = rng.sample(nodes, 2)
@@ -428,17 +584,35 @@ def platform_map() -> tuple:
 def heroes() -> list[dict]:
     HERO_OUT.mkdir(parents=True, exist_ok=True)
     made = []
-    for k, (file, theme, title, notes, tangle) in enumerate([
-        ("order-journey.drawio", ORDER, "Online order journey", ORDER_NOTES, False),
-        ("hiring-process.drawio", HIRING, "Hiring process", HIRING_NOTES, False),
-        ("support-tickets.drawio", TICKETS, "Support ticket flow", TICKETS_NOTES, False),
-        ("ai-platform-map.drawio", platform_map(), "Company AI platform map · 108 services", {}, True),
-    ]):
+    for k, (file, theme, title, notes, tangle) in enumerate(
+        [
+            ("order-journey.drawio", ORDER, "Online order journey", ORDER_NOTES, False),
+            ("hiring-process.drawio", HIRING, "Hiring process", HIRING_NOTES, False),
+            ("support-tickets.drawio", TICKETS, "Support ticket flow", TICKETS_NOTES, False),
+            (
+                "ai-platform-map.drawio",
+                platform_map(),
+                "Company AI platform map · 108 services",
+                {},
+                True,
+            ),
+        ]
+    ):
         _, xml, labels = diagram(900 + k, theme, title, notes, tangle)
         data = xml.encode()
         (HERO_OUT / file).write_bytes(data)
-        made.append({"file": file, "title": title, "labels": labels, "sha256": hashlib.sha256(data).hexdigest()})
-    (HERO_OUT / "index.json").write_text(json.dumps({"generator": "scripts/corpus/generate_library.py", "files": made}, indent=1) + "\n")
+        made.append(
+            {
+                "file": file,
+                "title": title,
+                "labels": labels,
+                "sha256": hashlib.sha256(data).hexdigest(),
+            }
+        )
+    (HERO_OUT / "index.json").write_text(
+        json.dumps({"generator": "scripts/corpus/generate_library.py", "files": made}, indent=1)
+        + "\n"
+    )
     return made
 
 
