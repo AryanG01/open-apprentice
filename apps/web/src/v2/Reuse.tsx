@@ -143,7 +143,7 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
               <article key={k} className={`result ${res.status}`} data-result={name(docId)}>
                 <button type="button" className="tile-img" aria-label={`Compare before and after: ${name(docId)}`} disabled={res.status !== "published"}
                   onClick={() => setCompare({ run, docId, pageId: pageId ?? "" })}>
-                  <img src={thumb} alt="" loading="lazy" />
+                  <Thumb src={thumb} />
                 </button>
                 <h3>
                   {name(docId)}: {STATUS_TEXT[res.status]}
@@ -173,6 +173,17 @@ export function Reuse({ docs, skillId, onCorrect }: Props) {
       ))}
       {compare ? <Compare {...compare} title={name(compare.docId)} onClose={() => setCompare(null)} /> : null}
     </section>
+  );
+}
+
+/** A wall thumbnail: says it is rendering until the engine's image arrives, instead of showing a blank tile. */
+function Thumb({ src }: { src: string }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <span className={`thumbwrap${loaded ? " loaded" : ""}`}>
+      {loaded ? null : <span className="thumb-wait" aria-hidden="true">rendering…</span>}
+      <img src={src} alt="" loading="lazy" onLoad={() => setLoaded(true)} />
+    </span>
   );
 }
 
