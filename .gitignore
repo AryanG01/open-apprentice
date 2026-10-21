@@ -67,3 +67,4 @@ results/redesign/*/
 .oa-store/
 results/eval_v2/*/episodes/
 results/redesign/spend.lock
+results/demo_video/
