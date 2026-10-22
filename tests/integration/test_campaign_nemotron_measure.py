@@ -37,7 +37,9 @@ def test_the_measurement_table_on_the_mock(engine_url):
     )
     assert [e["origin"] for e in m["explanations"]] == ["model"] * 3
     assert [p["origin"] for p in m["procedures"]] == ["model", "model"]
-    assert all(p["program"] == APPLY_PLAN for p in m["procedures"])  # what was accepted is kept for audit
+    assert all(
+        p["program"] == APPLY_PLAN for p in m["procedures"]
+    )  # what was accepted is kept for audit
     md = render_markdown(m, live=False)
     assert "MOCK provider" in md and "Nemotron correct on **6 of 6**" in md
 

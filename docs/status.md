@@ -317,3 +317,24 @@ Plan `docs/superpowers/plans/2026-10-22-p9d-fabric-parity-and-sealed-set.md`.
   Until then there is no held-out result and no generalization claim.
 - Fabric text height uses Fabric's own metrics (a 1.13 font-size multiplier); every gold still fits, but the margin is
   smaller on Fabric than on Konva.
+
+## 2026-10-22: Plan 9E, Nemotron in the Campaign lane (branch `p9e-campaign-nemotron`)
+
+Plan `docs/superpowers/plans/2026-10-22-p9e-campaign-nemotron.md`.
+
+### What works (verified by running it, on Python 3.12, by the agent outside the sandbox)
+- Role proposals for untagged banners (Nemotron, checked; heuristic fallback; owner confirms), checked overflow
+  explanations (template fallback), Nemotron-written native procedures for Konva and Fabric accepted only through the
+  verifier against gold (reference fallback). All three work with model mode off.
+- Campaign tab: "Propose roles → confirm", explanation with its origin, "Write the procedure with Nemotron" per engine.
+- **Live measurement (Nemotron-3-Super, 2026-10-22, $0.040 ledger, 25k tokens):** roles 6/6 (heuristic also 6/6);
+  explanations accepted 3/3; procedures accepted on the first attempt on Konva and Fabric (3/3 cases each).
+  `docs/evaluation/campaign_nemotron.md`. A first run (12 calls, $0.031) completed but lost its table to a CLI bug (the
+  provider was closed from a second event loop), fixed with a test. Plan total about $0.071 ledger (~$0.08 real).
+- Tests: Python **1497 passed** (`OA_ENGINE_TESTS=1`), engine **83/83**, browser e2e **13 passed, 0 failed**, web lint
+  0 errors (1 pre-existing warning), `lint-imports` 2 kept, black clean.
+
+### Open
+- The programs Nemotron wrote in this run were not saved (the save was added afterwards); a rerun (~$0.04) would make
+  the accepted procedures auditable.
+- These are development fixtures; role mapping is easy on them, so no gain over the heuristic is claimed.

@@ -322,3 +322,10 @@ episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether i
     owner-authored and sealed by hash before any run. Known divergence: Fabric text runs about 3-8% taller (its 1.13
     font-size multiplier), so a banner near a frame limit can be `ready` on Konva and `question` on Fabric. Adding the
     campaign tools changed the Fabric public schema hash for every Fabric session (recorded on bindings, never compared).
+
+60. **Nemotron in the Campaign lane (2026-10-22, Plan 9E).** Nemotron-3-Super does three jobs, each behind a deterministic
+    check with a labelled fallback: role proposals (owner confirms), overflow wording (numbers and elements must match the
+    measured facts), and native procedures (accepted only through the independent verifier on a seen and two fresh
+    banners). The procedure prompt deliberately omits the reference program so a copy cannot pass for Nemotron's work.
+    Workspaces are metered like Try-it-live sessions under the server-wide demo cap. Measured once on development
+    fixtures for $0.04 (see `docs/evaluation/campaign_nemotron.md`).
