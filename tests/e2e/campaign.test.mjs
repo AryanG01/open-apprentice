@@ -104,6 +104,12 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     assert.match(await text(), /Saved preference: Split across two cards v2/i);
     assert.doesNotMatch(await text(), /Which tradeoff/);
 
+    await page.getByRole("radio", { name: "Fabric" }).check();
+    await run("short_a");
+    assert.match(await text(), /engine: fabric/i);
+    assert.match(await text(), /15 of 15 checks passed/);
+    await page.getByRole("radio", { name: "Konva" }).check();
+
     await run("missing_role");
     assert.match(await page.getByRole("alert").innerText(), /role price is missing/);
 

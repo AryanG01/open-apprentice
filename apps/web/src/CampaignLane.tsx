@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CampaignFixture, CampaignPreview, CampaignRun, CampaignScope, CampaignWorkspace } from "./types";
+import type { CampaignEngine, CampaignFixture, CampaignPreview, CampaignRun, CampaignScope, CampaignWorkspace } from "./types";
 
 const OUTCOME_LABEL: Record<string, string> = {
   builtin_shrink_hero: "Shrink the product image",
@@ -51,6 +51,7 @@ export function CampaignLane() {
   const [ws, setWs] = useState<CampaignWorkspace | null>(null);
   const [run, setRun] = useState<CampaignRun | null>(null);
   const [scopes, setScopes] = useState<CampaignScope[]>([]);
+  const [engine, setEngine] = useState<CampaignEngine>("konva");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -85,7 +86,7 @@ export function CampaignLane() {
   const start = (fid: string) =>
     go(async () => {
       if (!ws) return;
-      setRun(await call<CampaignRun>(`/api/campaign/workspaces/${ws.workspace_id}/runs`, { fixture_id: fid }));
+      setRun(await call<CampaignRun>(`/api/campaign/workspaces/${ws.workspace_id}/runs`, { fixture_id: fid, backend: engine }));
       await refreshPrefs(ws.workspace_id);
     });
 
@@ -151,6 +152,14 @@ export function CampaignLane() {
 
       <section aria-labelledby="c-run">
         <h3 id="c-run">2. Run on a banner</h3>
+        <fieldset className="controls" disabled={busy}>
+          <legend className="muted small">Graphics engine (same learned rule on both)</legend>
+          {(["konva", "fabric"] as const).map((e) => (
+            <label key={e}>
+              <input type="radio" name="campaign-engine" value={e} checked={engine === e} onChange={() => setEngine(e)} /> {e === "konva" ? "Konva" : "Fabric"}
+            </label>
+          ))}
+        </fieldset>
         <div className="samples">
           {fixtures
             .filter((f) => f.kind !== "teaching")
@@ -170,7 +179,7 @@ export function CampaignLane() {
           <div className="runout" aria-live="polite">
             <p>
               <strong>{run.fixture_id}</strong>: <span className={run.status === "ready" || run.status === "applied" ? "pill ok" : run.status === "question" ? "pill live" : "pill bad"}>{run.status}</span>{" "}
-              <span className="pill recorded">learned: {String(run.provenance.learned_origin ?? "")}</span>{" "}
+              <span className="pill recorded">engine: {run.backend}</span> <span className="pill recorded">learned: {String(run.provenance.learned_origin ?? "")}</span>{" "}
               <span className="pill recorded">procedure: {String(run.provenance.procedure_origin ?? "")}</span>
               {run.provenance.outcome_origin ? <span className="pill recorded"> outcome: built-in</span> : null}
               {run.status === "applied" && run.previews.length === 0 && run.provenance.preference_version ? (

@@ -206,13 +206,13 @@ def test_an_engine_at_its_session_cap_is_a_503_and_a_retry_works(client, monkeyp
     wid = _workspace(client)["workspace_id"]
     real, calls = campaign_api._open, []
 
-    def capped(harness, scene):
+    def capped(harness, scene, backend="konva"):
         calls.append(1)
         if len(calls) == 1:
             raise campaign_api.HTTPException(
                 503, "the graphics engine is busy or unavailable; try again shortly"
             )
-        return real(harness, scene)
+        return real(harness, scene, backend)
 
     monkeypatch.setattr(campaign_api, "_open", capped)
     r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a"})
@@ -246,13 +246,13 @@ def test_the_second_session_refused_mid_run_is_a_503_and_leaves_no_session(clien
     wid = _workspace(client)["workspace_id"]
     real, calls = campaign_api._open, []
 
-    def second_refused(harness, scene):
+    def second_refused(harness, scene, backend="konva"):
         calls.append(1)
         if len(calls) == 2:
             raise campaign_api.HTTPException(
                 503, "the graphics engine is busy or unavailable; try again shortly"
             )
-        return real(harness, scene)
+        return real(harness, scene, backend)
 
     monkeypatch.setattr(campaign_api, "_open", second_refused)
     r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "de_long_a"})
@@ -293,3 +293,31 @@ def test_store_and_verifier_work_never_runs_on_the_event_loop(client, monkeypatc
         json={"locale": "de", "to_version": 1, "expected_version": 2},
     )
     assert on_loop == []
+
+
+def test_runs_and_answers_on_fabric(client):
+    wid = _workspace(client)["workspace_id"]
+    r = client.post(
+        f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a", "backend": "fabric"}
+    )
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert out["status"] == "ready" and out["backend"] == "fabric"
+    _passed(out)
+    q = client.post(
+        f"/api/campaign/workspaces/{wid}/runs",
+        json={"fixture_id": "de_long_a", "backend": "fabric"},
+    ).json()
+    assert q["status"] == "question" and q["backend"] == "fabric"
+    a = _answer(client, wid, q["run_id"], SPLIT)
+    assert a["status"] == "applied" and a["backend"] == "fabric"
+    _passed(a)
+    assert _engine_sessions(client) == 0
+
+
+def test_an_unknown_backend_is_refused(client):
+    wid = _workspace(client)["workspace_id"]
+    r = client.post(
+        f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a", "backend": "svg"}
+    )
+    assert r.status_code == 422

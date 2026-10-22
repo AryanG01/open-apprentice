@@ -8,7 +8,7 @@ import asyncio
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
@@ -77,9 +77,9 @@ def _harness(request: Request) -> EvaluatorHarness:
     return EvaluatorHarness(url, token)
 
 
-def _open(harness: EvaluatorHarness, scene: dict):
+def _open(harness: EvaluatorHarness, scene: dict, backend: str = "konva"):
     try:
-        return harness.open_session(scene, OWNER)[0]
+        return harness.open_session(scene, OWNER, backend=backend)[0]
     except httpx.HTTPError as e:
         raise HTTPException(
             503, "the graphics engine is busy or unavailable; try again shortly"
@@ -179,6 +179,7 @@ async def preferences(request: Request, wid: str) -> dict:
 
 class RunIn(BaseModel):
     fixture_id: str = Field(min_length=1, max_length=40)
+    backend: Literal["konva", "fabric"] = "konva"
 
 
 class AnswerIn(BaseModel):
@@ -196,6 +197,7 @@ class RollbackIn(BaseModel):
 class RunRecord:
     run: CampaignRun
     fixture_id: str
+    backend: str
     snapshots: dict[
         str, dict
     ]  # session id -> {png, native}; the sessions themselves are already closed
@@ -235,6 +237,7 @@ def _run_out(rec: RunRecord, status: str | None = None, verification: dict | Non
     return {
         "run_id": run.run_id,
         "fixture_id": rec.fixture_id,
+        "backend": rec.backend,
         "locale": run.locale,
         "status": status or run.status,
         "problems": run.problems,
@@ -276,7 +279,7 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
 
     def open_session(scene: dict):
         try:
-            return _open(harness, scene)
+            return _open(harness, scene, body.backend)
         except HTTPException as e:
             busy.append(e.detail)
             raise
@@ -298,7 +301,7 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
             close_run(run)  # best effort: no session outlives the request
         if busy or run.engine_error:
             return {}
-        rec = RunRecord(run, body.fixture_id, snapshots)
+        rec = RunRecord(run, body.fixture_id, body.backend, snapshots)
         while len(ws.runs) >= MAX_RUNS:
             del ws.runs[next(iter(ws.runs))]
         ws.runs[run.run_id] = rec

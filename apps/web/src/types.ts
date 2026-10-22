@@ -387,9 +387,12 @@ export interface CampaignPreview {
   png: string;
 }
 
+export type CampaignEngine = "konva" | "fabric";
+
 export interface CampaignRun {
   run_id: string;
   fixture_id: string;
+  backend: CampaignEngine;
   locale: string;
   status: "ready" | "question" | "applied" | "unchanged" | "needs_roles" | "unsupported_format" | "failed" | "blocked";
   problems: string[];
