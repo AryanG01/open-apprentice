@@ -4,6 +4,9 @@
   const MAX_NODES = 100;
   const LIMIT = 10000;
   const STYLE_FIELDS = ["fill", "stroke", "strokeWidth", "opacity"];
+  // Per-kind style allowlist for campaign nodes (spec 7.3): text fill, copy, links and assets are never writable.
+  const KIND_STYLE = { rect: STYLE_FIELDS, shape: [...STYLE_FIELDS, "cornerRadius"], text: ["fontSize"], image: [] };
+  const RESIZABLE = new Set(["rect", "shape", "text", "image"]);
 
   let stage = null;
   let layer = null;
@@ -151,7 +154,7 @@
     },
     resize_node: ({ node_id, width, height }) => {
       const n = find(node_id);
-      if (kind(n) !== "rect") throw new ToolError("UNSUPPORTED_CAPABILITY", "resize supports rect only");
+      if (!RESIZABLE.has(kind(n))) throw new ToolError("UNSUPPORTED_CAPABILITY", "resize supports rect, shape, text and image");
       num(width, "width"); num(height, "height");
       if (width <= 0 || height <= 0) throw new ToolError("INVALID_ARGUMENT", "size must be positive");
       n.size({ width, height });
@@ -159,11 +162,13 @@
     },
     set_style: ({ node_id, style }) => {
       const n = find(node_id);
-      if (kind(n) !== "rect" || typeof style !== "object" || style === null) throw new ToolError("INVALID_ARGUMENT", "style");
+      const allowed = KIND_STYLE[kind(n)];
+      if (!allowed || typeof style !== "object" || style === null) throw new ToolError("INVALID_ARGUMENT", "style");
       for (const [k, v] of Object.entries(style)) {
-        if (!STYLE_FIELDS.includes(k)) throw new ToolError("INVALID_ARGUMENT", `style field not allowed: ${k}`);
-        n[k](v);
+        if (!allowed.includes(k)) throw new ToolError("INVALID_ARGUMENT", `style field not allowed: ${k}`);
+        if (k === "fontSize" || k === "cornerRadius") { num(v, k); if (v < (k === "fontSize" ? 1 : 0)) throw new ToolError("INVALID_ARGUMENT", k); }
       }
+      for (const [k, v] of Object.entries(style)) n[k](v);
       return publicProps(n);
     },
     clone_node: ({ node_id, new_id }) => {
@@ -247,13 +252,60 @@
       }
       return { fits: violations.length === 0, text, violations };
     },
+    create_artboard: ({ artboard_id, x, y, width, height, format, safe, sequence }) => {
+      if (typeof artboard_id !== "string" || !artboard_id || stage.findOne("#" + CSS.escape(artboard_id))) throw new ToolError("INVALID_ARGUMENT", "artboard_id must be a fresh string");
+      for (const [k, v] of Object.entries({ x, y, width, height })) num(v, k);
+      if (width <= 0 || height <= 0) throw new ToolError("INVALID_ARGUMENT", "size must be positive");
+      if (!["9:16", "16:9"].includes(format)) throw new ToolError("INVALID_ARGUMENT", "format");
+      if (typeof safe !== "object" || safe === null) throw new ToolError("INVALID_ARGUMENT", "safe");
+      for (const k of ["top", "right", "bottom", "left"]) num(safe[k], `safe.${k}`);
+      if (!Number.isInteger(sequence) || sequence < 1) throw new ToolError("INVALID_ARGUMENT", "sequence");
+      return publicProps(build({ id: artboard_id, type: "artboard", x, y, width, height, format, safe, sequence }, layer, new Map()));
+    },
+    remove_artboard: ({ artboard_id }) => {
+      const ab = find(artboard_id);
+      if (kind(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "not an artboard");
+      if (ab.getChildren().length) throw new ToolError("INVALID_ARGUMENT", "artboard is not empty");
+      ab.destroy();
+      return { removed: artboard_id };
+    },
+    reparent_nodes: ({ node_ids, parent_id }) => {
+      if (!Array.isArray(node_ids) || node_ids.length < 1) throw new ToolError("INVALID_ARGUMENT", "node_ids");
+      const parent = find(parent_id);
+      if (!["artboard", "group"].includes(kind(parent))) throw new ToolError("INVALID_ARGUMENT", "parent must be an artboard or group");
+      const nodes = node_ids.map(find);
+      if (nodes.some((n) => n === parent || n.isAncestorOf(parent))) throw new ToolError("INVALID_ARGUMENT", "cannot move a node into itself");
+      // Same convention as group_nodes: world placement is kept, local attrs are re-expressed in the new parent.
+      for (const n of nodes) { const abs = n.getAbsolutePosition(); n.moveTo(parent); n.setAbsolutePosition(abs); }
+      return { moved: node_ids };
+    },
+    set_order: ({ node_id, z }) => {
+      const n = find(node_id);
+      const count = n.getParent().getChildren().length;
+      if (!Number.isInteger(z) || z < 0 || z >= count) throw new ToolError("INVALID_ARGUMENT", `z must be an integer in 0..${count - 1}`);
+      n.zIndex(z);
+      return publicProps(n);
+    },
+    fit_image_contain: ({ node_id, x, y, width, height }) => {
+      const n = find(node_id);
+      if (kind(n) !== "image") throw new ToolError("INVALID_ARGUMENT", "not an image");
+      for (const [k, v] of Object.entries({ x, y, width, height })) num(v, k);
+      if (width <= 0 || height <= 0) throw new ToolError("INVALID_ARGUMENT", "size must be positive");
+      const img = n.image();
+      const s = Math.min(width / img.naturalWidth, height / img.naturalHeight);
+      const w = img.naturalWidth * s, h = img.naturalHeight * s;
+      n.position({ x: x + (width - w) / 2, y: y + (height - h) / 2 });
+      n.size({ width: w, height: h });
+      return publicProps(n);
+    },
     export_scene: ({ format }) => {
       if (format !== "png") throw new ToolError("UNSUPPORTED_CAPABILITY", "only png is supported by this backend");
       return { mime: "image/png", data_url: stage.toDataURL({ pixelRatio: 1 }) };
     },
     finish: ({ summary }) => ({ finished: true, summary: String(summary ?? "").slice(0, 500) }),
   };
-  const MUTATING = new Set(["move_node", "resize_node", "set_style", "clone_node", "group_nodes", "ungroup_node"]);
+  const MUTATING = new Set(["move_node", "resize_node", "set_style", "clone_node", "group_nodes", "ungroup_node",
+    "create_artboard", "remove_artboard", "reparent_nodes", "set_order", "fit_image_contain"]);
 
   function dispatch({ tool, args, action_id, expected_revision }) {
     if (!Object.prototype.hasOwnProperty.call(TOOLS, tool)) {

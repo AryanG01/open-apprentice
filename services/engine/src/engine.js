@@ -34,7 +34,9 @@ const COMMON_TOOLS = {
   group_nodes: ["node_ids", "group_id"], ungroup_node: ["node_id"], export_scene: ["format"], finish: ["summary"],
 };
 export const PUBLIC_TOOL_SCHEMAS = {
-  konva: { backend: "konva", tools: { ...COMMON_TOOLS, observe_fit: ["artboard_id", "limits"] } },
+  konva: { backend: "konva", tools: { ...COMMON_TOOLS, observe_fit: ["artboard_id", "limits"],
+    create_artboard: ["artboard_id", "x", "y", "width", "height", "format", "safe", "sequence"], remove_artboard: ["artboard_id"],
+    reparent_nodes: ["node_ids", "parent_id"], set_order: ["node_id", "z"], fit_image_contain: ["node_id", "x", "y", "width", "height"] } },
   // Fabric: same tool names; grouping is a documented capability error, not a silent no-op.
   fabric: { backend: "fabric", tools: COMMON_TOOLS, unsupported: ["group_nodes", "ungroup_node"] },
 };

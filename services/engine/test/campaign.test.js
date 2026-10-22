@@ -144,3 +144,82 @@ test("text in a font the verifier cannot measure is refused", async () => {
     await assert.rejects(eng.create(variant(edit), { owner: "u1" }), (e) => e.code === "INVALID_SCENE");
   }
 });
+
+// Plan 9B Task 1: campaign layout tools.
+const mut = async (s, tool, args) => {
+  const r = await eng.act(s.session_id, "u1", { tool, args, expected_revision: s.revision });
+  if (r.ok) s.revision = r.revision;
+  return r;
+};
+const nodeOf = async (s, id) => (await eng.nativeState(s.session_id, "u1")).nodes.find((n) => n.id === id);
+
+test("create_artboard adds a story card with its metadata", async () => {
+  const s = await mk(FULL);
+  const before = s.revision;
+  const r = await mut(s, "create_artboard", { artboard_id: "story-2", x: 1180, y: 0, width: 1080, height: 1920, format: "9:16", safe: SAFE, sequence: 2 });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  assert.equal(r.revision, before + 1);
+  const ab = await nodeOf(s, "story-2");
+  assert.deepEqual([ab.type, ab.x, ab.width, ab.height, ab.format, ab.sequence], ["artboard", 1180, 1080, 1920, "9:16", 2]);
+  assert.deepEqual(ab.safe, SAFE);
+});
+
+test("remove_artboard refuses a card that still has content", async () => {
+  const s = await mk(FULL);
+  const r = await mut(s, "remove_artboard", { artboard_id: "story-1" });
+  assert.equal(r.error.code, "INVALID_ARGUMENT");
+});
+
+test("remove_artboard removes an empty card", async () => {
+  const s = await mk(FULL);
+  await mut(s, "create_artboard", { artboard_id: "story-2", x: 1180, y: 0, width: 1080, height: 1920, format: "9:16", safe: SAFE, sequence: 2 });
+  const r = await mut(s, "remove_artboard", { artboard_id: "story-2" });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  assert.equal(await nodeOf(s, "story-2"), undefined);
+});
+
+test("reparent_nodes moves a node into another card keeping its world position", async () => {
+  const s = await mk(FULL);
+  await mut(s, "create_artboard", { artboard_id: "story-2", x: 1180, y: 0, width: 1080, height: 1920, format: "9:16", safe: SAFE, sequence: 2 });
+  const r = await mut(s, "reparent_nodes", { node_ids: ["price"], parent_id: "story-2" });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  const p = await nodeOf(s, "price");
+  assert.deepEqual([p.parent, p.x, p.y], ["story-2", 72 - 1180, 1256]);
+});
+
+test("set_order changes stacking within the parent", async () => {
+  const s = await mk(FULL);
+  const r = await mut(s, "set_order", { node_id: "legal", z: 1 });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  assert.equal((await nodeOf(s, "legal")).z, 1);
+});
+
+test("resize_node resizes a text frame", async () => {
+  const s = await mk(FULL);
+  const r = await mut(s, "resize_node", { node_id: "head", width: 600, height: 300 });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  const h = await nodeOf(s, "head");
+  assert.deepEqual([h.width, h.height], [600, 300]);
+});
+
+test("set_style on text allows fontSize only", async () => {
+  const s = await mk(FULL);
+  assert.equal((await mut(s, "set_style", { node_id: "head", style: { fill: "#ff0000" } })).error.code, "INVALID_ARGUMENT");
+  assert.equal((await mut(s, "set_style", { node_id: "head", style: { fontSize: 44 } })).ok, true);
+  assert.equal((await nodeOf(s, "head")).fontSize, 44);
+});
+
+test("set_style on a shape allows cornerRadius", async () => {
+  const s = await mk(FULL);
+  const r = await mut(s, "set_style", { node_id: "cta-plate", style: { cornerRadius: 4 } });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  assert.equal((await nodeOf(s, "cta-plate")).cornerRadius, 4);
+});
+
+test("fit_image_contain centres the image at its natural aspect", async () => {
+  const s = await mk(FULL);
+  const r = await mut(s, "fit_image_contain", { node_id: "hero", x: 72, y: 320, width: 936, height: 720 });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  const h = await nodeOf(s, "hero");
+  assert.deepEqual([h.x, h.y, h.width, h.height, h.crop], [72 + 108, 320, 720, 720, null]);
+});
