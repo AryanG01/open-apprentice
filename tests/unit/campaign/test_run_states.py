@@ -84,3 +84,23 @@ def test_an_answer_for_a_changed_source_is_refused_and_changes_nothing(tmp_path)
             run, "builtin_shrink_hero", prefs, expected_version=None, current_source_hash="edited"
         )
     assert run.status == "question" and prefs.get(scope_key("de")) is None
+
+
+class _Sess:
+    def __init__(self, sid, fail=False):
+        self.session_id, self.fail, self.closed = sid, fail, False
+
+    def close(self):
+        if self.fail:
+            raise RuntimeError("engine went away")
+        self.closed = True
+
+
+def test_close_run_keeps_closing_after_one_failure():
+    from open_apprentice.campaign.run import close_run
+
+    run = _question_run()
+    a, b = _Sess("a", fail=True), _Sess("b")
+    run.sessions = {"a": a, "b": b}
+    close_run(run)
+    assert b.closed and run.sessions == {}

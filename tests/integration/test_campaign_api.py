@@ -219,3 +219,77 @@ def test_an_engine_at_its_session_cap_is_a_503_and_a_retry_works(client, monkeyp
     assert r.status_code == 503 and "busy" in r.json()["detail"]
     assert _engine_sessions(client) == 0
     assert _run(client, wid, "short_a")["status"] == "ready"
+
+
+def test_an_engine_failure_mid_run_is_a_plain_503_and_leaves_no_session(client, monkeypatch):
+    from open_apprentice.environments.client import EngineSession
+
+    wid = _workspace(client)["workspace_id"]
+    real = EngineSession.call
+
+    def flaky(self, tool, **args):
+        if tool == "set_order":
+            raise httpx.ConnectError("connection refused by http://engine:8090/sessions/x")
+        return real(self, tool, **args)
+
+    monkeypatch.setattr(EngineSession, "call", flaky)
+    r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a"})
+    assert r.status_code == 503 and "http" not in r.json()["detail"]
+    assert _engine_sessions(client) == 0
+    monkeypatch.setattr(EngineSession, "call", real)
+    assert _run(client, wid, "short_a")["status"] == "ready"
+
+
+def test_the_second_session_refused_mid_run_is_a_503_and_leaves_no_session(client, monkeypatch):
+    import open_apprentice.api.campaign as campaign_api
+
+    wid = _workspace(client)["workspace_id"]
+    real, calls = campaign_api._open, []
+
+    def second_refused(harness, scene):
+        calls.append(1)
+        if len(calls) == 2:
+            raise campaign_api.HTTPException(
+                503, "the graphics engine is busy or unavailable; try again shortly"
+            )
+        return real(harness, scene)
+
+    monkeypatch.setattr(campaign_api, "_open", second_refused)
+    r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "de_long_a"})
+    assert r.status_code == 503
+    assert _engine_sessions(client) == 0
+
+
+def test_store_and_verifier_work_never_runs_on_the_event_loop(client, monkeypatch):
+    import asyncio
+
+    from open_apprentice.campaign.preferences import PreferenceStore
+
+    on_loop = []
+
+    def watch(fn):
+        def wrapper(*a, **k):
+            try:
+                asyncio.get_running_loop()
+                on_loop.append(fn.__name__)
+            except RuntimeError:
+                pass
+            return fn(*a, **k)
+
+        return wrapper
+
+    for name in ("get", "set", "rollback", "history"):
+        monkeypatch.setattr(PreferenceStore, name, watch(getattr(PreferenceStore, name)))
+    import open_apprentice.api.campaign as campaign_api
+
+    monkeypatch.setattr(campaign_api, "verify_story", watch(campaign_api.verify_story))
+    wid = _workspace(client)["workspace_id"]
+    q = _run(client, wid, "de_long_a")
+    _answer(client, wid, q["run_id"], SHRINK)
+    client.get(f"/api/campaign/workspaces/{wid}/preferences")
+    _answer(client, wid, _run(client, wid, "de_long_b")["run_id"], SPLIT, expected_version=1)
+    client.post(
+        f"/api/campaign/workspaces/{wid}/preferences/rollback",
+        json={"locale": "de", "to_version": 1, "expected_version": 2},
+    )
+    assert on_loop == []

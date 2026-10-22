@@ -10,6 +10,8 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
+import httpx
+
 from open_apprentice.campaign.builtins import (
     BUILTINS,
     ORIGIN as BUILTIN_ORIGIN,
@@ -52,6 +54,9 @@ class CampaignRun:
     problems: list[str] = field(default_factory=list)
     provenance: dict = field(default_factory=dict)
     sessions: dict[str, EngineSession] = field(default_factory=dict, repr=False)
+    engine_error: bool = (
+        False  # the run failed because the engine itself failed (caller maps it to "busy, retry")
+    )
 
 
 def _hash(scene: dict) -> str:
@@ -61,7 +66,12 @@ def _hash(scene: dict) -> str:
 def close_run(run: CampaignRun, keep: Optional[str] = None) -> None:
     """Close the run's engine sessions, except `keep`."""
     for sid in [s for s in run.sessions if s != keep]:
-        run.sessions.pop(sid).close()
+        try:
+            run.sessions.pop(sid).close()
+        except (
+            Exception
+        ):  # noqa: BLE001 - best effort: one failed close must not strand the remaining sessions
+            pass
 
 
 def _attempt(
@@ -137,7 +147,13 @@ def start_run(
         Exception
     ) as e:  # tool errors, the engine's 429 session cap, timeouts, rule/program errors: never leak a session
         close_run(run)
-        run.status, run.problems, run.result_session, run.previews = "failed", [f"{e}"], None, {}
+        run.engine_error = isinstance(e, httpx.HTTPError)
+        problem = (
+            "the graphics engine failed during this run; try again shortly"
+            if run.engine_error
+            else f"{e}"
+        )
+        run.status, run.problems, run.result_session, run.previews = "failed", [problem], None, {}
         return run
 
 

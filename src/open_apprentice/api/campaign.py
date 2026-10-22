@@ -86,12 +86,20 @@ def _open(harness: EvaluatorHarness, scene: dict):
         ) from e
 
 
+BUSY = "the graphics engine is busy or unavailable; try again shortly"
+
+
 def _render(harness: EvaluatorHarness, scene: dict) -> str:
     s = _open(harness, scene)
     try:
         return s.call("export_scene", format="png")["data_url"]
+    except httpx.HTTPError as e:
+        raise HTTPException(503, BUSY) from e
     finally:
-        s.close()
+        try:
+            s.close()
+        except httpx.HTTPError:
+            pass  # the session is reaped by the engine's idle timeout
 
 
 def _thumb(harness: EvaluatorHarness, fid: str) -> str:
@@ -122,9 +130,8 @@ async def create_workspace(request: Request) -> dict:
     _rate_limit(request, "campaign")
     harness = _harness(request)
     before, after = load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"]
-    learned = await learn_layout(
-        before, after
-    )  # search only: the model path stays off in this lane (plan 9C)
+    # search only: the model path stays off in this lane (plan 9C); the search is CPU work, kept off the event loop
+    learned = await asyncio.to_thread(asyncio.run, learn_layout(before, after))
     before_png, after_png = await asyncio.to_thread(
         lambda: (_thumb(harness, "teach_before"), _render(harness, after))
     )
@@ -165,7 +172,9 @@ def _scope_out(prefs: PreferenceStore, locale: str) -> dict:
 @router.get("/workspaces/{wid}/preferences")
 async def preferences(request: Request, wid: str) -> dict:
     ws = _ws(request, wid)
-    return {"scopes": [_scope_out(ws.prefs, loc) for loc in LOCALES]}
+    return {
+        "scopes": await asyncio.to_thread(lambda: [_scope_out(ws.prefs, loc) for loc in LOCALES])
+    }
 
 
 class RunIn(BaseModel):
@@ -272,7 +281,7 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
             busy.append(e.detail)
             raise
 
-    def work() -> RunRecord:
+    def work() -> dict:
         run = start_run(fixture["scene"], fixture["locale"], ws.learned, open_session, ws.prefs)
         try:
             snapshots = {
@@ -282,18 +291,24 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
                 }
                 for sid, sess in run.sessions.items()
             }
+        except httpx.HTTPError:
+            busy.append(BUSY)
+            return {}
         finally:
-            close_run(run)
-        return RunRecord(run, body.fixture_id, snapshots)
-
-    async with ws.lock:
-        rec = await asyncio.to_thread(work)
-        if busy:
-            raise HTTPException(503, busy[0])
+            close_run(run)  # best effort: no session outlives the request
+        if busy or run.engine_error:
+            return {}
+        rec = RunRecord(run, body.fixture_id, snapshots)
         while len(ws.runs) >= MAX_RUNS:
             del ws.runs[next(iter(ws.runs))]
-        ws.runs[rec.run.run_id] = rec
-        return _gate(rec) if rec.run.status in ("ready", "applied") else _run_out(rec)
+        ws.runs[run.run_id] = rec
+        return _gate(rec) if run.status in ("ready", "applied") else _run_out(rec)
+
+    async with ws.lock:
+        out = await asyncio.to_thread(work)
+    if not out:
+        raise HTTPException(503, busy[0] if busy else BUSY)
+    return out
 
 
 @router.post("/workspaces/{wid}/runs/{rid}/answer")
@@ -301,7 +316,8 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
     ws = _ws(request, wid)
     if body.choice not in CHOICES:
         raise HTTPException(422, f"choice must be one of {list(CHOICES)}")
-    async with ws.lock:
+
+    def work() -> dict:
         rec = ws.runs.get(rid)
         if rec is None:
             raise HTTPException(404, "unknown or expired run")
@@ -310,34 +326,24 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
             raise HTTPException(409, f"this run is {run.status}, not waiting for an answer")
         preview = run.previews.get(body.choice)
         if preview is not None and preview.fits:  # verify before anything is applied or saved
-            verification = _verify(
-                rec.fixture_id, body.choice, rec.snapshots[preview.session_id]["native"]
-            )
+            snap = rec.snapshots[preview.session_id]
+            verification = _verify(rec.fixture_id, body.choice, snap["native"])
             if not verification["passed"]:
                 out = _run_out(rec, "blocked")
-                out["result"] = {
-                    "png": rec.snapshots[preview.session_id]["png"],
-                    "verification": verification,
-                }
+                out["result"] = {"png": snap["png"], "verification": verification}
                 return out
-        source_hash = (
-            run.source_hash
-        )  # the banner is a fixed development fixture: recompute to refuse a changed source
-        if _hash(load_fixture(rec.fixture_id)["scene"]) != source_hash:
-            raise HTTPException(
-                409, "the banner changed since these previews were made; start a new run"
-            )
+        # A guard for when banners can change: today the fixture is fixed, so this always matches.
+        current = _hash(load_fixture(rec.fixture_id)["scene"])
         try:
-            answer(
-                run, body.choice, ws.prefs, body.expected_version, current_source_hash=source_hash
-            )
+            answer(run, body.choice, ws.prefs, body.expected_version, current_source_hash=current)
         except ValueError as e:
             raise HTTPException(409, str(e)) from e
         except PreferenceConflict as e:
             raise HTTPException(409, f"the saved preference changed: {e}") from e
-        if run.status == "unchanged":
-            return _run_out(rec)
-        return _gate(rec)
+        return _run_out(rec) if run.status == "unchanged" else _gate(rec)
+
+    async with ws.lock:
+        return await asyncio.to_thread(work)
 
 
 @router.post("/workspaces/{wid}/preferences/rollback")
@@ -345,10 +351,15 @@ async def rollback(request: Request, wid: str, body: RollbackIn) -> dict:
     ws = _ws(request, wid)
     if body.locale not in LOCALES:
         raise HTTPException(404, "unknown locale")
-    try:
-        ws.prefs.rollback(scope_key(body.locale), body.to_version, body.expected_version)
-    except PreferenceConflict as e:
-        raise HTTPException(409, str(e)) from e
-    except KeyError as e:
-        raise HTTPException(404, "no such version") from e
-    return _scope_out(ws.prefs, body.locale)
+
+    def work() -> dict:
+        try:
+            ws.prefs.rollback(scope_key(body.locale), body.to_version, body.expected_version)
+        except PreferenceConflict as e:
+            raise HTTPException(409, str(e)) from e
+        except KeyError as e:
+            raise HTTPException(404, "no such version") from e
+        return _scope_out(ws.prefs, body.locale)
+
+    async with ws.lock:
+        return await asyncio.to_thread(work)
