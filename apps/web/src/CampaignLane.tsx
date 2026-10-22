@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CampaignEngine, CampaignFixture, CampaignPreview, CampaignRun, CampaignScope, CampaignWorkspace } from "./types";
+import type { CampaignEngine, CampaignFixture, CampaignPreview, CampaignProcedure, CampaignRoles, CampaignRun, CampaignScope, CampaignWorkspace } from "./types";
+
+const ROLE_NAMES = ["background", "brand_mark", "product_image", "headline", "price", "cta", "legal"];
+const origin = (o: string): string => (o === "model" ? "Nemotron" : o);
 
 const OUTCOME_LABEL: Record<string, string> = {
   builtin_shrink_hero: "Shrink the product image",
@@ -52,6 +55,8 @@ export function CampaignLane() {
   const [run, setRun] = useState<CampaignRun | null>(null);
   const [scopes, setScopes] = useState<CampaignScope[]>([]);
   const [engine, setEngine] = useState<CampaignEngine>("konva");
+  const [roles, setRoles] = useState<{ fixture: string; proposal: CampaignRoles; mapping: Record<string, string> } | null>(null);
+  const [procs, setProcs] = useState<Partial<Record<CampaignEngine, CampaignProcedure>>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,11 +88,27 @@ export function CampaignLane() {
       await refreshPrefs(w.workspace_id);
     });
 
-  const start = (fid: string) =>
+  const start = (fid: string, confirmed?: Record<string, string>) =>
     go(async () => {
       if (!ws) return;
-      setRun(await call<CampaignRun>(`/api/campaign/workspaces/${ws.workspace_id}/runs`, { fixture_id: fid, backend: engine }));
+      setRun(await call<CampaignRun>(`/api/campaign/workspaces/${ws.workspace_id}/runs`, { fixture_id: fid, backend: engine, roles: confirmed }));
+      setRoles(null);
       await refreshPrefs(ws.workspace_id);
+    });
+
+  const proposeRoles = (fid: string) =>
+    go(async () => {
+      if (!ws) return;
+      const p = await call<CampaignRoles>(`/api/campaign/workspaces/${ws.workspace_id}/roles`, { fixture_id: fid });
+      setRun(null);
+      setRoles({ fixture: fid, proposal: p, mapping: { ...p.mapping } });
+    });
+
+  const writeProcedure = (backend: CampaignEngine) =>
+    go(async () => {
+      if (!ws) return;
+      const p = await call<CampaignProcedure>(`/api/campaign/workspaces/${ws.workspace_id}/procedures`, { backend });
+      setProcs((old) => ({ ...old, [backend]: p }));
     });
 
   const reply = (choice: string) =>
@@ -164,23 +185,66 @@ export function CampaignLane() {
           {fixtures
             .filter((f) => f.kind !== "teaching")
             .map((f) => (
-              <button key={f.id} className={run?.fixture_id === f.id ? "samplebtn on" : "samplebtn"} disabled={busy || !ws} onClick={() => start(f.id)}>
+              <button key={f.id} className={run?.fixture_id === f.id || roles?.fixture === f.id ? "samplebtn on" : "samplebtn"} disabled={busy || !ws} onClick={() => (f.kind === "untagged" ? proposeRoles(f.id) : start(f.id))}>
                 <img src={f.png} alt="" className="thumb" />
                 <strong>{f.id}</strong>
                 <span className="muted small">
                   {f.locale}
-                  {f.kind === "broken" ? " · broken on purpose" : ""}
+                  {f.kind === "broken" ? " · broken on purpose" : f.kind === "untagged" ? " · no roles yet" : ""}
                 </span>
               </button>
             ))}
         </div>
+
+        {roles ? (
+          <div className="runout">
+            <p>
+              <strong>{roles.fixture}</strong> has no role tags. Roles proposed by <span className="pill recorded">{origin(roles.proposal.origin)}</span>{" "}
+              {roles.proposal.model === "off" ? <span className="muted small">Nemotron is off on this server; the rule-of-thumb proposal is shown.</span> : null}
+            </p>
+            {roles.proposal.problems.length ? (
+              <p className="muted small">Nemotron's proposal was not used: {roles.proposal.problems.join("; ")}</p>
+            ) : null}
+            <div className="table-wrap">
+              <table className="data">
+                <thead>
+                  <tr>
+                    <th>Layer</th>
+                    <th>What it is</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roles.proposal.candidates.map((c) => (
+                    <tr key={c.id}>
+                      <td>{c.id}</td>
+                      <td className="muted small">{c.type}{c.text ? `: ${c.text.slice(0, 60)}` : c.asset ? `: ${c.asset}` : ""}</td>
+                      <td>
+                        <select aria-label={`role for ${c.id}`} value={roles.mapping[c.id] ?? ""} onChange={(e) => setRoles({ ...roles, mapping: { ...roles.mapping, [c.id]: e.target.value } })}>
+                          {ROLE_NAMES.map((r) => (
+                            <option key={r} value={r}>
+                              {r}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button className="btn primary" disabled={busy} onClick={() => start(roles.fixture, roles.mapping)}>
+              Confirm roles and run
+            </button>
+          </div>
+        ) : null}
 
         {run ? (
           <div className="runout" aria-live="polite">
             <p>
               <strong>{run.fixture_id}</strong>: <span className={run.status === "ready" || run.status === "applied" ? "pill ok" : run.status === "question" ? "pill live" : "pill bad"}>{run.status}</span>{" "}
               <span className="pill recorded">engine: {run.backend}</span> <span className="pill recorded">learned: {String(run.provenance.learned_origin ?? "")}</span>{" "}
-              <span className="pill recorded">procedure: {String(run.provenance.procedure_origin ?? "")}</span>
+              <span className="pill recorded">procedure: {origin(String(run.provenance.procedure_origin ?? ""))}</span>
               {run.provenance.outcome_origin ? <span className="pill recorded"> outcome: built-in</span> : null}
               {run.status === "applied" && run.previews.length === 0 && run.provenance.preference_version ? (
                 <span className="pill live"> Saved preference: {outcomeLabel(run.preference?.outcome ?? "")} v{String(run.provenance.preference_version)}</span>
@@ -227,6 +291,11 @@ export function CampaignLane() {
             {run.status === "question" ? (
               <div className="question">
                 <p className="q">Which tradeoff should this rule make when the offer does not fit?</p>
+                {run.explanation ? (
+                  <p>
+                    <span className="pill recorded">explained by {origin(run.explanation.origin)}</span> {run.explanation.text}
+                  </p>
+                ) : null}
                 <div className="svgpair two">
                   {run.previews.map((p) => (
                     <PreviewCard key={p.outcome} p={p} busy={busy} onPick={reply} />
@@ -242,6 +311,43 @@ export function CampaignLane() {
           </div>
         ) : null}
       </section>
+
+      {ws ? (
+        <section aria-labelledby="c-procs">
+          <h3 id="c-procs">Native procedure</h3>
+          <p className="muted small">
+            By default the layout is carried out by the reference procedure. Nemotron can write its own; it is used only if the independent verifier passes it on a seen banner and two new
+            ones.
+          </p>
+          <div className="controls">
+            {(["konva", "fabric"] as const).map((b) => (
+              <button key={b} className="btn" disabled={busy} onClick={() => writeProcedure(b)}>
+                Write the {b === "konva" ? "Konva" : "Fabric"} procedure with Nemotron
+              </button>
+            ))}
+          </div>
+          {(["konva", "fabric"] as const).map((b) => {
+            const p = procs[b];
+            if (!p) return null;
+            return (
+              <p key={b}>
+                <strong>{b}:</strong>{" "}
+                {p.model === "off" ? (
+                  "Nemotron is off on this server; the reference procedure stays in use."
+                ) : p.accepted ? (
+                  <>
+                    <span className="pill ok">accepted: Nemotron</span> after {p.attempts.length} attempt{p.attempts.length === 1 ? "" : "s"}; later {b} runs use it.
+                  </>
+                ) : (
+                  <>
+                    <span className="pill bad">not accepted</span> {p.attempts.length} attempt{p.attempts.length === 1 ? "" : "s"} failed the checks; the reference procedure stays in use.
+                  </>
+                )}
+              </p>
+            );
+          })}
+        </section>
+      ) : null}
 
       {ws ? (
         <section aria-labelledby="c-prefs">

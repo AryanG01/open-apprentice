@@ -324,3 +324,123 @@ def test_an_unknown_backend_is_refused(client):
         f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a", "backend": "svg"}
     )
     assert r.status_code == 422
+
+
+# ---- Plan 9E: Nemotron role proposals, explanations and procedures (mock provider) ----
+def _payload(messages):
+    import json as _json
+
+    return _json.loads(messages[-1].content)
+
+
+def _mock(roles=None, explain_ok=True, procedure=None):
+    from open_apprentice.campaign.explain import template_explanation
+    from open_apprentice.providers.mock import MockProvider
+
+    fns = {
+        "campaign_explain": lambda m: {
+            "text": template_explanation(_payload(m)) if explain_ok else "It needs 999 px."
+        }
+    }
+    if roles is not None:
+        fns["campaign_roles"] = lambda m: {"roles": roles}
+    if procedure is not None:
+        fns["campaign_procedure"] = lambda m: {
+            "candidates": [{"program": procedure, "summary": "s"}]
+        }
+    return MockProvider({}, functions=fns)
+
+
+def _truth(src):
+    from open_apprentice.campaign.fixtures import load_fixture
+
+    return {n["id"]: n["role"] for n in load_fixture(src)["scene"]["nodes"] if n.get("role")}
+
+
+def test_an_untagged_banner_needs_confirmed_roles(client):
+    client.app.state.provider = _mock(roles=_truth("short_b"))
+    wid = _workspace(client)["workspace_id"]
+    r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "untagged_short_b"})
+    assert r.status_code == 422 and "roles" in r.json()["detail"]
+    p = client.post(
+        f"/api/campaign/workspaces/{wid}/roles", json={"fixture_id": "untagged_short_b"}
+    ).json()
+    assert (
+        p["origin"] == "model"
+        and p["mapping"] == _truth("short_b")
+        and p["model"] == "on"
+        and len(p["candidates"]) == 7
+    )
+    bad = dict(p["mapping"])
+    bad[next(k for k, v in bad.items() if v == "price")] = "headline"
+    assert (
+        client.post(
+            f"/api/campaign/workspaces/{wid}/runs",
+            json={"fixture_id": "untagged_short_b", "roles": bad},
+        ).status_code
+        == 422
+    )
+    out = _run_with(client, wid, {"fixture_id": "untagged_short_b", "roles": p["mapping"]})
+    assert out["status"] == "ready" and out["provenance"]["roles_origin"] == "owner"
+    _passed(out)
+
+
+def _run_with(c, wid, body):
+    r = c.post(f"/api/campaign/workspaces/{wid}/runs", json=body)
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def test_a_question_carries_a_checked_explanation(client):
+    client.app.state.provider = _mock()
+    wid = _workspace(client)["workspace_id"]
+    q = _run(client, wid, "de_long_b")
+    assert q["explanation"]["origin"] == "model" and "headline" in q["explanation"]["text"]
+    client.app.state.provider = _mock(explain_ok=False)
+    q = _run(client, wid, "de_long_a")
+    assert q["explanation"]["origin"] == "template" and q["explanation"]["problems"]
+
+
+def test_an_accepted_model_procedure_is_used_by_later_runs(client):
+    from open_apprentice.campaign.procedures import APPLY_PLAN
+
+    client.app.state.provider = _mock(procedure=APPLY_PLAN)
+    wid = _workspace(client)["workspace_id"]
+    r = client.post(f"/api/campaign/workspaces/{wid}/procedures", json={"backend": "fabric"})
+    assert r.status_code == 200, r.text
+    assert r.json()["accepted"] and r.json()["origin"] == "model"
+    assert _engine_sessions(client) == 0
+    out = _run_with(client, wid, {"fixture_id": "short_a", "backend": "fabric"})
+    assert out["provenance"]["procedure_origin"] == "model"
+    _passed(out)
+
+
+def test_model_mode_off_uses_every_baseline(client):
+    client.app.state.provider = None
+    wid = _workspace(client)["workspace_id"]
+    p = client.post(
+        f"/api/campaign/workspaces/{wid}/roles", json={"fixture_id": "untagged_fr_long"}
+    ).json()
+    assert p["origin"] == "heuristic" and p["model"] == "off"
+    assert _run(client, wid, "de_long_a")["explanation"]["origin"] == "template"
+    proc = client.post(
+        f"/api/campaign/workspaces/{wid}/procedures", json={"backend": "konva"}
+    ).json()
+    assert proc["origin"] == "reference" and not proc["accepted"]
+
+
+def test_a_provider_out_of_budget_degrades_to_baselines(client):
+    from open_apprentice.budget import BudgetExhausted
+    from open_apprentice.providers.mock import MockProvider
+
+    class Broke(MockProvider):
+        async def _call(self, messages, *, max_tokens, ctx):
+            raise BudgetExhausted("usd", "cap")
+
+    client.app.state.provider = Broke({})
+    wid = _workspace(client)["workspace_id"]
+    p = client.post(
+        f"/api/campaign/workspaces/{wid}/roles", json={"fixture_id": "untagged_short_b"}
+    )
+    assert p.status_code == 200 and p.json()["origin"] == "heuristic" and p.json()["problems"]
+    assert _run(client, wid, "de_long_b")["explanation"]["origin"] == "template"

@@ -110,6 +110,15 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     assert.match(await text(), /15 of 15 checks passed/);
     await page.getByRole("radio", { name: "Konva" }).check();
 
+    await banner("untagged_short_b").click();
+    await page.getByRole("button", { name: "Confirm roles and run" }).waitFor();
+    assert.match(await text(), /Roles proposed by/);
+    const confirmed = page.waitForResponse((r) => /\/api\/campaign\/workspaces\/[0-9a-f]+\/runs$/.test(r.url()));
+    await page.getByRole("button", { name: "Confirm roles and run" }).click();
+    await confirmed;
+    await page.waitForLoadState("networkidle");
+    assert.match(await text(), /15 of 15 checks passed/);
+
     await run("missing_role");
     assert.match(await page.getByRole("alert").innerText(), /role price is missing/);
 

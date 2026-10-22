@@ -14,12 +14,22 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from open_apprentice.api.teach import _engine, _rate_limit
+from open_apprentice.api.teach import _account, _engine, _rate_limit, _require_model_budget
+from open_apprentice.budget import Ledger, Limits
+from open_apprentice.campaign.explain import explain, overflow_facts
+from open_apprentice.campaign.model_procedures import write_procedure
+from open_apprentice.campaign.roles import (
+    apply_roles,
+    check_role_mapping,
+    propose_roles,
+    role_candidates,
+)
 from open_apprentice.campaign.fixtures import FIXTURE_IDS, load_fixture
 from open_apprentice.campaign.learn import Learned, learn_layout
 from open_apprentice.campaign.preferences import PreferenceConflict, PreferenceStore, scope_key
 from open_apprentice.campaign.run import CampaignRun, _hash, answer, close_run, start_run
 from open_apprentice.evaluation.campaign_gold import GOLD_KEYS, load_gold
+from open_apprentice.evaluation.campaign_procedure_check import check_procedure
 from open_apprentice.evaluation.campaign_verifier import verify_story
 from open_apprentice.evaluation.harness import EvaluatorHarness
 from open_apprentice.storage.factory import store_from_env
@@ -37,6 +47,9 @@ GOLD_OUTCOME = {
     "builtin_split_two_cards": "split",
 }  # gold files name outcomes briefly
 _PNG_CACHE: dict[str, str] = {}  # fixture id -> rendered thumbnail, once per process
+WORKSPACE_MODEL_LIMITS = Limits(
+    tokens=60_000, calls=12
+)  # per workspace; the server-wide demo cap applies on top
 
 
 @dataclass
@@ -47,6 +60,14 @@ class Workspace:
     runs: dict[str, Any] = field(default_factory=dict)
     touched: float = field(default_factory=time.time)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock)
+    # Nemotron use, metered like a Try-it-live session (teach._account / _require_model_budget read these fields)
+    ledger: Ledger = field(default_factory=lambda: Ledger(WORKSPACE_MODEL_LIMITS))
+    replay: bool = False
+    counted_tokens: int = 0
+    counted_usd: float = 0.0
+    procedures: dict[str, tuple[list, str]] = field(
+        default_factory=dict
+    )  # backend -> accepted model procedure
 
 
 def _workspaces(request: Request) -> dict[str, Workspace]:
@@ -182,6 +203,17 @@ async def preferences(request: Request, wid: str) -> dict:
 class RunIn(BaseModel):
     fixture_id: str = Field(min_length=1, max_length=40)
     backend: Literal["konva", "fabric"] = "konva"
+    roles: dict[str, str] | None = Field(
+        default=None, max_length=20
+    )  # owner-confirmed roles for an untagged banner
+
+
+class FixtureIn(BaseModel):
+    fixture_id: str = Field(min_length=1, max_length=40)
+
+
+class BackendIn(BaseModel):
+    backend: Literal["konva", "fabric"]
 
 
 class AnswerIn(BaseModel):
@@ -200,6 +232,7 @@ class RunRecord:
     run: CampaignRun
     fixture_id: str
     backend: str
+    source: dict  # the scene the run used (an untagged banner with the owner's roles applied)
     snapshots: dict[
         str, dict
     ]  # session id -> {png, native}; the sessions themselves are already closed
@@ -212,11 +245,11 @@ def _gold(fid: str, outcome: str) -> dict | None:
     return None if gold is None else gold["scene"]
 
 
-def _verify(fid: str, outcome: str, native: dict) -> dict:
-    """`outcome` is "layout" or a built-in name."""
-    report = verify_story(
-        load_fixture(fid)["scene"], native, _gold(fid, GOLD_OUTCOME.get(outcome, outcome))
-    )
+def _verify(fid: str, outcome: str, native: dict, source: dict) -> dict:
+    """`outcome` is "layout" or a built-in name. An untagged banner is judged against the gold of the banner it was
+    derived from (same layers, same ids)."""
+    gold_fid = fid.removeprefix("untagged_")
+    report = verify_story(source, native, _gold(gold_fid, GOLD_OUTCOME.get(outcome, outcome)))
     return {
         "passed": report.passed,
         "failed": report.failed(),
@@ -267,7 +300,9 @@ def _gate(rec: RunRecord) -> dict:
     """Verifier gate for a committed run: a failure is reported as `blocked`, never as applied."""
     run = rec.run
     outcome = "layout" if run.status == "ready" else run.preference.outcome
-    verification = _verify(rec.fixture_id, outcome, rec.snapshots[run.result_session]["native"])
+    verification = _verify(
+        rec.fixture_id, outcome, rec.snapshots[run.result_session]["native"], rec.source
+    )
     return _run_out(rec, None if verification["passed"] else "blocked", verification)
 
 
@@ -276,8 +311,20 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
     _rate_limit(request, "campaign")
     ws = _ws(request, wid)
     fixture = _banner(body.fixture_id)
+    source = fixture["scene"]
+    roles_origin = "authored"
+    if body.fixture_id.startswith("untagged_"):
+        if not body.roles:
+            raise HTTPException(
+                422, "this banner has no roles yet: propose roles and confirm them first"
+            )
+        problems = check_role_mapping(source, "banner", body.roles)
+        if problems:
+            raise HTTPException(422, f"the confirmed roles are not usable: {'; '.join(problems)}")
+        source, roles_origin = apply_roles(source, "banner", body.roles), "owner"
     harness = _harness(request)
     busy: list[str] = []
+    keep: list[RunRecord] = []
 
     def open_session(scene: dict):
         try:
@@ -287,7 +334,15 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
             raise
 
     def work() -> dict:
-        run = start_run(fixture["scene"], fixture["locale"], ws.learned, open_session, ws.prefs)
+        run = start_run(
+            source,
+            fixture["locale"],
+            ws.learned,
+            open_session,
+            ws.prefs,
+            ws.procedures.get(body.backend),
+        )
+        run.provenance["roles_origin"] = roles_origin
         try:
             snapshots = {
                 sid: {
@@ -303,7 +358,8 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
             close_run(run)  # best effort: no session outlives the request
         if busy or run.engine_error:
             return {}
-        rec = RunRecord(run, body.fixture_id, body.backend, snapshots)
+        rec = RunRecord(run, body.fixture_id, body.backend, source, snapshots)
+        keep.append(rec)
         while len(ws.runs) >= MAX_RUNS:
             del ws.runs[next(iter(ws.runs))]
         ws.runs[run.run_id] = rec
@@ -311,8 +367,13 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
 
     async with ws.lock:
         out = await asyncio.to_thread(work)
-    if not out:
-        raise HTTPException(503, busy[0] if busy else BUSY)
+        if not out:
+            raise HTTPException(503, busy[0] if busy else BUSY)
+        if out["status"] == "question":
+            provider, note = _model(request, ws)
+            e = await explain(provider, ws.ledger, overflow_facts(keep[0].run, source))
+            _account(request, ws)
+            out["explanation"] = {"text": e.text, "origin": e.origin, "problems": e.problems + note}
     return out
 
 
@@ -332,13 +393,13 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
         preview = run.previews.get(body.choice)
         if preview is not None and preview.fits:  # verify before anything is applied or saved
             snap = rec.snapshots[preview.session_id]
-            verification = _verify(rec.fixture_id, body.choice, snap["native"])
+            verification = _verify(rec.fixture_id, body.choice, snap["native"], rec.source)
             if not verification["passed"]:
                 out = _run_out(rec, "blocked")
                 out["result"] = {"png": snap["png"], "verification": verification}
                 return out
         # A guard for when banners can change: today the fixture is fixed, so this always matches.
-        current = _hash(load_fixture(rec.fixture_id)["scene"])
+        current = _hash(rec.source)
         try:
             answer(run, body.choice, ws.prefs, body.expected_version, current_source_hash=current)
         except ValueError as e:
@@ -368,3 +429,59 @@ async def rollback(request: Request, wid: str, body: RollbackIn) -> dict:
 
     async with ws.lock:
         return await asyncio.to_thread(work)
+
+
+def _model(request: Request, ws: Workspace):
+    """(provider, notes): the server's Nemotron provider when model mode is on and the demo budget allows one more call."""
+    provider = getattr(request.app.state, "provider", None)
+    if provider is None:
+        return None, []
+    try:
+        _require_model_budget(request, ws)
+    except HTTPException as e:
+        return None, [str(e.detail)]
+    return provider, []
+
+
+@router.post("/workspaces/{wid}/roles")
+async def roles(request: Request, wid: str, body: FixtureIn) -> dict:
+    _rate_limit(request, "campaign")
+    ws = _ws(request, wid)
+    scene = _banner(body.fixture_id)["scene"]
+    provider, note = _model(request, ws)
+    async with ws.lock:
+        p = await propose_roles(provider, ws.ledger, scene, "banner")
+        _account(request, ws)
+    return {
+        "mapping": p.mapping,
+        "origin": p.origin,
+        "problems": p.problems + note,
+        "candidates": role_candidates(scene, "banner"),
+        "model": "on" if getattr(request.app.state, "provider", None) is not None else "off",
+    }
+
+
+@router.post("/workspaces/{wid}/procedures")
+async def procedures(request: Request, wid: str, body: BackendIn) -> dict:
+    _rate_limit(request, "campaign")
+    ws = _ws(request, wid)
+    url, token = _engine(request)
+    provider, note = _model(request, ws)
+    async with ws.lock:
+        out = await write_procedure(
+            provider,
+            ws.ledger,
+            body.backend,
+            lambda prog: check_procedure(prog, body.backend, url, token),
+        )
+        _account(request, ws)
+        if out.origin == "model":
+            ws.procedures[body.backend] = (out.program, "model")
+    return {
+        "backend": body.backend,
+        "origin": out.origin,
+        "accepted": out.origin == "model",
+        "attempts": out.attempts,
+        "notes": note,
+        "model": "on" if getattr(request.app.state, "provider", None) is not None else "off",
+    }

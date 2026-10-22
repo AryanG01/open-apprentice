@@ -400,6 +400,34 @@ export interface CampaignRun {
   result: { png: string; verification: CampaignVerification | null } | null;
   previews: CampaignPreview[];
   preference: { outcome: string; version: number } | null;
+  explanation?: { text: string; origin: string; problems: string[] };
+}
+
+export interface CampaignRoleLayer {
+  id: string;
+  type: string;
+  box: (number | null)[];
+  text?: string;
+  fontSize?: number;
+  asset?: string;
+  children?: string[];
+}
+
+export interface CampaignRoles {
+  mapping: Record<string, string>;
+  origin: "model" | "heuristic";
+  problems: string[];
+  candidates: CampaignRoleLayer[];
+  model: "on" | "off";
+}
+
+export interface CampaignProcedure {
+  backend: CampaignEngine;
+  origin: "model" | "reference";
+  accepted: boolean;
+  attempts: { passed: boolean; cases: { fixture: string; outcome: string; passed: boolean; failed_checks: string[] }[]; note?: string }[];
+  notes: string[];
+  model: "on" | "off";
 }
 
 export interface CampaignScope {
