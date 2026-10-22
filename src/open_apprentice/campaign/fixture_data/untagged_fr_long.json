@@ -1,0 +1,166 @@
+{
+ "id": "untagged_fr_long",
+ "locale": "fr",
+ "provenance": "derived from fr_long with every role removed; development fixture, not held out",
+ "artboard": "banner",
+ "scene": {
+  "canvas": {
+   "width": 1600,
+   "height": 900
+  },
+  "nodes": [
+   {
+    "id": "banner",
+    "type": "artboard",
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 900,
+    "format": "16:9",
+    "safe": {
+     "top": 0,
+     "right": 0,
+     "bottom": 0,
+     "left": 0
+    },
+    "sequence": 1
+   },
+   {
+    "id": "fl-bg",
+    "type": "rect",
+    "parent": "banner",
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 900,
+    "fill": "#1d1240",
+    "z": 0
+   },
+   {
+    "id": "fl-logo",
+    "type": "image",
+    "parent": "banner",
+    "asset": "halden-wordmark",
+    "crop": null,
+    "focal": {
+     "x": 240,
+     "y": 60
+    },
+    "x": 80.0,
+    "y": 60.0,
+    "width": 240.0,
+    "height": 60.0,
+    "z": 1
+   },
+   {
+    "id": "fl-hero",
+    "type": "image",
+    "parent": "banner",
+    "asset": "h7-headphones",
+    "crop": null,
+    "focal": {
+     "x": 500,
+     "y": 520
+    },
+    "x": 100.0,
+    "y": 190.0,
+    "width": 620.0,
+    "height": 620.0,
+    "z": 2
+   },
+   {
+    "id": "fl-head",
+    "type": "text",
+    "parent": "banner",
+    "text": "Faites taire la ville grâce à la réduction de bruit active nouvelle génération.",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 64.0,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 800.0,
+    "y": 200.0,
+    "width": 720.0,
+    "height": 220.0,
+    "z": 3
+   },
+   {
+    "id": "fl-price",
+    "type": "text",
+    "parent": "banner",
+    "text": "179 € au lieu de 249 €",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 48.0,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 800.0,
+    "y": 440.0,
+    "width": 720.0,
+    "height": 64.0,
+    "z": 4
+   },
+   {
+    "id": "fl-cta",
+    "type": "group",
+    "parent": "banner",
+    "link": "https://halden.example/fr/h7-offre",
+    "x": 800.0,
+    "y": 540.0,
+    "z": 5
+   },
+   {
+    "id": "fl-cta-plate",
+    "type": "shape",
+    "parent": "fl-cta",
+    "x": 0,
+    "y": 0,
+    "width": 320.0,
+    "height": 96.0,
+    "fill": "#ffd23f",
+    "cornerRadius": 48.0,
+    "z": 0
+   },
+   {
+    "id": "fl-cta-label",
+    "type": "text",
+    "parent": "fl-cta",
+    "text": "Acheter",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 36.0,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "center",
+    "wrap": "word",
+    "fill": "#1d1240",
+    "x": 0,
+    "y": 24.0,
+    "width": 320.0,
+    "height": 48.0,
+    "z": 1
+   },
+   {
+    "id": "fl-legal",
+    "type": "text",
+    "parent": "banner",
+    "text": "Offre valable jusqu'au 31/10/2026 dans la limite des stocks disponibles. Voir conditions générales.",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 20.0,
+    "fontStyle": "normal",
+    "lineHeight": 1.3,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 800.0,
+    "y": 700.0,
+    "width": 720.0,
+    "height": 140.0,
+    "z": 6
+   }
+  ]
+ }
+}

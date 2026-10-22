@@ -345,7 +345,7 @@ export interface SvgHarm {
 export interface CampaignFixture {
   id: string;
   locale: string;
-  kind: "teaching" | "banner" | "broken";
+  kind: "teaching" | "banner" | "broken" | "untagged";
   png: string;
 }
 

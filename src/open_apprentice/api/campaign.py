@@ -109,6 +109,8 @@ def _thumb(harness: EvaluatorHarness, fid: str) -> str:
 
 
 def _kind(fid: str) -> str:
+    if fid.startswith("untagged_"):
+        return "untagged"
     return "teaching" if fid == "teach_before" else "broken" if fid in BROKEN else "banner"
 
 

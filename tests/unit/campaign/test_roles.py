@@ -1,0 +1,87 @@
+import asyncio
+
+import pytest
+
+from open_apprentice.budget import Ledger, Limits
+from open_apprentice.campaign.fixtures import load_fixture
+from open_apprentice.campaign.roles import (
+    apply_roles,
+    check_role_mapping,
+    heuristic_roles,
+    propose_roles,
+    role_candidates,
+)
+from open_apprentice.providers.mock import MockProvider
+
+UNTAGGED = {
+    "untagged_short_b": "short_b",
+    "untagged_de_long_a": "de_long_a",
+    "untagged_fr_long": "fr_long",
+}
+
+
+def _truth(src):
+    return {n["id"]: n["role"] for n in load_fixture(src)["scene"]["nodes"] if n.get("role")}
+
+
+@pytest.mark.parametrize("fid,src", UNTAGGED.items())
+def test_the_heuristic_recovers_the_authored_roles(fid, src):
+    scene = load_fixture(fid)["scene"]
+    assert heuristic_roles(scene, "banner") == _truth(src)
+    assert check_role_mapping(scene, "banner", _truth(src)) == []
+
+
+def test_candidates_are_what_the_model_sees():
+    c = role_candidates(load_fixture("untagged_short_b")["scene"], "banner")
+    assert len(c) == 7 and all("role" not in x for x in c)
+    assert {x["type"] for x in c} == {"rect", "image", "text", "group"}
+
+
+def _ledger():
+    return Ledger(Limits(tokens=100_000, calls=4))
+
+
+def _propose(fid, mapping):
+    provider = MockProvider({"campaign_roles": [{"roles": mapping}]})
+    return (
+        asyncio.run(propose_roles(provider, _ledger(), load_fixture(fid)["scene"], "banner")),
+        provider,
+    )
+
+
+def test_a_correct_model_mapping_is_accepted():
+    p, provider = _propose("untagged_de_long_a", _truth("de_long_a"))
+    assert (
+        p.origin == "model"
+        and p.mapping == _truth("de_long_a")
+        and p.problems == []
+        and len(provider.calls) == 1
+    )
+
+
+def test_a_swapped_price_and_headline_is_rejected_and_the_heuristic_is_used():
+    swapped = dict(_truth("short_b"))
+    swapped["sb-head"], swapped["sb-price"] = "price", "headline"
+    p, _ = _propose("untagged_short_b", swapped)
+    assert p.origin == "heuristic" and p.mapping == _truth("short_b")
+    assert any("price" in x for x in p.problems)
+
+
+def test_a_mapping_missing_a_role_is_rejected():
+    partial = {k: v for k, v in _truth("short_b").items() if v != "legal"}
+    assert any(
+        "legal" in x
+        for x in check_role_mapping(load_fixture("untagged_short_b")["scene"], "banner", partial)
+    )
+
+
+def test_without_a_provider_the_heuristic_is_used_and_nothing_is_called():
+    p = asyncio.run(propose_roles(None, None, load_fixture("untagged_fr_long")["scene"], "banner"))
+    assert p.origin == "heuristic" and p.mapping == _truth("fr_long")
+
+
+def test_apply_roles_returns_a_tagged_copy():
+    scene = load_fixture("untagged_short_b")["scene"]
+    tagged = apply_roles(scene, "banner", _truth("short_b"))
+    assert {n["id"]: n.get("role") for n in tagged["nodes"] if n.get("role")} == _truth("short_b")
+    assert all("role" not in n for n in scene["nodes"])

@@ -1,0 +1,166 @@
+{
+ "id": "untagged_de_long_a",
+ "locale": "de",
+ "provenance": "derived from de_long_a with every role removed; development fixture, not held out",
+ "artboard": "banner",
+ "scene": {
+  "canvas": {
+   "width": 1600,
+   "height": 900
+  },
+  "nodes": [
+   {
+    "id": "banner",
+    "type": "artboard",
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 900,
+    "format": "16:9",
+    "safe": {
+     "top": 0,
+     "right": 0,
+     "bottom": 0,
+     "left": 0
+    },
+    "sequence": 1
+   },
+   {
+    "id": "da-bg",
+    "type": "rect",
+    "parent": "banner",
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 900,
+    "fill": "#1d1240",
+    "z": 0
+   },
+   {
+    "id": "da-logo",
+    "type": "image",
+    "parent": "banner",
+    "asset": "halden-wordmark",
+    "crop": null,
+    "focal": {
+     "x": 240,
+     "y": 60
+    },
+    "x": 80.0,
+    "y": 60.0,
+    "width": 240.0,
+    "height": 60.0,
+    "z": 1
+   },
+   {
+    "id": "da-hero",
+    "type": "image",
+    "parent": "banner",
+    "asset": "h7-headphones",
+    "crop": null,
+    "focal": {
+     "x": 500,
+     "y": 520
+    },
+    "x": 100.0,
+    "y": 190.0,
+    "width": 620.0,
+    "height": 620.0,
+    "z": 2
+   },
+   {
+    "id": "da-head",
+    "type": "text",
+    "parent": "banner",
+    "text": "Bring die Stadt endlich zum Schweigen – mit aktiver Geräuschunterdrückung.",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 64.0,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 800.0,
+    "y": 200.0,
+    "width": 720.0,
+    "height": 220.0,
+    "z": 3
+   },
+   {
+    "id": "da-price",
+    "type": "text",
+    "parent": "banner",
+    "text": "Jetzt 179 € (statt 249 €)",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 48.0,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 800.0,
+    "y": 440.0,
+    "width": 720.0,
+    "height": 64.0,
+    "z": 4
+   },
+   {
+    "id": "da-cta",
+    "type": "group",
+    "parent": "banner",
+    "link": "https://halden.example/de/h7-angebot",
+    "x": 800.0,
+    "y": 540.0,
+    "z": 5
+   },
+   {
+    "id": "da-cta-plate",
+    "type": "shape",
+    "parent": "da-cta",
+    "x": 0,
+    "y": 0,
+    "width": 320.0,
+    "height": 96.0,
+    "fill": "#ffd23f",
+    "cornerRadius": 48.0,
+    "z": 0
+   },
+   {
+    "id": "da-cta-label",
+    "type": "text",
+    "parent": "da-cta",
+    "text": "Jetzt kaufen",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 36.0,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "center",
+    "wrap": "word",
+    "fill": "#1d1240",
+    "x": 0,
+    "y": 24.0,
+    "width": 320.0,
+    "height": 48.0,
+    "z": 1
+   },
+   {
+    "id": "da-legal",
+    "type": "text",
+    "parent": "banner",
+    "text": "Angebot gültig bis 31.10.2026, solange der Vorrat reicht. Es gelten die AGB der Halden Audio GmbH. Abbildung ähnlich.",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 20.0,
+    "fontStyle": "normal",
+    "lineHeight": 1.3,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 800.0,
+    "y": 700.0,
+    "width": 720.0,
+    "height": 140.0,
+    "z": 6
+   }
+  ]
+ }
+}

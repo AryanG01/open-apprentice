@@ -10,6 +10,9 @@ EXPECTED = {
     "fr_long",
     "missing_role",
     "duplicate_role",
+    "untagged_short_b",
+    "untagged_de_long_a",
+    "untagged_fr_long",
 }
 
 
@@ -18,7 +21,7 @@ def test_every_fixture_is_listed_and_loads():
     for fid in FIXTURE_IDS:
         f = load_fixture(fid)
         assert f["locale"] in {"en", "de", "fr"}
-        assert f["provenance"] == "authored in-repo, development fixture, not held out"
+        assert "development fixture, not held out" in f["provenance"]
 
 
 def test_text_uses_only_the_vendored_font():

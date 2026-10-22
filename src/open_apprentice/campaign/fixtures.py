@@ -18,6 +18,9 @@ FIXTURE_IDS: tuple[str, ...] = (
     "fr_long",
     "missing_role",
     "duplicate_role",
+    "untagged_short_b",
+    "untagged_de_long_a",
+    "untagged_fr_long",
 )
 
 

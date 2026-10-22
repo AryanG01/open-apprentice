@@ -43,6 +43,9 @@ def test_fixtures_are_listed_with_thumbnails(client):
         "fr_long": "banner",
         "missing_role": "broken",
         "duplicate_role": "broken",
+        "untagged_short_b": "untagged",
+        "untagged_de_long_a": "untagged",
+        "untagged_fr_long": "untagged",
     }
     assert all(f["png"].startswith("data:image/png;base64,") for f in fx)
     assert {f["id"]: f["locale"] for f in fx}["de_long_a"] == "de"
