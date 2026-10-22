@@ -191,6 +191,55 @@
       g.destroy();
       return { children: kids.map((k) => k.id()) };
     },
+    // Read-only fit observation (spec 7.2): measures wrapped text with the page's real font on an unbounded clone (a fixed-height
+    // Konva.Text silently drops overflowing lines) and reports layout violations inside one artboard against caller-given limits.
+    observe_fit: ({ artboard_id, limits }) => {
+      const ab = find(artboard_id);
+      if (kind(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "artboard_id must name an artboard");
+      if (typeof limits !== "object" || limits === null || typeof limits.safe !== "object") throw new ToolError("INVALID_ARGUMENT", "limits");
+      const nodes = ab.find((n) => Boolean(n.id()));
+      const violations = [];
+      const flag = (k, n, detail) => violations.push({ kind: k, node_id: n.id(), detail });
+      const ctx = document.createElement("canvas").getContext("2d");
+      const text = nodes.filter((n) => kind(n) === "text").map((n) => {
+        const probe = new Konva.Text({ text: n.text(), fontFamily: n.fontFamily(), fontSize: n.fontSize(), fontStyle: n.fontStyle(),
+          lineHeight: n.lineHeight(), align: n.align(), wrap: n.wrap(), width: n.width() });
+        const lines = probe.textArr.map((l) => l.text);
+        const out = { id: n.id(), lines, line_widths: probe.textArr.map((l) => l.width), text_height: probe.height(),
+          frame_width: n.width(), frame_height: n.height() };
+        probe.destroy();
+        if (out.text_height > out.frame_height) flag("text_overflow", n, `${out.text_height} > ${out.frame_height}`);
+        ctx.font = `${n.fontStyle()} ${n.fontSize()}px "${n.fontFamily()}"`;
+        const wide = n.text().split(/\s+/).find((w) => ctx.measureText(w).width > n.width());
+        if (wide !== undefined) flag("word_too_wide", n, wide.slice(0, 60));
+        return out;
+      });
+      const rect = (n) => n.getClientRect({ relativeTo: ab, skipShadow: true, skipStroke: true });
+      const roled = nodes.filter((n) => n.getAttr("role") && n.getAttr("role") !== "background");
+      const W = ab.width(), H = ab.height(), sf = limits.safe;
+      for (const n of roled) {
+        const r = rect(n);
+        if (r.x < sf.left || r.y < sf.top || r.x + r.width > W - sf.right || r.y + r.height > H - sf.bottom) flag("outside_safe", n, r);
+        const role = n.getAttr("role");
+        if (role === "legal" && n.fontSize() < limits.min_legal_font) flag("below_minimum", n, "legal font");
+        if ((role === "headline" || role === "price") && n.fontSize() < limits.min_font) flag("below_minimum", n, "font");
+        if (role === "cta" && r.height < limits.min_cta_height) flag("below_minimum", n, "cta height");
+        if (role === "product_image" && r.width < limits.min_hero_width) flag("below_minimum", n, "hero width");
+      }
+      for (const n of nodes) {
+        const owner = n.getParent();
+        if (kind(n) === "text" && owner.getAttr("role") === "cta" && n.fontSize() < limits.min_font) flag("below_minimum", n, "cta label font");
+      }
+      for (let i = 0; i < roled.length; i++) {
+        for (let j = i + 1; j < roled.length; j++) {
+          const a = rect(roled[i]), b = rect(roled[j]);
+          const w = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+          const h = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+          if (w > 0 && h > 0) flag("overlap", roled[i], roled[j].id());
+        }
+      }
+      return { fits: violations.length === 0, text, violations };
+    },
     export_scene: ({ format }) => {
       if (format !== "png") throw new ToolError("UNSUPPORTED_CAPABILITY", "only png is supported by this backend");
       return { mime: "image/png", data_url: stage.toDataURL({ pixelRatio: 1 }) };

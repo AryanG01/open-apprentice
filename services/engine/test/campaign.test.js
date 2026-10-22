@@ -65,3 +65,57 @@ test("image keeps no crop and its aspect", async () => {
   assert.equal(hero.height, 720);
   assert.equal(hero.type, "image");
 });
+
+const LIMITS = { safe: SAFE, min_font: 40, min_legal_font: 24, min_cta_height: 96, min_hero_width: 432 };
+const FULL = structuredClone(STORY);
+FULL.nodes.push(
+  { id: "price", type: "text", parent: "story-1", role: "price", text: "Now $179 (was $249)", fontFamily: "Liberation Sans", fontSize: 56, fontStyle: "bold", lineHeight: 1.1, align: "left", wrap: "word", fill: "#fdfbff", x: 72, y: 1256, width: 936, height: 72, z: 5 },
+  { id: "legal", type: "text", parent: "story-1", role: "legal", text: "Offer ends 31 Oct 2026. While stocks last. Terms apply.", fontFamily: "Liberation Sans", fontSize: 24, fontStyle: "normal", lineHeight: 1.3, align: "left", wrap: "word", fill: "#fdfbff", x: 72, y: 1540, width: 936, height: 160, z: 6 },
+);
+const variant = (edit) => { const v = structuredClone(FULL); edit(Object.fromEntries(v.nodes.map((n) => [n.id, n]))); return v; };
+const fit = async (scene) => {
+  const s = await mk(scene);
+  const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: LIMITS });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  return { s, r };
+};
+const act = (s, tool, args) => eng.act(s.session_id, "u1", { tool, args });
+const kinds = (r) => r.result.violations.map((v) => `${v.kind}:${v.node_id}`);
+
+test("short English copy fits the taught layout", async () => {
+  const { r } = await fit(FULL);
+  assert.deepEqual(r.result.violations, []);
+  assert.equal(r.result.fits, true);
+  assert.equal(r.result.text.find((t) => t.id === "head").lines.length, 1);
+});
+
+test("fixed-height frame does not hide overflow", async () => {
+  const { r } = await fit(variant((n) => { n.head.width = 300; n.head.height = 80; n.head.text = "Hear only what matters."; }));
+  const head = r.result.text.find((t) => t.id === "head");
+  assert.ok(head.lines.length >= 3, JSON.stringify(head.lines));
+  assert.ok(head.text_height > 80);
+  assert.ok(kinds(r).includes("text_overflow:head"), kinds(r).join());
+  assert.equal(r.result.fits, false);
+});
+
+test("over-wide German compound is reported, not broken", async () => {
+  const { r } = await fit(variant((n) => { n.head.width = 300; n.head.height = 400; n.head.text = "Geräuschunterdrückungstechnologie"; }));
+  assert.ok(kinds(r).includes("word_too_wide:head"), kinds(r).join());
+});
+
+test("observe_fit does not mutate", async () => {
+  const { s, r } = await fit(FULL);
+  assert.equal(r.revision, s.revision);
+});
+
+test("node outside safe area and overlapping nodes are reported", async () => {
+  const { r } = await fit(variant((n) => { n.logo.y = 100; n.price.y = 1200; }));
+  assert.ok(kinds(r).includes("outside_safe:logo"), kinds(r).join());
+  assert.ok(kinds(r).some((k) => k.startsWith("overlap:")) , kinds(r).join());
+});
+
+test("minimum sizes are enforced", async () => {
+  const { r } = await fit(variant((n) => { n.legal.fontSize = 20; n.hero.width = 400; n.hero.height = 400; }));
+  assert.ok(kinds(r).includes("below_minimum:legal"), kinds(r).join());
+  assert.ok(kinds(r).includes("below_minimum:hero"), kinds(r).join());
+});
