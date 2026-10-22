@@ -65,3 +65,51 @@ test("fabric: an unknown asset and a foreign font are refused", async () => {
     await assert.rejects(eng.create(bad, { owner: "u", backend: "fabric" }), (e) => e.code === "INVALID_SCENE" && why.test(e.message));
   }
 });
+
+// Plan 9D Task 3: observe_fit on Fabric (same contract as Konva).
+const LIMITS = { safe: SAFE, min_font: 40, min_legal_font: 24, min_cta_height: 96, min_hero_width: 432 };
+const variant = (edit) => { const v = structuredClone(STORY); edit(Object.fromEntries(v.nodes.map((n) => [n.id, n]))); return v; };
+const act = (s, tool, args, extra = {}) => eng.act(s.session_id, "u", { tool, args, ...extra });
+const fit = async (scene) => {
+  const s = await mk(scene);
+  const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: LIMITS });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  return { s, r };
+};
+const kinds = (r) => r.result.violations.map((v) => `${v.kind}:${v.node_id}`);
+
+test("fabric observe_fit: short English copy fits", async () => {
+  const { r } = await fit(STORY);
+  assert.deepEqual(r.result.violations, []);
+  assert.equal(r.result.text.find((t) => t.id === "head").lines.length, 1);
+});
+
+test("fabric observe_fit: a short frame overflows", async () => {
+  const { r } = await fit(variant((n) => { n.head.width = 300; n.head.height = 80; n.head.text = "Hear only what matters."; }));
+  assert.ok(r.result.text.find((t) => t.id === "head").lines.length >= 3);
+  assert.ok(kinds(r).includes("text_overflow:head"), kinds(r).join());
+});
+
+test("fabric observe_fit: a widened textbox still reports the over-wide word", async () => {
+  const { r } = await fit(variant((n) => { n.head.width = 300; n.head.height = 400; n.head.text = "Geräuschunterdrückungstechnologie"; }));
+  assert.ok(kinds(r).includes("word_too_wide:head"), kinds(r).join());
+});
+
+test("fabric observe_fit: read-only", async () => {
+  const { s, r } = await fit(STORY);
+  assert.equal(r.revision, s.revision);
+});
+
+test("fabric observe_fit: outside safe area, overlap and minimums", async () => {
+  const { r } = await fit(variant((n) => { n.logo.y = 100; n.price.y = 1200; n.legal.fontSize = 20; }));
+  assert.ok(kinds(r).includes("outside_safe:logo"), kinds(r).join());
+  assert.ok(kinds(r).some((k) => k.startsWith("overlap:")), kinds(r).join());
+  assert.ok(kinds(r).includes("below_minimum:legal"), kinds(r).join());
+});
+
+test("fabric observe_fit: incomplete limits are refused", async () => {
+  const s = await mk();
+  const { min_font, ...partial } = LIMITS;
+  const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: partial });
+  assert.equal(r.error.code, "INVALID_ARGUMENT");
+});

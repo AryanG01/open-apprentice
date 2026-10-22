@@ -200,6 +200,66 @@
       objs.set(new_id, c);
       return props(new_id, c);
     },
+    // Read-only fit observation (same contract as Konva). Text is measured by a fresh Textbox at the AUTHORED width (Fabric
+    // widens a Textbox to its longest word, which would hide an over-wide word); boxes are relative to the artboard.
+    observe_fit: ({ artboard_id, limits }) => {
+      if (!campaign) throw new ToolError("UNSUPPORTED_CAPABILITY", "observe_fit needs a campaign scene");
+      const ab = find(artboard_id);
+      if (kindOf(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "artboard_id must name an artboard");
+      if (typeof limits !== "object" || limits === null || typeof limits.safe !== "object" || limits.safe === null) throw new ToolError("INVALID_ARGUMENT", "limits");
+      for (const k of ["min_font", "min_legal_font", "min_cta_height", "min_hero_width"]) num(limits[k], `limits.${k}`);
+      for (const k of ["top", "right", "bottom", "left"]) num(limits.safe[k], `limits.safe.${k}`);
+      const nodes = [];
+      const walk = (g) => { for (const o of g.getObjects()) { nodes.push(o); if (o instanceof fabric.Group) walk(o); } };
+      walk(ab);
+      const violations = [];
+      const flag = (k, o, detail) => violations.push({ kind: k, node_id: o.oaId, detail });
+      const ctx = document.createElement("canvas").getContext("2d");
+      const text = nodes.filter((o) => kindOf(o) === "text").map((o) => {
+        const probe = new fabric.Textbox(o.text, { width: o.oaFrameWidth, fontFamily: o.fontFamily, fontSize: o.fontSize,
+          fontWeight: o.fontWeight, lineHeight: o.lineHeight, textAlign: o.textAlign });
+        const lines = probe._textLines.map((l) => l.join(""));
+        const out = { id: o.oaId, lines, line_widths: lines.map((_, i) => probe.getLineWidth(i)), text_height: probe.calcTextHeight(),
+          frame_width: o.oaFrameWidth, frame_height: o.oaFrameHeight };
+        if (out.text_height > out.frame_height) flag("text_overflow", o, `${out.text_height} > ${out.frame_height}`);
+        ctx.font = `${o.fontWeight} ${o.fontSize}px "${o.fontFamily}"`;
+        const wide = o.text.split(/[ \n]/).find((w) => ctx.measureText(w).width > o.oaFrameWidth);
+        if (wide !== undefined) flag("word_too_wide", o, wide.slice(0, 60));
+        return out;
+      });
+      const abBox = ab.getBoundingRect();
+      const rect = (o) => {
+        o.setCoords(); // a Textbox re-measures after it joins its group; its cached corners can be stale
+        const r = o.getBoundingRect();
+        const w = kindOf(o) === "text" ? o.oaFrameWidth : r.width, h = kindOf(o) === "text" ? o.oaFrameHeight : r.height;
+        return { x: r.left - abBox.left, y: r.top - abBox.top, width: w, height: h };
+      };
+      const scaleY = (o) => o.getObjectScaling().y / ab.getObjectScaling().y;
+      const fontPx = (o) => o.fontSize * scaleY(o);
+      const roled = nodes.filter((o) => o.oaMeta?.role && o.oaMeta.role !== "background");
+      const W = ab.width, H = ab.height, sf = limits.safe;
+      for (const o of roled) {
+        const r = rect(o);
+        if (r.x < sf.left || r.y < sf.top || r.x + r.width > W - sf.right || r.y + r.height > H - sf.bottom) flag("outside_safe", o, r);
+        const role = o.oaMeta.role;
+        if (role === "legal" && fontPx(o) < limits.min_legal_font) flag("below_minimum", o, "legal font");
+        if ((role === "headline" || role === "price") && fontPx(o) < limits.min_font) flag("below_minimum", o, "font");
+        if (role === "cta" && r.height < limits.min_cta_height) flag("below_minimum", o, "cta height");
+        if (role === "product_image" && r.width < limits.min_hero_width) flag("below_minimum", o, "hero width");
+      }
+      for (const o of nodes) {
+        if (kindOf(o) === "text" && o.group?.oaMeta?.role === "cta" && fontPx(o) < limits.min_font) flag("below_minimum", o, "cta label font");
+      }
+      for (let i = 0; i < roled.length; i++) {
+        for (let j = i + 1; j < roled.length; j++) {
+          const a = rect(roled[i]), b = rect(roled[j]);
+          const w = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+          const h = Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y);
+          if (w > 0 && h > 0) flag("overlap", roled[i], roled[j].oaId);
+        }
+      }
+      return { fits: violations.length === 0, text, violations };
+    },
     group_nodes: () => { throw new ToolError("UNSUPPORTED_CAPABILITY", "fabric backend: grouping is outside the declared common subset"); },
     ungroup_node: () => { throw new ToolError("UNSUPPORTED_CAPABILITY", "fabric backend: grouping is outside the declared common subset"); },
     export_scene: ({ format }) => {

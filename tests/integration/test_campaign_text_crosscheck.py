@@ -1,5 +1,6 @@
 """Engine (browser canvas, kerning on) and the verifier's font-table layout must agree on every line count in the fixtures."""
 
+import pytest
 from open_apprentice.campaign.fixtures import FIXTURE_IDS, load_fixture
 from open_apprentice.campaign.limits import fit_limits
 from open_apprentice.environments.client import EngineSession
@@ -16,25 +17,34 @@ def _scenes():
             yield f"{fid}.{outcome}", g["scene"]
 
 
-def test_engine_and_verifier_agree_on_line_counts(engine_url):
+@pytest.mark.parametrize("backend", ["konva", "fabric"])
+def test_engine_and_verifier_agree_on_line_counts(engine_url, backend):
     mismatches = []
     for name, scene in _scenes():
-        s = EngineSession.create(engine_url, scene, owner="crosscheck")
+        s = EngineSession.create(engine_url, scene, owner="crosscheck", backend=backend)
         try:
             by_id = {n["id"]: n for n in scene["nodes"]}
             for board in (n for n in scene["nodes"] if n["type"] == "artboard"):
                 obs = s.call("observe_fit", artboard_id=board["id"], limits=fit_limits())
+                too_wide = {v["node_id"] for v in obs["violations"] if v["kind"] == "word_too_wide"}
                 for t in obs["text"]:
                     n = by_id[t["id"]]
-                    mine = fit(
+                    f = fit(
                         n["text"],
                         n["width"],
                         n["fontSize"],
                         n["fontStyle"] == "bold",
                         n["lineHeight"],
-                    ).lines
-                    if len(mine) != len(t["lines"]):
-                        mismatches.append((name, t["id"], t["lines"], mine))
+                    )
+                    if f.word_too_wide or t["id"] in too_wide:
+                        # an over-wide word has no common layout (Konva breaks it, Fabric widens the box): both sides
+                        # must still call it a failure
+                        if not (f.word_too_wide and t["id"] in too_wide):
+                            mismatches.append(
+                                (backend, name, t["id"], "word_too_wide disagreement")
+                            )
+                    elif len(f.lines) != len(t["lines"]):
+                        mismatches.append((backend, name, t["id"], t["lines"], f.lines))
         finally:
             s.close()
     assert not mismatches, "\n".join(map(str, mismatches))
