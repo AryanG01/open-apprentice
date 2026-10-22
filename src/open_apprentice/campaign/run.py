@@ -75,11 +75,15 @@ def close_run(run: CampaignRun, keep: Optional[str] = None) -> None:
 
 
 def _attempt(
-    run: CampaignRun, source: dict, plan: LayoutPlan, open_session: OpenSession
+    run: CampaignRun,
+    source: dict,
+    plan: LayoutPlan,
+    open_session: OpenSession,
+    procedure: tuple[list, str] | None = None,
 ) -> tuple[str, bool, list[dict]]:
     session = open_session(source)
     run.sessions[session.session_id] = session
-    apply_plan(session, plan)
+    apply_plan(session, plan, *(procedure or ()))
     violations: list[dict] = []
     for board in plan.artboards:
         obs = session.call("observe_fit", artboard_id=board["id"], limits=fit_limits())
@@ -88,14 +92,20 @@ def _attempt(
 
 
 def start_run(
-    source: dict, locale: str, learned: Learned, open_session: OpenSession, prefs: PreferenceStore
+    source: dict,
+    locale: str,
+    learned: Learned,
+    open_session: OpenSession,
+    prefs: PreferenceStore,
+    procedure: tuple[list, str] | None = None,
 ) -> CampaignRun:
+    """`procedure` is (program, origin) for an accepted model-written procedure; the reference procedure otherwise."""
     run = CampaignRun(uuid.uuid4().hex, locale, "failed", _hash(source))
     run.provenance = {
         "run_id": run.run_id,
         "source_hash": run.source_hash,
         "learned_origin": learned.origin,
-        "procedure_origin": PROCEDURE_ORIGIN,
+        "procedure_origin": procedure[1] if procedure else PROCEDURE_ORIGIN,
     }
     boards = [n["id"] for n in source["nodes"] if n["type"] == "artboard"]
     try:
@@ -114,7 +124,7 @@ def start_run(
         return run
     base = plan_from_layout(base_out, source, boards[0], learned.origin)
     try:
-        sid, fits, violations = _attempt(run, source, base, open_session)
+        sid, fits, violations = _attempt(run, source, base, open_session, procedure)
         if fits:
             run.status, run.result_session = "ready", sid
             close_run(run, keep=sid)
@@ -128,7 +138,9 @@ def start_run(
         for outcome in ([pref.outcome] if pref else []) + [
             o for o in asked if not pref or o != pref.outcome
         ]:
-            sid, fits, violations = _attempt(run, source, TRANSFORMS[outcome](base), open_session)
+            sid, fits, violations = _attempt(
+                run, source, TRANSFORMS[outcome](base), open_session, procedure
+            )
             run.previews[outcome] = Preview(outcome, BUILTIN_ORIGIN, sid, fits, violations)
             if (
                 pref and outcome == pref.outcome and fits

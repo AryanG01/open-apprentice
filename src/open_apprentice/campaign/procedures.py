@@ -121,7 +121,12 @@ def plan_inputs(plan: LayoutPlan) -> dict:
     }
 
 
-def apply_plan(session: EngineSession, plan: LayoutPlan) -> dict:
-    """Run the reference procedure on `session`. Engine tool errors propagate (the caller discards the session)."""
-    _, used = run_program(APPLY_PLAN, plan_inputs(plan), session.tools(sorted(APPLY_TOOLS)))
-    return {"origin": ORIGIN, "actions": used["actions"]}
+def apply_plan(
+    session: EngineSession, plan: LayoutPlan, program: list | None = None, origin: str = ORIGIN
+) -> dict:
+    """Run a procedure (the reference one by default) on `session`. Engine tool errors propagate (the caller discards the
+    session)."""
+    _, used = run_program(
+        program or APPLY_PLAN, plan_inputs(plan), session.tools(sorted(APPLY_TOOLS))
+    )
+    return {"origin": origin, "actions": used["actions"]}

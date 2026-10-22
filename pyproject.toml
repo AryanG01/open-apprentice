@@ -94,6 +94,7 @@ forbidden_modules = [
   "open_apprentice.evaluation.campaign_verifier",
   "open_apprentice.evaluation.campaign_parity",
   "open_apprentice.evaluation.campaign_sealed",
+  "open_apprentice.evaluation.campaign_procedure_check",
 ]
 
 [[tool.importlinter.contracts]]
