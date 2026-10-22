@@ -1,8 +1,10 @@
 # Campaign lane: Konva / Fabric parity
 
-Generated 2026-10-22 at commit `ce33259` (Konva 9.3.22, Fabric 6.9.1) by `oa eval campaign-parity`. Public development fixtures, not held out.
+Generated 2026-10-22 at commit `b637dee` (Konva 9.3.22, Fabric 6.9.1) by `oa eval campaign-parity`. Public development fixtures, not held out.
 
 One learned rule for both backends (origin `search`, sha256 `d1e124db9dd79ed3…`), the same reference procedure, built-in outcomes labelled as such. Each row is the independent verifier against the authored gold.
+
+Fabric measures text with its own metrics (a 1.13 font-size multiplier), so a banner whose copy sits close to a frame limit can come back `ready` on Konva and `question` on Fabric; the run-status table below shows whether that happened for these fixtures.
 
 **16 of 16 rows pass.**
 
