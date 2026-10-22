@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
-import { MAX_XML, PROFILE_BASE, RENDER_TIMEOUT_MS, openFontPage, renderPage } from "./drawio.js";
+import { FONT_CSS, MAX_XML, PROFILE_BASE, RENDER_TIMEOUT_MS, openFontPage, read, renderPage } from "./drawio.js";
 
 const require = createRequire(import.meta.url);
 const KONVA_PATH = require.resolve("konva/konva.min.js");
@@ -14,6 +14,10 @@ const BACKENDS = {
   konva: { lib: KONVA_PATH, dispatcher: fileURLToPath(new URL("./dispatcher.browser.js", import.meta.url)) },
   fabric: { lib: FABRIC_PATH, dispatcher: fileURLToPath(new URL("./dispatcher.fabric.js", import.meta.url)) },
 };
+
+// Campaign assets (spec 7.1): vendored, hash-checked at startup, handed to the page as data URLs (the page has no network).
+const ASSETS = Object.fromEntries([["h7-headphones", 1000, 1000], ["halden-wordmark", 480, 120]].map(([id, width, height]) =>
+  [id, { data_url: `data:image/svg+xml;base64,${read(`assets/${id}.svg`).toString("base64")}`, width, height }]));
 
 const MAX_SESSIONS = 4;          // spec 19.2 parallel browser contexts
 const ACTION_DEADLINE_MS = 5000; // per-action deadline (spec 6.5)
@@ -90,11 +94,16 @@ export class Engine {
       const page = await context.newPage();
       slot.page = page;
       await page.setContent('<!doctype html><html><body><div id="c"></div></body></html>');
+      await page.addStyleTag({ content: FONT_CSS });
+      await page.evaluate(async () => {
+        await document.fonts.load('16px "Liberation Sans"'); await document.fonts.load('bold 16px "Liberation Sans"');
+        await document.fonts.ready;
+      });
       await page.addScriptTag({ path: BACKENDS[backend].lib });
       await page.addScriptTag({ path: BACKENDS[backend].dispatcher });
       let loaded;
       try {
-        loaded = await page.evaluate(([sc, c]) => window.__engine.load(sc, c), [scene, privateConfig ?? null]);
+        loaded = await page.evaluate(([sc, c, a]) => window.__engine.load(sc, c, a), [scene, privateConfig ?? null, ASSETS]);
       } catch (e) {
         throw Object.assign(new Error(String(e.message).split("\n")[0].slice(0, 200)), { code: "INVALID_SCENE" });
       }
@@ -219,17 +228,25 @@ export class Engine {
     return this.#browser.contexts().length;
   }
 
-  async textWidthForTest(family, text) {
+  async textWidthForTest(family, text, { size = 12, weight = "normal" } = {}) {
     const { context, page } = await openFontPage(this.#browser);
     try {
-      return await page.evaluate(([f, t]) => {
+      return await page.evaluate(([f, t, sz, w]) => {
         const c = document.createElement("canvas").getContext("2d");
-        c.font = `12px "${f}"`;
+        c.font = `${w} ${sz}px "${f}"`;
         return c.measureText(t).width;
-      }, [family, text]);
+      }, [family, text, size, weight]);
     } finally {
       await context.close();
     }
+  }
+
+  async sessionTextWidthForTest(id, owner, font, text) {
+    return this.#get(id, owner).page.evaluate(([f, t]) => {
+      const c = document.createElement("canvas").getContext("2d");
+      c.font = f;
+      return c.measureText(t).width;
+    }, [font, text]);
   }
 
   // Raw native attrs for the private verifier (evaluator route only).

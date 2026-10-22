@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 
 const VENDOR = new URL("../vendor/", import.meta.url);
 const MANIFEST = JSON.parse(readFileSync(new URL("MANIFEST.json", VENDOR)));
-const read = (rel) => {
+export const read = (rel) => {
   const buf = readFileSync(new URL(rel, VENDOR));
   if (createHash("sha256").update(buf).digest("hex") !== MANIFEST.files[rel].sha256) throw new Error(`vendored ${rel} hash mismatch`);
   return buf;
@@ -16,7 +16,7 @@ const REGULAR = read("fonts/LiberationSans-Regular.ttf").toString("base64");
 const BOLD = read("fonts/LiberationSans-Bold.ttf").toString("base64");
 // The bundled font is declared under "Helvetica" (what draw.io requests) and a probe name used only by tests; author
 // @font-face rules shadow any system Helvetica, so the profile is identical on macOS and on Cloud Run.
-const FONT_CSS = ["Helvetica", "OA Liberation Probe"].map((fam) =>
+export const FONT_CSS = ["Helvetica", "OA Liberation Probe", "Liberation Sans"].map((fam) =>
   `@font-face{font-family:"${fam}";src:url(data:font/ttf;base64,${REGULAR}) format("truetype");font-weight:400}` +
   `@font-face{font-family:"${fam}";src:url(data:font/ttf;base64,${BOLD}) format("truetype");font-weight:700}`).join("");
 export const PROFILE_BASE = {

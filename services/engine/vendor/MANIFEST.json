@@ -1,10 +1,38 @@
 {
   "files": {
-    "drawio/viewer-static.min.js": {"sha256": "bc7586cb62eec98018c13b78619078d3a7179cc7bfc711c566dda19527520a30", "bytes": 4360162,
-      "source": "https://raw.githubusercontent.com/jgraph/drawio/v32.4.1/src/main/webapp/js/viewer-static.min.js", "licence": "Apache-2.0"},
-    "fonts/LiberationSans-Regular.ttf": {"sha256": "76d04c18ea243f426b7de1f3ad208e927008f961dc5945e5aad352d0dfde8ee8", "bytes": 410712,
-      "source": "https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz (release 2.1.5; tarball sha256 7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0)", "licence": "OFL-1.1"},
-    "fonts/LiberationSans-Bold.ttf": {"sha256": "788abee4c806d660e8aee46689dd8540cd4bb98da03dcc9d171ce3efd99a9173", "bytes": 414456,
-      "source": "https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz (release 2.1.5; tarball sha256 7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0)", "licence": "OFL-1.1"}
+    "drawio/viewer-static.min.js": {
+      "sha256": "bc7586cb62eec98018c13b78619078d3a7179cc7bfc711c566dda19527520a30",
+      "bytes": 4360162,
+      "source": "https://raw.githubusercontent.com/jgraph/drawio/v32.4.1/src/main/webapp/js/viewer-static.min.js",
+      "licence": "Apache-2.0"
+    },
+    "fonts/LiberationSans-Regular.ttf": {
+      "sha256": "76d04c18ea243f426b7de1f3ad208e927008f961dc5945e5aad352d0dfde8ee8",
+      "bytes": 410712,
+      "source": "https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz (release 2.1.5; tarball sha256 7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0)",
+      "licence": "OFL-1.1"
+    },
+    "fonts/LiberationSans-Bold.ttf": {
+      "sha256": "788abee4c806d660e8aee46689dd8540cd4bb98da03dcc9d171ce3efd99a9173",
+      "bytes": 414456,
+      "source": "https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz (release 2.1.5; tarball sha256 7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0)",
+      "licence": "OFL-1.1"
+    },
+    "assets/h7-headphones.svg": {
+      "sha256": "66d1298764bce4b02424ffbf5091933c75adc6ef4c8481b5f48da509d9445526",
+      "bytes": 825,
+      "source": "authored in-repo for Open Apprentice, 2026-10-22",
+      "licence": "project",
+      "width": 1000,
+      "height": 1000
+    },
+    "assets/halden-wordmark.svg": {
+      "sha256": "39b46c743928159e0c723d7281d5c2dd71da64b2c89e7828b844c2ac30e15f33",
+      "bytes": 519,
+      "source": "authored in-repo for Open Apprentice, 2026-10-22",
+      "licence": "project",
+      "width": 480,
+      "height": 120
+    }
   }
 }

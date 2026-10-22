@@ -22,3 +22,14 @@ test("the viewer is the spike-pinned build", () => {
 test("both font weights are bundled", () => {
   for (const w of ["Regular", "Bold"]) assert.ok(manifest.files[`fonts/LiberationSans-${w}.ttf`], w);
 });
+
+test("campaign assets are vendored with their intrinsic size", () => {
+  for (const [rel, w, h] of [["assets/h7-headphones.svg", 1000, 1000], ["assets/halden-wordmark.svg", 480, 120]]) {
+    const meta = manifest.files[rel];
+    assert.ok(meta, rel);
+    assert.equal(meta.width, w, rel);
+    assert.equal(meta.height, h, rel);
+    const svg = readFileSync(new URL(rel, root), "utf8");
+    assert.doesNotMatch(svg, /<\s*(script|text|foreignObject)\b|\son[a-z]+\s*=/i, rel);
+  }
+});
