@@ -31,11 +31,15 @@
     return n;
   };
   const allNodes = () => stage.find((n) => n !== layer && n.id());
-  const kind = (n) => (n.getClassName() === "Group" ? "group" : "rect");
+  const CLASS_KIND = { Group: "group", Rect: "rect", Text: "text", Image: "image" };
+  const kind = (n) => n.getAttr("oaType") ?? CLASS_KIND[n.getClassName()] ?? "rect";
+  // Campaign metadata (spec 7.1) rides on the node as plain attrs; tools never write it.
+  const META = ["role", "link", "asset", "focal", "format", "safe", "sequence"];
 
   const publicProps = (n) => ({
     id: n.id(),
     type: kind(n),
+    role: n.getAttr("role"),
     parent: n.getParent() === layer ? null : n.getParent().id(),
     x: n.x(), y: n.y(),
     width: n.width(), height: n.height(),
@@ -43,17 +47,48 @@
     fill: n.fill ? n.fill() : undefined,
   });
 
-  function build(spec, parent) {
+  function build(spec, parent, images) {
     if (allNodes().length >= MAX_NODES) throw new ToolError("LIMIT", "node limit");
     const common = { id: spec.id, x: spec.x ?? 0, y: spec.y ?? 0, scaleX: spec.scaleX ?? 1, scaleY: spec.scaleY ?? 1 };
-    const node = spec.type === "group"
-      ? new Konva.Group(common)
-      : new Konva.Rect({ ...common, width: spec.width, height: spec.height, fill: spec.fill, stroke: spec.stroke, strokeWidth: spec.strokeWidth ?? 0 });
+    const box = { width: spec.width, height: spec.height };
+    const type = spec.type ?? "rect";
+    let node;
+    if (type === "group") node = new Konva.Group(common);
+    else if (type === "artboard") {
+      node = new Konva.Group({ ...common, ...box, clipX: 0, clipY: 0, clipWidth: spec.width, clipHeight: spec.height });
+      node.setAttr("oaType", "artboard");
+    } else if (type === "rect" || type === "shape") {
+      node = new Konva.Rect({ ...common, ...box, fill: spec.fill, stroke: spec.stroke, strokeWidth: spec.strokeWidth ?? 0, cornerRadius: spec.cornerRadius ?? 0 });
+      if (type === "shape") node.setAttr("oaType", "shape");
+    } else if (type === "text") {
+      node = new Konva.Text({ ...common, ...box, text: spec.text, fontFamily: spec.fontFamily, fontSize: spec.fontSize,
+        fontStyle: spec.fontStyle ?? "normal", lineHeight: spec.lineHeight ?? 1, align: spec.align ?? "left", wrap: spec.wrap ?? "word", fill: spec.fill });
+    } else if (type === "image") {
+      const img = images.get(spec.asset);
+      if (!img) throw new ToolError("INVALID_SCENE", `unknown asset ${String(spec.asset).slice(0, 40)}`);
+      node = new Konva.Image({ ...common, ...box, image: img });
+      if (spec.crop) node.crop(spec.crop);
+    } else throw new ToolError("INVALID_SCENE", `unknown node type ${String(type).slice(0, 20)}`);
+    for (const k of META) if (spec[k] !== undefined) node.setAttr(k, spec[k]);
     parent.add(node);
     return node;
   }
 
-  function load(scene, privateConfig) {
+  async function decodeAssets(scene, assets) {
+    const images = new Map();
+    for (const id of new Set(scene.nodes.filter((n) => n.type === "image").map((n) => n.asset))) {
+      const a = assets?.[id];
+      if (!a) continue; // build() reports the unknown id
+      const img = new Image();
+      img.src = a.data_url;
+      await img.decode();
+      images.set(id, img);
+    }
+    return images;
+  }
+
+  async function load(scene, privateConfig, assets) {
+    const images = await decodeAssets(scene, assets);
     if (stage) stage.destroy();
     const host = document.getElementById("c") || document.body.appendChild(Object.assign(document.createElement("div"), { id: "c" }));
     stage = new Konva.Stage({ container: host, width: scene.canvas.width, height: scene.canvas.height });
@@ -67,9 +102,11 @@
       const s = pending.shift();
       const p = s.parent ? byId.get(s.parent) : layer;
       if (!p) { pending.push(s); continue; }
-      byId.set(s.id, build(s, p));
+      byId.set(s.id, build(s, p, images));
     }
     if (pending.length) throw new ToolError("INVALID_SCENE", "unresolved parents");
+    // Explicit stacking: within each parent, nodes that give z are raised in ascending z.
+    for (const s of [...scene.nodes].filter((n) => typeof n.z === "number").sort((a, b) => a.z - b.z)) byId.get(s.id).moveToTop();
     layer.draw();
     revision = 1;
     done.clear();
@@ -187,11 +224,21 @@
   // Raw native attrs for the PRIVATE verifier. Deliberately NOT computed world geometry.
   const nativeState = () => ({
     canvas: { width: stage.width(), height: stage.height() },
-    nodes: allNodes().map((n) => ({
-      id: n.id(), parent: n.getParent() === layer ? null : n.getParent().id(), type: kind(n),
-      x: n.x(), y: n.y(), width: n.width(), height: n.height(),
-      scaleX: n.scaleX(), scaleY: n.scaleY(), rotation: n.rotation(), fill: n.fill ? n.fill() : undefined,
-    })),
+    nodes: allNodes().map((n) => {
+      const t = kind(n);
+      const out = {
+        id: n.id(), parent: n.getParent() === layer ? null : n.getParent().id(), type: t,
+        x: n.x(), y: n.y(), width: n.width(), height: n.height(),
+        scaleX: n.scaleX(), scaleY: n.scaleY(), rotation: n.rotation(), z: n.zIndex(), fill: n.fill ? n.fill() : undefined,
+      };
+      for (const k of META) if (n.getAttr(k) !== undefined) out[k] = n.getAttr(k);
+      if (t === "rect" || t === "shape") out.cornerRadius = n.cornerRadius();
+      if (t === "text") {
+        for (const k of ["text", "fontFamily", "fontSize", "fontStyle", "lineHeight", "align", "wrap"]) out[k] = n[k]();
+      }
+      if (t === "image") out.crop = n.cropWidth() > 0 ? n.crop() : null;
+      return out;
+    }),
   });
 
   window.__engine = { load, dispatch, nativeState, toolNames: () => Object.keys(TOOLS) };
