@@ -1124,6 +1124,30 @@ def staging_check(
         raise typer.Exit(1)
 
 
+@eval_app.command("campaign-parity")
+def eval_campaign_parity(
+    out: Path = typer.Option(
+        Path("docs/evaluation/campaign_parity.md"), "--out", help="where to write the parity table"
+    ),
+) -> None:
+    """Run every campaign development fixture/outcome on Konva and Fabric and write the verifier table (plan 9D).
+    Uses ENGINE_URL + EVALUATOR_TOKEN when set, otherwise starts a local engine."""
+    from contextlib import nullcontext
+
+    from open_apprentice.evaluation.campaign_parity import parity_table, render_markdown
+    from open_apprentice.evaluation.local_engine import local_engine
+
+    url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
+    with nullcontext((url, token)) if url and token else local_engine(".") as (eng_url, eng_token):
+        table = parity_table(eng_url, eng_token)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render_markdown(table))
+    rows = table["verifier_rows"]
+    typer.echo(
+        f"{sum(r['passed'] for r in rows)} of {len(rows)} verifier rows pass; written to {out}"
+    )
+
+
 def main() -> None:
     try:
         app()

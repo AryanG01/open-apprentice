@@ -20,14 +20,14 @@ OWNER = "campaign-run"
 SHRINK, SPLIT = "builtin_shrink_hero", "builtin_split_two_cards"
 
 
-@pytest.fixture
-def ctx(engine_url, tmp_path):
+@pytest.fixture(params=["konva", "fabric"])
+def ctx(engine_url, tmp_path, request):
     harness = EvaluatorHarness(engine_url, TOKEN)
     learned = asyncio.run(
         learn_layout(load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"])
     )
     prefs = PreferenceStore(LocalStore(tmp_path))
-    open_session = lambda scene: harness.open_session(scene, owner=OWNER)[0]
+    open_session = lambda scene: harness.open_session(scene, owner=OWNER, backend=request.param)[0]
 
     def run(fid):
         f = load_fixture(fid)

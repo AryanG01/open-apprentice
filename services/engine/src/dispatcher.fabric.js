@@ -55,6 +55,14 @@
     return images;
   }
 
+  // A card is laid out once, when it is built: a child's relayout (the CTA fitting its plate) bubbles up to the parent group,
+  // and a plain FixedLayout then re-fits the card around its content, moving and resizing it.
+  class CardLayout extends fabric.FixedLayout {
+    shouldPerformLayout(context) {
+      return context.type === "initialization";
+    }
+  }
+
   function buildCampaign(spec, all, images) {
     if (objs.size >= MAX_NODES) throw new ToolError("LIMIT", "node limit");
     const type = spec.type ?? "rect";
@@ -79,7 +87,9 @@
       const kidSpecs = all.filter((n) => n.parent === spec.id);
       const width = spec.width ?? Math.max(0, ...kidSpecs.map((k) => (k.x ?? 0) + (k.width ?? 0)));
       const height = spec.height ?? Math.max(0, ...kidSpecs.map((k) => (k.y ?? 0) + (k.height ?? 0)));
-      o = new fabric.Group(kids, { ...at, width, height, layoutManager: new fabric.LayoutManager(new fabric.FixedLayout()),
+      // artboards have a fixed size; a group (the CTA) fits its content, so resizing its plate resizes the group
+      const strategy = type === "artboard" ? new CardLayout() : new fabric.FitContentLayout();
+      o = new fabric.Group(kids, { ...at, width, height, layoutManager: new fabric.LayoutManager(strategy),
         clipPath: type === "artboard" ? new fabric.Rect({ width, height, originX: "center", originY: "center" }) : undefined }, true);
     } else throw new ToolError("INVALID_SCENE", `unknown node type ${String(type).slice(0, 20)}`);
     o.oaId = spec.id;
@@ -330,6 +340,7 @@
         if (wide !== undefined) flag("word_too_wide", o, wide.slice(0, 60));
         return out;
       });
+      ab.setCoords(); // a card created by a tool keeps stale corners until refreshed (invisible for a card at x 0)
       const abBox = ab.getBoundingRect();
       const rect = (o) => {
         o.setCoords(); // a Textbox re-measures after it joins its group; its cached corners can be stale
@@ -389,6 +400,8 @@
       let result;
       if (viaCampaign) {
         result = (await CAMPAIGN_TOOLS[tool](args || {})) ?? { id: args?.node_id ?? args?.artboard_id };
+        const changed = typeof args?.node_id === "string" ? objs.get(args.node_id) : null;
+        if (changed?.group && kindOf(changed.group) === "group") changed.group.triggerLayout();
       } else {
         result = await TOOLS[tool](args || {});
       }

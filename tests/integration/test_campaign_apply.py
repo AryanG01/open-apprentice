@@ -12,10 +12,11 @@ from ..unit.campaign.test_plan import taught_outcome
 from .conftest import TOKEN
 
 
-def test_reference_procedure_reproduces_the_taught_story(engine_url):
+@pytest.mark.parametrize("backend", ["konva", "fabric"])
+def test_reference_procedure_reproduces_the_taught_story(engine_url, backend):
     harness = EvaluatorHarness(engine_url, TOKEN)
     src = load_fixture("teach_before")["scene"]
-    session, _ = harness.open_session(src, owner="apply")
+    session, _ = harness.open_session(src, owner="apply", backend=backend)
     try:
         out = apply_plan(
             session, plan_from_layout(taught_outcome(), src, "banner", origin="search")
@@ -31,14 +32,15 @@ def test_reference_procedure_reproduces_the_taught_story(engine_url):
         session.close()
 
 
-def test_a_target_missing_from_the_scene_is_a_tool_error(engine_url):
+@pytest.mark.parametrize("backend", ["konva", "fabric"])
+def test_a_target_missing_from_the_scene_is_a_tool_error(engine_url, backend):
     harness = EvaluatorHarness(engine_url, TOKEN)
     src = load_fixture("teach_before")["scene"]
     outcome = taught_outcome()
     ghost = outcome.targets.pop("tb-head")
     ghost.node_id = "ghost"
     outcome.targets["ghost"] = ghost
-    session, _ = harness.open_session(src, owner="apply")
+    session, _ = harness.open_session(src, owner="apply", backend=backend)
     try:
         with pytest.raises(EngineToolError):
             apply_plan(session, plan_from_layout(outcome, src, "banner", origin="search"))

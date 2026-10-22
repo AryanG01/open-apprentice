@@ -178,3 +178,46 @@ test("fabric tools: clone an image into place and move it to another card", asyn
   n = await native(s);
   assert.deepEqual([n["logo-2"].parent, ...local(n, n["logo-2"])], ["story-2", 72, 220]);
 });
+
+test("fabric tools: a CTA group follows its plate when the plate is resized", async () => {
+  const small = variant((n) => { n["cta-plate"].width = 256; n["cta-plate"].height = 76.8; n["cta-label"].y = 14; });
+  const s = await mk(small);
+  await mut(s, "resize_node", { node_id: "cta-plate", width: 936, height: 112 });
+  const n = await native(s);
+  assert.deepEqual([n.cta.width, n.cta.height], [936, 112]);
+  assert.deepEqual(local(n, n.cta), [72, 1360]);
+  assert.ok(local(n, n["cta-plate"]).every((v) => Math.abs(v) < 1e-6), String(local(n, n["cta-plate"])));
+  const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: LIMITS });
+  assert.ok(!kinds(r).includes("below_minimum:cta"), kinds(r).join());
+});
+
+test("fabric observe_fit: a second card measures its own content, not the first card's frame", async () => {
+  const s = await mk();
+  await mut(s, "create_artboard", CARD2);
+  await mut(s, "reparent_nodes", { node_ids: ["price"], parent_id: "story-2" });
+  await mut(s, "move_node", { node_id: "price", x: 72, y: 800 });
+  const r = await act(s, "observe_fit", { artboard_id: "story-2", limits: LIMITS });
+  assert.ok(!kinds(r).includes("outside_safe:price"), kinds(r).join());
+});
+
+test("fabric tools: adding objects never moves or resizes an artboard", async () => {
+  const s = await mk();
+  await mut(s, "create_artboard", CARD2);
+  await mut(s, "clone_node", { node_id: "bg", new_id: "bg-2" });
+  await mut(s, "reparent_nodes", { node_ids: ["bg-2", "price"], parent_id: "story-2" });
+  const n = await native(s);
+  assert.deepEqual([n["story-2"].x, n["story-2"].y, n["story-2"].width, n["story-2"].height], [1180, 0, 1080, 1920]);
+  assert.deepEqual([n["story-1"].x, n["story-1"].width], [0, 1080]);
+});
+
+test("fabric tools: relaying out a CTA inside a card never moves or resizes the card", async () => {
+  const s = await mk();
+  await mut(s, "create_artboard", CARD2);
+  await mut(s, "reparent_nodes", { node_ids: ["cta"], parent_id: "story-2" });
+  await mut(s, "move_node", { node_id: "cta", x: 72, y: 904 });
+  await mut(s, "move_node", { node_id: "cta-plate", x: 0, y: 0 });
+  await mut(s, "resize_node", { node_id: "cta-plate", width: 936, height: 112 });
+  const n = await native(s);
+  assert.deepEqual([n["story-2"].x, n["story-2"].y, n["story-2"].width, n["story-2"].height], [1180, 0, 1080, 1920]);
+  assert.deepEqual(local(n, n.cta), [72, 904]);
+});
