@@ -307,3 +307,9 @@ episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether i
     so the plan follows the gold (owner confirmed by approving Plan 9B). Every result carries origins: learned layout `search`
     or `model`, apply procedure `reference`, overflow outcomes `builtin`; nothing built-in is labelled learned or model.
     The overflow choice is a user preference (not a learned branch), versioned per `promo_card/9:16/overflow/<locale>`.
+
+58. **Campaign API (2026-10-22, Plan 9C).** Preferences are namespaced per workspace (a public demo must not let visitors
+    overwrite each other's choices). No engine session outlives a request: results and previews are snapshotted (PNG + native
+    state) and closed, so a pending question costs no engine capacity. The commit gate is the independent verifier against the
+    authored development gold; with no gold a result is `blocked`, so the lane only runs development fixtures until a
+    gold-free product gate is designed.

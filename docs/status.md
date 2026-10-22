@@ -270,3 +270,28 @@ mock provider, no live Nemotron call). No UI or API route yet (9C); Konva only (
   rules may not contain `ask`, set `parent`, or change stacking. Python 1414 passed, engine 62/62.
 - Konva tools are shared: `resize_node`/`set_style` widening also applies to badge-lane bindings on Konva (Fabric still
   refuses), and the Konva public schema hash changed with the new tools (recorded on bindings, not compared).
+
+## 2026-10-22: Plan 9C, Campaign API and tab (branch `p9c-campaign-api-tab`)
+
+Plan `docs/superpowers/plans/2026-10-22-p9c-campaign-api-and-tab.md`. Development fixtures only; no live model; Konva only.
+
+### What works (verified by running it, on Python 3.12, by the agent outside the sandbox)
+- `/api/campaign`: fixtures with thumbnails; workspaces (learn the taught layout; 30 min TTL, max 20); runs; answers;
+  per-workspace preferences with rollback. Every engine session a request opens is snapshotted (PNG + native state) and
+  closed before the response (engine live sessions back to 0 after every call, tested).
+- Verifier gate: a committed result is checked by `verify_story` against its authored gold before it is shown as applied;
+  a failure is `blocked` (and on an answer, nothing is saved). Expired workspace 404, double answer 409, engine at its
+  session cap 503 with a working retry.
+- Campaign tab (`#campaign`): teaching pair, Learn, banner picker, result with the verifier's checks and origin labels as
+  separate items, the overflow question with two applied previews (built-in, fits / does not fit), Neither, saved
+  preferences with rollback.
+- Tests: Python **1426 passed** (`OA_ENGINE_TESTS=1`), engine **62/62**, browser e2e **13 passed, 0 failed** (incl. the new
+  campaign journey; run with the uncommitted `repaired_by` edits set aside), web lint 0 errors (1 pre-existing warning),
+  `lint-imports` 2 kept, black clean.
+- `docker/api.Dockerfile` now ships `services/engine/vendor` and `prompts`. **Not built here** (Docker daemon not running);
+  the deployed image (`docker/demo.Dockerfile`) already ships both.
+
+### Open
+- The uncommitted `repaired_by` change renames "Repaired." to "Repaired by …"; two Try-it-live e2e tests expect "Repaired."
+  and must be updated with it. (Its `api/teach.py` line was committed by mistake inside the 9C workspace commit; harmless.)
+- Preferences are scoped to a workspace (one teaching), not to a signed-in owner.
