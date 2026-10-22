@@ -238,3 +238,30 @@ Development work only: no learner, no question, no UI, no Fabric yet (plans 9B-9
 - Final review fixes: the verifier and `observe_fit` apply node and group scale to font sizes, image aspect and focal point;
   safe areas come from the frozen limits, not the result's own metadata; a no-break-space run counts as one word; `observe_fit`
   refuses incomplete limits; text must use Liberation Sans, normal or bold. Python 1362 passed, engine 53/53.
+
+## 2026-10-22: Plan 9B, campaign tools, layout rule, learner, overflow question and preference (branch `p9b-campaign-learning`)
+
+Plan `docs/superpowers/plans/2026-10-22-p9b-campaign-learning-and-question.md`. Development results only (public fixtures,
+mock provider, no live Nemotron call). No UI or API route yet (9C); Konva only (9D adds Fabric).
+
+### What works (verified by running it, on Python 3.12, by the agent outside the sandbox)
+- Konva tools: `create_artboard`, `remove_artboard` (empty only), `reparent_nodes`, `set_order`, `fit_image_contain`; `resize_node`
+  on shape/text/image; `set_style` per kind (text: `fontSize` only, so copy colour stays protected).
+- `rules.py` campaign dialect (opt-in): `place`/`fit_image`/`style` emits, `facts.output_format`/`facts.overflows`, a built-in
+  `ask`; extra emit fields (text, link, asset, fill) are rejected; the symbolic compiler reports these rules `Unsupported`.
+- Learner: one teaching pair gives the base layout (search candidate; optional model candidates checked identically, origin
+  tagged). Reused by role on banners with different ids and sizes.
+- Reference apply procedure (restricted JSON-AST, origin `reference`); built-in shrink and split (origin `builtin`); versioned
+  per-language preferences with rollback.
+- End to end on real Konva, every committed result checked by the independent verifier against its gold: `short_a`/`short_b`
+  ready; `de_long_a` asks, shrink applied and saved; `de_long_b` asks again (shrink does not fit), split applied and saved;
+  `de_long_a` then reuses split without asking; `fr_long` asks; a missing role stops before any session; a tool error fails
+  the run and closes its sessions.
+- Tests: Python **1408 passed** (`OA_ENGINE_TESTS=1`), engine **62/62**, `lint-imports` 2 kept, black clean.
+
+### Limits and what 9C needs
+- Learning is deterministic: with a fixed 1080x1920 output the only search candidate is the taught boxes. Model candidates are
+  exercised with a mock only.
+- 9C must: route commits through `verify_story` (the run itself never imports the evaluator), serve PNG previews, reject answers
+  for expired runs, and ship `services/engine/vendor` (fonts, assets, manifest) in the API image.
+- The Konva tool doc string (`environments/docs.py`) is unchanged on purpose: it is part of the badge lane's prompts.

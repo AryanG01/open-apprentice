@@ -301,3 +301,9 @@ episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether i
     Frozen before any evaluation (spec §10). Text frames have fixed heights so gold outputs are authorable by hand. The verifier
     measures text from the font tables with `fonttools` (new dependency) and ignores kerning; a line-count disagreement with the
     engine fails the result. The symbolic axis is not used for this lane (spec §7.9). Public fixtures are development only.
+
+57. **Campaign lane: no offer group; origin vocabulary; preference scope (2026-10-22, Plan 9B).** Spec §2 says headline, price
+    and CTA are "regrouped into one offer group"; the owner-approved 9A gold outputs keep them as direct children of the card,
+    so the plan follows the gold (owner confirmed by approving Plan 9B). Every result carries origins: learned layout `search`
+    or `model`, apply procedure `reference`, overflow outcomes `builtin`; nothing built-in is labelled learned or model.
+    The overflow choice is a user preference (not a learned branch), versioned per `promo_card/9:16/overflow/<locale>`.
