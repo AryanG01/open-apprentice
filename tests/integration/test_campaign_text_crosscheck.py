@@ -26,7 +26,13 @@ def test_engine_and_verifier_agree_on_line_counts(engine_url):
                 obs = s.call("observe_fit", artboard_id=board["id"], limits=fit_limits())
                 for t in obs["text"]:
                     n = by_id[t["id"]]
-                    mine = fit(n["text"], n["width"], n["fontSize"], n["fontStyle"] == "bold", n["lineHeight"]).lines
+                    mine = fit(
+                        n["text"],
+                        n["width"],
+                        n["fontSize"],
+                        n["fontStyle"] == "bold",
+                        n["lineHeight"],
+                    ).lines
                     if len(mine) != len(t["lines"]):
                         mismatches.append((name, t["id"], t["lines"], mine))
         finally:
