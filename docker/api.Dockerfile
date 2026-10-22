@@ -4,5 +4,8 @@ WORKDIR /app
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv UV_CACHE_DIR=/tmp/uv-cache PATH="/opt/venv/bin:$PATH"
 COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
+# the campaign verifier reads the vendored fonts/assets/manifest and the learner reads its prompt (repo-relative paths)
+COPY services/engine/vendor ./services/engine/vendor
+COPY prompts ./prompts
 RUN uv sync --frozen --no-dev --python 3.12 && chmod -R a+rX /opt/venv
 USER 10001:10001
