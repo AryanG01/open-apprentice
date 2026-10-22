@@ -10,6 +10,7 @@
   const STYLE_FIELDS = ["fill", "opacity"];
 
   let canvas = null;
+  let campaign = false; // campaign scenes (spec 7.1): real Fabric groups, textboxes and images; flat rect scenes keep the old path
   let revision = 0;
   let cfg = { move_origin: "top-left" };
   const objs = new Map();
@@ -35,12 +36,102 @@
     width: o.width, height: o.height, scaleX: o.scaleX, scaleY: o.scaleY, fill: o.fill,
   });
 
-  function load(scene, privateConfig) {
+  // ---- campaign scenes ------------------------------------------------------------------------------------------
+  // Fabric's own semantics are kept: a group child's left/top live in the group's centre frame (the private verifier
+  // composes them itself). Text frames are kept as authored (Fabric widens a Textbox to its longest word).
+  const META = ["role", "link", "asset", "focal", "format", "safe", "sequence"];
+  const kindOf = (o) => o.oaType;
+
+  async function decodeAssets(scene, assets) {
+    const images = new Map();
+    for (const id of new Set(scene.nodes.filter((n) => n.type === "image").map((n) => n.asset))) {
+      const a = assets?.[id];
+      if (!a) continue;
+      const img = new Image();
+      img.src = a.data_url;
+      await img.decode();
+      images.set(id, img);
+    }
+    return images;
+  }
+
+  function buildCampaign(spec, all, images) {
+    if (objs.size >= MAX_NODES) throw new ToolError("LIMIT", "node limit");
+    const type = spec.type ?? "rect";
+    const at = { left: spec.x ?? 0, top: spec.y ?? 0, originX: "left", originY: "top", strokeWidth: 0, objectCaching: false };
+    let o;
+    if (type === "rect" || type === "shape") {
+      o = new fabric.Rect({ ...at, width: spec.width, height: spec.height, fill: spec.fill, rx: spec.cornerRadius ?? 0, ry: spec.cornerRadius ?? 0 });
+    } else if (type === "text") {
+      if (spec.fontFamily !== "Liberation Sans") throw new ToolError("INVALID_SCENE", "text must use the vendored Liberation Sans");
+      if (!["normal", "bold", undefined].includes(spec.fontStyle)) throw new ToolError("INVALID_SCENE", "fontStyle must be normal or bold");
+      o = new fabric.Textbox(spec.text, { ...at, width: spec.width, fontFamily: spec.fontFamily, fontSize: spec.fontSize,
+        fontWeight: spec.fontStyle === "bold" ? "bold" : "normal", lineHeight: spec.lineHeight ?? 1, textAlign: spec.align ?? "left", fill: spec.fill });
+      o.oaFrameWidth = spec.width;
+      o.oaFrameHeight = spec.height;
+    } else if (type === "image") {
+      const img = images.get(spec.asset);
+      if (!img) throw new ToolError("INVALID_SCENE", `unknown asset ${String(spec.asset).slice(0, 40)}`);
+      o = new fabric.FabricImage(img, { ...at, scaleX: spec.width / img.naturalWidth, scaleY: spec.height / img.naturalHeight });
+      if (spec.crop) o.set({ cropX: spec.crop.x, cropY: spec.crop.y, width: spec.crop.width, height: spec.crop.height });
+    } else if (type === "group" || type === "artboard") {
+      const kids = all.filter((n) => n.parent === spec.id).sort((a, b) => (a.z ?? 0) - (b.z ?? 0)).map((k) => buildCampaign(k, all, images));
+      const kidSpecs = all.filter((n) => n.parent === spec.id);
+      const width = spec.width ?? Math.max(0, ...kidSpecs.map((k) => (k.x ?? 0) + (k.width ?? 0)));
+      const height = spec.height ?? Math.max(0, ...kidSpecs.map((k) => (k.y ?? 0) + (k.height ?? 0)));
+      o = new fabric.Group(kids, { ...at, width, height, layoutManager: new fabric.LayoutManager(new fabric.FixedLayout()),
+        clipPath: type === "artboard" ? new fabric.Rect({ width, height, originX: "center", originY: "center" }) : undefined }, true);
+    } else throw new ToolError("INVALID_SCENE", `unknown node type ${String(type).slice(0, 20)}`);
+    o.oaId = spec.id;
+    o.oaType = type;
+    o.oaMeta = Object.fromEntries(META.filter((k) => spec[k] !== undefined).map((k) => [k, spec[k]]));
+    objs.set(spec.id, o);
+    return o;
+  }
+
+  async function loadCampaign(scene, assets) {
+    const images = await decodeAssets(scene, assets);
+    const ids = new Set(scene.nodes.map((n) => n.id));
+    if (scene.nodes.some((n) => n.parent && !ids.has(n.parent))) throw new ToolError("INVALID_SCENE", "unresolved parents");
+    for (const root of scene.nodes.filter((n) => !n.parent).sort((a, b) => (a.z ?? 0) - (b.z ?? 0))) canvas.add(buildCampaign(root, scene.nodes, images));
+  }
+
+  const campaignState = () => ({
+    canvas: { width: canvas.getWidth(), height: canvas.getHeight() },
+    nodes: [...objs].map(([id, o]) => {
+      const t = kindOf(o);
+      const parent = o.group ? o.group.oaId : null;
+      const siblings = o.group ? o.group.getObjects() : canvas.getObjects();
+      const out = {
+        id, parent, type: t, frame: parent ? "group_center" : "canvas",
+        x: o.left, y: o.top,
+        width: t === "text" ? o.oaFrameWidth : o.width, height: t === "text" ? o.oaFrameHeight : o.height,
+        scaleX: o.scaleX, scaleY: o.scaleY, rotation: o.angle, z: siblings.indexOf(o),
+        ...o.oaMeta,
+      };
+      if (t === "rect" || t === "shape") Object.assign(out, { fill: o.fill, cornerRadius: o.rx });
+      if (t === "text") Object.assign(out, { fill: o.fill, text: o.text, fontFamily: o.fontFamily, fontSize: o.fontSize,
+        fontStyle: o.fontWeight === "bold" ? "bold" : "normal", lineHeight: o.lineHeight, align: o.textAlign, wrap: "word" });
+      if (t === "image") out.crop = o.cropX || o.cropY ? { x: o.cropX, y: o.cropY, width: o.width, height: o.height } : null;
+      return out;
+    }),
+  });
+
+  async function load(scene, privateConfig, assets) {
     if (canvas) canvas.dispose();
     objs.clear();
     done.clear();
     const el = document.body.appendChild(document.createElement("canvas"));
     canvas = new fabric.StaticCanvas(el, { width: scene.canvas.width, height: scene.canvas.height, renderOnAddRemove: false });
+    // Only scenes built around an artboard use the campaign path; anything else is the badge lane's flat subset, unchanged.
+    campaign = scene.nodes.some((n) => n.type === "artboard");
+    if (campaign) {
+      await loadCampaign(scene, assets);
+      canvas.requestRenderAll();
+      revision = 1;
+      cfg = { move_origin: "top-left", ...(privateConfig || {}) };
+      return { revision };
+    }
     for (const s of scene.nodes) {
       if (s.type === "group" || s.parent) throw new ToolError("INVALID_SCENE", "fabric backend subset: flat rect scenes only");
       if (objs.size >= MAX_NODES) throw new ToolError("LIMIT", "node limit");
@@ -140,7 +231,7 @@
   }
 
   // Raw native attrs for the PRIVATE verifier (x,y = Fabric left/top; origin exported so the verifier can refuse non-default).
-  const nativeState = () => ({
+  const nativeState = () => (campaign ? campaignState() : {
     canvas: { width: canvas.getWidth(), height: canvas.getHeight() },
     nodes: [...objs].map(([id, o]) => ({
       id, parent: null, type: "rect", x: o.left, y: o.top, width: o.width, height: o.height,
