@@ -48,11 +48,28 @@ It works on any draw.io diagram where text notes annotate shapes: flowcharts, ar
 network maps and floor plans. It only moves notes; it does not restyle. An earlier prototype, also in the app, applies the
 same show, ask and check loop to UI components across two graphics engines (Konva and Fabric).
 
+**A second, newer lane: banner to story card (Campaign tab, development fixtures).** You teach one compound layout
+change: a layered 16:9 promo banner (logo, product image, headline, price, button, legal line) becomes a 1080x1920
+story card, with every layer moved, resized and restyled. The rule is learned by search from that one example and reused
+on other banners by each layer's role, not its coordinates. When a long headline, such as German copy, does not fit,
+the apprentice stops and shows two fully rendered outcomes (shrink the product image, or split across two cards). It
+saves your answer per language as a versioned preference that you can roll back. The same rule runs in real Konva and
+real Fabric, and every result passes an independent verifier before it is shown: 16 of 16 rows pass on both engines.
+Nemotron-3-Super has two checked jobs here:
+- **Roles:** it proposes layer roles for banners that arrive untagged, and you confirm them. In our live measurement it
+  was right on 6 of 6 banners, but a simple rule of thumb also scores 6 of 6, so this shows no gain.
+- **Wording:** it phrases the overflow question. Its wording is used only if every number in it matches the measured
+  facts. That happened on 0 of 3 banners, so the built-in wording is shown, and the page says so.
+
+Nemotron-written native procedures passed the verifier on both engines, but they closely follow the prompt's template.
+Each request can cost about $0.25, so they are switched off in the public demo. These are public development
+fixtures, not held out, so we claim no generalization yet.
+
 ## How we built it
 
 - **NVIDIA Nemotron on Nebius Token Factory:** the reasoning core.
   - **Nemotron-3-Super** (`nvidia/nemotron-3-super-120b-a12b`) runs the live site. A pre-registered check on the demo flow
-    adopted it: sessions took about 25 s, against about 55 s for Ultra, at roughly a third of the price
+    adopted it: median sessions took about 22 s, against about 58 s for Ultra, at roughly a tenth of the cost
     (`docs/evaluation/product_model_check.md`).
   - **Nemotron-3-Ultra** (`nvidia/Nemotron-3-Ultra-550b-a55b`) is the model in our frozen evaluation, where serious
     reasoning matters more than speed.
@@ -104,7 +121,7 @@ and Ultra does the heavy evaluation.
 
 ## Built with
 
-nvidia-nemotron, nebius-token-factory, python, fastapi, react, typescript, playwright, draw.io, google-cloud-run,
+nvidia-nemotron, nebius-token-factory, python, fastapi, react, typescript, playwright, draw.io, konva, fabric.js, google-cloud-run,
 cloud-tasks, cloud-storage, z3, remotion
 
 ## Feedback on Nebius Token Factory and NVIDIA models (required field)
@@ -120,8 +137,8 @@ What worked well:
 
 What would help:
 1. **Truncation from hidden reasoning is the biggest pitfall.** Reasoning tokens count against `max_tokens`. With a small
-   cap a request returns zero visible text and `finish_reason: "length"`. Ultra replies to our rule-writing prompts used
-   a median of about 13k completion tokens, and some hit a 32k cap, ending 10 of our evaluation runs. Ideas:
+   cap a request returns zero visible text and `finish_reason: "length"`. Some Ultra replies to our rule-writing prompts
+   hit our 32k completion cap inside hidden reasoning, ending 10 of our evaluation runs. Ideas:
    - a separate budget for reasoning versus visible output;
    - a distinct finish reason when the cap is hit inside reasoning;
    - a warning in the docs.
@@ -133,7 +150,7 @@ What would help:
 3. **Latency:** a long Ultra reasoning reply can take minutes. Streaming the reasoning progress, or an estimated time
    budget per request, would let apps show meaningful progress.
 4. **Billing visibility:** an API view of spend per key or per day would let apps enforce caps against the real balance.
-   We keep our own durable ledger, and it ran about 13% below the dashboard because of our rate assumptions.
+   We keep our own durable ledger, and it ran about 11% below the real spend on the dashboard because of our rate assumptions.
 
 ## Testing instructions (for judges)
 
@@ -143,6 +160,9 @@ Open the demo URL; no login is needed.
 3. Tick **Use the live model** and press **This whole document is right**.
 4. Answer the question, approve the preview, then apply the skill to the other documents. Optionally press **Load the
    100-diagram library**, then **Confirm all**, **Select all** and **Apply**.
+5. Optional, the newer lane: open the **Campaign** tab, press **Learn this layout**, then pick a banner. `de_long_a`
+   asks the overflow question; choose an outcome or **Neither**. `untagged_short_b` shows Nemotron's role proposal; press
+   **Confirm roles and run**.
 
 Live sessions use Nemotron-3-Super under a durable spending cap. If the cap is reached, the page says so and offers the
 offline learner. A live run can also stop and say why, for example when your example is ambiguous in a way it cannot

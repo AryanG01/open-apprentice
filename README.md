@@ -17,16 +17,21 @@ Nemotron-3-Super on the live site, chosen by a pre-registered check, `docs/evalu
 Video (2:37): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
 diagrams), confirm which box each note describes, drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
 document is right*. The apprentice's notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks.
-Then apply the skill to **the 100-diagram library** (ten kinds: flowcharts, architecture maps, org charts, roadmaps, network maps, floor plans;
+Then apply the skill to **the 100-diagram library** (ten themes drawn as flowcharts, architecture maps, org charts, roadmaps, network maps and floor plans;
 `docs/corpus/library_provenance.md`) and to **The big one**, a 217-object platform map, and compare before and after. Teaching works on pages of up
 to 32 objects; a learned skill applies to pages of up to 400 objects and 200 notes. Every session and run states `Model: … · Teacher: …` (and `· Policy: product-1` for live sessions, a
 disclosed difference from the evaluated policy: `docs/evaluation/product_policy.md`). Live use runs under a **durable** dollar cap
 (`DEMO_MODEL_MAX_USD`, shared by all instances and surviving restarts) and 3 live sessions per visitor per hour. When the cap is reached the page says so
 and offers the offline learner; it never silently downgrades. The first request after idle can take a few seconds.
 
+The **Campaign** tab (banner to story card, below) is also live on the demo, on development fixtures. There Nemotron-3-Super
+proposes roles for untagged banners and words the overflow question, each with a labelled fallback. Nemotron-written
+procedures are off in production (`CAMPAIGN_MODEL_PROCEDURES` unset). Campaign model calls are capped per server instance
+(at most 6 requests per address per hour) rather than by the durable ledger: a known gap.
+
 ## How well does it work? (read before judging)
 
-Frozen, pre-registered battery (36 synthetic label-placement episodes, 3 repeats, live Nemotron, 240 runs, about $47 of real model spend), scored by an
+Frozen, pre-registered battery (36 synthetic label-placement episodes, 3 repeats, live Nemotron, 240 runs, $41.4 in our ledger, about $47 of real model spend), scored by an
 independent oracle on documents the learner never saw. The learner runs in an isolated process that cannot read the private manifests
 (0 boundary violations). Full tables, intervals and failure analysis: [`docs/evaluation/final_results.md`](docs/evaluation/final_results.md).
 
@@ -79,7 +84,7 @@ aspect, safe areas, minimum sizes, text fit measured from the font tables, and t
 
 What is and is not shown:
 - The layout is learned by search from one example, and the two overflow outcomes are fixed reference procedures,
-  labelled as such. NVIDIA Nemotron-3-Super (Nebius Token Factory) does three checked jobs here, each with a labelled
+  labelled as such. NVIDIA Nemotron-3-Super (Nebius Token Factory) does three checked jobs here (the third is off in the public demo), each with a labelled
   fallback: it proposes roles for banners that arrive untagged (the owner confirms them), words the overflow question
   (used only if every number and element matches the measured facts), and writes the native procedure for Konva and
   Fabric (used only if the independent verifier passes it on a seen banner and two unseen ones). Latest live
@@ -143,7 +148,7 @@ the `.drawio`, SVG or receipt, or correct a result. Without `DEMO_MODEL_ENABLED=
 every session and run shows `Model: … · Teacher: …`. The earlier badge demo is under *Earlier prototype*, unchanged.
 
 **Live NVIDIA Nemotron on Nebius Token Factory (the intended public configuration).** Put your Nebius key in `.env` (copy `.env.example`), then start the server with
-`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=1.5 uv run uvicorn open_apprentice.api.app:app --port 8000`. *Try it live* then defaults to **Nemotron-3-Ultra called live through Nebius Token Factory**: it proposes candidate rules
+`DEMO_MODEL_ENABLED=1 DEMO_MODEL_MAX_USD=1.5 uv run uvicorn open_apprentice.api.app:app --port 8000`. *Try it live* then defaults to **Nemotron-3-Super called live through Nebius Token Factory**: it proposes candidate rules
 (unioned with a bounded symbolic search so a rule the model omits can still be found; the teacher alone decides), writes the native procedure for each backend and attempts the repair. Every output is checked on the real engine before it is accepted;
 if a model procedure or repair fails, a scripted fixture is used instead and the interface says so (in a real run Nemotron's own repair attempt failed the checks and a labelled fixture repair was promoted). A live meter shows tokens, calls and estimated dollars.
 Measured: one full session (teach, Konva, Fabric, tool change, repair, stress test) is about 5 model calls, 36k tokens and **$0.085** (89 s). Safety: model mode is **off unless `DEMO_MODEL_ENABLED=1`**, a global dollar cap refuses new sessions
@@ -183,7 +188,7 @@ We hold ourselves to the claims we can back with a command.
 - Reproduced native mismatch when a tool changes silently while the abstract model still passes, and binding-only repair with retained-case replay (a hard-coded "fix" is rejected).
 - Exact-arithmetic rule language, an AST-to-Z3 compiler with property-tested agreement, and typed witness search (`witness_found` / `no_witness_in_model` / `incomplete` / ...).
 - Four evidence axes (intent, symbolic, native, held-out) are kept separate everywhere; there is no combined score and no single "Verified" badge.
-- 470+ tests (472 in the offline unit, evaluation and contract suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
+- 1,500+ tests (1,523 in the unit, integration, contract and evaluation suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
 
 **Measured with a live NVIDIA model (development split, small samples):** the model alone committed to a wrong rule 15 of 34 times (44%); an extra "audit" round did not help; unioning the model's proposals with a
 bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that alone does not show the model adds value. On six rules *outside* the search's grammar it does: search alone got 0 of 12 right, the model alone 5 of 12 (with 2 confident-wrong commits), and the hybrid committed 5 rules, all correct. Tiny samples, development split.
