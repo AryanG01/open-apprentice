@@ -241,3 +241,15 @@ test("fabric: flat-rect read tools refuse campaign scenes instead of misreportin
     assert.equal(r.error.code, "UNSUPPORTED_CAPABILITY", tool);
   }
 });
+
+test("fabric: export_scene shows every story card, even beyond the source canvas", async () => {
+  const s = await mk();
+  assert.equal((await mut(s, "create_artboard", CARD2)).ok, true);
+  const r = await act(s, "export_scene", { format: "png" });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  const b = Buffer.from(r.result.data_url.split(",")[1], "base64");
+  const [w, h] = [b.readUInt32BE(16), b.readUInt32BE(20)];
+  const boards = (await eng.nativeState(s.session_id, "u")).nodes.filter((n) => n.type === "artboard");
+  const span = (k, d) => Math.max(...boards.map((n) => n[k] + n[d])) - Math.min(...boards.map((n) => n[k]));
+  assert.ok(Math.abs(w / h - span("x", "width") / span("y", "height")) < 0.01, `exported ${w}x${h}`);
+});

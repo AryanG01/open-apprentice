@@ -384,7 +384,12 @@
     ungroup_node: () => { throw new ToolError("UNSUPPORTED_CAPABILITY", "fabric backend: grouping is outside the declared common subset"); },
     export_scene: ({ format }) => {
       if (format !== "png") throw new ToolError("UNSUPPORTED_CAPABILITY", "only png is supported by this backend");
-      return { mime: "image/png", data_url: canvas.toDataURL({ format: "png", multiplier: 1 }) };
+      // story cards can lie beyond the source canvas: export the area every artboard covers (at most 2400 px a side)
+      const boards = canvas.getObjects().filter((o) => kindOf(o) === "artboard").map((o) => (o.setCoords(), o.getBoundingRect()));
+      if (!boards.length) return { mime: "image/png", data_url: canvas.toDataURL({ format: "png", multiplier: 1 }) };
+      const left = Math.min(...boards.map((b) => b.left)), top = Math.min(...boards.map((b) => b.top));
+      const width = Math.max(...boards.map((b) => b.left + b.width)) - left, height = Math.max(...boards.map((b) => b.top + b.height)) - top;
+      return { mime: "image/png", data_url: canvas.toDataURL({ format: "png", left, top, width, height, multiplier: Math.min(1, 2400 / Math.max(width, height)) }) };
     },
     finish: ({ summary }) => ({ finished: true, summary: String(summary ?? "").slice(0, 500) }),
   };

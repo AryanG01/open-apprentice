@@ -223,3 +223,20 @@ test("fit_image_contain centres the image at its natural aspect", async () => {
   const h = await nodeOf(s, "hero");
   assert.deepEqual([h.x, h.y, h.width, h.height, h.crop], [72 + 108, 320, 720, 720, null]);
 });
+
+const pngSize = (dataUrl) => {
+  const b = Buffer.from(dataUrl.split(",")[1], "base64");
+  return [b.readUInt32BE(16), b.readUInt32BE(20)];
+};
+
+test("export_scene shows every story card, even beyond the source canvas", async () => {
+  const s = await mk(FULL);
+  await mut(s, "create_artboard", { artboard_id: "story-2", x: 1180, y: 0, width: 1080, height: 1920, format: "9:16", safe: SAFE, sequence: 2 });
+  const r = await eng.act(s.session_id, "u1", { tool: "export_scene", args: { format: "png" } });
+  assert.equal(r.ok, true, JSON.stringify(r.error));
+  const [w, h] = pngSize(r.result.data_url);
+  const boards = (await eng.nativeState(s.session_id, "u1")).nodes.filter((n) => n.type === "artboard");
+  const right = Math.max(...boards.map((b) => b.x + b.width)), bottom = Math.max(...boards.map((b) => b.y + b.height));
+  const left = Math.min(...boards.map((b) => b.x)), top = Math.min(...boards.map((b) => b.y));
+  assert.ok(Math.abs(w / h - (right - left) / (bottom - top)) < 0.01, `exported ${w}x${h}, cards span ${right - left}x${bottom - top}`);
+});

@@ -300,7 +300,12 @@
     },
     export_scene: ({ format }) => {
       if (format !== "png") throw new ToolError("UNSUPPORTED_CAPABILITY", "only png is supported by this backend");
-      return { mime: "image/png", data_url: stage.toDataURL({ pixelRatio: 1 }) };
+      // story cards can lie beyond the source canvas: export the area every artboard covers (at most 2400 px a side)
+      const boards = stage.find((n) => kind(n) === "artboard").map((n) => ({ x: n.x(), y: n.y(), width: n.width(), height: n.height() }));
+      if (!boards.length) return { mime: "image/png", data_url: stage.toDataURL({ pixelRatio: 1 }) };
+      const x = Math.min(...boards.map((b) => b.x)), y = Math.min(...boards.map((b) => b.y));
+      const width = Math.max(...boards.map((b) => b.x + b.width)) - x, height = Math.max(...boards.map((b) => b.y + b.height)) - y;
+      return { mime: "image/png", data_url: stage.toDataURL({ x, y, width, height, pixelRatio: Math.min(1, 2400 / Math.max(width, height)) }) };
     },
     finish: ({ summary }) => ({ finished: true, summary: String(summary ?? "").slice(0, 500) }),
   };
