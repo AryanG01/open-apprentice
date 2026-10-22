@@ -113,3 +113,68 @@ test("fabric observe_fit: incomplete limits are refused", async () => {
   const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: partial });
   assert.equal(r.error.code, "INVALID_ARGUMENT");
 });
+
+// Plan 9D Task 4: campaign layout tools on Fabric (same contract as Konva).
+const mut = async (s, tool, args) => {
+  const r = await eng.act(s.session_id, "u", { tool, args, expected_revision: s.revision });
+  if (r.ok) s.revision = r.revision;
+  return r;
+};
+const CARD2 = { artboard_id: "story-2", x: 1180, y: 0, width: 1080, height: 1920, format: "9:16", safe: SAFE, sequence: 2 };
+
+test("fabric tools: create and remove an artboard", async () => {
+  const s = await mk();
+  assert.equal((await mut(s, "create_artboard", CARD2)).ok, true);
+  let n = await native(s);
+  assert.deepEqual([n["story-2"].type, n["story-2"].x, n["story-2"].width, n["story-2"].sequence], ["artboard", 1180, 1080, 2]);
+  assert.equal((await mut(s, "remove_artboard", { artboard_id: "story-1" })).error.code, "INVALID_ARGUMENT");
+  assert.equal((await mut(s, "remove_artboard", { artboard_id: "story-2" })).ok, true);
+  n = await native(s);
+  assert.equal(n["story-2"], undefined);
+});
+
+test("fabric tools: reparent keeps world position, move_node takes parent-local top-left", async () => {
+  const s = await mk();
+  await mut(s, "create_artboard", CARD2);
+  assert.equal((await mut(s, "reparent_nodes", { node_ids: ["price"], parent_id: "story-2" })).ok, true);
+  let n = await native(s);
+  assert.equal(n.price.parent, "story-2");
+  assert.deepEqual(local(n, n.price), [72 - 1180, 1256]);
+  assert.equal((await mut(s, "move_node", { node_id: "price", x: 72, y: 800 })).ok, true);
+  n = await native(s);
+  assert.deepEqual(local(n, n.price), [72, 800]);
+});
+
+test("fabric tools: set_order, resize text, style text and shape", async () => {
+  const s = await mk();
+  assert.equal((await mut(s, "set_order", { node_id: "legal", z: 1 })).ok, true);
+  assert.equal((await mut(s, "resize_node", { node_id: "head", width: 600, height: 300 })).ok, true);
+  assert.equal((await mut(s, "set_style", { node_id: "head", style: { fill: "#ff0000" } })).error.code, "INVALID_ARGUMENT");
+  assert.equal((await mut(s, "set_style", { node_id: "head", style: { fontSize: 44 } })).ok, true);
+  assert.equal((await mut(s, "set_style", { node_id: "cta-plate", style: { cornerRadius: 4 } })).ok, true);
+  const n = await native(s);
+  assert.equal(n.legal.z, 1);
+  assert.deepEqual([n.head.width, n.head.height, n.head.fontSize], [600, 300, 44]);
+  assert.equal(n["cta-plate"].cornerRadius, 4);
+});
+
+test("fabric tools: fit_image_contain keeps the natural aspect, centred, uncropped", async () => {
+  const s = await mk();
+  assert.equal((await mut(s, "fit_image_contain", { node_id: "hero", x: 72, y: 320, width: 936, height: 720 })).ok, true);
+  const n = await native(s);
+  assert.deepEqual(local(n, n.hero), [72 + 108, 320]);
+  assert.deepEqual([n.hero.width * n.hero.scaleX, n.hero.height * n.hero.scaleY, n.hero.crop], [720, 720, null]);
+});
+
+test("fabric tools: clone an image into place and move it to another card", async () => {
+  const s = await mk();
+  await mut(s, "create_artboard", CARD2);
+  assert.equal((await mut(s, "clone_node", { node_id: "logo", new_id: "logo-2" })).ok, true);
+  let n = await native(s);
+  assert.deepEqual([n["logo-2"].parent, ...local(n, n["logo-2"])], ["story-1", 72, 220]);
+  assert.equal(n["logo-2"].asset, "halden-wordmark");
+  await mut(s, "reparent_nodes", { node_ids: ["logo-2"], parent_id: "story-2" });
+  await mut(s, "move_node", { node_id: "logo-2", x: 72, y: 220 });
+  n = await native(s);
+  assert.deepEqual([n["logo-2"].parent, ...local(n, n["logo-2"])], ["story-2", 72, 220]);
+});

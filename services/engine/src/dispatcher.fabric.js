@@ -117,6 +117,109 @@
     }),
   });
 
+  // A group child's left/top live in the group's plane, whose origin is the group's centre.
+  const toPlane = (o, x, y) => (o.group ? { left: x - o.group.width / 2, top: y - o.group.height / 2 } : { left: x, top: y });
+  const KIND_STYLE = { rect: ["fill", "opacity", "cornerRadius"], shape: ["fill", "opacity", "cornerRadius"], text: ["fontSize"], image: [] };
+  const RESIZABLE = new Set(["rect", "shape", "text", "image"]);
+  const freshId = (id) => {
+    if (typeof id !== "string" || !id || objs.has(id)) throw new ToolError("INVALID_ARGUMENT", "id must be a fresh string");
+    if (objs.size >= MAX_NODES) throw new ToolError("LIMIT", "node limit");
+  };
+
+  const CAMPAIGN_TOOLS = {
+    move_node: ({ node_id, x, y }) => {
+      const o = find(node_id);
+      num(x, "x"); num(y, "y");
+      o.set(toPlane(o, x, y));
+      o.setCoords();
+    },
+    resize_node: ({ node_id, width, height }) => {
+      const o = find(node_id);
+      if (!RESIZABLE.has(kindOf(o))) throw new ToolError("UNSUPPORTED_CAPABILITY", "resize supports rect, shape, text and image");
+      num(width, "width"); num(height, "height");
+      if (width <= 0 || height <= 0) throw new ToolError("INVALID_ARGUMENT", "size must be positive");
+      if (kindOf(o) === "text") { o.set({ width }); o.oaFrameWidth = width; o.oaFrameHeight = height; o.initDimensions(); }
+      else if (kindOf(o) === "image") o.set({ scaleX: width / o.width, scaleY: height / o.height });
+      else o.set({ width, height });
+      o.setCoords();
+    },
+    set_style: ({ node_id, style }) => {
+      const o = find(node_id);
+      const allowed = KIND_STYLE[kindOf(o)];
+      if (!allowed || typeof style !== "object" || style === null) throw new ToolError("INVALID_ARGUMENT", "style");
+      for (const [k, v] of Object.entries(style)) {
+        if (!allowed.includes(k)) throw new ToolError("INVALID_ARGUMENT", `style field not allowed: ${k}`);
+        if (k === "fontSize" || k === "cornerRadius") { num(v, k); if (v < (k === "fontSize" ? 1 : 0)) throw new ToolError("INVALID_ARGUMENT", k); }
+      }
+      for (const [k, v] of Object.entries(style)) {
+        if (k === "cornerRadius") o.set({ rx: v, ry: v }); else o.set(k, v);
+      }
+      if (kindOf(o) === "text") o.initDimensions();
+    },
+    clone_node: async ({ node_id, new_id }) => {
+      const o = find(node_id);
+      freshId(new_id);
+      if (!RESIZABLE.has(kindOf(o))) throw new ToolError("UNSUPPORTED_CAPABILITY", "clone supports rect, shape, text and image");
+      const c = await o.clone();
+      Object.assign(c, { oaId: new_id, oaType: o.oaType, oaMeta: structuredClone(o.oaMeta), oaFrameWidth: o.oaFrameWidth, oaFrameHeight: o.oaFrameHeight });
+      if (o.group) {
+        // the copy's left/top are in the group plane; add() expects canvas coordinates, so express them there first
+        const p = fabric.util.transformPoint(new fabric.Point(c.left, c.top), o.group.calcTransformMatrix());
+        c.set({ left: p.x, top: p.y });
+        o.group.add(c);
+      } else canvas.add(c);
+      objs.set(new_id, c);
+    },
+    create_artboard: ({ artboard_id, x, y, width, height, format, safe, sequence }) => {
+      freshId(artboard_id);
+      for (const [k, v] of Object.entries({ x, y, width, height })) num(v, k);
+      if (width <= 0 || height <= 0) throw new ToolError("INVALID_ARGUMENT", "size must be positive");
+      if (!["9:16", "16:9"].includes(format)) throw new ToolError("INVALID_ARGUMENT", "format");
+      if (typeof safe !== "object" || safe === null) throw new ToolError("INVALID_ARGUMENT", "safe");
+      for (const k of ["top", "right", "bottom", "left"]) num(safe[k], `safe.${k}`);
+      if (!Number.isInteger(sequence) || sequence < 1) throw new ToolError("INVALID_ARGUMENT", "sequence");
+      canvas.add(buildCampaign({ id: artboard_id, type: "artboard", x, y, width, height, format, safe, sequence }, [], new Map()));
+    },
+    remove_artboard: ({ artboard_id }) => {
+      const ab = find(artboard_id);
+      if (kindOf(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "not an artboard");
+      if (ab.getObjects().length) throw new ToolError("INVALID_ARGUMENT", "artboard is not empty");
+      canvas.remove(ab);
+      objs.delete(artboard_id);
+      return { removed: artboard_id };
+    },
+    reparent_nodes: ({ node_ids, parent_id }) => {
+      if (!Array.isArray(node_ids) || node_ids.length < 1) throw new ToolError("INVALID_ARGUMENT", "node_ids");
+      const parent = find(parent_id);
+      if (!["artboard", "group"].includes(kindOf(parent))) throw new ToolError("INVALID_ARGUMENT", "parent must be an artboard or group");
+      const nodes = node_ids.map(find);
+      if (nodes.some((o) => o === parent || (o instanceof fabric.Group && o.contains(parent, true)))) throw new ToolError("INVALID_ARGUMENT", "cannot move a node into itself");
+      for (const o of nodes) {
+        // remove() hands the object back in canvas coordinates; add() re-expresses it in the new group's plane
+        if (o.group) o.group.remove(o); else canvas.remove(o);
+        parent.add(o);
+      }
+      return { moved: node_ids };
+    },
+    set_order: ({ node_id, z }) => {
+      const o = find(node_id);
+      const owner = o.group ?? canvas;
+      const count = owner.getObjects().length;
+      if (!Number.isInteger(z) || z < 0 || z >= count) throw new ToolError("INVALID_ARGUMENT", `z must be an integer in 0..${count - 1}`);
+      owner.moveObjectTo(o, z);
+    },
+    fit_image_contain: ({ node_id, x, y, width, height }) => {
+      const o = find(node_id);
+      if (kindOf(o) !== "image") throw new ToolError("INVALID_ARGUMENT", "not an image");
+      for (const [k, v] of Object.entries({ x, y, width, height })) num(v, k);
+      if (width <= 0 || height <= 0) throw new ToolError("INVALID_ARGUMENT", "size must be positive");
+      const sc = Math.min(width / o.width, height / o.height);
+      o.set({ scaleX: sc, scaleY: sc, ...toPlane(o, x + (width - o.width * sc) / 2, y + (height - o.height * sc) / 2) });
+      o.setCoords();
+    },
+  };
+  const CAMPAIGN_MUTATING = new Set(Object.keys(CAMPAIGN_TOOLS));
+
   async function load(scene, privateConfig, assets) {
     if (canvas) canvas.dispose();
     objs.clear();
@@ -271,17 +374,25 @@
   const MUTATING = new Set(["move_node", "resize_node", "set_style", "clone_node"]);
 
   async function dispatch({ tool, args, action_id, expected_revision }) {
-    if (!Object.prototype.hasOwnProperty.call(TOOLS, tool)) {
+    const own = (t, k) => Object.prototype.hasOwnProperty.call(t, k);
+    const viaCampaign = campaign && own(CAMPAIGN_TOOLS, tool);
+    if (!viaCampaign && !own(TOOLS, tool)) {
       return { ok: false, error: { code: "UNSUPPORTED_CAPABILITY", message: `unknown tool ${String(tool).slice(0, 40)}` }, revision };
     }
     if (action_id && done.has(action_id)) return { ...done.get(action_id), replayed: true };
     let out;
     try {
-      if (MUTATING.has(tool) && expected_revision !== revision) {
+      const mutating = viaCampaign ? CAMPAIGN_MUTATING.has(tool) : MUTATING.has(tool);
+      if (mutating && expected_revision !== revision) {
         return { ok: false, error: { code: "SCENE_REVISION_CONFLICT", message: `expected ${expected_revision}, at ${revision}` }, revision };
       }
-      const result = await TOOLS[tool](args || {});
-      if (MUTATING.has(tool)) { revision += 1; canvas.requestRenderAll(); }
+      let result;
+      if (viaCampaign) {
+        result = (await CAMPAIGN_TOOLS[tool](args || {})) ?? { id: args?.node_id ?? args?.artboard_id };
+      } else {
+        result = await TOOLS[tool](args || {});
+      }
+      if (mutating) { revision += 1; canvas.requestRenderAll(); }
       out = { ok: true, result, revision };
     } catch (e) {
       out = { ok: false, error: { code: e.code || "TOOL_ERROR", message: String(e.message).slice(0, 200) }, revision };
