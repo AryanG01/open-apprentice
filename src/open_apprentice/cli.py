@@ -1255,6 +1255,10 @@ def eval_campaign_nemotron(
         )  # closes the provider inside its own event loop
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render_markdown(m, live=True, spent_usd=guard.run_usd))
+    programs = {p["backend"]: p["program"] for p in m["procedures"] if p["program"] is not None}
+    out.with_name(out.stem + "_programs.json").write_text(
+        json.dumps(programs, indent=1) + "\n"
+    )  # what Nemotron wrote
     stopped = f"; stopped: {guard.stopped_reason}" if guard.stopped_reason else ""
     typer.echo(
         f"{guard.calls} calls, ${guard.run_usd:.3f} (ledger) of ${cap_usd:.2f}{stopped}; table in {out}"

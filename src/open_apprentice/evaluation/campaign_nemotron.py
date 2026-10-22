@@ -101,7 +101,14 @@ async def measure_async(provider: Provider, engine_url: str, token: str) -> dict
             backend,
             lambda prog, b=backend: check_procedure(prog, b, engine_url, token),
         )
-        procedures.append({"backend": backend, "origin": out.origin, "attempts": out.attempts})
+        procedures.append(
+            {
+                "backend": backend,
+                "origin": out.origin,
+                "attempts": out.attempts,
+                "program": out.program if out.origin == "model" else None,
+            }
+        )
     snap = ledger.snapshot()
     return {
         "model": getattr(provider, "requested_model", "?"),
