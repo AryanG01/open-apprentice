@@ -62,8 +62,10 @@ Nemotron-3-Super has two checked jobs here:
   facts. That happened on 0 of 3 banners, so the built-in wording is shown, and the page says so.
 
 Nemotron-written native procedures passed the verifier on both engines, but they closely follow the prompt's template.
-Each request can cost about $0.25, so they are switched off in the public demo. These are public development
-fixtures, not held out, so we claim no generalization yet.
+Each request can cost about $0.25, so they are switched off in the public demo. Those were public development
+fixtures. On a sealed set of 8 new banners in 4 new languages, written by a fresh agent from the written rules only
+(not by us), 22 of 22 results pass on both engines, and it asks exactly when it should
+(`docs/evaluation/campaign_sealed.md`).
 
 ## How we built it
 

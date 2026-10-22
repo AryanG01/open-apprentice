@@ -96,9 +96,10 @@ What is and is not shown:
   not bounded by its token limit.
 - The same learned rule runs on real Konva and real Fabric through the same restricted procedure:
   [`docs/evaluation/campaign_parity.md`](docs/evaluation/campaign_parity.md) (16 of 16 verifier rows pass).
-- Those are **public development fixtures, not held out**. A private sealed set for a generalization claim has tooling
-  (`oa eval campaign-seal`, `oa eval campaign-sealed-run`, [how-to](docs/evaluation/campaign_sealed_howto.md)) but has
-  not been authored or run yet, so no generalization is claimed.
+- Those are **public development fixtures, not held out**. A private sealed set was then written by a fresh agent from
+  the written rules only (not by the owner), and its hashes were committed before the run. On it, **22 of 22 rows pass
+  on both engines**, and the question was asked exactly when it should be (16 of 16 cases): 8 banners in 4 new locales
+  ([`docs/evaluation/campaign_sealed.md`](docs/evaluation/campaign_sealed.md), with its limits).
 
 ## Earlier work in this repository
 
