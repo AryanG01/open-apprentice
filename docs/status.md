@@ -335,6 +335,8 @@ Plan `docs/superpowers/plans/2026-10-22-p9e-campaign-nemotron.md`.
   0 errors (1 pre-existing warning), `lint-imports` 2 kept, black clean.
 
 ### Open
-- The programs Nemotron wrote in this run were not saved (the save was added afterwards); a rerun (~$0.04) would make
-  the accepted procedures auditable.
+- Third live run (2026-10-22, $0.032, approved) saved the programs: one loop per input list in the prompt's order; the
+  Konva program is identical to the reference, the Fabric one differs only in names and a redundant guard. This shows
+  contract-following, not procedure design; explanations were 2/3 in this run (3/3 in run 2). Plan total about $0.10
+  ledger (~$0.12 real) over three runs.
 - These are development fixtures; role mapping is easy on them, so no gain over the heuristic is claimed.

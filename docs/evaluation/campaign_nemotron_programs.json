@@ -1,0 +1,777 @@
+{
+ "konva": [
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.artboards"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "create_artboard",
+     "args": {
+      "artboard_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "artboard_id"
+       ]
+      },
+      "x": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "x"
+       ]
+      },
+      "y": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "y"
+       ]
+      },
+      "width": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "width"
+       ]
+      },
+      "height": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "height"
+       ]
+      },
+      "format": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "format"
+       ]
+      },
+      "safe": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "safe"
+       ]
+      },
+      "sequence": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "sequence"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.clones"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "clone_node",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_id"
+       ]
+      },
+      "new_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "new_id"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.reparents"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "reparent_nodes",
+     "args": {
+      "node_ids": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_ids"
+       ]
+      },
+      "parent_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "parent_id"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.moves"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "move_node",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_id"
+       ]
+      },
+      "x": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "x"
+       ]
+      },
+      "y": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "y"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.resizes"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "resize_node",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_id"
+       ]
+      },
+      "width": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "width"
+       ]
+      },
+      "height": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "height"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.contains"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "fit_image_contain",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_id"
+       ]
+      },
+      "x": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "x"
+       ]
+      },
+      "y": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "y"
+       ]
+      },
+      "width": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "width"
+       ]
+      },
+      "height": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "height"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.styles"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "set_style",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_id"
+       ]
+      },
+      "style": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "style"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.orders"
+   },
+   "var": "it",
+   "body": [
+    {
+     "op": "call",
+     "tool": "set_order",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "node_id"
+       ]
+      },
+      "z": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.it"
+        },
+        "z"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "call",
+   "tool": "remove_artboard",
+   "args": {
+    "artboard_id": {
+     "ref": "inputs.source_artboard"
+    }
+   }
+  }
+ ],
+ "fabric": [
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.artboards"
+   },
+   "var": "ab",
+   "body": [
+    {
+     "op": "call",
+     "tool": "create_artboard",
+     "args": {
+      "artboard_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "artboard_id"
+       ]
+      },
+      "x": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "x"
+       ]
+      },
+      "y": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "y"
+       ]
+      },
+      "width": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "width"
+       ]
+      },
+      "height": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "height"
+       ]
+      },
+      "format": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "format"
+       ]
+      },
+      "safe": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "safe"
+       ]
+      },
+      "sequence": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.ab"
+        },
+        "sequence"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.clones"
+   },
+   "var": "cl",
+   "body": [
+    {
+     "op": "call",
+     "tool": "clone_node",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cl"
+        },
+        "node_id"
+       ]
+      },
+      "new_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cl"
+        },
+        "new_id"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.reparents"
+   },
+   "var": "rp",
+   "body": [
+    {
+     "op": "call",
+     "tool": "reparent_nodes",
+     "args": {
+      "node_ids": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.rp"
+        },
+        "node_ids"
+       ]
+      },
+      "parent_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.rp"
+        },
+        "parent_id"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.moves"
+   },
+   "var": "mv",
+   "body": [
+    {
+     "op": "call",
+     "tool": "move_node",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.mv"
+        },
+        "node_id"
+       ]
+      },
+      "x": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.mv"
+        },
+        "x"
+       ]
+      },
+      "y": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.mv"
+        },
+        "y"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.resizes"
+   },
+   "var": "rs",
+   "body": [
+    {
+     "op": "call",
+     "tool": "resize_node",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.rs"
+        },
+        "node_id"
+       ]
+      },
+      "width": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.rs"
+        },
+        "width"
+       ]
+      },
+      "height": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.rs"
+        },
+        "height"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.contains"
+   },
+   "var": "cn",
+   "body": [
+    {
+     "op": "call",
+     "tool": "fit_image_contain",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cn"
+        },
+        "node_id"
+       ]
+      },
+      "x": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cn"
+        },
+        "x"
+       ]
+      },
+      "y": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cn"
+        },
+        "y"
+       ]
+      },
+      "width": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cn"
+        },
+        "width"
+       ]
+      },
+      "height": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.cn"
+        },
+        "height"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.styles"
+   },
+   "var": "st",
+   "body": [
+    {
+     "op": "call",
+     "tool": "set_style",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.st"
+        },
+        "node_id"
+       ]
+      },
+      "style": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.st"
+        },
+        "style"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "for_each",
+   "over": {
+    "ref": "inputs.orders"
+   },
+   "var": "or",
+   "body": [
+    {
+     "op": "call",
+     "tool": "set_order",
+     "args": {
+      "node_id": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.or"
+        },
+        "node_id"
+       ]
+      },
+      "z": {
+       "op": "get",
+       "args": [
+        {
+         "ref": "locals.or"
+        },
+        "z"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "if",
+   "cond": {
+    "op": "ne",
+    "args": [
+     {
+      "ref": "inputs.source_artboard"
+     },
+     ""
+    ]
+   },
+   "then": [
+    {
+     "op": "call",
+     "tool": "remove_artboard",
+     "args": {
+      "artboard_id": {
+       "ref": "inputs.source_artboard"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "op": "if",
+   "cond": {
+    "op": "eq",
+    "args": [
+     {
+      "ref": "inputs.source_artboard"
+     },
+     ""
+    ]
+   },
+   "then": []
+  }
+ ]
+}
