@@ -59,3 +59,27 @@ def test_an_orphaned_version_from_a_lost_race_does_not_block_the_locale(tmp_path
     v = p.set(DE, "builtin_split_two_cards", {}, expected_version=1)
     assert v.version == 3 and p.get(DE).outcome == "builtin_split_two_cards"
     assert p.set(DE, "builtin_shrink_hero", {}, expected_version=3).version == 4
+
+
+def test_namespaces_keep_independent_histories(tmp_path):
+    store = LocalStore(tmp_path)
+    a, b = PreferenceStore(store, namespace="a" * 16), PreferenceStore(store, namespace="b" * 16)
+    a.set(DE, "builtin_shrink_hero", {}, expected_version=None)
+    assert b.get(DE) is None
+    b.set(DE, "builtin_split_two_cards", {}, expected_version=None)
+    assert (
+        a.get(DE).outcome == "builtin_shrink_hero"
+        and b.get(DE).outcome == "builtin_split_two_cards"
+    )
+
+
+def test_empty_namespace_reads_unnamespaced_preferences(tmp_path):
+    store = LocalStore(tmp_path)
+    PreferenceStore(store).set(DE, "builtin_shrink_hero", {}, expected_version=None)
+    assert PreferenceStore(store, namespace="").get(DE).outcome == "builtin_shrink_hero"
+    assert PreferenceStore(store, namespace="c" * 16).get(DE) is None
+
+
+def test_bad_namespace_is_refused(tmp_path):
+    with pytest.raises(ValueError):
+        PreferenceStore(LocalStore(tmp_path), namespace="../x")

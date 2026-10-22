@@ -4,6 +4,7 @@ rollback. Same compare-and-set pointer pattern as skills/versions.py; the choice
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from typing import Optional
 
@@ -29,11 +30,14 @@ class PreferenceConflict(Exception):
 
 
 class PreferenceStore:
-    def __init__(self, store: Store) -> None:
+    def __init__(self, store: Store, namespace: str = "") -> None:
+        if namespace and not re.fullmatch(r"[a-f0-9]{8,64}", namespace):
+            raise ValueError("a preference namespace is 8-64 lowercase hex characters")
         self.store = store
+        self.prefix = f"campaign/{namespace}/preferences" if namespace else "campaign/preferences"
 
     def _key(self, scope: str, leaf: str) -> str:
-        return f"campaign/preferences/{scope}/{leaf}.json"
+        return f"{self.prefix}/{scope}/{leaf}.json"
 
     def _pointer(self, scope: str) -> tuple[dict, Optional[int]]:
         blob = self.store.get(self._key(scope, "active"))
