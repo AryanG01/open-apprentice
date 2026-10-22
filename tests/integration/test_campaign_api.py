@@ -528,3 +528,17 @@ def test_model_written_procedures_are_off_unless_the_operator_turns_them_on(clie
     p = client.post(f"/api/campaign/workspaces/{wid}/procedures", json={"backend": "konva"}).json()
     assert p["origin"] == "reference" and not p["accepted"] and any("off" in n for n in p["notes"])
     assert provider.calls == []  # nothing was spent
+
+
+def test_model_calls_fit_the_production_completion_floor(client):
+    """Production reserves NEBIUS_COMPLETION_CAP=32000 tokens per call: a workspace must still be able to make calls."""
+    provider = _mock(roles=_opaque_truth("untagged_short_b", "short_b"))
+    provider.completion_floor = 32_000
+    client.app.state.provider = provider
+    wid = _workspace(client)["workspace_id"]
+    p = client.post(
+        f"/api/campaign/workspaces/{wid}/roles", json={"fixture_id": "untagged_short_b"}
+    ).json()
+    assert p["origin"] == "model", p["problems"]
+    q = _run(client, wid, "de_long_a")
+    assert q["explanation"]["origin"] == "model", q["explanation"]["problems"]

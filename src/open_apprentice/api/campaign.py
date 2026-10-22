@@ -48,9 +48,10 @@ GOLD_OUTCOME = {
     "builtin_split_two_cards": "split",
 }  # gold files name outcomes briefly
 _PNG_CACHE: dict[str, str] = {}  # fixture id -> rendered thumbnail, once per process
-WORKSPACE_MODEL_LIMITS = Limits(
-    tokens=30_000, calls=8
-)  # per workspace; the server-wide demo cap applies on top
+# Per workspace. A live call RESERVES max(max_tokens, NEBIUS_COMPLETION_CAP) tokens (32000 in production) before it is
+# reconciled to what it really used (< 1000 here), so the token limit must hold one floor-sized reservation; the spend
+# guards are the server-wide demo cap and the per-address model quota.
+WORKSPACE_MODEL_LIMITS = Limits(tokens=100_000, calls=8)
 
 
 @dataclass
