@@ -50,17 +50,28 @@ def _children(nodes: list[Node], pid: str) -> list[Node]:
     return [n for n in nodes if n.get("parent") == pid]
 
 
+def _local(nodes: list[Node], n: Node) -> tuple[float, float]:
+    """Top-left of n in its parent's top-left frame. Konva states are already there; Fabric keeps a group child's
+    left/top in the group's centre frame ("group_center"), so the parent's half size is added back here.
+    """
+    if n.get("frame") == "group_center":
+        parent = next(p for p in nodes if p["id"] == n["parent"])
+        return n["x"] + parent["width"] / 2, n["y"] + parent["height"] / 2
+    return n["x"], n["y"]
+
+
 def _box(nodes: list[Node], n: Node) -> Box:
-    """Bounds in the coordinates of n's parent; a group is the union of its children."""
+    """Bounds in the coordinates of n's parent (top-left frame); a group is the union of its children."""
     sx, sy = n.get("scaleX", 1), n.get("scaleY", 1)
+    x, y = _local(nodes, n)
     if n["type"] == "group":
         kids = [_box(nodes, k) for k in _children(nodes, n["id"])]
         if not kids:
-            return (n["x"], n["y"], 0.0, 0.0)
+            return (x, y, 0.0, 0.0)
         x0, y0 = min(k[0] for k in kids), min(k[1] for k in kids)
         x1, y1 = max(k[0] + k[2] for k in kids), max(k[1] + k[3] for k in kids)
-        return (n["x"] + x0 * sx, n["y"] + y0 * sy, (x1 - x0) * sx, (y1 - y0) * sy)
-    return (n["x"], n["y"], n["width"] * sx, n["height"] * sy)
+        return (x + x0 * sx, y + y0 * sy, (x1 - x0) * sx, (y1 - y0) * sy)
+    return (x, y, n["width"] * sx, n["height"] * sy)
 
 
 def _scale(nodes: list[Node], n: Node | None) -> tuple[float, float]:
@@ -185,8 +196,9 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
             hidden.append(n["id"])
             continue
         sx, sy = _scale(fin, n)
-        fx = n["x"] + f["x"] * n["width"] * sx / a["width"]
-        fy = n["y"] + f["y"] * n["height"] * sy / a["height"]
+        lx, ly = _local(fin, n)
+        fx = lx + f["x"] * n["width"] * sx / a["width"]
+        fy = ly + f["y"] * n["height"] * sy / a["height"]
         if not (0 <= fx <= card["width"] and 0 <= fy <= card["height"]):
             hidden.append(n["id"])
     rep.add("focal_visible", not hidden, str(hidden))
@@ -284,8 +296,17 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
             n = fin_by_id.get(g["id"])
             if n is None:
                 continue
-            for k in ("x", "y", "width", "height"):
-                if k in g and abs(n.get(k, 0) - g[k]) > GOLD_TOL_PX:
+            x, y = _local(fin, n)
+            eff = {"x": x, "y": y}
+            if (
+                n["type"] != "group"
+            ):  # effective size: Fabric keeps images at natural size and carries the scale
+                eff |= {
+                    "width": n["width"] * n.get("scaleX", 1),
+                    "height": n["height"] * n.get("scaleY", 1),
+                }
+            for k, v in eff.items():
+                if k in g and abs(v - g[k]) > GOLD_TOL_PX:
                     off.append(f"{g['id']}.{k}")
             for k in ("parent", "fontSize", "cornerRadius", "sequence"):
                 if k in g and n.get(k) != g[k]:

@@ -203,3 +203,58 @@ def test_altered_safe_metadata_fails_card_sequence():
         "layout",
         lambda s: next(n for n in s["nodes"] if n["id"] == "story-1").update(safe={}),
     )
+
+
+# Plan 9D: the same results as Fabric reports them (children in the group-centre frame, images at natural size + scale).
+NATURAL = {"h7-headphones": (1000, 1000), "halden-wordmark": (480, 120)}
+
+
+def _as_fabric(scene: dict) -> dict:
+    out = copy.deepcopy(scene)
+    nodes = {n["id"]: n for n in out["nodes"]}
+
+    def size(n):
+        if "width" in n:
+            return n["width"], n["height"]
+        kids = [k for k in out["nodes"] if k.get("parent") == n["id"]]
+        return max(k["x"] + k["width"] for k in kids), max(k["y"] + k["height"] for k in kids)
+
+    sizes = {n["id"]: size(n) for n in out["nodes"] if n["type"] in ("artboard", "group")}
+    for n in out["nodes"]:
+        if n["type"] in ("artboard", "group"):
+            n["width"], n["height"] = sizes[n["id"]]
+        if n.get("parent"):
+            pw, ph = sizes[n["parent"]]
+            n["x"], n["y"], n["frame"] = n["x"] - pw / 2, n["y"] - ph / 2, "group_center"
+        else:
+            n["frame"] = "canvas"
+        if n["type"] == "image":
+            nw, nh = NATURAL[n["asset"]]
+            n["scaleX"], n["scaleY"] = n["width"] / nw, n["height"] / nh
+            n["width"], n["height"] = nw, nh
+    assert nodes  # keep the mapping alive for readability
+    return out
+
+
+@pytest.mark.parametrize("fid,outcome", APPLICABLE)
+def test_fabric_shaped_gold_passes_every_check(fid, outcome):
+    gold = load_gold(fid, outcome)["scene"]
+    report = verify_story(load_fixture(fid)["scene"], _as_fabric(gold), gold)
+    assert report.passed, report.failed()
+
+
+def test_reading_centre_frame_positions_as_top_left_is_caught():
+    gold = load_gold("short_a", "layout")["scene"]
+    naive = _as_fabric(gold)
+    for n in naive["nodes"]:
+        n.pop("frame", None)
+    failed = verify_story(load_fixture("short_a")["scene"], naive, gold).failed()
+    assert "matches_gold" in failed and "inside_safe" in failed
+
+
+def test_an_image_at_natural_size_without_its_scale_is_caught():
+    gold = load_gold("short_a", "layout")["scene"]
+    fab = _as_fabric(gold)
+    hero = next(n for n in fab["nodes"] if n.get("role") == "product_image")
+    hero["scaleX"] = hero["scaleY"] = 1
+    assert "matches_gold" in verify_story(load_fixture("short_a")["scene"], fab, gold).failed()
