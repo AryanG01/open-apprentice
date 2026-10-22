@@ -36,9 +36,21 @@ def _strip(scene: dict) -> tuple[dict, dict]:
     return untagged, truth
 
 
-def measure(provider: Provider, engine_url: str, token: str) -> dict:
-    """One event loop for the whole measurement: a live provider's HTTP client cannot cross loops."""
-    return asyncio.run(measure_async(provider, engine_url, token))
+def measure(provider: Provider, engine_url: str, token: str, *, close: bool = False) -> dict:
+    """One event loop for the whole measurement: a live provider's HTTP client cannot cross loops, so with `close` the
+    provider is also closed in that loop (closing it later from a new loop fails)."""
+
+    async def go() -> dict:
+        try:
+            return await measure_async(provider, engine_url, token)
+        finally:
+            if close:
+                try:
+                    await provider.aclose()
+                except Exception:  # noqa: BLE001 - a failed close must not lose the measurement
+                    pass
+
+    return asyncio.run(go())
 
 
 async def measure_async(provider: Provider, engine_url: str, token: str) -> dict:

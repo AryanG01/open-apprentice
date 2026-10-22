@@ -39,3 +39,29 @@ def test_the_measurement_table_on_the_mock(engine_url):
     assert [p["origin"] for p in m["procedures"]] == ["model", "model"]
     md = render_markdown(m, live=False)
     assert "MOCK provider" in md and "Nemotron correct on **6 of 6**" in md
+
+
+def test_the_provider_is_closed_inside_the_measurements_own_event_loop(engine_url):
+    import asyncio
+
+    class Closing(MockProvider):
+        loops = []
+
+        async def _call(self, messages, *, max_tokens, ctx):
+            Closing.loops.append(asyncio.get_running_loop())
+            return await super()._call(messages, max_tokens=max_tokens, ctx=ctx)
+
+        async def aclose(self):
+            Closing.loops.append(("closed", asyncio.get_running_loop()))
+
+    provider = Closing(
+        {},
+        functions={
+            "campaign_roles": _truth_for,
+            "campaign_explain": lambda m: {"text": "x"},
+            "campaign_procedure": lambda m: {"candidates": []},
+        },
+    )
+    measure(provider, engine_url, TOKEN, close=True)
+    closed = [x for x in Closing.loops if isinstance(x, tuple)]
+    assert len(closed) == 1 and closed[0][1] is Closing.loops[0]  # same loop as the calls

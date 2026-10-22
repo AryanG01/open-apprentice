@@ -1225,7 +1225,6 @@ def eval_campaign_nemotron(
     """Measure what Nemotron adds in the campaign lane against each baseline, once, under a spend cap (plan 9E).
     Needs PROVIDER_MODE=nebius and the reserve in results/redesign/budget.json; the mock version is an integration test.
     """
-    import asyncio
     import datetime
     from contextlib import nullcontext
 
@@ -1250,14 +1249,10 @@ def eval_campaign_nemotron(
         make_provider(settings), run_id=run_id, run_cap_usd=cap_usd, merge_system=True
     )
     url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
-    try:
-        with nullcontext((url, token)) if url and token else local_engine(".") as (
-            eng_url,
-            eng_token,
-        ):
-            m = measure(guard, eng_url, eng_token)
-    finally:
-        asyncio.run(guard.aclose())
+    with nullcontext((url, token)) if url and token else local_engine(".") as (eng_url, eng_token):
+        m = measure(
+            guard, eng_url, eng_token, close=True
+        )  # closes the provider inside its own event loop
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(render_markdown(m, live=True, spent_usd=guard.run_usd))
     stopped = f"; stopped: {guard.stopped_reason}" if guard.stopped_reason else ""
