@@ -42,6 +42,14 @@ EMIT_KINDS = {
     "clone_place": ({"x", "y"}, {"x", "y", "w", "h"}),  # (required, allowed)
 }
 _FORBIDDEN = {"__proto__", "constructor", "prototype"}
+# Campaign dialect (spec 7.3; opt-in via validate_rule(campaign=True)): placement/style emits, read-only facts, a built-in ask.
+CAMPAIGN_EMITS = {
+    "place": ({"x", "y", "w", "h"}, {"x", "y", "w", "h", "parent", "z"}),
+    "fit_image": ({"x", "y", "w", "h"}, {"x", "y", "w", "h"}),
+    "style": (set(), {"fontSize", "cornerRadius"}),
+}
+CAMPAIGN_FACTS = ("output_format", "overflows")
+ASK_OPTIONS = ("builtin_shrink_hero", "builtin_split_two_cards")
 
 
 class RuleError(Exception):
@@ -70,8 +78,10 @@ def _cap(x: Fraction) -> Fraction:
     return x
 
 
-def validate_rule(body: list) -> None:
-    """Static validation shared (syntax only) by the concrete and symbolic evaluators."""
+def validate_rule(body: list, *, campaign: bool = False) -> None:
+    """Static validation shared (syntax only) by the concrete and symbolic evaluators. `campaign=True` selects the campaign
+    dialect: only CAMPAIGN_EMITS kinds, the `facts` ref root and the `ask` statement (and nothing else) are added.
+    """
     nodes = 0
 
     def expr(e: Any, depth: int = 0) -> None:
@@ -96,7 +106,10 @@ def validate_rule(body: list) -> None:
             if not isinstance(ref, str) or _FORBIDDEN & set(ref.split(".")):
                 raise RuleError(f"bad ref {ref!r}")
             head = ref.split(".")[0]
-            if head not in ("objects", "canvas", "locals"):
+            if campaign and head == "facts":
+                if ref.split(".")[1:] not in ([f] for f in CAMPAIGN_FACTS):
+                    raise RuleError(f"bad facts ref {ref!r}")
+            elif head not in ("objects", "canvas", "locals"):
                 raise RuleError(f"bad ref root {head!r}")
         elif "op" in e:
             op, args = e["op"], e.get("args", [])
@@ -138,6 +151,30 @@ def validate_rule(body: list) -> None:
                 ):
                     raise RuleError("for_each iterates over {'ref':'objects'} with a var name")
                 block(s.get("body"), depth + 1)
+            elif op == "emit_target" and campaign:
+                kind = s.get("kind")
+                if kind not in CAMPAIGN_EMITS:
+                    raise RuleError(f"unknown campaign emit kind {kind!r}")
+                required, allowed = CAMPAIGN_EMITS[kind]
+                fields = set(s) - {"op", "kind", "target"}
+                if not required <= fields or not fields <= allowed or not fields:
+                    raise RuleError(
+                        f"{kind}: properties must include {sorted(required)} within {sorted(allowed)}"
+                    )
+                if "target" not in s:
+                    raise RuleError(f"{kind} needs a 'target' key")
+                expr(s["target"])
+                if "parent" in s and not isinstance(s["parent"], str):
+                    raise RuleError("parent must be a string literal")
+                if "z" in s and (
+                    isinstance(s["z"], bool) or not isinstance(s["z"], int) or s["z"] < 0
+                ):
+                    raise RuleError("z must be a non-negative int literal")
+                for k in fields - {"parent", "z"}:
+                    expr(s[k])
+            elif op == "ask" and campaign:
+                if s.get("options") != list(ASK_OPTIONS) or set(s) != {"op", "options"}:
+                    raise RuleError(f"ask offers exactly {list(ASK_OPTIONS)}")
             elif op == "emit_target":
                 kind = s.get("kind")
                 if kind not in EMIT_KINDS:

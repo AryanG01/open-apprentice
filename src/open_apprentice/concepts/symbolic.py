@@ -281,7 +281,13 @@ class _Sym:
 
 def compile_rule(body: list, objs: list[SymObj], canvas: dict) -> dict[str, dict[str, Any]]:
     """Symbolic final state: key -> {defined, x, y, w, h}. Raises Unsupported outside the subset."""
-    validate_rule(body)
+    try:
+        validate_rule(body)
+    except RuleError:
+        validate_rule(body, campaign=True)  # still invalid: the RuleError stands
+        raise Unsupported(
+            "campaign layout rules are outside the symbolic subset (spec 7.9)"
+        ) from None
     c = _Sym(objs, canvas)
     c.block(body)
     return c.state
