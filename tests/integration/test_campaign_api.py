@@ -540,3 +540,15 @@ def test_model_calls_fit_the_production_completion_floor(client):
     assert p["origin"] == "model", p["problems"]
     q = _run(client, wid, "de_long_a")
     assert q["explanation"]["origin"] == "model", q["explanation"]["problems"]
+
+
+def test_the_owner_role_table_is_keyed_like_the_mapping(client):
+    """The owner edits the mapping row by row: every row must name a layer the mapping uses, while still showing the
+    opaque label the model saw (a table keyed by L1..Ln showed every role as the first option)."""
+    client.app.state.provider = _mock(roles=_opaque_truth("untagged_short_b", "short_b"))
+    wid = _workspace(client)["workspace_id"]
+    p = client.post(
+        f"/api/campaign/workspaces/{wid}/roles", json={"fixture_id": "untagged_short_b"}
+    ).json()
+    assert {c["id"] for c in p["candidates"]} == set(p["mapping"])
+    assert sorted(c["label"] for c in p["candidates"]) == [f"L{k}" for k in range(1, 8)]

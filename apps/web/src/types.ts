@@ -404,7 +404,8 @@ export interface CampaignRun {
 }
 
 export interface CampaignRoleLayer {
-  id: string;
+  id: string; // the real layer id, as in the mapping
+  label: string; // the opaque id the model saw (L1..Ln)
   type: string;
   box: (number | null)[];
   text?: string;

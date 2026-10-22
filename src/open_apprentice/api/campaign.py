@@ -21,6 +21,7 @@ from open_apprentice.campaign.explain import explain, overflow_facts
 from open_apprentice.campaign.model_procedures import write_procedure
 from open_apprentice.campaign.roles import (
     apply_roles,
+    opaque_ids,
     check_role_mapping,
     propose_roles,
     role_candidates,
@@ -476,6 +477,12 @@ def _model(request: Request, ws: Workspace):
     return provider, []
 
 
+def _owner_candidates(scene: dict) -> list[dict]:
+    """What the model saw, keyed by the real layer id like the mapping the owner edits; `label` is the opaque id it saw."""
+    real = {v: k for k, v in opaque_ids(scene, "banner").items()}
+    return [c | {"id": real[c["id"]], "label": c["id"]} for c in role_candidates(scene, "banner")]
+
+
 @router.post("/workspaces/{wid}/roles")
 async def roles(request: Request, wid: str, body: FixtureIn) -> dict:
     _rate_limit(request, "campaign")
@@ -491,7 +498,7 @@ async def roles(request: Request, wid: str, body: FixtureIn) -> dict:
         "mapping": p.mapping,
         "origin": p.origin,
         "problems": p.problems + note,
-        "candidates": role_candidates(scene, "banner"),
+        "candidates": _owner_candidates(scene),
         "model": "on" if getattr(request.app.state, "provider", None) is not None else "off",
     }
 

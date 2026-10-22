@@ -217,10 +217,10 @@ export function CampaignLane() {
                 <tbody>
                   {roles.proposal.candidates.map((c) => (
                     <tr key={c.id}>
-                      <td>{c.id}</td>
+                      <td>{c.label}</td>
                       <td className="muted small">{c.type}{c.text ? `: ${c.text.slice(0, 60)}` : c.asset ? `: ${c.asset}` : ""}</td>
                       <td>
-                        <select aria-label={`role for ${c.id}`} value={roles.mapping[c.id] ?? ""} onChange={(e) => setRoles({ ...roles, mapping: { ...roles.mapping, [c.id]: e.target.value } })}>
+                        <select aria-label={`role for ${c.label}`} value={roles.mapping[c.id] ?? ""} onChange={(e) => setRoles({ ...roles, mapping: { ...roles.mapping, [c.id]: e.target.value } })}>
                           {ROLE_NAMES.map((r) => (
                             <option key={r} value={r}>
                               {r}
