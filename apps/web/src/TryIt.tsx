@@ -547,7 +547,7 @@ export function TryIt() {
         {repair ? (
           <>
             <p className={repair.status === "validated" ? "callout ok" : "callout bad"} role="note">
-              <strong>{repair.status === "validated" ? "Repaired." : `Repair ${repair.status}.`}</strong>{" "}
+              <strong>{repair.status === "validated" ? `Repaired by ${repair.repaired_by === "model" ? "Nemotron" : "a scripted fixture"}.` : `Repair ${repair.status}.`}</strong>{" "}
               {repair.rule_unchanged ? "Your rule and its sealed hash are byte-identical; only the native procedure changed." : "The rule hash changed, so this promotion would have been refused."}
             </p>
             <Attempts attempts={repair.attempts} />

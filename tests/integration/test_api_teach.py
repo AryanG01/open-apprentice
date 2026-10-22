@@ -55,6 +55,7 @@ def test_teach_reuse_on_both_backends_then_tool_change_then_binding_only_repair(
 
     fix = client.post(f"/api/teach/{sid}/repair").json()
     assert fix["status"] == "validated" and fix["rule_unchanged"] is True
+    assert fix["repaired_by"] == "fixture"  # reference mode never calls a model
     assert fix["concept_hash_before"] == fix["concept_hash_after"] == sealed
     assert (
         fix["attempts"][0]["failed_stage"] == "retained_in_original_env"
@@ -178,6 +179,26 @@ def test_model_mode_end_to_end_marks_model_origin_and_meters_every_call(engine_u
         assert [a["source"] for a in fix["attempts"]] == ["model", "model"] and fix["versions"][-1][
             "origin"
         ] == "model"
+        assert fix["repaired_by"] == "model"
+    finally:
+        c.__exit__(None, None, None)
+
+
+def test_failed_model_repair_reports_the_fixture_as_the_repairer(engine_url, monkeypatch):
+    from open_apprentice.api import fixtures as fx
+
+    c = _model_client(
+        engine_url, monkeypatch, _script([fx.NAIVE], [fx.HARDCODED_OFFSET])
+    )  # the "model" repair is wrong, so the labelled fixture must be the one credited
+    try:
+        sid = _teach_with_model(c)
+        c.post(
+            f"/api/teach/{sid}/run", json={"width": 300, "backend": "fabric", "tool_change": True}
+        )
+        fix = c.post(f"/api/teach/{sid}/repair").json()
+        assert fix["status"] == "validated" and fix["repaired_by"] == "fixture"
+        assert "model" in [a["source"] for a in fix["attempts"]]
+        assert any("scripted fixture repair was tried" in f for f in fix["fallbacks"])
     finally:
         c.__exit__(None, None, None)
 

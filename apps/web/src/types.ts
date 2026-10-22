@@ -230,6 +230,7 @@ export interface LiveRepair {
   meter: Meter | null;
   fallbacks: string[];
   status: string;
+  repaired_by: "model" | "fixture" | "none";
   attempts: Attempt[];
   old_program: Program;
   new_program: Program | null;

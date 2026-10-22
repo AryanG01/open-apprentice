@@ -175,7 +175,7 @@ describe("web app in a real browser", { skip: !enabled && "set OA_E2E=1 to run b
     assert.ok(await repairBtn.isEnabled(), "repair should be offered after a reproduced mismatch");
 
     await repairBtn.click();
-    await page.waitForSelector("text=/Repaired\\./", { timeout: 90_000 });
+    await page.waitForSelector("text=/Repaired by (Nemotron|a scripted fixture)\\./", { timeout: 90_000 });
     assert.match(await bodyText(page), /byte-identical/, "the rule hash must be unchanged by a repair");
     const after = await run(page, "fabric", true);
     assert.match(after, /Independent verifier\s*\|?\s*PASS/i);
@@ -227,7 +227,7 @@ describe("web app in a real browser", { skip: !enabled && "set OA_E2E=1 to run b
     const size = await page.evaluate(() => ({ w: document.documentElement.scrollWidth, h: document.documentElement.scrollHeight }));
     assert.ok(size.w <= 1280, `page is ${size.w}px wide: something overflows horizontally (the repair diff once did, by ~73,000 px)`);
     assert.ok(size.h < 5000, `page is ${size.h}px tall: something stretches it (the repair diff once made it 6,828px)`);
-    assert.match(text, /Repaired\./, "the repair result should stay on screen");
+    assert.match(text, /Repaired by (Nemotron|a scripted fixture)\./, "the repair result should stay on screen, naming who repaired it");
     assert.match(text, /Passes after the silent tool change/, "after a repair the run panel must not claim it survived without one");
     assert.doesNotMatch(text, /Survived the silent tool change/);
     assert.match(text, /Could not break it: 40 of 40/, "the stress result should stay on screen");
