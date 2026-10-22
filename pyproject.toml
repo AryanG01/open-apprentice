@@ -98,6 +98,7 @@ source_modules = [
   "open_apprentice.storage",
   "open_apprentice.drawio",
   "open_apprentice.learner",
+  "open_apprentice.campaign",
 ]
 forbidden_modules = [
   "open_apprentice.evaluation",
