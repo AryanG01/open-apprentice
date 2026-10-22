@@ -1148,6 +1148,67 @@ def eval_campaign_parity(
     )
 
 
+@eval_app.command("campaign-seal")
+def eval_campaign_seal(
+    root: Path = typer.Option(
+        Path("benchmarks/final/campaign"), "--root", help="the owner-authored private set"
+    ),
+    manifest: Path = typer.Option(
+        Path("docs/evaluation/campaign_sealed_manifest.json"),
+        "--manifest",
+        help="hash manifest to commit",
+    ),
+) -> None:
+    """Validate and seal the private campaign set: writes only file hashes (plan 9D)."""
+    from open_apprentice.evaluation.campaign_sealed import SealError, seal
+
+    try:
+        m = seal(root, manifest)
+    except SealError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1) from e
+    typer.echo(
+        f"sealed {len(m['files'])} files, combined {m['combined_sha256'][:16]}; commit {manifest} only"
+    )
+
+
+@eval_app.command("campaign-sealed-run")
+def eval_campaign_sealed_run(
+    root: Path = typer.Option(
+        Path("benchmarks/final/campaign"), "--root", help="the owner-authored private set"
+    ),
+    manifest: Path = typer.Option(
+        Path("docs/evaluation/campaign_sealed_manifest.json"),
+        "--manifest",
+        help="the committed hash manifest",
+    ),
+    out: Optional[Path] = typer.Option(
+        None, "--out", help="report directory (default results/campaign_sealed/<date>)"
+    ),
+) -> None:
+    """Run the sealed campaign set on Konva and Fabric and write the report (plan 9D)."""
+    import datetime
+    from contextlib import nullcontext
+
+    from open_apprentice.evaluation.campaign_sealed import SealError, run_sealed
+    from open_apprentice.evaluation.local_engine import local_engine
+
+    out = out or Path("results/campaign_sealed") / datetime.date.today().isoformat()
+    url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
+    try:
+        with nullcontext((url, token)) if url and token else local_engine(".") as (
+            eng_url,
+            eng_token,
+        ):
+            summary = run_sealed(root, manifest, eng_url, eng_token, out)
+    except SealError as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1) from e
+    typer.echo(
+        f"{summary['passed']} of {summary['total']} sealed rows pass; report in {out / 'report.md'}"
+    )
+
+
 def main() -> None:
     try:
         app()
