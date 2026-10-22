@@ -211,3 +211,25 @@ inventory and coverage (rotated element refused with a reason), UI tab. NOT done
 - Tests now: 381 Python (with engine), 27 Node, 9 browser; lint, black, import contracts clean.
 - **Phase C gate (free):** with the reference learner on the 12 development episodes x 2 concepts, 15 of 24 demonstrations are genuinely ambiguous (12 of 12 badge, 3 of 12 spacing; questions asked: 0 x9, 1 x11, 2 x4); the other 9 have exactly one fitting rule, so a calibrated agent should NOT ask there. Ambiguity here is defined relative to the declared rule grammar and the enumerative source's cap of 4.
 - Not done yet: Phase C (NeMo Gym environment), D, E. Nothing from this evening has been pushed to GitHub.
+
+## 2026-10-22: Plan 9A, campaign scene, fit observation, fixtures and verifier (branch `p9-promo-story-card`)
+
+Spec `docs/superpowers/specs/2026-10-22-promo-story-card-design.md`; plan `docs/superpowers/plans/2026-10-22-p9a-campaign-scene-and-verifier.md`.
+Development work only: no learner, no question, no UI, no Fabric yet (plans 9B-9D). Nothing here is a held-out or model result.
+
+### What works (each verified by running it, on Python 3.12, by the agent outside the sandbox)
+- Konva engine: `text`, `image`, `shape`, `artboard` nodes with role/link/asset/focal/format/safe/sequence metadata and explicit z;
+  sessions load the vendored Liberation Sans and two authored SVG assets (hash-checked); unknown asset id fails `INVALID_SCENE`.
+- `observe_fit` (read-only, Konva only): measured lines per text node on an unbounded clone, and `text_overflow`,
+  `word_too_wide`, `outside_safe`, `below_minimum`, `overlap` violations against caller-given limits.
+- `open_apprentice.campaign`: frozen limits, `role_map` (missing or doubled role stops with named problems), 9 development fixtures.
+- Evaluator side: 9 authored gold outputs (one "not applicable"), `text_layout` (font-table widths via `fonttools`, Konva wrap rule,
+  no kerning), `campaign_verifier.verify_story` with 15 named checks.
+- Tests: Python **1356 passed** (`OA_ENGINE_TESTS=1`, whole `tests/`), engine **49/49**, `lint-imports` 2 kept, black clean.
+  Engine and verifier agree on every line count in the fixtures and golds; every gold scene read back from Konva passes the verifier.
+
+### Limits
+- The verifier ignores kerning; a kerned line the browser fits can fail the verifier (tested deliberately). It reads the fonts from
+  `services/engine/vendor`, so it runs from the repo, not yet inside the API image.
+- Fabric has none of the new node types or `observe_fit`; its public schema hash is unchanged.
+- Browser e2e and web build were not rerun (no web change in 9A).

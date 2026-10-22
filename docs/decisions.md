@@ -295,3 +295,9 @@ three and treats a reply cut at the completion cap as an empty round instead of 
 (same prompts, same budgets: ≤ 8 attempts, retries counted). It was designed after the final rows were seen, so its
 final-split numbers are post-hoc; the unchanged A, B and D rows stay published. A pre-registered go/no-go rule on development
 episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether it is re-run on the final split.
+
+56. **Campaign lane limits and evidence axes (2026-10-22, Plan 9A).** Story artboard 1080×1920, safe insets 220/72/220/72,
+    minimums: headline/price/CTA label 40 px, legal 24 px, CTA height 96 px, hero width 432 px; gold geometry tolerance 2 px.
+    Frozen before any evaluation (spec §10). Text frames have fixed heights so gold outputs are authorable by hand. The verifier
+    measures text from the font tables with `fonttools` (new dependency) and ignores kerning; a line-count disagreement with the
+    engine fails the result. The symbolic axis is not used for this lane (spec §7.9). Public fixtures are development only.

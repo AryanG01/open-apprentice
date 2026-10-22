@@ -68,3 +68,4 @@ results/redesign/*/
 results/eval_v2/*/episodes/
 results/redesign/spend.lock
 results/demo_video/
+.superpowers/
