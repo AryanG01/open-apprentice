@@ -100,3 +100,16 @@ def test_a_word_containing_cta_is_not_a_role_mention():
         "Splitting across two cards fits.", "Splitting across two cards fits, as the facts dictate."
     )
     assert check_explanation(ok, FACTS) == []
+
+
+def test_a_rejected_model_text_is_kept_for_audit():
+    provider = MockProvider({"campaign_explain": [{"text": "The headline needs 5 lines."}]})
+    e = asyncio.run(explain(provider, Ledger(Limits(tokens=50_000, calls=2)), FACTS))
+    assert e.origin == "template" and e.rejected_text == "The headline needs 5 lines."
+
+
+def test_problem_messages_name_the_options_in_plain_words():
+    probs = check_explanation(
+        "The headline needs 317 px of 160 px and the legal line 218 px of 160 px.", FACTS
+    )
+    assert any("splitting" in p for p in probs) and not any("spliting" in p for p in probs)

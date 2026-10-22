@@ -33,6 +33,7 @@ WORDS = {
     "background": ("background",),
 }
 OUTCOME_WORDS = {SHRINK: "shrink", SPLIT: "split"}
+OUTCOME_NAMES = {SHRINK: "shrinking", SPLIT: "splitting"}
 NEGATIONS = ("not", "n't", "cannot", "too ")
 
 
@@ -45,6 +46,9 @@ class Explanation:
     text: str
     origin: str  # model | template
     problems: list[str] = field(default_factory=list)
+    rejected_text: str | None = (
+        None  # the model's wording when the check refused it, kept for audit
+    )
 
 
 def overflow_facts(run: CampaignRun, source: dict) -> dict:
@@ -147,14 +151,14 @@ def check_explanation(text: str, facts: dict) -> list[str]:
         word = OUTCOME_WORDS[outcome]
         mentions = [c for c in clauses if word in c]
         if not mentions:
-            problems.append(f"does not say whether {word}ing fits")
+            problems.append(f"does not say whether {OUTCOME_NAMES[outcome]} fits")
         for c in mentions:
             says_not = any(x in c for x in NOT_FIT)
             says_fits = any(x in c + " " for x in FIT) and not NEGATION.search(c)
             if fits and not says_fits:
-                problems.append(f"does not say plainly that {word}ing fits")
+                problems.append(f"does not say plainly that {OUTCOME_NAMES[outcome]} fits")
             if not fits and not says_not:
-                problems.append(f"suggests {word}ing works, but it does not fit")
+                problems.append(f"suggests {OUTCOME_NAMES[outcome]} works, but it does not fit")
     return problems
 
 
@@ -175,5 +179,5 @@ async def explain(provider: Provider | None, ledger: Ledger | None, facts: dict)
         return Explanation(fallback, "template", [res.error or "no reply"])
     problems = check_explanation(res.parsed.text, facts)
     if problems:
-        return Explanation(fallback, "template", problems)
+        return Explanation(fallback, "template", problems, res.parsed.text)
     return Explanation(res.parsed.text, "model")

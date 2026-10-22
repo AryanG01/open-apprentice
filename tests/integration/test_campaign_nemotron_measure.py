@@ -76,3 +76,24 @@ def test_the_provider_is_closed_inside_the_measurements_own_event_loop(engine_ur
     measure(provider, engine_url, TOKEN, close=True)
     closed = [x for x in Closing.loops if isinstance(x, tuple)]
     assert len(closed) == 1 and closed[0][1] is Closing.loops[0]  # same loop as the calls
+
+
+def test_rejected_wording_appears_in_the_table():
+    from open_apprentice.evaluation.campaign_nemotron import render_markdown
+
+    m = {
+        "model": "m",
+        "tokens": 1,
+        "roles": [],
+        "procedures": [],
+        "explanations": [
+            {
+                "banner": "b",
+                "origin": "template",
+                "text": "t",
+                "rejected_because": ["x"],
+                "rejected_text": "MODEL SAID THIS",
+            }
+        ],
+    }
+    assert "MODEL SAID THIS" in render_markdown(m, live=False)

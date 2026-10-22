@@ -82,14 +82,13 @@ What is and is not shown:
   labelled as such. NVIDIA Nemotron-3-Super (Nebius Token Factory) does three checked jobs here, each with a labelled
   fallback: it proposes roles for banners that arrive untagged (the owner confirms them), words the overflow question
   (used only if every number and element matches the measured facts), and writes the native procedure for Konva and
-  Fabric (used only if the independent verifier passes it on a seen banner and two new ones). One live measurement
-  ([`docs/evaluation/campaign_nemotron.md`](docs/evaluation/campaign_nemotron.md), about $0.10 over three runs): roles 6 of 6, the same as a
-  simple heuristic (no measured gain on these banners); its explanations passed the fact check 3 of 3 in one run and 2 of
-  3 in another; its procedures were accepted on the first attempt on both engines, but they are essentially what the
-  prompt's input contract dictates (the Konva one is identical to our reference), so this shows contract-following, not
-  procedure design. Development fixtures only, and measured with a setup the final review then tightened (the role
-  prompt's layer ids named the roles; one "new" acceptance banner had been shown as an example), so these numbers need a
-  rerun before they are quoted.
+  Fabric (used only if the independent verifier passes it on a seen banner and two unseen ones). Latest live
+  measurement ([`docs/evaluation/campaign_nemotron.md`](docs/evaluation/campaign_nemotron.md), run 4 of 4 on
+  development fixtures): roles 6 of 6 with opaque layer ids (a simple heuristic also gets 6 of 6, so no gain is
+  shown); explanations 0 of 3 accepted under the strict fact check (the template was shown); procedures accepted on
+  both engines (first and second attempt), but they follow the prompt's input contract almost verbatim, so this shows
+  contract-following, not procedure design. A procedure request can cost about $0.25 because the model's reasoning is
+  not bounded by its token limit.
 - The same learned rule runs on real Konva and real Fabric through the same restricted procedure:
   [`docs/evaluation/campaign_parity.md`](docs/evaluation/campaign_parity.md) (16 of 16 verifier rows pass).
 - Those are **public development fixtures, not held out**. A private sealed set for a generalization claim has tooling

@@ -347,3 +347,10 @@ Plan `docs/superpowers/plans/2026-10-22-p9e-campaign-nemotron.md`.
   the acceptance banners; the procedure check never raises; model use is scarce per address (6/hour), workspace
   limits are lower, an accepted procedure is reused server-wide, and a model procedure that fails on a banner falls back
   to the reference. Python 1518 passed, engine 83/83, e2e 13/13. **The committed measurement predates these fixes.**
+- **Run 4 under the fixed setup (2026-10-22, Super, owner-approved): $0.255 ledger**, 8x the estimate: two Fabric
+  procedure calls ran ~35k reasoning tokens each into the completion limit ($0.22). Roles 6/6 (opaque ids; heuristic
+  also 6/6); explanations 0/3 accepted (rejected text not recorded in that run; now recorded); procedures accepted on
+  Konva (attempt 1) and Fabric (attempt 2). All four runs: $0.358 ledger (~$0.40 real), balance ~ $11.97 (to confirm).
+- **Before deploying 9E with model mode on:** one procedure request can cost ~$0.25, and the per-workspace token ledger
+  learns this only after the call (the guard prices calls at max_tokens). Either keep the procedure endpoint's model
+  path off in production, or bound reasoning (lower reasoning effort for the `campaign_procedure` role) and re-measure.

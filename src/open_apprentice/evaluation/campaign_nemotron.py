@@ -91,7 +91,13 @@ async def measure_async(provider: Provider, engine_url: str, token: str) -> dict
         run = await asyncio.to_thread(question, f)
         e = await explain(provider, ledger, overflow_facts(run, f["scene"]))
         explanations.append(
-            {"banner": fid, "origin": e.origin, "text": e.text, "rejected_because": e.problems}
+            {
+                "banner": fid,
+                "origin": e.origin,
+                "text": e.text,
+                "rejected_because": e.problems,
+                "rejected_text": e.rejected_text,
+            }
         )
     procedures = []
     for backend in ("konva", "fabric"):
@@ -157,6 +163,10 @@ def render_markdown(m: dict, *, live: bool, spent_usd: float | None = None) -> s
         f"| {e['banner']} | {e['origin']} | {e['text']} | {'; '.join(e['rejected_because']) or '-'} |"
         for e in ex
     ]
+    rejected = [e for e in ex if e.get("rejected_text")]
+    if rejected:
+        lines += ["", "Nemotron's rejected wording (kept for audit):", ""]
+        lines += [f"- {e['banner']}: {e['rejected_text']}" for e in rejected]
     lines += [
         "",
         "## Native procedures (accepted only if the verifier passes a seen banner and two new ones)",

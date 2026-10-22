@@ -5,7 +5,7 @@
    "over": {
     "ref": "inputs.artboards"
    },
-   "var": "it",
+   "var": "ab",
    "body": [
     {
      "op": "call",
@@ -15,7 +15,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "artboard_id"
        ]
@@ -24,7 +24,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "x"
        ]
@@ -33,7 +33,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "y"
        ]
@@ -42,7 +42,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "width"
        ]
@@ -51,7 +51,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "height"
        ]
@@ -60,7 +60,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "format"
        ]
@@ -69,7 +69,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "safe"
        ]
@@ -78,7 +78,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.ab"
         },
         "sequence"
        ]
@@ -92,7 +92,7 @@
    "over": {
     "ref": "inputs.clones"
    },
-   "var": "it",
+   "var": "cl",
    "body": [
     {
      "op": "call",
@@ -102,7 +102,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cl"
         },
         "node_id"
        ]
@@ -111,7 +111,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cl"
         },
         "new_id"
        ]
@@ -125,7 +125,7 @@
    "over": {
     "ref": "inputs.reparents"
    },
-   "var": "it",
+   "var": "rp",
    "body": [
     {
      "op": "call",
@@ -135,7 +135,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.rp"
         },
         "node_ids"
        ]
@@ -144,7 +144,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.rp"
         },
         "parent_id"
        ]
@@ -158,7 +158,7 @@
    "over": {
     "ref": "inputs.moves"
    },
-   "var": "it",
+   "var": "mv",
    "body": [
     {
      "op": "call",
@@ -168,7 +168,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.mv"
         },
         "node_id"
        ]
@@ -177,7 +177,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.mv"
         },
         "x"
        ]
@@ -186,7 +186,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.mv"
         },
         "y"
        ]
@@ -200,7 +200,7 @@
    "over": {
     "ref": "inputs.resizes"
    },
-   "var": "it",
+   "var": "rs",
    "body": [
     {
      "op": "call",
@@ -210,7 +210,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.rs"
         },
         "node_id"
        ]
@@ -219,7 +219,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.rs"
         },
         "width"
        ]
@@ -228,7 +228,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.rs"
         },
         "height"
        ]
@@ -242,7 +242,7 @@
    "over": {
     "ref": "inputs.contains"
    },
-   "var": "it",
+   "var": "cn",
    "body": [
     {
      "op": "call",
@@ -252,7 +252,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cn"
         },
         "node_id"
        ]
@@ -261,7 +261,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cn"
         },
         "x"
        ]
@@ -270,7 +270,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cn"
         },
         "y"
        ]
@@ -279,7 +279,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cn"
         },
         "width"
        ]
@@ -288,7 +288,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.cn"
         },
         "height"
        ]
@@ -302,7 +302,7 @@
    "over": {
     "ref": "inputs.styles"
    },
-   "var": "it",
+   "var": "st",
    "body": [
     {
      "op": "call",
@@ -312,7 +312,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.st"
         },
         "node_id"
        ]
@@ -321,7 +321,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.st"
         },
         "style"
        ]
@@ -335,7 +335,7 @@
    "over": {
     "ref": "inputs.orders"
    },
-   "var": "it",
+   "var": "or",
    "body": [
     {
      "op": "call",
@@ -345,7 +345,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.or"
         },
         "node_id"
        ]
@@ -354,7 +354,7 @@
        "op": "get",
        "args": [
         {
-         "ref": "locals.it"
+         "ref": "locals.or"
         },
         "z"
        ]
@@ -738,40 +738,13 @@
    ]
   },
   {
-   "op": "if",
-   "cond": {
-    "op": "ne",
-    "args": [
-     {
-      "ref": "inputs.source_artboard"
-     },
-     ""
-    ]
-   },
-   "then": [
-    {
-     "op": "call",
-     "tool": "remove_artboard",
-     "args": {
-      "artboard_id": {
-       "ref": "inputs.source_artboard"
-      }
-     }
+   "op": "call",
+   "tool": "remove_artboard",
+   "args": {
+    "artboard_id": {
+     "ref": "inputs.source_artboard"
     }
-   ]
-  },
-  {
-   "op": "if",
-   "cond": {
-    "op": "eq",
-    "args": [
-     {
-      "ref": "inputs.source_artboard"
-     },
-     ""
-    ]
-   },
-   "then": []
+   }
   }
  ]
 }
