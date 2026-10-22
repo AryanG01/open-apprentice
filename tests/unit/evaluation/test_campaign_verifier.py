@@ -161,3 +161,45 @@ def test_unexpected_extra_node_fails_non_writable_unchanged():
         )
 
     _fails("non_writable_unchanged", "short_a", "layout", m)
+
+
+# Final review fixes (scale, safe-area source, no-break spaces).
+def test_scaled_down_legal_fails_minimum_sizes():
+    _fails(
+        "minimum_sizes",
+        "short_a",
+        "layout",
+        lambda s: _node(s, "legal").update(scaleX=0.5, scaleY=0.5),
+    )
+
+
+def test_squashing_scale_fails_image_aspect():
+    _fails(
+        "image_aspect", "short_a", "layout", lambda s: _node(s, "product_image").update(scaleY=0.5)
+    )
+
+
+def test_scaled_up_image_pushes_focal_off_card():
+    _fails(
+        "focal_visible",
+        "short_a",
+        "layout",
+        lambda s: _node(s, "product_image").update(scaleX=3, scaleY=3),
+    )
+
+
+def test_missing_safe_metadata_does_not_switch_off_inside_safe():
+    def m(s):
+        del next(n for n in s["nodes"] if n["id"] == "story-1")["safe"]
+        _node(s, "brand_mark").update(y=100)
+
+    _fails("inside_safe", "short_a", "layout", m)
+
+
+def test_altered_safe_metadata_fails_card_sequence():
+    _fails(
+        "card_sequence",
+        "short_a",
+        "layout",
+        lambda s: next(n for n in s["nodes"] if n["id"] == "story-1").update(safe={}),
+    )

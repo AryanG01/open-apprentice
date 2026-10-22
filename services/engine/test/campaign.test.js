@@ -119,3 +119,28 @@ test("minimum sizes are enforced", async () => {
   assert.ok(kinds(r).includes("below_minimum:legal"), kinds(r).join());
   assert.ok(kinds(r).includes("below_minimum:hero"), kinds(r).join());
 });
+
+// Final review fixes.
+test("a no-break-space run is one word for word_too_wide", async () => {
+  const { r } = await fit(variant((n) => { n.price.width = 300; n.price.height = 400; n.price.text = "49,99 € statt 79,99 €"; }));
+  assert.ok(kinds(r).includes("word_too_wide:price"), kinds(r).join());
+});
+
+test("scaled-down legal text is below the minimum", async () => {
+  const { r } = await fit(variant((n) => { n.legal.scaleX = 0.5; n.legal.scaleY = 0.5; }));
+  assert.ok(kinds(r).includes("below_minimum:legal"), kinds(r).join());
+});
+
+test("observe_fit refuses incomplete limits instead of skipping checks", async () => {
+  const s = await mk(FULL);
+  const { min_font, ...partial } = LIMITS;
+  const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: partial });
+  assert.equal(r.ok, false);
+  assert.equal(r.error.code, "INVALID_ARGUMENT");
+});
+
+test("text in a font the verifier cannot measure is refused", async () => {
+  for (const edit of [(n) => { n.head.fontFamily = "Arial"; }, (n) => { n.head.fontStyle = "italic"; }]) {
+    await assert.rejects(eng.create(variant(edit), { owner: "u1" }), (e) => e.code === "INVALID_SCENE");
+  }
+});

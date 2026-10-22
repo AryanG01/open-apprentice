@@ -61,6 +61,9 @@
       node = new Konva.Rect({ ...common, ...box, fill: spec.fill, stroke: spec.stroke, strokeWidth: spec.strokeWidth ?? 0, cornerRadius: spec.cornerRadius ?? 0 });
       if (type === "shape") node.setAttr("oaType", "shape");
     } else if (type === "text") {
+      // Only the vendored font is measurable by the independent verifier; anything else would be a silent fallback.
+      if (spec.fontFamily !== "Liberation Sans") throw new ToolError("INVALID_SCENE", "text must use the vendored Liberation Sans");
+      if (!["normal", "bold", undefined].includes(spec.fontStyle)) throw new ToolError("INVALID_SCENE", "fontStyle must be normal or bold");
       node = new Konva.Text({ ...common, ...box, text: spec.text, fontFamily: spec.fontFamily, fontSize: spec.fontSize,
         fontStyle: spec.fontStyle ?? "normal", lineHeight: spec.lineHeight ?? 1, align: spec.align ?? "left", wrap: spec.wrap ?? "word", fill: spec.fill });
     } else if (type === "image") {
@@ -196,7 +199,9 @@
     observe_fit: ({ artboard_id, limits }) => {
       const ab = find(artboard_id);
       if (kind(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "artboard_id must name an artboard");
-      if (typeof limits !== "object" || limits === null || typeof limits.safe !== "object") throw new ToolError("INVALID_ARGUMENT", "limits");
+      if (typeof limits !== "object" || limits === null || typeof limits.safe !== "object" || limits.safe === null) throw new ToolError("INVALID_ARGUMENT", "limits");
+      for (const k of ["min_font", "min_legal_font", "min_cta_height", "min_hero_width"]) num(limits[k], `limits.${k}`);
+      for (const k of ["top", "right", "bottom", "left"]) num(limits.safe[k], `limits.safe.${k}`);
       const nodes = ab.find((n) => Boolean(n.id()));
       const violations = [];
       const flag = (k, n, detail) => violations.push({ kind: k, node_id: n.id(), detail });
@@ -210,25 +215,27 @@
         probe.destroy();
         if (out.text_height > out.frame_height) flag("text_overflow", n, `${out.text_height} > ${out.frame_height}`);
         ctx.font = `${n.fontStyle()} ${n.fontSize()}px "${n.fontFamily()}"`;
-        const wide = n.text().split(/\s+/).find((w) => ctx.measureText(w).width > n.width());
+        // Split only where the wrap may break (a space): a no-break-space run is one unbreakable word.
+        const wide = n.text().split(/[ \n]/).find((w) => ctx.measureText(w).width > n.width());
         if (wide !== undefined) flag("word_too_wide", n, wide.slice(0, 60));
         return out;
       });
       const rect = (n) => n.getClientRect({ relativeTo: ab, skipShadow: true, skipStroke: true });
       const roled = nodes.filter((n) => n.getAttr("role") && n.getAttr("role") !== "background");
       const W = ab.width(), H = ab.height(), sf = limits.safe;
+      const fontPx = (n) => n.fontSize() * (n.getAbsoluteScale().y / ab.getAbsoluteScale().y);
       for (const n of roled) {
         const r = rect(n);
         if (r.x < sf.left || r.y < sf.top || r.x + r.width > W - sf.right || r.y + r.height > H - sf.bottom) flag("outside_safe", n, r);
         const role = n.getAttr("role");
-        if (role === "legal" && n.fontSize() < limits.min_legal_font) flag("below_minimum", n, "legal font");
-        if ((role === "headline" || role === "price") && n.fontSize() < limits.min_font) flag("below_minimum", n, "font");
+        if (role === "legal" && fontPx(n) < limits.min_legal_font) flag("below_minimum", n, "legal font");
+        if ((role === "headline" || role === "price") && fontPx(n) < limits.min_font) flag("below_minimum", n, "font");
         if (role === "cta" && r.height < limits.min_cta_height) flag("below_minimum", n, "cta height");
         if (role === "product_image" && r.width < limits.min_hero_width) flag("below_minimum", n, "hero width");
       }
       for (const n of nodes) {
         const owner = n.getParent();
-        if (kind(n) === "text" && owner.getAttr("role") === "cta" && n.fontSize() < limits.min_font) flag("below_minimum", n, "cta label font");
+        if (kind(n) === "text" && owner.getAttr("role") === "cta" && fontPx(n) < limits.min_font) flag("below_minimum", n, "cta label font");
       }
       for (let i = 0; i < roled.length; i++) {
         for (let j = i + 1; j < roled.length; j++) {

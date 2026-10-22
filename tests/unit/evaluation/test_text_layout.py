@@ -30,3 +30,7 @@ def test_bold_is_wider_than_regular():
 def test_tampered_font_hash_is_refused():
     with pytest.raises(ValueError, match="hash"):
         text_layout._load_font("LiberationSans-Regular.ttf", "0" * 64)
+
+
+def test_no_break_space_run_counts_as_one_word():
+    assert fit("49,99 € statt 79,99 €", 300, 56, True, 1.1).word_too_wide

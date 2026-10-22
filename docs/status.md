@@ -233,3 +233,8 @@ Development work only: no learner, no question, no UI, no Fabric yet (plans 9B-9
   `services/engine/vendor`, so it runs from the repo, not yet inside the API image.
 - Fabric has none of the new node types or `observe_fit`; its public schema hash is unchanged.
 - Browser e2e and web build were not rerun (no web change in 9A).
+- **9B prerequisite (from the 9A review):** the verifier reads fonts from `services/engine/vendor`; copy `fonts/`, `assets/` and
+  `MANIFEST.json` into the API image (or make the path configurable) before any API route calls `verify_story`.
+- Final review fixes: the verifier and `observe_fit` apply node and group scale to font sizes, image aspect and focal point;
+  safe areas come from the frozen limits, not the result's own metadata; a no-break-space run counts as one word; `observe_fit`
+  refuses incomplete limits; text must use Liberation Sans, normal or bold. Python 1362 passed, engine 53/53.

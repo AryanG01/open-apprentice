@@ -14,6 +14,7 @@ from open_apprentice.campaign.limits import (
     MIN_FONT,
     MIN_HERO_W,
     MIN_LEGAL_FONT,
+    SAFE,
     STORY_H,
     STORY_W,
 )
@@ -60,6 +61,20 @@ def _box(nodes: list[Node], n: Node) -> Box:
         x1, y1 = max(k[0] + k[2] for k in kids), max(k[1] + k[3] for k in kids)
         return (n["x"] + x0 * sx, n["y"] + y0 * sy, (x1 - x0) * sx, (y1 - y0) * sy)
     return (n["x"], n["y"], n["width"] * sx, n["height"] * sy)
+
+
+def _scale(nodes: list[Node], n: Node | None) -> tuple[float, float]:
+    """Effective scale of n inside its card: its own scale times every ancestor group's (the card itself is unscaled)."""
+    by_id = {m["id"]: m for m in nodes}
+    sx = sy = 1.0
+    while n is not None and n["type"] != "artboard":
+        sx, sy = sx * n.get("scaleX", 1), sy * n.get("scaleY", 1)
+        n = by_id.get(n.get("parent"))
+    return sx, sy
+
+
+def _font_px(nodes: list[Node], n: Node) -> float:
+    return n["fontSize"] * _scale(nodes, n)[1]
 
 
 def _roled(nodes: list[Node], card: Node) -> dict[str, list[Node]]:
@@ -145,10 +160,12 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
     bad_aspect = []
     for n in images:
         a = assets.get(n.get("asset"))
+        sx, sy = _scale(fin, n)
+        h = n["height"] * sy
         if (
             a is None
-            or n["height"] == 0
-            or abs((n["width"] / n["height"]) / (a["width"] / a["height"]) - 1) > ASPECT_REL_TOL
+            or h == 0
+            or abs((n["width"] * sx / h) / (a["width"] / a["height"]) - 1) > ASPECT_REL_TOL
         ):
             bad_aspect.append(n["id"])
     rep.add("image_aspect", not bad_aspect, str(bad_aspect))
@@ -167,10 +184,9 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
         if a is None or card is None or f is None:
             hidden.append(n["id"])
             continue
-        fx, fy = (
-            n["x"] + f["x"] * n["width"] / a["width"],
-            n["y"] + f["y"] * n["height"] / a["height"],
-        )
+        sx, sy = _scale(fin, n)
+        fx = n["x"] + f["x"] * n["width"] * sx / a["width"]
+        fy = n["y"] + f["y"] * n["height"] * sy / a["height"]
         if not (0 <= fx <= card["width"] and 0 <= fy <= card["height"]):
             hidden.append(n["id"])
     rep.add("focal_visible", not hidden, str(hidden))
@@ -184,7 +200,9 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
 
     seqs = [c.get("sequence") for c in cards]
     shaped = all(
-        (c["width"], c["height"], c.get("format")) == (STORY_W, STORY_H, "9:16") for c in cards
+        (c["width"], c["height"], c.get("format"), c.get("safe"))
+        == (STORY_W, STORY_H, "9:16", SAFE)
+        for c in cards
     )
     rep.add(
         "card_sequence",
@@ -194,7 +212,7 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
 
     outside = []
     for c in cards:
-        sf = c.get("safe") or {}
+        sf = SAFE  # the frozen limits, never the result's own metadata
         for nodes in by_card[c["id"]].values():
             for n in nodes:
                 x, y, w, h = _box(fin, n)
@@ -210,12 +228,12 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
     for c in cards:
         roles = by_card[c["id"]]
         for r in ("headline", "price"):
-            small += [n["id"] for n in roles.get(r, []) if n["fontSize"] < MIN_FONT]
-        small += [n["id"] for n in roles.get("legal", []) if n["fontSize"] < MIN_LEGAL_FONT]
+            small += [n["id"] for n in roles.get(r, []) if _font_px(fin, n) < MIN_FONT]
+        small += [n["id"] for n in roles.get("legal", []) if _font_px(fin, n) < MIN_LEGAL_FONT]
         small += [n["id"] for n in roles.get("product_image", []) if _box(fin, n)[2] < MIN_HERO_W]
         for cta in roles.get("cta", []):
             label = _cta_label(fin, cta)
-            if _box(fin, cta)[3] < MIN_CTA_H or label is None or label["fontSize"] < MIN_FONT:
+            if _box(fin, cta)[3] < MIN_CTA_H or label is None or _font_px(fin, label) < MIN_FONT:
                 small.append(cta["id"])
     rep.add("minimum_sizes", not small, str(small))
 

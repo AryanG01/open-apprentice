@@ -81,5 +81,8 @@ class Fit:
 
 def fit(text: str, width: float, font_size: float, bold: bool, line_height: float) -> Fit:
     lines = wrap(text, width, font_size, bold)
-    wide = any(advance_width(w, font_size, bold) > width for w in text.split())
+    # Tokens split only where the wrap may break (a space), so a no-break-space run counts as one unbreakable word.
+    wide = any(
+        advance_width(w, font_size, bold) > width for w in text.replace("\n", " ").split(" ")
+    )
     return Fit(lines, len(lines) * font_size * line_height, wide)
