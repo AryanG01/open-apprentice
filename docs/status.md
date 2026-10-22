@@ -295,3 +295,25 @@ Plan `docs/superpowers/plans/2026-10-22-p9c-campaign-api-and-tab.md`. Developmen
 - The uncommitted `repaired_by` change renames "Repaired." to "Repaired by …"; two Try-it-live e2e tests expect "Repaired."
   and must be updated with it. (Its `api/teach.py` line was committed by mistake inside the 9C workspace commit; harmless.)
 - Preferences are scoped to a workspace (one teaching), not to a signed-in owner.
+
+## 2026-10-22: Plan 9D, Fabric parity and sealed-set tooling (branch `p9d-fabric-parity`)
+
+Plan `docs/superpowers/plans/2026-10-22-p9d-fabric-parity-and-sealed-set.md`.
+
+### What works (verified by running it, on Python 3.12, by the agent outside the sandbox)
+- Fabric campaign scenes as real Fabric objects (cards and the CTA as `fabric.Group`, `Textbox`, `FabricImage`, rounded
+  `Rect`), `observe_fit`, and the campaign tools; the badge lane's flat-rect Fabric path and its private drift unchanged.
+- The verifier composes Fabric's centre-frame positions and natural-size-plus-scale images itself.
+- Parity: one learned rule, same reference procedure, every development fixture/outcome on both engines:
+  `docs/evaluation/campaign_parity.md` (16 of 16 verifier rows pass; run status identical per banner).
+- The Campaign tab and API take `konva` or `fabric`.
+- Sealed-set tooling: validate, seal (hash manifest), run on both engines, report. Tested on a toy set only.
+- Tests: Python **1456 passed** (`OA_ENGINE_TESTS=1`), engine **81/81**, browser e2e **13 passed, 0 failed**, web lint
+  0 errors (1 pre-existing warning), `lint-imports` 2 kept, black clean.
+
+### Open
+- **Owner step:** author at least 6 held-out banners with gold under the private folder (see
+  `docs/evaluation/campaign_sealed_howto.md`), seal, commit the manifest; then run `oa eval campaign-sealed-run`.
+  Until then there is no held-out result and no generalization claim.
+- Fabric text height uses Fabric's own metrics (a 1.13 font-size multiplier); every gold still fits, but the margin is
+  smaller on Fabric than on Konva.

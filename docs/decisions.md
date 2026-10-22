@@ -313,3 +313,10 @@ episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether i
     state) and closed, so a pending question costs no engine capacity. The commit gate is the independent verifier against the
     authored development gold; with no gold a result is `blocked`, so the lane only runs development fixtures until a
     gold-free product gate is designed.
+
+59. **Campaign lane on Fabric (2026-10-22, Plan 9D).** Fabric scenes keep Fabric's own semantics: group children are stored
+    in the group's centre frame and images at natural size with a scale; `nativeState` reports them raw with a `frame` tag
+    and the independent verifier composes them. Cards use a layout that runs only at creation (a child's relayout must not
+    move the card); the CTA group fits its content. Campaign mode switches on only for scenes with an artboard, so the badge
+    lane's Fabric subset and drift are unchanged. Parity is measured on development fixtures only; the held-out set is
+    owner-authored and sealed by hash before any run.

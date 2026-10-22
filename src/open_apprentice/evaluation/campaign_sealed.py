@@ -1,5 +1,6 @@
 """Private sealed set for the campaign lane (spec 7.8, 7.9; plan 9D). The banners and their gold are authored by the owner
-under benchmarks/final/campaign/ (git-ignored); only a hash manifest is committed. This module validates, seals and runs
+in the private, git-ignored folder the CLI passes in (docs/evaluation/campaign_sealed_howto.md); only a hash manifest
+is committed. This module validates, seals and runs
 the set; it never generates any of its contents. Agent-visible packages never import it (import-linter)."""
 
 from __future__ import annotations

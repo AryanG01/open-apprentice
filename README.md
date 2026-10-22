@@ -69,6 +69,23 @@ npm test -w services/engine && npm run build:web && npm run test:e2e          # 
 uv run oa eval report --help                                                  # rebuild the evaluation report from stored rows
 ```
 
+## Campaign lane: banner to story card (development, Konva and Fabric)
+
+The "Campaign" tab teaches a compound layout change once: a layered 16:9 promo banner (logo, product image, headline, price,
+CTA, legal line) becomes a 1080x1920 story card. Reused on other banners by role, not by coordinates. When the copy does not
+fit, it stops and shows two **built-in** outcomes, already applied (shrink the product image, or split across two cards), and
+saves your choice per language. Every result it applies passes an independent verifier (exact copy, link, logo, image
+aspect, safe areas, minimum sizes, text fit measured from the font tables, and the authored expected output) first.
+
+What is and is not shown:
+- The layout is learned by search from one example; no language model is used in this lane, and the two overflow outcomes
+  are fixed reference procedures, labelled as such.
+- The same learned rule runs on real Konva and real Fabric through the same restricted procedure:
+  [`docs/evaluation/campaign_parity.md`](docs/evaluation/campaign_parity.md) (16 of 16 verifier rows pass).
+- Those are **public development fixtures, not held out**. A private sealed set for a generalization claim has tooling
+  (`oa eval campaign-seal`, `oa eval campaign-sealed-run`, [how-to](docs/evaluation/campaign_sealed_howto.md)) but has
+  not been authored or run yet, so no generalization is claimed.
+
 ## Earlier work in this repository
 
 The sections below describe the earlier badge/Konva-Fabric prototype, the NeMo Gym environment and the label-program research line. They are still true of the code
