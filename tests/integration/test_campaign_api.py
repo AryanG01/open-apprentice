@@ -70,3 +70,152 @@ def test_the_oldest_workspace_is_evicted_past_the_cap(client):
     for _ in range(20):
         _workspace(client)
     assert client.get(f"/api/campaign/workspaces/{first}/preferences").status_code == 404
+
+
+SHRINK, SPLIT = "builtin_shrink_hero", "builtin_split_two_cards"
+
+
+def _run(c, wid, fid, status=200):
+    r = c.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": fid})
+    assert r.status_code == status, r.text
+    assert _engine_sessions(c) == 0  # every session was snapshotted and closed
+    return r.json()
+
+
+def _answer(c, wid, rid, choice, expected_version=None, status=200):
+    r = c.post(
+        f"/api/campaign/workspaces/{wid}/runs/{rid}/answer",
+        json={"choice": choice, "expected_version": expected_version},
+    )
+    assert r.status_code == status, r.text
+    assert _engine_sessions(c) == 0
+    return r.json()
+
+
+def _passed(out):
+    v = out["result"]["verification"]
+    assert v["passed"] and len(v["checks"]) == 15, v
+    assert out["result"]["png"].startswith("data:image/png")
+
+
+def test_runs_questions_answers_and_reuse(client):
+    wid = _workspace(client)["workspace_id"]
+    out = _run(client, wid, "short_a")
+    assert out["status"] == "ready" and out["provenance"]["procedure_origin"] == "reference"
+    _passed(out)
+
+    q = _run(client, wid, "de_long_a")
+    assert q["status"] == "question" and q["result"] is None
+    previews = {p["outcome"]: p for p in q["previews"]}
+    assert previews[SHRINK]["fits"] and previews[SPLIT]["fits"]
+    assert all(
+        p["origin"] == "builtin" and p["png"].startswith("data:image/png") for p in q["previews"]
+    )
+    a = _answer(client, wid, q["run_id"], SHRINK)
+    assert a["status"] == "applied" and a["preference"] == {"outcome": SHRINK, "version": 1}
+    _passed(a)
+    _answer(client, wid, q["run_id"], SHRINK, status=409)  # answered already
+
+    q = _run(client, wid, "de_long_b")
+    previews = {p["outcome"]: p for p in q["previews"]}
+    assert q["status"] == "question" and not previews[SHRINK]["fits"] and previews[SPLIT]["fits"]
+    _answer(client, wid, q["run_id"], SHRINK, status=409)  # does not fit
+    a = _answer(client, wid, q["run_id"], SPLIT, expected_version=1)
+    assert a["preference"] == {"outcome": SPLIT, "version": 2}
+    _passed(a)
+
+    reuse = _run(client, wid, "de_long_a")
+    assert (
+        reuse["status"] == "applied"
+        and reuse["previews"] == []
+        and reuse["preference"]["outcome"] == SPLIT
+    )
+    _passed(reuse)
+
+    assert _run(client, wid, "fr_long")["status"] == "question"
+    broken = _run(client, wid, "missing_role")
+    assert broken["status"] == "needs_roles" and any("price" in p for p in broken["problems"])
+
+    prefs = {
+        s["locale"]: s
+        for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]
+    }
+    assert prefs["de"]["active"] == {"outcome": SPLIT, "version": 2} and [
+        h["version"] for h in prefs["de"]["history"]
+    ] == [1, 2]
+    r = client.post(
+        f"/api/campaign/workspaces/{wid}/preferences/rollback",
+        json={"locale": "de", "to_version": 1, "expected_version": 2},
+    )
+    assert r.status_code == 200 and r.json()["active"] == {"outcome": SHRINK, "version": 1}
+    stale = client.post(
+        f"/api/campaign/workspaces/{wid}/preferences/rollback",
+        json={"locale": "de", "to_version": 2, "expected_version": 2},
+    )
+    assert stale.status_code == 409
+
+
+def test_an_expired_workspace_cannot_answer(client):
+    wid = _workspace(client)["workspace_id"]
+    q = _run(client, wid, "de_long_a")
+    client.app.state.campaign[wid].touched -= 3600
+    r = client.post(
+        f"/api/campaign/workspaces/{wid}/runs/{q['run_id']}/answer",
+        json={"choice": SHRINK, "expected_version": None},
+    )
+    assert r.status_code == 404
+
+
+def test_a_result_without_gold_is_blocked_not_applied(client, monkeypatch):
+    import open_apprentice.api.campaign as campaign_api
+
+    monkeypatch.setattr(campaign_api, "_gold", lambda fid, outcome: None)
+    wid = _workspace(client)["workspace_id"]
+    out = _run(client, wid, "short_a")
+    assert out["status"] == "blocked"
+    assert "matches_gold" in out["result"]["verification"]["failed"]
+    q = _run(client, wid, "de_long_a")
+    blocked = _answer(client, wid, q["run_id"], SHRINK)
+    assert (
+        blocked["status"] == "blocked" and blocked["preference"] is None
+    )  # nothing saved for a refused result
+    prefs = {
+        s["locale"]: s
+        for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]
+    }
+    assert prefs["de"]["active"] is None
+
+
+def test_unknown_banner_is_404(client):
+    wid = _workspace(client)["workspace_id"]
+    assert (
+        client.post(
+            f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "teach_after"}
+        ).status_code
+        == 404
+    )
+    assert (
+        client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "../x"}).status_code
+        == 404
+    )
+
+
+def test_an_engine_at_its_session_cap_is_a_503_and_a_retry_works(client, monkeypatch):
+    import open_apprentice.api.campaign as campaign_api
+
+    wid = _workspace(client)["workspace_id"]
+    real, calls = campaign_api._open, []
+
+    def capped(harness, scene):
+        calls.append(1)
+        if len(calls) == 1:
+            raise campaign_api.HTTPException(
+                503, "the graphics engine is busy or unavailable; try again shortly"
+            )
+        return real(harness, scene)
+
+    monkeypatch.setattr(campaign_api, "_open", capped)
+    r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a"})
+    assert r.status_code == 503 and "busy" in r.json()["detail"]
+    assert _engine_sessions(client) == 0
+    assert _run(client, wid, "short_a")["status"] == "ready"
