@@ -356,3 +356,14 @@ Plan `docs/superpowers/plans/2026-10-22-p9e-campaign-nemotron.md`.
   path off in production, or bound reasoning (lower reasoning effort for the `campaign_procedure` role) and re-measure.
 - Decision (owner, 2026-10-22): Nemotron-written procedures are **off by default** on any server
   (`CAMPAIGN_MODEL_PROCEDURES=1` turns them on); role proposals and explanations stay on with model mode.
+
+## 2026-10-22: Campaign lane deployed
+
+- Production revision `open-apprentice-00030-vel` (image `prod-5a378e6`), 100% traffic and the `next` tag; rollback to
+  `00027-jif` in `docs/HANDOFF.md`. Candidate smoke: Konva and Fabric runs 15/15 checks, question and answer, untagged
+  banner with live Nemotron roles, live explanations (one accepted, one rejected by the fact check), procedures off.
+  Apprentice journey passes against the candidate and the public URL.
+- Bug found by the smoke test: production reserves 32,000 completion tokens per call, which the 30k workspace ledger
+  refused, so Nemotron was never called; fixed (100k ledger) with a test before promotion.
+- Cloud Run's Linux Chromium wraps the German legal line in 6 lines where macOS gives 7 (187 vs 218 px); fit verdicts are
+  unchanged.
