@@ -296,6 +296,7 @@ RATE_LIMITS = {
     "nemotron": 3,
     "replay": 60,
     "svg": 120,
+    "campaign": 120,
 }  # new sessions per client per hour; the paid mode is deliberately scarce
 
 
@@ -924,6 +925,7 @@ async def repair(request: Request, sid: str) -> dict:
             "meter": _meter(request, live),
             "fallbacks": list(live.fallbacks),
             "status": status,
+            "repaired_by": new.origin if status == "validated" and new else "none",
             "attempts": [
                 {
                     "candidate": i,

@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from open_apprentice import __version__
 from open_apprentice.api.svg import router as svg_router
+from open_apprentice.api.campaign import router as campaign_router
 from open_apprentice.api.teach import replay_router, router as teach_router
 from open_apprentice.api.v2 import routes as v2_routes
 from open_apprentice.api.v2.context import make_v2
@@ -33,6 +34,8 @@ TAPE_PATH = pathlib.Path(
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Engine: ENGINE_URL + EVALUATOR_TOKEN when deployed (compose); otherwise start a local one for development."""
     app.state.live = {}
+    app.state.campaign = {}  # campaign workspaces (api/campaign.py)
+    app.state.campaign_store = None
     app.state.engine = None
     app.state.engine_error = None
     app.state.spend = {"usd": 0.0, "tokens": 0}
@@ -99,6 +102,7 @@ async def security_headers(request, call_next):
 app.include_router(teach_router)
 app.include_router(replay_router)
 app.include_router(svg_router)
+app.include_router(campaign_router)
 v2_routes.install(app)
 
 
