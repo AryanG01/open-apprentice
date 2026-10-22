@@ -69,11 +69,13 @@ class PreferenceStore:
             raise PreferenceConflict(
                 f"{scope}: active version is {state['active']}, not {expected_version}"
             )
+        # Probe for the next free version: a writer that created vN and then lost the pointer race leaves vN behind,
+        # and that orphan must not block the locale for ever (same probing as skills/versions.py).
         pref = Preference(scope, outcome, state["latest"] + 1, state["active"], provenance)
-        if not self.store.create(
+        while not self.store.create(
             self._key(scope, f"v{pref.version}"), json.dumps(asdict(pref)).encode()
         ):
-            raise PreferenceConflict(f"{scope}: version {pref.version} was written concurrently")
+            pref.version += 1
         self._move(scope, {"active": pref.version, "latest": pref.version}, gen)
         return pref
 
@@ -89,4 +91,13 @@ class PreferenceStore:
 
     def history(self, scope: str) -> list[Preference]:
         state, _ = self._pointer(scope)
-        return [self._version(scope, n) for n in range(1, state["latest"] + 1)]
+        out = []
+        for n in range(1, state["latest"] + 1):
+            try:
+                out.append(self._version(scope, n))
+            except (
+                KeyError,
+                TypeError,
+            ):  # an orphan left by a lost race is not part of the history
+                continue
+        return out

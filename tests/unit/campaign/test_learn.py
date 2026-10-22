@@ -106,3 +106,30 @@ def test_missing_role_stops_before_any_model_call():
             )
         )
     assert provider.calls == []
+
+
+def test_model_candidate_with_its_own_ask_is_rejected():
+    rule = copy.deepcopy(_learn().rule)
+    rule[0]["body"].append(
+        {
+            "op": "if",
+            "cond": {
+                "op": "eq",
+                "args": [{"op": "get", "args": [{"ref": "locals.o"}, "role"]}, "x"],
+            },
+            "then": [{"op": "ask", "options": ["builtin_shrink_hero", "builtin_split_two_cards"]}],
+        }
+    )
+    model = [
+        c for c in _learn(provider=_model(rule), ledger=_ledger()).candidates if c.origin == "model"
+    ][0]
+    assert not model.reproduces and "built in" in model.reason
+
+
+def test_model_candidate_with_different_stacking_is_rejected():
+    rule = copy.deepcopy(_learn().rule)
+    _emit_for(rule, "headline")["z"] = 0
+    model = [
+        c for c in _learn(provider=_model(rule), ledger=_ledger()).candidates if c.origin == "model"
+    ][0]
+    assert not model.reproduces and "stacking" in model.reason

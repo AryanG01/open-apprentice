@@ -263,5 +263,10 @@ mock provider, no live Nemotron call). No UI or API route yet (9C); Konva only (
 - Learning is deterministic: with a fixed 1080x1920 output the only search candidate is the taught boxes. Model candidates are
   exercised with a mock only.
 - 9C must: route commits through `verify_story` (the run itself never imports the evaluator), serve PNG previews, reject answers
-  for expired runs, and ship `services/engine/vendor` (fonts, assets, manifest) in the API image.
+  for expired runs, pass the current source hash to `answer` (stale answers are refused), and ship `services/engine/vendor` (fonts, assets, manifest) in the API image.
 - The Konva tool doc string (`environments/docs.py`) is unchanged on purpose: it is part of the badge lane's prompts.
+- Final review fixes (Plan 9B): any failure after a session opened (incl. the engine's 429 session cap) closes the run's
+  sessions and fails the run; `answer` refuses a changed source; a lost preference race no longer blocks a locale; learned
+  rules may not contain `ask`, set `parent`, or change stacking. Python 1414 passed, engine 62/62.
+- Konva tools are shared: `resize_node`/`set_style` widening also applies to badge-lane bindings on Konva (Fabric still
+  refuses), and the Konva public schema hash changed with the new tools (recorded on bindings, not compared).

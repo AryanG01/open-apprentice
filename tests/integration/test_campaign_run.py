@@ -62,7 +62,7 @@ def test_question_answer_and_reuse(ctx):
     try:
         assert r.status == "question"
         assert r.previews[SHRINK].fits and r.previews[SPLIT].fits
-        r = answer(r, SHRINK, prefs, expected_version=None)
+        r = answer(r, SHRINK, prefs, expected_version=None, current_source_hash=r.source_hash)
         assert r.status == "applied" and r.provenance["outcome_origin"] == "builtin"
         verified("de_long_a", "shrink", src, r)
     finally:
@@ -72,7 +72,7 @@ def test_question_answer_and_reuse(ctx):
     src, r = run("de_long_b")  # preference says shrink, but shrink does not fit: ask again
     try:
         assert r.status == "question" and not r.previews[SHRINK].fits and r.previews[SPLIT].fits
-        r = answer(r, SPLIT, prefs, expected_version=1)
+        r = answer(r, SPLIT, prefs, expected_version=1, current_source_hash=r.source_hash)
         verified("de_long_b", "split", src, r)
     finally:
         close_run(r)
@@ -115,3 +115,24 @@ def test_a_tool_error_midway_fails_the_run_and_closes_its_sessions(engine_url, t
     )
     assert r.status == "failed" and "z must be" in r.problems[0]
     assert r.sessions == {} and r.result_session is None
+
+
+def test_any_failure_after_a_session_opened_closes_it_and_fails_the_run(engine_url, tmp_path):
+    harness = EvaluatorHarness(engine_url, TOKEN)
+    learned = asyncio.run(
+        learn_layout(load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"])
+    )
+    opened = []
+
+    def flaky(scene):  # the second open fails like the engine's 429 session cap
+        if opened:
+            raise RuntimeError("429 session limit")
+        s = harness.open_session(scene, owner=OWNER)[0]
+        opened.append(s)
+        return s
+
+    src = load_fixture("de_long_a")["scene"]  # overflows, so a second session is needed
+    r = start_run(src, "de", learned, flaky, PreferenceStore(LocalStore(tmp_path)))
+    assert r.status == "failed" and "429" in r.problems[0] and r.sessions == {}
+    with pytest.raises(Exception):
+        harness.native(opened[0].session_id, OWNER)  # the first session was really closed

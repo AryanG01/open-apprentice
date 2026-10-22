@@ -16,7 +16,6 @@ PLACE_HEAD = {
     "y": 1080,
     "w": 936,
     "h": 160,
-    "parent": "story-1",
     "z": 3,
 }
 STYLE_HEAD = {"op": "emit_target", "kind": "style", "target": {"ref": "locals.o"}, "fontSize": 72}
@@ -57,7 +56,14 @@ def test_campaign_constructs_need_the_campaign_dialect(stmt):
 
 
 @pytest.mark.parametrize(
-    "extra", [{"text": "Hi"}, {"link": "https://x"}, {"asset": "h7-headphones"}, {"fill": "#fff"}]
+    "extra",
+    [
+        {"parent": "cta"},
+        {"text": "Hi"},
+        {"link": "https://x"},
+        {"asset": "h7-headphones"},
+        {"fill": "#fff"},
+    ],
 )
 def test_non_writable_fields_are_rejected(extra):
     with pytest.raises(RuleError):
@@ -102,7 +108,7 @@ def test_wrapped_rule_returns_targets_when_it_fits():
         1080,
         936,
         160,
-        "story-1",
+        None,
         3,
         72,
     )

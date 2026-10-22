@@ -130,7 +130,20 @@ def _search_rule(expected: dict[str, dict]) -> list:
     return [{"op": "for_each", "over": {"ref": "objects"}, "var": "o", "body": branches}]
 
 
+def _asks(stmts: list) -> bool:
+    return any(
+        isinstance(s, dict)
+        and (s.get("op") == "ask" or any(_asks(s.get(k) or []) for k in ("then", "else", "body")))
+        for s in stmts
+    )
+
+
 def _check(rule: list, before: dict, expected: dict[str, dict]) -> tuple[bool, str]:
+    if not isinstance(rule, list) or _asks(rule):
+        return (
+            False,
+            "invalid rule: overflow questions are built in and cannot be part of a learned layout",
+        )
     try:
         validate_rule(wrap_learned(rule), campaign=True)
         objs = objects_for_rule(before, _board(before))
@@ -146,6 +159,8 @@ def _check(rule: list, before: dict, expected: dict[str, dict]) -> tuple[bool, s
         t = got.get(role)
         if t is None or (t.x, t.y, t.w, t.h) != e["box"]:
             return False, f"{role}: box differs from the taught story"
+        if not e["image"] and t.z != e["z"]:
+            return False, f"{role}: stacking differs from the taught story"
         if e["fontSize"] is not None:
             size = t.font_size if t.font_size is not None else Fraction(str(src_font[t.node_id]))
             if size != e["fontSize"]:

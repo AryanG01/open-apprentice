@@ -47,3 +47,15 @@ def test_scopes_are_per_locale(tmp_path):
     p.set(DE, "builtin_shrink_hero", {}, expected_version=None)
     assert scope_key("de") != scope_key("fr") and p.get(scope_key("fr")) is None
     assert scope_key("de") == "promo_card/9:16/overflow/de"
+
+
+def test_an_orphaned_version_from_a_lost_race_does_not_block_the_locale(tmp_path):
+    store = LocalStore(tmp_path)
+    p = PreferenceStore(store)
+    p.set(DE, "builtin_shrink_hero", {}, expected_version=None)
+    store.create(
+        f"campaign/preferences/{DE}/v2.json", b"{}"
+    )  # a writer created v2, then lost the pointer race
+    v = p.set(DE, "builtin_split_two_cards", {}, expected_version=1)
+    assert v.version == 3 and p.get(DE).outcome == "builtin_split_two_cards"
+    assert p.set(DE, "builtin_shrink_hero", {}, expected_version=3).version == 4

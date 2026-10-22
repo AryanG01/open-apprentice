@@ -26,15 +26,23 @@ def _question_run() -> CampaignRun:
 
 def test_answering_twice_is_refused(tmp_path):
     prefs = PreferenceStore(LocalStore(tmp_path))
-    run = answer(_question_run(), "builtin_shrink_hero", prefs, expected_version=None)
+    run = answer(
+        _question_run(),
+        "builtin_shrink_hero",
+        prefs,
+        expected_version=None,
+        current_source_hash="abc",
+    )
     assert run.status == "applied" and run.result_session == "s1"
     with pytest.raises(ValueError):
-        answer(run, "builtin_shrink_hero", prefs, expected_version=1)
+        answer(run, "builtin_shrink_hero", prefs, expected_version=1, current_source_hash="abc")
 
 
 def test_neither_changes_nothing_and_saves_nothing(tmp_path):
     prefs = PreferenceStore(LocalStore(tmp_path))
-    run = answer(_question_run(), "neither", prefs, expected_version=None)
+    run = answer(
+        _question_run(), "neither", prefs, expected_version=None, current_source_hash="abc"
+    )
     assert run.status == "unchanged" and run.result_session is None
     assert prefs.get(scope_key("de")) is None
 
@@ -46,6 +54,7 @@ def test_a_preview_that_does_not_fit_cannot_be_chosen(tmp_path):
             "builtin_split_two_cards",
             PreferenceStore(LocalStore(tmp_path)),
             expected_version=None,
+            current_source_hash="abc",
         )
 
 
@@ -65,3 +74,13 @@ def test_missing_role_opens_no_session(tmp_path):
         PreferenceStore(LocalStore(tmp_path)),
     )
     assert run.status == "needs_roles" and any("price" in p for p in run.problems)
+
+
+def test_an_answer_for_a_changed_source_is_refused_and_changes_nothing(tmp_path):
+    prefs = PreferenceStore(LocalStore(tmp_path))
+    run = _question_run()
+    with pytest.raises(ValueError, match="changed"):
+        answer(
+            run, "builtin_shrink_hero", prefs, expected_version=None, current_source_hash="edited"
+        )
+    assert run.status == "question" and prefs.get(scope_key("de")) is None

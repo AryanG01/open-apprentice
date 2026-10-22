@@ -44,7 +44,10 @@ EMIT_KINDS = {
 _FORBIDDEN = {"__proto__", "constructor", "prototype"}
 # Campaign dialect (spec 7.3; opt-in via validate_rule(campaign=True)): placement/style emits, read-only facts, a built-in ask.
 CAMPAIGN_EMITS = {
-    "place": ({"x", "y", "w", "h"}, {"x", "y", "w", "h", "parent", "z"}),
+    "place": (
+        {"x", "y", "w", "h"},
+        {"x", "y", "w", "h", "z"},
+    ),  # parents are set by plans and built-ins, never rules
     "fit_image": ({"x", "y", "w", "h"}, {"x", "y", "w", "h"}),
     "style": (set(), {"fontSize", "cornerRadius"}),
 }

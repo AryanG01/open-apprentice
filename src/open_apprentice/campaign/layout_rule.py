@@ -109,7 +109,6 @@ class _LayoutRun(_Run):
         if kind in ("place", "fit_image"):
             cur.x, cur.y, cur.w, cur.h = (_num(self.ev(s[k])) for k in ("x", "y", "w", "h"))
             cur.contain = kind == "fit_image"
-            cur.parent = s.get("parent", cur.parent)
             cur.z = s.get("z", cur.z)
         else:  # style
             if "fontSize" in s:

@@ -23,7 +23,7 @@ from open_apprentice.campaign.plan import LayoutPlan, plan_from_layout
 from open_apprentice.campaign.preferences import Preference, PreferenceStore, scope_key
 from open_apprentice.campaign.procedures import ORIGIN as PROCEDURE_ORIGIN, apply_plan
 from open_apprentice.campaign.scene import RoleError, role_map
-from open_apprentice.environments.client import EngineSession, EngineToolError
+from open_apprentice.environments.client import EngineSession
 
 OpenSession = Callable[[dict], EngineSession]
 TRANSFORMS = dict(zip(BUILTINS, (shrink_hero, split_two_cards)))
@@ -133,19 +133,29 @@ def start_run(
                 return run
         run.status = "question"
         return run
-    except EngineToolError as e:
+    except (
+        Exception
+    ) as e:  # tool errors, the engine's 429 session cap, timeouts, rule/program errors: never leak a session
         close_run(run)
         run.status, run.problems, run.result_session, run.previews = "failed", [f"{e}"], None, {}
         return run
 
 
 def answer(
-    run: CampaignRun, choice: str, prefs: PreferenceStore, expected_version: Optional[int]
+    run: CampaignRun,
+    choice: str,
+    prefs: PreferenceStore,
+    expected_version: Optional[int],
+    *,
+    current_source_hash: str,
 ) -> CampaignRun:
     """Resolve a question once: `neither` leaves the source unchanged; a fitting built-in becomes the result and the
-    owner's saved preference for this language."""
+    owner's saved preference for this language. An answer for a source that changed since the previews is refused.
+    """
     if run.status != "question":
         raise ValueError(f"run {run.run_id} is {run.status}, not waiting for an answer")
+    if current_source_hash != run.source_hash:
+        raise ValueError("the banner changed since these previews were made; start a new run")
     if choice == "neither":
         close_run(run)
         run.status = "unchanged"
