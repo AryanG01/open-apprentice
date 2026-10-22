@@ -123,7 +123,7 @@ describe("web app in a real browser", { skip: !enabled && "set OA_E2E=1 to run b
   test("every tab renders with no page or network errors", async () => {
     const { page, problems, close } = await newPage();
     await page.goto(`${API}/#home`, { waitUntil: "networkidle" });
-    for (const tab of ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live", "Real SVG"]) {
+    for (const tab of ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live", "Real SVG", "Campaign"]) {
       await page.getByText(tab, { exact: true }).first().click();
       await page.waitForTimeout(800);
       assert.ok((await page.locator("body").innerText()).length > 500, `${tab} tab rendered (almost) nothing`);
@@ -285,7 +285,7 @@ describe("web app in a real browser", { skip: !enabled && "set OA_E2E=1 to run b
     // a static host has no API: /health/ready and the SVG lane's /api calls legitimately 404 there
     const { page, problems, close } = await newPage({}, /\/(health\/ready|api\/.*)$/);
     await page.goto(`${STATIC}/#home`, { waitUntil: "networkidle" });
-    for (const tab of ["Try it live", "Real SVG"]) {
+    for (const tab of ["Try it live", "Real SVG", "Campaign"]) {
       await page.getByText(tab, { exact: true }).first().click();
       await page.waitForTimeout(1500);
       assert.match(await page.locator(".banner").first().innerText(), /NOT AVAILABLE IN THIS COPY/);
