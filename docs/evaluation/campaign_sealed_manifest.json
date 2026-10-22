@@ -1,0 +1,25 @@
+{
+ "sealed_at": "2026-10-22",
+ "files": {
+  "banners/sealed_es_long_b.json": "f3228692223acee869fa7ccb13bf7e27255c9f7ba3cc458d8e9effee67e8ff30",
+  "banners/sealed_es_short_a.json": "794ea6692ec3db90667ed4e704a6a7ab4ce94d325ae0ad5c4a3042a0c0f8372d",
+  "banners/sealed_it_long_a.json": "2790dc1bd284ab8943437cc4cfb25e4fdd2866eb662a2db67db34d8a6e97b4e8",
+  "banners/sealed_it_xlong_b.json": "5bba04dd269a4b587626cbfdcd243a6c321548ec761459a10da16b7c7a99cdd0",
+  "banners/sealed_nl_long_c.json": "3dc19bee2785ea4c1cfef611798bc93ef863521be5252d5a4b714b90dd371343",
+  "banners/sealed_nl_short_a.json": "75be0e4521c0e52c9711cd73a99cd458e72fdde50a4357f8f52193b01ba0b56a",
+  "banners/sealed_pl_short_a.json": "85ba357b53e7a5d6738df44a5876b7497d682e4d7b4ff2702d8921f72c8da4cc",
+  "banners/sealed_pl_xlong_a.json": "1169fc248d731281043df98d206924bd9b57a5426a2002a5feab9a2c107dfeb6",
+  "gold/sealed_es_long_b.shrink.json": "fcf39e24ed851f2eccfe16c64e92456c426266389376ff555a28516081bebac4",
+  "gold/sealed_es_long_b.split.json": "faccdfeb16f7d8ae52e02822ebba53deca49de391f3c317983df67f3236bd2aa",
+  "gold/sealed_es_short_a.layout.json": "de969d35d01d5789bc41e87316179555161991834fbf18d5c029426389f445ea",
+  "gold/sealed_it_long_a.shrink.json": "4a455ec99d30e6f3bdaf01f0def47326cd5b04fc3841db31bbb5aaae7ab1999a",
+  "gold/sealed_it_long_a.split.json": "c21eb5defc14fd7781e02bd29d3af0069994a8b7db75f3bb6d9f5fac75c21aba",
+  "gold/sealed_it_xlong_b.split.json": "6ff2f64ea6c39099fab7dc26511c84e129711518e8edc42a8b660fba73589546",
+  "gold/sealed_nl_long_c.shrink.json": "2525731bfbde6e3b83507f2b5a63606a890e4b7fc1d1e88949d15ab1f0939a82",
+  "gold/sealed_nl_long_c.split.json": "dc2d572ddd964cd75710987c4ed48bcc25e7ca7a541ceceb3f18ed90ac03acfa",
+  "gold/sealed_nl_short_a.layout.json": "d460fd6f1e0751b35450b1b3059422154742773c71fbac9b8e91fe4a1686bed4",
+  "gold/sealed_pl_short_a.layout.json": "19566b37b81c625b291694793233dc250ad71be62f76f294adbc8919742fa5ae",
+  "gold/sealed_pl_xlong_a.split.json": "44ffcc70778dbec8628e67203f86d5a17d86425747a16d9e4405e5c4c78e0d52"
+ },
+ "combined_sha256": "7a53dd3ad32afdd53a02b9f8ef3f297909e9b81ff955f7e4bb0173c6663116e5"
+}
