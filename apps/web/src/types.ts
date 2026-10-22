@@ -339,3 +339,68 @@ export interface SvgHarm {
   all_rejected: boolean;
   attempts: { attempt: string; rejected: boolean; reasons: string[] }[];
 }
+
+// ---- Campaign lane (/api/campaign) ----
+export interface CampaignFixture {
+  id: string;
+  locale: string;
+  kind: "teaching" | "banner" | "broken";
+  png: string;
+}
+
+export interface CampaignCandidate {
+  origin: string;
+  reproduces: boolean;
+  reason: string;
+}
+
+export interface CampaignWorkspace {
+  workspace_id: string;
+  learned: { origin: string; candidates: CampaignCandidate[] };
+  teaching: { before_png: string; after_png: string };
+}
+
+export interface CampaignCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface CampaignVerification {
+  passed: boolean;
+  failed: string[];
+  checks: CampaignCheck[];
+}
+
+export interface CampaignViolation {
+  kind: string;
+  node_id: string;
+  detail: unknown;
+}
+
+export interface CampaignPreview {
+  outcome: string;
+  origin: string;
+  fits: boolean;
+  violations: CampaignViolation[];
+  png: string;
+}
+
+export interface CampaignRun {
+  run_id: string;
+  fixture_id: string;
+  locale: string;
+  status: "ready" | "question" | "applied" | "unchanged" | "needs_roles" | "unsupported_format" | "failed" | "blocked";
+  problems: string[];
+  provenance: Record<string, string | number | object>;
+  result: { png: string; verification: CampaignVerification | null } | null;
+  previews: CampaignPreview[];
+  preference: { outcome: string; version: number } | null;
+}
+
+export interface CampaignScope {
+  scope: string;
+  locale: string;
+  active: { outcome: string; version: number } | null;
+  history: { version: number; outcome: string; parent: number | null }[];
+}

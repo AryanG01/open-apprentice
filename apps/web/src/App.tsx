@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CampaignLane } from "./CampaignLane";
 import { Compare } from "./Compare";
 import { Attempts, AxisChips, Checks, Facts, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
@@ -8,8 +9,8 @@ import { TryIt } from "./TryIt";
 import { Apprentice } from "./v2/Apprentice";
 import type { Demo, Evidence, Step } from "./types";
 
-type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live" | "Real SVG";
-const MODES: Mode[] = ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live", "Real SVG"];
+type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live" | "Real SVG" | "Campaign";
+const MODES: Mode[] = ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live", "Real SVG", "Campaign"];
 
 const MODE_HELP: Record<Mode, string> = {
   Home: "What this is and what we measured.",
@@ -20,6 +21,7 @@ const MODE_HELP: Record<Mode, string> = {
   Compare: "Stored live runs against baselines, with their limits.",
   "Try it live": "Teach the rule yourself on the real engines.",
   "Real SVG": "Apply your taught rule to a real SVG document (experimental).",
+  Campaign: "Teach a banner-to-story layout once; it asks when the copy does not fit (development fixtures).",
 };
 
 async function loadJson<T>(name: string): Promise<T> {
@@ -29,7 +31,7 @@ async function loadJson<T>(name: string): Promise<T> {
 }
 
 const HASH: Record<string, Mode> = {
-  home: "Home", learn: "Learn", reuse: "Reuse", transfer: "Transfer", challenge: "Challenge", compare: "Compare", live: "Try it live", svg: "Real SVG" };
+  home: "Home", learn: "Learn", reuse: "Reuse", transfer: "Transfer", challenge: "Challenge", compare: "Compare", live: "Try it live", svg: "Real SVG", campaign: "Campaign" };
 
 function modeFromHash(): Mode {
   return HASH[window.location.hash.replace("#", "")] ?? "Home";
@@ -188,7 +190,7 @@ function Prototype() {
   const pickMode = (m: Mode) => {
     setMode(m);
     window.location.hash = Object.keys(HASH).find((k) => HASH[k] === m) ?? "";
-    if (m !== "Compare" && m !== "Try it live" && m !== "Home" && m !== "Real SVG") {
+    if (m !== "Compare" && m !== "Try it live" && m !== "Home" && m !== "Real SVG" && m !== "Campaign") {
       const first = steps.findIndex((s) => s.mode === m);
       if (first >= 0) setIndex(first);
     }
@@ -212,7 +214,7 @@ function Prototype() {
           <h1>Open Apprentice</h1>
           <p>Teach a layout rule once. It asks when unsure, reuses the rule across graphics backends, and repairs only the part that broke.</p>
         </div>
-        {(mode === "Try it live" || mode === "Real SVG") && backend === "no" ? (
+        {(mode === "Try it live" || mode === "Real SVG" || mode === "Campaign") && backend === "no" ? (
           <div className="banner" role="note">
             <span className="pill recorded">NOT AVAILABLE IN THIS COPY</span>
             <span>
@@ -238,6 +240,14 @@ function Prototype() {
             <span className="pill recorded">EXPERIMENTAL</span>
             <span>Applies the rule you taught to owner-authored SVG files. No language model is used; geometry is verified by measuring in the locked browser.</span>
           </div>
+        ) : mode === "Campaign" ? (
+          <div className="banner" role="note">
+            <span className="pill recorded">DEVELOPMENT</span>
+            <span>
+              Runs on the real Konva engine with authored development banners (not held out). No language model is used: the layout is learned by search, and the two overflow
+              outcomes are built in and labelled so.
+            </span>
+          </div>
         ) : mode === "Home" ? null : (
           <div className="banner" role="note">
             <span className="pill recorded">RECORDED</span>
@@ -260,7 +270,9 @@ function Prototype() {
         </nav>
       </header>
 
-      {mode === "Real SVG" ? (
+      {mode === "Campaign" ? (
+        <CampaignLane />
+      ) : mode === "Real SVG" ? (
         <SvgLane go={goHash} />
       ) : mode === "Home" ? (
         <Home data={evidence} go={goHash} />
@@ -315,7 +327,7 @@ function Prototype() {
 
       <footer className="foot">
         <p>
-          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live" and "Real SVG" need the local API; Nemotron mode additionally needs
+          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live", "Real SVG" and "Campaign" need the local API; Nemotron mode additionally needs
           DEMO_MODEL_ENABLED=1 and a Nebius key. Not built yet: a skill inspector, entering a corrected example after "Neither", and model-written SVG patches. Compare reads stored results only.
         </p>
       </footer>

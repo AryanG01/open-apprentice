@@ -562,3 +562,14 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 @media (prefers-reduced-motion: reduce) {
   .tally .meter::after { transition: none; }
 }
+
+/* ---- campaign lane ----------------------------------------------------------------- */
+.campaign { max-width: 1120px; }
+.campaign h3 { margin: 22px 0 8px; }
+.campaign .thumb { width: 120px; height: auto; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.campaign .placeholder { display: grid; place-items: center; min-height: 160px; border: 1px dashed var(--line); border-radius: 8px; color: var(--ink-2); }
+.campaign .preview { display: grid; gap: 8px; margin: 0; }
+.campaign .preview img { max-height: 520px; width: auto; max-width: 100%; }
+.campaign .preview.nofit img { opacity: 0.6; }
+.campaign .question .q { font-weight: 600; }
+.campaign .hist { display: inline-flex; gap: 6px; align-items: center; margin-right: 12px; }
