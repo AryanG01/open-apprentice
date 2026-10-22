@@ -28,6 +28,9 @@ class LayoutPlan:
     artboards: list[dict]
     targets: list[Target]
     kinds: dict[str, str]  # node id -> scene type, for every target (clones included)
+    roles: dict[str, str] = field(
+        default_factory=dict
+    )  # node id -> role (CTA children: cta/<type>)
     clones: list[tuple[str, str]] = field(default_factory=list)  # (source id, new id)
     origin: str = "search"
 
@@ -46,4 +49,11 @@ def plan_from_layout(
             Target(**{**t.__dict__, "parent": t.parent or ("story-1" if top_level else None)})
         )
     kinds = {t.node_id: nodes[t.node_id]["type"] if t.node_id in nodes else "rect" for t in targets}
-    return LayoutPlan(source_artboard, [card("story-1", 1)], targets, kinds, origin=origin)
+    roles = {}
+    for n in source["nodes"]:
+        if n.get("role"):
+            roles[n["id"]] = n["role"]
+            for k in source["nodes"]:
+                if k.get("parent") == n["id"]:
+                    roles[k["id"]] = f"{n['role']}/{k['type']}"
+    return LayoutPlan(source_artboard, [card("story-1", 1)], targets, kinds, roles, origin=origin)
