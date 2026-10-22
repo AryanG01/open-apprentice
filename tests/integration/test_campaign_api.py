@@ -410,7 +410,8 @@ def test_a_question_carries_a_checked_explanation(client):
     assert q["explanation"]["origin"] == "template" and q["explanation"]["problems"]
 
 
-def test_an_accepted_model_procedure_is_used_by_later_runs(client):
+def test_an_accepted_model_procedure_is_used_by_later_runs(client, monkeypatch):
+    monkeypatch.setenv("CAMPAIGN_MODEL_PROCEDURES", "1")
     from open_apprentice.campaign.procedures import APPLY_PLAN
 
     client.app.state.provider = _mock(procedure=APPLY_PLAN)
@@ -468,7 +469,8 @@ def test_the_procedure_check_never_raises_on_an_engine_failure(engine_url, monke
     assert not r.passed and all("engine went away" in c["error"] for c in r.cases)
 
 
-def test_a_server_out_of_model_budget_says_so_on_procedures(client):
+def test_a_server_out_of_model_budget_says_so_on_procedures(client, monkeypatch):
+    monkeypatch.setenv("CAMPAIGN_MODEL_PROCEDURES", "1")
     from open_apprentice.campaign.procedures import APPLY_PLAN
 
     client.app.state.provider = _mock(procedure=APPLY_PLAN)
@@ -478,7 +480,8 @@ def test_a_server_out_of_model_budget_says_so_on_procedures(client):
     assert p["origin"] == "reference" and any("budget" in n for n in p["notes"])
 
 
-def test_an_accepted_procedure_is_reused_by_every_workspace_without_new_calls(client):
+def test_an_accepted_procedure_is_reused_by_every_workspace_without_new_calls(client, monkeypatch):
+    monkeypatch.setenv("CAMPAIGN_MODEL_PROCEDURES", "1")
     from open_apprentice.campaign.procedures import APPLY_PLAN
 
     provider = _mock(procedure=APPLY_PLAN)
@@ -514,3 +517,14 @@ def test_a_model_procedure_that_fails_on_a_banner_falls_back_to_the_reference(cl
     assert out["status"] == "ready" and out["provenance"]["procedure_origin"] == "reference"
     assert "procedure_fallback" in out["provenance"]
     _passed(out)
+
+
+def test_model_written_procedures_are_off_unless_the_operator_turns_them_on(client):
+    from open_apprentice.campaign.procedures import APPLY_PLAN
+
+    provider = _mock(procedure=APPLY_PLAN)
+    client.app.state.provider = provider
+    wid = _workspace(client)["workspace_id"]
+    p = client.post(f"/api/campaign/workspaces/{wid}/procedures", json={"backend": "konva"}).json()
+    assert p["origin"] == "reference" and not p["accepted"] and any("off" in n for n in p["notes"])
+    assert provider.calls == []  # nothing was spent

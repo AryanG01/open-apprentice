@@ -316,8 +316,8 @@ export function CampaignLane() {
         <section aria-labelledby="c-procs">
           <h3 id="c-procs">Native procedure</h3>
           <p className="muted small">
-            By default the layout is carried out by the reference procedure. Nemotron can write its own; it is used only if the independent verifier passes it on a seen banner and two new
-            ones.
+            By default the layout is carried out by the reference procedure. Nemotron can write its own (if the server allows it); it is used only if the independent verifier passes
+            it on a seen banner and two unseen ones.
           </p>
           <div className="controls">
             {(["konva", "fabric"] as const).map((b) => (

@@ -354,3 +354,5 @@ Plan `docs/superpowers/plans/2026-10-22-p9e-campaign-nemotron.md`.
 - **Before deploying 9E with model mode on:** one procedure request can cost ~$0.25, and the per-workspace token ledger
   learns this only after the call (the guard prices calls at max_tokens). Either keep the procedure endpoint's model
   path off in production, or bound reasoning (lower reasoning effort for the `campaign_procedure` role) and re-measure.
+- Decision (owner, 2026-10-22): Nemotron-written procedures are **off by default** on any server
+  (`CAMPAIGN_MODEL_PROCEDURES=1` turns them on); role proposals and explanations stay on with model mode.

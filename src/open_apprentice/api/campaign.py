@@ -5,6 +5,7 @@ before the response, and every result offered as applied has passed the independ
 from __future__ import annotations
 
 import asyncio
+import os
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -515,7 +516,14 @@ async def procedures(request: Request, wid: str, body: BackendIn) -> dict:
                 "notes": [],
                 "model": "on" if model_on else "off",
             }
-        provider, note = _model(request, ws)
+        if os.environ.get("CAMPAIGN_MODEL_PROCEDURES") != "1":
+            # off by default: one request can cost ~$0.25 because the model's reasoning is not bounded by its token
+            # limit (docs/evaluation/campaign_nemotron.md); an operator turns it on deliberately
+            provider, note = None, [
+                "Nemotron-written procedures are off on this server (CAMPAIGN_MODEL_PROCEDURES=1 turns them on)"
+            ]
+        else:
+            provider, note = _model(request, ws)
         try:
             out = await write_procedure(
                 provider,
