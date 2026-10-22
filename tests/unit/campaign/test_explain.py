@@ -1,5 +1,7 @@
 import asyncio
 
+import pytest
+
 from open_apprentice.budget import Ledger, Limits
 from open_apprentice.campaign.explain import (
     check_explanation,
@@ -77,7 +79,6 @@ def test_without_a_provider_the_template_is_used():
 
 
 # Final review fixes: contradictions, raw ids, booleans, links.
-import pytest
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,5 @@
 """Campaign lane over HTTP on the REAL engine (opt-in: OA_ENGINE_TESTS=1)."""
 
-import time
-
 import httpx
 import pytest
 from fastapi.testclient import TestClient

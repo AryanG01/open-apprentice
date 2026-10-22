@@ -65,6 +65,10 @@ def role_candidates(scene: dict, artboard: str) -> list[dict]:
     return out
 
 
+def area(x: dict) -> float:
+    return (x.get("width") or 0) * (x.get("height") or 0)
+
+
 def check_role_mapping(scene: dict, artboard: str, mapping: dict[str, str]) -> list[str]:
     layers = {n["id"]: n for n in _layers(scene, artboard)}
     board = next((n for n in scene["nodes"] if n["id"] == artboard), None)
@@ -103,7 +107,6 @@ def check_role_mapping(scene: dict, artboard: str, mapping: dict[str, str]) -> l
         and not texts[0]["fontSize"] > texts[1]["fontSize"] > texts[2]["fontSize"]
     ):
         problems.append("text sizes must run headline > price > legal")
-    area = lambda x: (x.get("width") or 0) * (x.get("height") or 0)
     if (
         n["product_image"]["type"] == "image"
         and n["brand_mark"]["type"] == "image"
@@ -120,7 +123,6 @@ def heuristic_roles(scene: dict, artboard: str) -> dict[str, str]:
     """Deterministic baseline: biggest rect is the background, biggest image the product, the other image the logo, the
     group the CTA; text by font size (largest headline, middle price, smallest legal)."""
     layers = _layers(scene, artboard)
-    area = lambda x: (x.get("width") or 0) * (x.get("height") or 0)
     out: dict[str, str] = {}
     rects = sorted((x for x in layers if x["type"] == "rect"), key=area, reverse=True)
     images = sorted((x for x in layers if x["type"] == "image"), key=area, reverse=True)
