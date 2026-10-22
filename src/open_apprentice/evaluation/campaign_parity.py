@@ -121,6 +121,10 @@ def render_markdown(t: dict) -> str:
         f"One learned rule for both backends (origin `{t['learned_origin']}`, sha256 `{t['rule_sha256'][:16]}…`), the same "
         "reference procedure, built-in outcomes labelled as such. Each row is the independent verifier against the authored gold.",
         "",
+        "Fabric measures text with its own metrics (a 1.13 font-size multiplier), so a banner whose copy sits close to a "
+        "frame limit can come back `ready` on Konva and `question` on Fabric; the run-status table below shows whether that "
+        "happened for these fixtures.",
+        "",
         f"**{passed} of {len(rows)} rows pass.**",
         "",
         "| fixture | outcome | backend | verifier | failed checks |",

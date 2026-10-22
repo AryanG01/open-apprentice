@@ -319,4 +319,6 @@ episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether i
     and the independent verifier composes them. Cards use a layout that runs only at creation (a child's relayout must not
     move the card); the CTA group fits its content. Campaign mode switches on only for scenes with an artboard, so the badge
     lane's Fabric subset and drift are unchanged. Parity is measured on development fixtures only; the held-out set is
-    owner-authored and sealed by hash before any run.
+    owner-authored and sealed by hash before any run. Known divergence: Fabric text runs about 3-8% taller (its 1.13
+    font-size multiplier), so a banner near a frame limit can be `ready` on Konva and `question` on Fabric. Adding the
+    campaign tools changed the Fabric public schema hash for every Fabric session (recorded on bindings, never compared).

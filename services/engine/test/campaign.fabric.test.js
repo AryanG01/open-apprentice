@@ -179,12 +179,11 @@ test("fabric tools: clone an image into place and move it to another card", asyn
   assert.deepEqual([n["logo-2"].parent, ...local(n, n["logo-2"])], ["story-2", 72, 220]);
 });
 
-test("fabric tools: a CTA group follows its plate when the plate is resized", async () => {
+test("fabric tools: a resized CTA plate counts toward the CTA height", async () => {
   const small = variant((n) => { n["cta-plate"].width = 256; n["cta-plate"].height = 76.8; n["cta-label"].y = 14; });
   const s = await mk(small);
   await mut(s, "resize_node", { node_id: "cta-plate", width: 936, height: 112 });
   const n = await native(s);
-  assert.deepEqual([n.cta.width, n.cta.height], [936, 112]);
   assert.deepEqual(local(n, n.cta), [72, 1360]);
   assert.ok(local(n, n["cta-plate"]).every((v) => Math.abs(v) < 1e-6), String(local(n, n["cta-plate"])));
   const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: LIMITS });
@@ -220,4 +219,25 @@ test("fabric tools: relaying out a CTA inside a card never moves or resizes the 
   const n = await native(s);
   assert.deepEqual([n["story-2"].x, n["story-2"].y, n["story-2"].width, n["story-2"].height], [1180, 0, 1080, 1920]);
   assert.deepEqual(local(n, n.cta), [72, 904]);
+});
+
+// Final review fixes (plan 9D).
+test("fabric tools: moving CTA children keeps Konva's parent-local meaning", async () => {
+  const s = await mk();
+  await mut(s, "move_node", { node_id: "cta-plate", x: 20, y: 0 });
+  await mut(s, "move_node", { node_id: "cta-label", x: 20, y: 30 });
+  await mut(s, "move_node", { node_id: "cta-label", x: 40, y: 30 });
+  const n = await native(s);
+  assert.deepEqual(local(n, n.cta), [72, 1360]);
+  assert.ok(Math.abs(local(n, n["cta-label"])[0] - 40) < 1e-6, String(local(n, n["cta-label"])));
+  assert.ok(Math.abs(local(n, n["cta-plate"])[0] - 20) < 1e-6, String(local(n, n["cta-plate"])));
+});
+
+test("fabric: flat-rect read tools refuse campaign scenes instead of misreporting them", async () => {
+  const s = await mk();
+  for (const [tool, args] of [["inspect_scene", {}], ["inspect_node", { node_id: "head" }], ["measure_node", { node_id: "head" }]]) {
+    const r = await act(s, tool, args);
+    assert.equal(r.ok, false, tool);
+    assert.equal(r.error.code, "UNSUPPORTED_CAPABILITY", tool);
+  }
 });

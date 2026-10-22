@@ -55,9 +55,10 @@
     return images;
   }
 
-  // A card is laid out once, when it is built: a child's relayout (the CTA fitting its plate) bubbles up to the parent group,
-  // and a plain FixedLayout then re-fits the card around its content, moving and resizing it.
-  class CardLayout extends fabric.FixedLayout {
+  // Cards and the CTA group are laid out once, when built, so their plane centre never moves: a child's parent-local
+  // position then means the same thing as on Konva. (A re-fitting layout would shift the group's origin after every move,
+  // and a FixedLayout re-fits a card around content added to it.)
+  class InitialLayout extends fabric.FixedLayout {
     shouldPerformLayout(context) {
       return context.type === "initialization";
     }
@@ -87,8 +88,7 @@
       const kidSpecs = all.filter((n) => n.parent === spec.id);
       const width = spec.width ?? Math.max(0, ...kidSpecs.map((k) => (k.x ?? 0) + (k.width ?? 0)));
       const height = spec.height ?? Math.max(0, ...kidSpecs.map((k) => (k.y ?? 0) + (k.height ?? 0)));
-      // artboards have a fixed size; a group (the CTA) fits its content, so resizing its plate resizes the group
-      const strategy = type === "artboard" ? new CardLayout() : new fabric.FitContentLayout();
+      const strategy = new InitialLayout();
       o = new fabric.Group(kids, { ...at, width, height, layoutManager: new fabric.LayoutManager(strategy),
         clipPath: type === "artboard" ? new fabric.Rect({ width, height, originX: "center", originY: "center" }) : undefined }, true);
     } else throw new ToolError("INVALID_SCENE", `unknown node type ${String(type).slice(0, 20)}`);
@@ -343,6 +343,12 @@
       ab.setCoords(); // a card created by a tool keeps stale corners until refreshed (invisible for a card at x 0)
       const abBox = ab.getBoundingRect();
       const rect = (o) => {
+        if (kindOf(o) === "group") {
+          // a group's extent is its children's (the verifier's rule), not the group's own fixed box
+          const kids = o.getObjects().map(rect);
+          const x0 = Math.min(...kids.map((k) => k.x)), y0 = Math.min(...kids.map((k) => k.y));
+          return { x: x0, y: y0, width: Math.max(...kids.map((k) => k.x + k.width)) - x0, height: Math.max(...kids.map((k) => k.y + k.height)) - y0 };
+        }
         o.setCoords(); // a Textbox re-measures after it joins its group; its cached corners can be stale
         const r = o.getBoundingRect();
         const w = kindOf(o) === "text" ? o.oaFrameWidth : r.width, h = kindOf(o) === "text" ? o.oaFrameHeight : r.height;
@@ -386,6 +392,10 @@
 
   async function dispatch({ tool, args, action_id, expected_revision }) {
     const own = (t, k) => Object.prototype.hasOwnProperty.call(t, k);
+    if (campaign && ["inspect_scene", "inspect_node", "measure_node"].includes(tool)) {
+      // these report the flat-rect contract (canvas left/top, type rect); on a campaign scene they would mislead
+      return { ok: false, error: { code: "UNSUPPORTED_CAPABILITY", message: `${tool} is not available on Fabric campaign scenes; use observe_fit` }, revision };
+    }
     const viaCampaign = campaign && own(CAMPAIGN_TOOLS, tool);
     if (!viaCampaign && !own(TOOLS, tool)) {
       return { ok: false, error: { code: "UNSUPPORTED_CAPABILITY", message: `unknown tool ${String(tool).slice(0, 40)}` }, revision };
@@ -400,8 +410,6 @@
       let result;
       if (viaCampaign) {
         result = (await CAMPAIGN_TOOLS[tool](args || {})) ?? { id: args?.node_id ?? args?.artboard_id };
-        const changed = typeof args?.node_id === "string" ? objs.get(args.node_id) : null;
-        if (changed?.group && kindOf(changed.group) === "group") changed.group.triggerLayout();
       } else {
         result = await TOOLS[tool](args || {});
       }

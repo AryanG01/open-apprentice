@@ -109,6 +109,18 @@ def seal(root: pathlib.Path, manifest: pathlib.Path) -> dict:
     return body
 
 
+def check_sealed(root: pathlib.Path, manifest: pathlib.Path) -> None:
+    """Everything a run needs before it may touch an engine: a manifest, a valid set, and no file changed since sealing."""
+    if not manifest.is_file():
+        raise SealError(
+            f"no manifest at {manifest}: author the set and run `oa eval campaign-seal` first"
+        )
+    problems = validate_set(root)
+    if problems:
+        raise SealError("the set is not valid: " + "; ".join(problems))
+    _check_seal(root, manifest)
+
+
 def _check_seal(root: pathlib.Path, manifest: pathlib.Path) -> None:
     want = json.loads(manifest.read_text())["files"]
     got = _hashes(root)
@@ -123,7 +135,7 @@ def run_sealed(
     """Learn from the PUBLIC teaching pair only, run every sealed banner on both backends, answer a question with the
     gold's outcome (recorded as such), and verify against the sealed gold. Refuses a set that changed since sealing.
     """
-    _check_seal(root, manifest)  # before any engine call
+    check_sealed(root, manifest)  # before any engine call
     learned = asyncio.run(
         learn_layout(load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"])
     )

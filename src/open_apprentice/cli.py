@@ -1190,12 +1190,13 @@ def eval_campaign_sealed_run(
     import datetime
     from contextlib import nullcontext
 
-    from open_apprentice.evaluation.campaign_sealed import SealError, run_sealed
+    from open_apprentice.evaluation.campaign_sealed import SealError, check_sealed, run_sealed
     from open_apprentice.evaluation.local_engine import local_engine
 
     out = out or Path("results/campaign_sealed") / datetime.date.today().isoformat()
     url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
     try:
+        check_sealed(root, manifest)  # refuse before starting an engine
         with nullcontext((url, token)) if url and token else local_engine(".") as (
             eng_url,
             eng_token,

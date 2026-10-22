@@ -83,3 +83,28 @@ def test_an_empty_or_missing_set_is_refused(tmp_path):
     assert any("no banners" in p for p in validate_set(tmp_path / "missing"))
     with pytest.raises(SealError):
         seal(tmp_path / "missing", tmp_path / "manifest.json")
+
+
+def test_the_run_revalidates_a_sealed_set(toy, tmp_path):
+    seal(toy, tmp_path / "manifest.json")
+    b = json.loads((toy / "banners" / "toy_short.json").read_text())
+    b["id"] = (
+        "short_a"  # e.g. a public fixture added later with this id; the manifest is re-sealed by hand
+    )
+    (toy / "banners" / "toy_short.json").write_text(json.dumps(b))
+    from open_apprentice.evaluation.campaign_sealed import _hashes
+
+    m = json.loads((tmp_path / "manifest.json").read_text())
+    m["files"] = _hashes(toy)
+    (tmp_path / "manifest.json").write_text(json.dumps(m))
+    with pytest.raises(SealError, match="public"):
+        run_sealed(
+            toy, tmp_path / "manifest.json", "http://127.0.0.1:9", "unused", tmp_path / "out"
+        )
+
+
+def test_a_missing_manifest_is_a_plain_refusal(toy, tmp_path):
+    from open_apprentice.evaluation.campaign_sealed import check_sealed
+
+    with pytest.raises(SealError, match="no manifest"):
+        check_sealed(toy, tmp_path / "absent.json")
