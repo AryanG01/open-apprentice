@@ -351,6 +351,15 @@ def _mock(roles=None, explain_ok=True, procedure=None):
     return MockProvider({}, functions=fns)
 
 
+def _opaque_truth(fid, src):
+    """The authored roles keyed by the opaque ids the model is shown (what a correct model would answer)."""
+    from open_apprentice.campaign.fixtures import load_fixture
+    from open_apprentice.campaign.roles import opaque_ids
+
+    ids = opaque_ids(load_fixture(fid)["scene"], "banner")
+    return {ids[k]: v for k, v in _truth(src).items()}
+
+
 def _truth(src):
     from open_apprentice.campaign.fixtures import load_fixture
 
@@ -358,7 +367,7 @@ def _truth(src):
 
 
 def test_an_untagged_banner_needs_confirmed_roles(client):
-    client.app.state.provider = _mock(roles=_truth("short_b"))
+    client.app.state.provider = _mock(roles=_opaque_truth("untagged_short_b", "short_b"))
     wid = _workspace(client)["workspace_id"]
     r = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "untagged_short_b"})
     assert r.status_code == 422 and "roles" in r.json()["detail"]
@@ -444,3 +453,64 @@ def test_a_provider_out_of_budget_degrades_to_baselines(client):
     )
     assert p.status_code == 200 and p.json()["origin"] == "heuristic" and p.json()["problems"]
     assert _run(client, wid, "de_long_b")["explanation"]["origin"] == "template"
+
+
+# ---- Plan 9E final review fixes ----
+def test_the_procedure_check_never_raises_on_an_engine_failure(engine_url, monkeypatch):
+    from open_apprentice.campaign.procedures import APPLY_PLAN
+    from open_apprentice.evaluation import campaign_procedure_check as cpc
+
+    def broken(self, *a, **k):
+        raise httpx.ConnectError("engine went away")
+
+    monkeypatch.setattr(cpc.EvaluatorHarness, "open_session", broken)
+    r = cpc.check_procedure(APPLY_PLAN, "konva", engine_url, TOKEN)
+    assert not r.passed and all("engine went away" in c["error"] for c in r.cases)
+
+
+def test_a_server_out_of_model_budget_says_so_on_procedures(client):
+    from open_apprentice.campaign.procedures import APPLY_PLAN
+
+    client.app.state.provider = _mock(procedure=APPLY_PLAN)
+    client.app.state.spend["usd"] = 1e9
+    wid = _workspace(client)["workspace_id"]
+    p = client.post(f"/api/campaign/workspaces/{wid}/procedures", json={"backend": "konva"}).json()
+    assert p["origin"] == "reference" and any("budget" in n for n in p["notes"])
+
+
+def test_an_accepted_procedure_is_reused_by_every_workspace_without_new_calls(client):
+    from open_apprentice.campaign.procedures import APPLY_PLAN
+
+    provider = _mock(procedure=APPLY_PLAN)
+    client.app.state.provider = provider
+    a = _workspace(client)["workspace_id"]
+    assert client.post(
+        f"/api/campaign/workspaces/{a}/procedures", json={"backend": "konva"}
+    ).json()["accepted"]
+    calls = len(provider.calls)
+    b = _workspace(client)["workspace_id"]
+    p = client.post(f"/api/campaign/workspaces/{b}/procedures", json={"backend": "konva"}).json()
+    assert p["accepted"] and p.get("cached") is True and len(provider.calls) == calls
+
+
+def test_model_use_per_address_is_scarce_and_degrades_to_baselines(client):
+    client.app.state.provider = _mock(roles=_opaque_truth("untagged_short_b", "short_b"))
+    wid = _workspace(client)["workspace_id"]
+    origins = [
+        client.post(
+            f"/api/campaign/workspaces/{wid}/roles", json={"fixture_id": "untagged_short_b"}
+        ).json()["origin"]
+        for _ in range(8)
+    ]
+    assert origins[0] == "model" and origins[-1] == "heuristic"
+
+
+def test_a_model_procedure_that_fails_on_a_banner_falls_back_to_the_reference(client):
+    client.app.state.provider = None
+    wid = _workspace(client)["workspace_id"]
+    bad = [{"op": "call", "tool": "move_node", "args": {"node_id": "nope", "x": 0, "y": 0}}]
+    client.app.state.campaign[wid].procedures["konva"] = (bad, "model")
+    out = _run(client, wid, "short_a")
+    assert out["status"] == "ready" and out["provenance"]["procedure_origin"] == "reference"
+    assert "procedure_fallback" in out["provenance"]
+    _passed(out)

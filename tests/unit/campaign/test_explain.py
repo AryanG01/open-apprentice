@@ -65,7 +65,7 @@ def test_a_rejected_model_explanation_falls_back_to_the_template():
 
 
 def test_a_good_model_explanation_is_used():
-    good = "Your German headline needs 317 px but only 160 px fit, and the legal line needs 218 px. Shrinking the product image is not enough; splitting across two cards fits."
+    good = "Your German headline needs 317 px but only 160 px fit, and the legal line needs 218 px of 160 px. Shrinking the product image is not enough; splitting across two cards fits."
     provider = MockProvider({"campaign_explain": [{"text": good}]})
     e = asyncio.run(explain(provider, Ledger(Limits(tokens=50_000, calls=2)), FACTS))
     assert e.origin == "model" and e.text == good
@@ -74,3 +74,29 @@ def test_a_good_model_explanation_is_used():
 def test_without_a_provider_the_template_is_used():
     e = asyncio.run(explain(None, None, FACTS))
     assert e.origin == "template"
+
+
+# Final review fixes: contradictions, raw ids, booleans, links.
+import pytest
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "The headline needs 160 px but its frame holds 317 px; the legal line needs 218 px of 160 px. Shrinking works and splitting does not help.",
+        "The headline needs 317 px of 160 px and the legal line 218 px of 160 px. Shrink is not bad: it fits; splitting fits.",
+        "The headline needs 317 px of 160 px and the legal line 218 px of 160 px. Shrinking does not fit; splitting cannot help.",
+        "The headline needs 317 px of 160 px and the legal line 218 px of 160 px.",
+        "The headline needs 317 px of 160 px and the legal line 218 px of 160 px. shrink_hero does not fit (false); split_two_cards fits (true).",
+        "The headline needs 317 px of 160 px and the legal line 218 px of 160 px. Shrinking does not fit; splitting fits. See evil.example/x",
+    ],
+)
+def test_contradictions_raw_ids_and_links_are_rejected(bad):
+    assert check_explanation(bad, FACTS), bad
+
+
+def test_a_word_containing_cta_is_not_a_role_mention():
+    ok = template_explanation(FACTS).replace(
+        "Splitting across two cards fits.", "Splitting across two cards fits, as the facts dictate."
+    )
+    assert check_explanation(ok, FACTS) == []

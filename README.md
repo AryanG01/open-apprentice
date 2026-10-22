@@ -87,7 +87,9 @@ What is and is not shown:
   simple heuristic (no measured gain on these banners); its explanations passed the fact check 3 of 3 in one run and 2 of
   3 in another; its procedures were accepted on the first attempt on both engines, but they are essentially what the
   prompt's input contract dictates (the Konva one is identical to our reference), so this shows contract-following, not
-  procedure design. Development fixtures only.
+  procedure design. Development fixtures only, and measured with a setup the final review then tightened (the role
+  prompt's layer ids named the roles; one "new" acceptance banner had been shown as an example), so these numbers need a
+  rerun before they are quoted.
 - The same learned rule runs on real Konva and real Fabric through the same restricted procedure:
   [`docs/evaluation/campaign_parity.md`](docs/evaluation/campaign_parity.md) (16 of 16 verifier rows pass).
 - Those are **public development fixtures, not held out**. A private sealed set for a generalization claim has tooling

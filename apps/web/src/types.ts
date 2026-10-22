@@ -427,6 +427,7 @@ export interface CampaignProcedure {
   accepted: boolean;
   attempts: { passed: boolean; cases: { fixture: string; outcome: string; passed: boolean; failed_checks: string[] }[]; note?: string }[];
   notes: string[];
+  cached?: boolean;
   model: "on" | "off";
 }
 

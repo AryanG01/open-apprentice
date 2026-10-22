@@ -44,3 +44,9 @@ Nemotron's wording used on **2 of 3**; otherwise the template.
   variable names and a redundant guard. The prompt's input contract all but dictates the program, so this shows that
   Nemotron reliably follows a precise tool contract on both engines, not that it designs procedures. A harder test
   would give it unordered or higher-level inputs.
+- **Superseded setup (final review, same day).** These three runs used the first prompts: the role prompt showed authored
+  layer ids that named the roles (e.g. `sb-price`), so 6/6 says little; one of the two "new" acceptance banners
+  (`de_long_a`) had been shown to the model as an input example; and an empty program could have been credited to
+  Nemotron (the saved programs show it was not). All three are fixed (opaque ids, examples disjoint from the
+  acceptance banners, empty programs refused, a stricter explanation check). A rerun under the fixed setup is needed
+  before any of these numbers are quoted.

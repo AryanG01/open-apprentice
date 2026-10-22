@@ -42,6 +42,12 @@ def _ledger():
 
 
 def _propose(fid, mapping):
+    from open_apprentice.campaign.roles import opaque_ids
+
+    to_opaque = opaque_ids(load_fixture(fid)["scene"], "banner")
+    mapping = {
+        to_opaque.get(k, k): v for k, v in mapping.items()
+    }  # the model only ever sees opaque ids
     provider = MockProvider({"campaign_roles": [{"roles": mapping}]})
     return (
         asyncio.run(propose_roles(provider, _ledger(), load_fixture(fid)["scene"], "banner")),
@@ -64,7 +70,7 @@ def test_a_swapped_price_and_headline_is_rejected_and_the_heuristic_is_used():
     swapped["sb-head"], swapped["sb-price"] = "price", "headline"
     p, _ = _propose("untagged_short_b", swapped)
     assert p.origin == "heuristic" and p.mapping == _truth("short_b")
-    assert any("price" in x for x in p.problems)
+    assert any("price" in x or "sizes" in x for x in p.problems)
 
 
 def test_a_mapping_missing_a_role_is_rejected():
@@ -85,3 +91,42 @@ def test_apply_roles_returns_a_tagged_copy():
     tagged = apply_roles(scene, "banner", _truth("short_b"))
     assert {n["id"]: n.get("role") for n in tagged["nodes"] if n.get("role")} == _truth("short_b")
     assert all("role" not in n for n in scene["nodes"])
+
+
+# Final review fixes: swaps the type checks alone cannot see; ids must not name roles.
+@pytest.mark.parametrize(
+    "a,b", [("price", "legal"), ("headline", "legal"), ("brand_mark", "product_image")]
+)
+def test_swapped_roles_are_rejected(a, b):
+    m = dict(_truth("short_b"))
+    ka, kb = next(k for k, v in m.items() if v == a), next(k for k, v in m.items() if v == b)
+    m[ka], m[kb] = b, a
+    assert check_role_mapping(load_fixture("untagged_short_b")["scene"], "banner", m)
+
+
+def test_the_model_sees_opaque_ids_and_no_asset_names():
+    import json
+
+    seen = json.dumps(role_candidates(load_fixture("untagged_short_b")["scene"], "banner"))
+    for leak in (
+        "sb-",
+        "head",
+        "price",
+        "logo",
+        "hero",
+        "legal",
+        "cta",
+        "bg",
+        "wordmark",
+        "headphones",
+    ):
+        assert leak not in seen, leak
+
+
+def test_a_proposal_in_opaque_ids_is_mapped_back():
+    from open_apprentice.campaign.roles import opaque_ids
+
+    scene = load_fixture("untagged_de_long_a")["scene"]
+    to_opaque = opaque_ids(scene, "banner")
+    p, _ = _propose("untagged_de_long_a", {to_opaque[k]: v for k, v in _truth("de_long_a").items()})
+    assert p.origin == "model" and p.mapping == _truth("de_long_a")

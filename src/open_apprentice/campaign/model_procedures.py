@@ -23,6 +23,8 @@ from open_apprentice.skills.interpreter import ProgramError, validate_program
 
 PROMPT = pathlib.Path(__file__).resolve().parents[3] / "prompts" / "campaign_procedure.md"
 MAX_ATTEMPTS = 3
+# examples shown to the model; never the acceptance banners (short_b, de_long_a), so those are unseen
+EXAMPLE_BANNERS = ("teach_before", "de_long_b")
 
 
 class ProgramOut(StrictModel):
@@ -48,12 +50,16 @@ class ProcedureOutcome:
 
 
 def _example_inputs() -> list[dict]:
-    """Two real plan inputs (one card; two cards) from public development fixtures, so the model sees the field shapes."""
+    """Two real plan inputs (one card; two cards) from banners that are NOT acceptance cases, so the model sees the field
+    shapes without seeing the banners it is judged on."""
     learned = asyncio.run(
         learn_layout(load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"])
     )
     out = []
-    for fid, transform in (("short_a", lambda p: p), ("de_long_a", split_two_cards)):
+    for fid, transform in (
+        (EXAMPLE_BANNERS[0], lambda p: p),
+        (EXAMPLE_BANNERS[1], split_two_cards),
+    ):
         src = load_fixture(fid)["scene"]
         res = evaluate_layout(
             wrap_learned(learned.rule),
@@ -64,9 +70,22 @@ def _example_inputs() -> list[dict]:
     return out
 
 
+def _has_call(stmts: list) -> bool:
+    return any(
+        isinstance(x, dict)
+        and (
+            x.get("op") == "call"
+            or any(_has_call(x.get(k) or []) for k in ("body", "then", "else"))
+        )
+        for x in stmts
+    )
+
+
 async def propose_procedures(
     provider: Provider, ledger: Ledger, backend: str, failures: list[str] | None = None
-) -> list[list]:
+) -> tuple[list[list], str | None]:
+    """(candidates, error). A candidate must make at least one allowlisted tool call: an empty program must never be
+    accepted, credited to Nemotron, or confused with the reference."""
     examples = await asyncio.to_thread(_example_inputs)
     payload = {"backend": backend, "example_inputs": examples, "previous_failures": failures or []}
     res = await call_model(
@@ -79,9 +98,11 @@ async def propose_procedures(
         max_tokens=6000,
     )
     if res.parsed is None:
-        return []
+        return [], res.error
     kept = []
     for c in res.parsed.candidates[:2]:
+        if not c.program or not _has_call(c.program):
+            continue
         try:
             validate_program(
                 c.program, APPLY_TOOLS
@@ -89,7 +110,7 @@ async def propose_procedures(
         except ProgramError:
             continue
         kept.append(c.program)
-    return kept
+    return kept, None
 
 
 async def write_procedure(
@@ -103,7 +124,12 @@ async def write_procedure(
     attempts: list[dict] = []
     failures: list[str] = []
     for _ in range(MAX_ATTEMPTS):
-        candidates = await propose_procedures(provider, ledger, backend, failures)
+        candidates, error = await propose_procedures(provider, ledger, backend, failures)
+        if error:
+            attempts.append({"passed": False, "cases": [], "note": error})
+            if "budget" in error:
+                break  # spending more cannot help
+            continue
         if not candidates:
             attempts.append({"passed": False, "cases": [], "note": "no usable candidate"})
             failures = [

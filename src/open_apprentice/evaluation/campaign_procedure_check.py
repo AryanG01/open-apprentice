@@ -40,23 +40,21 @@ def check_procedure(program: list, backend: str, engine_url: str, token: str) ->
         plan = plan_from_layout(res, src, "banner", learned.origin)
         if outcome == "split":
             plan = split_two_cards(plan)
-        session, _ = harness.open_session(src, OWNER, backend=backend)
+        try:  # any failure (a broken candidate, the engine at its cap, a timeout) is a failed case, never a crash
+            session, _ = harness.open_session(src, OWNER, backend=backend)
+        except Exception as e:  # noqa: BLE001
+            cases.append(
+                {
+                    "fixture": fid,
+                    "outcome": outcome,
+                    "passed": False,
+                    "failed_checks": [],
+                    "error": f"{type(e).__name__}: {str(e)[:160]}",
+                }
+            )
+            continue
         try:
-            try:
-                apply_plan(session, plan, program, "model")
-            except (
-                Exception
-            ) as e:  # noqa: BLE001 - a broken candidate is a failed case, never a crash
-                cases.append(
-                    {
-                        "fixture": fid,
-                        "outcome": outcome,
-                        "passed": False,
-                        "failed_checks": [],
-                        "error": f"{type(e).__name__}: {str(e)[:160]}",
-                    }
-                )
-                continue
+            apply_plan(session, plan, program, "model")
             report = verify_story(
                 src, harness.native(session.session_id, OWNER), load_gold(fid, outcome)["scene"]
             )
@@ -68,6 +66,19 @@ def check_procedure(program: list, backend: str, engine_url: str, token: str) ->
                     "failed_checks": report.failed(),
                 }
             )
+        except Exception as e:  # noqa: BLE001
+            cases.append(
+                {
+                    "fixture": fid,
+                    "outcome": outcome,
+                    "passed": False,
+                    "failed_checks": [],
+                    "error": f"{type(e).__name__}: {str(e)[:160]}",
+                }
+            )
         finally:
-            session.close()
+            try:
+                session.close()
+            except Exception:  # noqa: BLE001 - the engine reaps an idle session
+                pass
     return ProcedureCheck(all(c["passed"] for c in cases), cases)

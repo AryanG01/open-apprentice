@@ -127,6 +127,8 @@ def apply_plan(
     """Run a procedure (the reference one by default) on `session`. Engine tool errors propagate (the caller discards the
     session)."""
     _, used = run_program(
-        program or APPLY_PLAN, plan_inputs(plan), session.tools(sorted(APPLY_TOOLS))
+        APPLY_PLAN if program is None else program,
+        plan_inputs(plan),
+        session.tools(sorted(APPLY_TOOLS)),
     )
     return {"origin": origin, "actions": used["actions"]}

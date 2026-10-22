@@ -36,6 +36,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.live = {}
     app.state.campaign = {}  # campaign workspaces (api/campaign.py)
     app.state.campaign_store = None
+    app.state.campaign_procedures = (
+        {}
+    )  # backend -> accepted model procedure, shared by every workspace
     app.state.engine = None
     app.state.engine_error = None
     app.state.spend = {"usd": 0.0, "tokens": 0}

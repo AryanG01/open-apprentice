@@ -334,6 +334,12 @@ export function CampaignLane() {
                 <strong>{b}:</strong>{" "}
                 {p.model === "off" ? (
                   "Nemotron is off on this server; the reference procedure stays in use."
+                ) : p.notes.length ? (
+                  `Nemotron was not used: ${p.notes.join("; ")}. The reference procedure stays in use.`
+                ) : p.cached ? (
+                  <>
+                    <span className="pill ok">accepted: Nemotron</span> (written and checked earlier on this server); later {b} runs use it.
+                  </>
                 ) : p.accepted ? (
                   <>
                     <span className="pill ok">accepted: Nemotron</span> after {p.attempts.length} attempt{p.attempts.length === 1 ? "" : "s"}; later {b} runs use it.

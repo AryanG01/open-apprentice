@@ -12,11 +12,19 @@ from .conftest import TOKEN
 
 
 def _truth_for(messages):
-    ids = {x["id"] for x in json.loads(messages[-1].content)["layers"]}
+    """A correct mock 'model': recognise the banner by its visible text, answer in the opaque ids it was shown."""
+    from open_apprentice.campaign.roles import opaque_ids
+
+    texts = {x["text"] for x in json.loads(messages[-1].content)["layers"] if "text" in x}
     for fid in ROLE_BANNERS:
-        nodes = load_fixture(fid)["scene"]["nodes"]
-        if ids == {n["id"] for n in nodes if n.get("parent") == "banner"}:
-            return {"roles": {n["id"]: n["role"] for n in nodes if n.get("role")}}
+        scene = load_fixture(fid)["scene"]
+        if texts == {
+            n["text"][:200]
+            for n in scene["nodes"]
+            if n.get("parent") == "banner" and n["type"] == "text"
+        }:
+            ids = opaque_ids(scene, "banner")
+            return {"roles": {ids[n["id"]]: n["role"] for n in scene["nodes"] if n.get("role")}}
     raise AssertionError("unknown banner")
 
 

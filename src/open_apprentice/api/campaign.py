@@ -48,7 +48,7 @@ GOLD_OUTCOME = {
 }  # gold files name outcomes briefly
 _PNG_CACHE: dict[str, str] = {}  # fixture id -> rendered thumbnail, once per process
 WORKSPACE_MODEL_LIMITS = Limits(
-    tokens=60_000, calls=12
+    tokens=30_000, calls=8
 )  # per workspace; the server-wide demo cap applies on top
 
 
@@ -333,15 +333,8 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
             busy.append(e.detail)
             raise
 
-    def work() -> dict:
-        run = start_run(
-            source,
-            fixture["locale"],
-            ws.learned,
-            open_session,
-            ws.prefs,
-            ws.procedures.get(body.backend),
-        )
+    def attempt(procedure) -> dict:
+        run = start_run(source, fixture["locale"], ws.learned, open_session, ws.prefs, procedure)
         run.provenance["roles_origin"] = roles_origin
         try:
             snapshots = {
@@ -365,14 +358,30 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
         ws.runs[run.run_id] = rec
         return _gate(rec) if run.status in ("ready", "applied") else _run_out(rec)
 
+    def work() -> dict:
+        procedure = ws.procedures.get(body.backend)
+        out = attempt(procedure)
+        if procedure and out and out["status"] in ("failed", "blocked"):
+            # an accepted model procedure was checked on three banners only: on any other it must never cost the result
+            status = out["status"]
+            keep.clear()
+            out = attempt(None)
+            if out:
+                out["provenance"][
+                    "procedure_fallback"
+                ] = f"Nemotron's procedure {status} on this banner; the reference procedure was used"
+        return out
+
     async with ws.lock:
         out = await asyncio.to_thread(work)
         if not out:
             raise HTTPException(503, busy[0] if busy else BUSY)
         if out["status"] == "question":
             provider, note = _model(request, ws)
-            e = await explain(provider, ws.ledger, overflow_facts(keep[0].run, source))
-            _account(request, ws)
+            try:
+                e = await explain(provider, ws.ledger, overflow_facts(keep[-1].run, source))
+            finally:
+                _account(request, ws)
             out["explanation"] = {"text": e.text, "origin": e.origin, "problems": e.problems + note}
     return out
 
@@ -431,15 +440,37 @@ async def rollback(request: Request, wid: str, body: RollbackIn) -> dict:
         return await asyncio.to_thread(work)
 
 
+MODEL_REQUESTS_PER_HOUR = (
+    6  # per address: model use is scarce on the public demo (Try-it-live allows 3 sessions/hour)
+)
+
+
+def _model_quota(request: Request) -> bool:
+    client = request.client.host if request.client else "unknown"
+    now, hits = time.time(), request.app.state.rate.setdefault((client, "campaign_model"), [])
+    hits[:] = [t for t in hits if now - t < 3600]
+    if len(hits) >= MODEL_REQUESTS_PER_HOUR:
+        return False
+    hits.append(now)
+    return True
+
+
 def _model(request: Request, ws: Workspace):
-    """(provider, notes): the server's Nemotron provider when model mode is on and the demo budget allows one more call."""
+    """(provider, notes): the server's Nemotron provider when model mode is on, this address has model requests left and
+    the demo budget allows it; otherwise (None, why) and the caller uses its baseline."""
     provider = getattr(request.app.state, "provider", None)
     if provider is None:
         return None, []
     try:
-        _require_model_budget(request, ws)
+        _require_model_budget(
+            request, None if ws.counted_usd == 0 else ws
+        )  # a workspace's first use needs a full reserve
     except HTTPException as e:
         return None, [str(e.detail)]
+    if not _model_quota(request):
+        return None, [
+            f"Nemotron is limited to {MODEL_REQUESTS_PER_HOUR} requests per hour per address on this demo; the fallback is shown"
+        ]
     return provider, []
 
 
@@ -448,10 +479,12 @@ async def roles(request: Request, wid: str, body: FixtureIn) -> dict:
     _rate_limit(request, "campaign")
     ws = _ws(request, wid)
     scene = _banner(body.fixture_id)["scene"]
-    provider, note = _model(request, ws)
     async with ws.lock:
-        p = await propose_roles(provider, ws.ledger, scene, "banner")
-        _account(request, ws)
+        provider, note = _model(request, ws)
+        try:
+            p = await propose_roles(provider, ws.ledger, scene, "banner")
+        finally:
+            _account(request, ws)
     return {
         "mapping": p.mapping,
         "origin": p.origin,
@@ -466,22 +499,41 @@ async def procedures(request: Request, wid: str, body: BackendIn) -> dict:
     _rate_limit(request, "campaign")
     ws = _ws(request, wid)
     url, token = _engine(request)
-    provider, note = _model(request, ws)
+    model_on = getattr(request.app.state, "provider", None) is not None
+    cache = request.app.state.campaign_procedures
     async with ws.lock:
-        out = await write_procedure(
-            provider,
-            ws.ledger,
-            body.backend,
-            lambda prog: check_procedure(prog, body.backend, url, token),
-        )
-        _account(request, ws)
+        if (
+            body.backend in cache
+        ):  # the task is the same for every visitor: an accepted procedure is reused, not re-bought
+            ws.procedures[body.backend] = (cache[body.backend], "model")
+            return {
+                "backend": body.backend,
+                "origin": "model",
+                "accepted": True,
+                "cached": True,
+                "attempts": [],
+                "notes": [],
+                "model": "on" if model_on else "off",
+            }
+        provider, note = _model(request, ws)
+        try:
+            out = await write_procedure(
+                provider,
+                ws.ledger,
+                body.backend,
+                lambda prog: check_procedure(prog, body.backend, url, token),
+            )
+        finally:
+            _account(request, ws)
         if out.origin == "model":
             ws.procedures[body.backend] = (out.program, "model")
+            cache[body.backend] = out.program
     return {
         "backend": body.backend,
         "origin": out.origin,
         "accepted": out.origin == "model",
+        "cached": False,
         "attempts": out.attempts,
         "notes": note,
-        "model": "on" if getattr(request.app.state, "provider", None) is not None else "off",
+        "model": "on" if model_on else "off",
     }

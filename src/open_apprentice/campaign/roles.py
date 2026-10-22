@@ -4,6 +4,7 @@ impossible mappings, a heuristic is the fallback, and the owner confirms before 
 from __future__ import annotations
 
 import copy
+import hashlib
 import pathlib
 import re
 from dataclasses import dataclass, field
@@ -37,19 +38,27 @@ def _children(scene: dict, nid: str) -> list[dict]:
     return [n for n in scene["nodes"] if n.get("parent") == nid]
 
 
+def opaque_ids(scene: dict, artboard: str) -> dict[str, str]:
+    """Real layer id -> L1..Ln in a hashed order: authored ids (e.g. "sb-price") and layer order would give the roles away."""
+    ids = sorted(
+        (n["id"] for n in _layers(scene, artboard)),
+        key=lambda i: hashlib.sha256(i.encode()).hexdigest(),
+    )
+    return {real: f"L{k + 1}" for k, real in enumerate(ids)}
+
+
 def role_candidates(scene: dict, artboard: str) -> list[dict]:
-    """Exactly what the model is shown: no roles, no gold, text cut to 200 characters."""
+    """Exactly what the model is shown: opaque ids, no roles, no asset names, no gold, text cut to 200 characters."""
+    ids = opaque_ids(scene, artboard)
     out = []
-    for n in _layers(scene, artboard):
+    for n in sorted(_layers(scene, artboard), key=lambda n: ids[n["id"]]):
         c = {
-            "id": n["id"],
+            "id": ids[n["id"]],
             "type": n["type"],
             "box": [n["x"], n["y"], n.get("width"), n.get("height")],
         }
         if n["type"] == "text":
             c |= {"text": n["text"][:200], "fontSize": n["fontSize"]}
-        if n["type"] == "image":
-            c["asset"] = n["asset"]
         if n["type"] == "group":
             c["children"] = sorted(k["type"] for k in _children(scene, n["id"]))
         out.append(c)
@@ -84,8 +93,23 @@ def check_role_mapping(scene: dict, artboard: str, mapping: dict[str, str]) -> l
     for r in ("headline", "price", "legal"):
         if n[r]["type"] != "text":
             problems.append(f"{r} must be text")
-    if n["price"]["type"] == "text" and not re.search(r"\d", n["price"]["text"]):
-        problems.append("price must contain a number")
+    if n["price"]["type"] == "text" and not (
+        re.search(r"\d", n["price"]["text"]) and re.search(r"[$€£¥]", n["price"]["text"])
+    ):
+        problems.append("price must contain a number and a currency sign")
+    texts = [n[r] for r in ("headline", "price", "legal")]
+    if (
+        all(t["type"] == "text" for t in texts)
+        and not texts[0]["fontSize"] > texts[1]["fontSize"] > texts[2]["fontSize"]
+    ):
+        problems.append("text sizes must run headline > price > legal")
+    area = lambda x: (x.get("width") or 0) * (x.get("height") or 0)
+    if (
+        n["product_image"]["type"] == "image"
+        and n["brand_mark"]["type"] == "image"
+        and area(n["product_image"]) <= area(n["brand_mark"])
+    ):
+        problems.append("the product image must be larger than the brand mark")
     kids = sorted(k["type"] for k in _children(scene, n["cta"]["id"]))
     if n["cta"]["type"] != "group" or kids != ["shape", "text"]:
         problems.append("cta must be a group holding a shape and a text")
@@ -129,10 +153,15 @@ async def propose_roles(
         return RoleProposal(
             heuristic_roles(scene, artboard), "heuristic", [res.error or "no reply"]
         )
-    problems = check_role_mapping(scene, artboard, res.parsed.roles)
+    back = {v: k for k, v in opaque_ids(scene, artboard).items()}
+    unknown = [i for i in res.parsed.roles if i not in back]
+    mapping = {back[i]: r for i, r in res.parsed.roles.items() if i in back}
+    problems = [f"{i} is not a layer it was shown" for i in unknown] + check_role_mapping(
+        scene, artboard, mapping
+    )
     if problems:
         return RoleProposal(heuristic_roles(scene, artboard), "heuristic", problems)
-    return RoleProposal(dict(res.parsed.roles), "model")
+    return RoleProposal(mapping, "model")
 
 
 def apply_roles(scene: dict, artboard: str, mapping: dict[str, str]) -> dict:

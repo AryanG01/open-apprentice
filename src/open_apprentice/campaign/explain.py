@@ -77,10 +77,36 @@ def template_explanation(facts: dict) -> str:
     return (first[:1].upper() + first[1:] + ". " + "; ".join(opts) + ".").strip()
 
 
+CLAUSE = re.compile(r"[.;:!?,\u2014\u2013]|\bbut\b|\bwhile\b|\bwhereas\b")
+NOT_FIT = (
+    "does not fit",
+    "doesn't fit",
+    "not enough",
+    "cannot",
+    "can't",
+    "won't fit",
+    "would not fit",
+    "still overflow",
+    "does not work",
+    "doesn't work",
+    "is not enough",
+    "too ",
+)
+FIT = ("fits", "fit ", "works", "resolves", "solves")
+NEGATION = re.compile(r"\b(not|no|never|cannot|can't|won't|doesn't|isn't|wouldn't)\b")
+BANNED = re.compile(
+    r"\(true\)|\(false\)|shrink_hero|split_two_cards|builtin_|https?://|www\.|@|\b[\w-]+\.(?:com|net|org|io|example|dev|app)\b"
+)
+
+
 def check_explanation(text: str, facts: dict) -> list[str]:
+    """Rejects any wording that adds, drops, swaps or contradicts a measured fact."""
     problems = []
+    low = text.lower()
     if len(text) > MAX_CHARS:
         problems.append(f"longer than {MAX_CHARS} characters")
+    if BANNED.search(low):
+        problems.append("contains raw ids, true/false values or a link")
     allowed = {
         n
         for v in facts["violations"]
@@ -90,20 +116,45 @@ def check_explanation(text: str, facts: dict) -> list[str]:
     for num in re.findall(r"\d+(?:\.\d+)?", text):
         if round(float(num)) not in allowed:
             problems.append(f"the number {num} is not in the measured facts")
-    low = text.lower()
     violating = {v["role"] for v in facts["violations"]}
     for role, words in WORDS.items():
-        named = any(w in low for w in words)
-        if named and role not in violating:
+        hits = [m.start() for w in words for m in re.finditer(rf"\b{re.escape(w)}\b", low)]
+        if hits and role not in violating:
             problems.append(f"names {role}, which did not overflow")
-        if role in violating and not named:
+        if role in violating and not hits:
             problems.append(f"does not mention the {role}, which overflows")
-    for outcome, fits in facts["outcomes"].items():
-        if fits:
+    for v in facts[
+        "violations"
+    ]:  # each role's numbers in order: what it needs, then what its frame holds
+        if "needed" not in v:
             continue
-        for sentence in re.split(r"[.;!?]", low):
-            if OUTCOME_WORDS[outcome] in sentence and not any(n in sentence for n in NEGATIONS):
-                problems.append(f"suggests {OUTCOME_WORDS[outcome]} works, but it does not fit")
+        starts = [
+            m.start()
+            for w in WORDS.get(v["role"], (v["role"],))
+            for m in re.finditer(rf"\b{re.escape(w)}\b", low)
+        ]
+        ok = False
+        for r in starts:
+            n = low.find(str(v["needed"]), r)
+            if n >= 0 and low.find(str(v["available"]), n + len(str(v["needed"]))) >= 0:
+                ok = True
+        if starts and not ok:
+            problems.append(
+                f"the {v['role']}'s numbers are missing or out of order (needs {v['needed']}, holds {v['available']})"
+            )
+    clauses = [c.strip() for c in CLAUSE.split(low)]
+    for outcome, fits in facts["outcomes"].items():
+        word = OUTCOME_WORDS[outcome]
+        mentions = [c for c in clauses if word in c]
+        if not mentions:
+            problems.append(f"does not say whether {word}ing fits")
+        for c in mentions:
+            says_not = any(x in c for x in NOT_FIT)
+            says_fits = any(x in c + " " for x in FIT) and not NEGATION.search(c)
+            if fits and not says_fits:
+                problems.append(f"does not say plainly that {word}ing fits")
+            if not fits and not says_not:
+                problems.append(f"suggests {word}ing works, but it does not fit")
     return problems
 
 

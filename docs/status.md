@@ -340,3 +340,10 @@ Plan `docs/superpowers/plans/2026-10-22-p9e-campaign-nemotron.md`.
   contract-following, not procedure design; explanations were 2/3 in this run (3/3 in run 2). Plan total about $0.10
   ledger (~$0.12 real) over three runs.
 - These are development fixtures; role mapping is easy on them, so no gain over the heuristic is claimed.
+- Final review fixes (Plan 9E): an empty model program is refused (it could otherwise have been credited to Nemotron
+  while the reference ran); the explanation check ties numbers to roles and order, requires each outcome with the right
+  polarity per clause, and rejects raw ids, true/false and links; the role check enforces text-size order, a currency in
+  the price and a larger product image, and the model now sees opaque layer ids; procedure examples no longer include
+  the acceptance banners; the procedure check never raises; model use is scarce per address (6/hour), workspace
+  limits are lower, an accepted procedure is reused server-wide, and a model procedure that fails on a banner falls back
+  to the reference. Python 1518 passed, engine 83/83, e2e 13/13. **The committed measurement predates these fixes.**
