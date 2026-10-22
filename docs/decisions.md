@@ -329,3 +329,11 @@ episodes (`docs/superpowers/plans/2026-10-18-p7-policy-v2.md`) decides whether i
     banners). The procedure prompt deliberately omits the reference program so a copy cannot pass for Nemotron's work.
     Workspaces are metered like Try-it-live sessions under the server-wide demo cap. Measured once on development
     fixtures for $0.04 (see `docs/evaluation/campaign_nemotron.md`).
+
+61. **Text cross-check compares fit verdicts, not line counts (2026-10-22).** GitHub CI (Linux Chromium) wrapped
+    "Hear only what matters." in `short_a` onto one line where macOS Chromium and the verifier's font-table layout give
+    two; the same platform drift showed earlier as 6 vs 7 legal lines on Cloud Run vs Mac. Near a wrap boundary exact
+    line counts are not portable, and nothing downstream depends on them: the verifier decides on fit. The cross-check
+    (`tests/integration/test_campaign_text_crosscheck.py`) now requires the engine and the verifier to agree on whether
+    each text fits its frame and on `word_too_wide`. Checked that it still has teeth: scaling the verifier's font size
+    by 1.4 fails it on both backends. Cost if wrong: a line-count bug that never changes a fit verdict goes unnoticed.
