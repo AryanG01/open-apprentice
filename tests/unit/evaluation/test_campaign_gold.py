@@ -50,3 +50,35 @@ def test_teaching_pair_is_its_own_gold():
 def test_gold_is_returned_as_a_fresh_copy():
     load_gold("short_a", "layout")["scene"]["nodes"].clear()
     assert load_gold("short_a", "layout")["scene"]["nodes"]
+
+
+# Frames per layout (plan 9A Task 5 expected-verdicts table), measured with the independent text layout.
+FRAMES = {
+    "base": {"headline": (160, 72, 1.1), "legal": (160, 24, 1.3)},
+    "shrink": {"headline": (448, 72, 1.1), "legal": (160, 24, 1.3)},
+    "split": {"headline": (620, 72, 1.1), "legal": (320, 24, 1.3)},
+}
+
+
+def _overflows(fid: str, layout: str) -> set[str]:
+    from open_apprentice.evaluation.text_layout import fit
+
+    copy = _copy(load_fixture(fid)["scene"])
+    out = set()
+    for role, (h, size, lh) in FRAMES[layout].items():
+        f = fit(copy[role], 936, size, role == "headline", lh)
+        if f.height > h or f.word_too_wide:
+            out.add(role)
+    return out
+
+
+def test_expected_fit_verdicts_hold():
+    for fid in ("short_a", "short_b"):
+        assert _overflows(fid, "base") == set(), fid
+    for fid in ("de_long_a", "fr_long"):
+        assert _overflows(fid, "base") == {"headline"}, fid
+        assert _overflows(fid, "shrink") == set(), fid
+        assert _overflows(fid, "split") == set(), fid
+    assert _overflows("de_long_b", "base") == {"headline", "legal"}
+    assert _overflows("de_long_b", "shrink") == {"legal"}
+    assert _overflows("de_long_b", "split") == set()

@@ -23,6 +23,7 @@ dependencies = [
   "pyyaml>=6.0,<7",
   "google-cloud-storage>=2.18,<3",
   "google-cloud-tasks>=2.26,<3",
+  "fonttools>=4.54,<5",
 ]
 
 [project.scripts]
@@ -89,6 +90,7 @@ forbidden_modules = [
   "open_apprentice.evaluation.label_reference",
   "open_apprentice.evaluation.teacher_sim",
   "open_apprentice.evaluation.campaign_gold",
+  "open_apprentice.evaluation.text_layout",
 ]
 
 [[tool.importlinter.contracts]]
