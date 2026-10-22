@@ -1,0 +1,7 @@
+{
+ "fixture": "de_long_b",
+ "outcome": "shrink",
+ "applicable": false,
+ "provenance": "authored in-repo from plan 9A layout tables, development gold, not held out",
+ "reason": "shrinking the hero frees space only for the headline; the legal line still overflows"
+}

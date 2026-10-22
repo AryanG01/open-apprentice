@@ -1,0 +1,173 @@
+{
+ "fixture": "short_a",
+ "outcome": "layout",
+ "applicable": true,
+ "provenance": "authored in-repo from plan 9A layout tables, development gold, not held out",
+ "scene": {
+  "canvas": {
+   "width": 1080,
+   "height": 1920
+  },
+  "nodes": [
+   {
+    "id": "story-1",
+    "type": "artboard",
+    "x": 0,
+    "y": 0,
+    "width": 1080,
+    "height": 1920,
+    "format": "9:16",
+    "safe": {
+     "top": 220,
+     "right": 72,
+     "bottom": 220,
+     "left": 72
+    },
+    "sequence": 1
+   },
+   {
+    "id": "sa-bg",
+    "type": "rect",
+    "parent": "story-1",
+    "role": "background",
+    "x": 0,
+    "y": 0,
+    "width": 1080,
+    "height": 1920,
+    "fill": "#1d1240",
+    "z": 0
+   },
+   {
+    "id": "sa-logo",
+    "type": "image",
+    "parent": "story-1",
+    "role": "brand_mark",
+    "asset": "halden-wordmark",
+    "crop": null,
+    "focal": {
+     "x": 240,
+     "y": 60
+    },
+    "x": 72,
+    "y": 220,
+    "width": 240,
+    "height": 60,
+    "z": 1
+   },
+   {
+    "id": "sa-hero",
+    "type": "image",
+    "parent": "story-1",
+    "role": "product_image",
+    "asset": "h7-headphones",
+    "crop": null,
+    "focal": {
+     "x": 500,
+     "y": 520
+    },
+    "x": 180,
+    "y": 320,
+    "width": 720,
+    "height": 720,
+    "z": 2
+   },
+   {
+    "id": "sa-head",
+    "type": "text",
+    "parent": "story-1",
+    "text": "Hear only what matters.",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 72,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 72,
+    "y": 1080,
+    "width": 936,
+    "height": 160,
+    "z": 3,
+    "role": "headline"
+   },
+   {
+    "id": "sa-price",
+    "type": "text",
+    "parent": "story-1",
+    "text": "Now $159 (was $229)",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 56,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 72,
+    "y": 1256,
+    "width": 936,
+    "height": 72,
+    "z": 4,
+    "role": "price"
+   },
+   {
+    "id": "sa-cta",
+    "type": "group",
+    "parent": "story-1",
+    "role": "cta",
+    "link": "https://halden.example/h7-sale",
+    "x": 72,
+    "y": 1360,
+    "z": 5
+   },
+   {
+    "id": "sa-legal",
+    "type": "text",
+    "parent": "story-1",
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 24,
+    "fontStyle": "normal",
+    "lineHeight": 1.3,
+    "align": "left",
+    "wrap": "word",
+    "fill": "#fdfbff",
+    "x": 72,
+    "y": 1540,
+    "width": 936,
+    "height": 160,
+    "z": 6,
+    "role": "legal"
+   },
+   {
+    "id": "sa-cta-plate",
+    "type": "shape",
+    "parent": "sa-cta",
+    "x": 0,
+    "y": 0,
+    "width": 936,
+    "height": 112,
+    "fill": "#ffd23f",
+    "cornerRadius": 16,
+    "z": 0
+   },
+   {
+    "id": "sa-cta-label",
+    "type": "text",
+    "parent": "sa-cta",
+    "text": "Shop now",
+    "fontFamily": "Liberation Sans",
+    "fontSize": 44,
+    "fontStyle": "bold",
+    "lineHeight": 1.1,
+    "align": "center",
+    "wrap": "word",
+    "fill": "#1d1240",
+    "x": 0,
+    "y": 30,
+    "width": 936,
+    "height": 52,
+    "z": 1
+   }
+  ]
+ }
+}

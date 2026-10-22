@@ -88,6 +88,7 @@ forbidden_modules = [
   "open_apprentice.evaluation.label_runner",
   "open_apprentice.evaluation.label_reference",
   "open_apprentice.evaluation.teacher_sim",
+  "open_apprentice.evaluation.campaign_gold",
 ]
 
 [[tool.importlinter.contracts]]
