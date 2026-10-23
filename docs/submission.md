@@ -56,8 +56,11 @@ the apprentice stops and shows two fully rendered outcomes (shrink the product i
 saves your answer per language as a versioned preference that you can roll back. The same rule runs in real Konva and
 real Fabric, and every result passes an independent verifier before it is shown: 16 of 16 rows pass on both engines.
 Nemotron-3-Super has two checked jobs here:
-- **Roles:** it proposes layer roles for banners that arrive untagged, and you confirm them. In our live measurement it
-  was right on 6 of 6 banners, but a simple rule of thumb also scores 6 of 6, so this shows no gain.
+- **Roles:** it proposes layer roles for banners that arrive untagged, and you confirm them. On 6 plain banners it and
+  a simple rule of thumb both scored 6 of 6. On 24 harder held-out banners (decoy layers, sale prices, twin prices),
+  pre-registered and written by a separate AI agent, the shipped Nemotron proposal was exactly right on 14 against the
+  rule of thumb's 6. The same run showed our own checker rejecting 3 correct sale-banner answers, so raw Nemotron did
+  better still (17).
 - **Wording:** it phrases the overflow question. Its wording is used only if every number in it matches the measured
   facts. That happened on 0 of 3 banners, so the built-in wording is shown, and the page says so.
 

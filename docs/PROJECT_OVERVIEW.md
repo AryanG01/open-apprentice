@@ -101,7 +101,8 @@ notes.
 | Same rule on Konva and Fabric, development fixtures | **16 / 16** verifier rows pass | `docs/evaluation/campaign_parity.md` |
 | **Sealed held-out set**: 8 new banners, 4 new languages (es, nl, pl, it) | **22 / 22** rows pass on both engines | `docs/evaluation/campaign_sealed.md` |
 | Asks exactly when it should, on the sealed set | **16 / 16** banner × engine cases (no question on 3 short banners; question on 5 long ones; on the 2 extra-long ones "shrink" is correctly marked *does not fit*) | same |
-| Nemotron role proposals (live, opaque ids) | **6 / 6** correct, but a simple heuristic is also 6/6, so **no gain is shown** | `docs/evaluation/campaign_nemotron.md` |
+| Nemotron role proposals (live, opaque ids), plain dev banners | **6 / 6**, heuristic also 6/6: no gain there | `docs/evaluation/campaign_nemotron.md` |
+| Role proposals, 24 harder held-out banners (pre-registered, agent-authored) | shipped hybrid **14/24** vs heuristic **6/24**; raw Nemotron 17/24 (the checker wrongly rejects sale banners); strong prompt 18/24 | `docs/evaluation/campaign_roles.md` |
 | Nemotron wording of the overflow question | **0 / 3** passed the strict fact check in the measurement, so the template was shown. (In one later live recording the wording did pass, so acceptance varies from run to run.) | same |
 | Nemotron-written native procedures | Accepted on both engines (Konva on attempt 1, Fabric on attempt 2). They follow the prompt's input contract almost verbatim, which shows **contract-following, not procedure design**. | same |
 | Live measurement spend (4 runs) | $0.358 in the ledger (the latest run alone $0.255, mostly two cut-off procedure calls) | `docs/evaluation/campaign_nemotron.md` |
@@ -161,7 +162,7 @@ The setup:
 
 ### 3d. Engineering
 
-- **Tests:** 1,523 Python tests (unit, integration, contracts, evaluation) and 85 engine tests (Konva and Fabric in
+- **Tests:** 1,530 Python tests (unit, integration, contracts, evaluation) and 85 engine tests (Konva and Fabric in
   real Chromium), plus browser end-to-end journeys.
 - **CI:** GitHub Actions on Python 3.12: lint, import contracts, web build, engine, browser.
 - **Clean-clone check:** the README setup steps were re-run from a fresh clone on 22 Oct and all passed.
@@ -183,9 +184,9 @@ contract-following rather than design.
 
 **Cost controls:**
 - Model mode is off unless `DEMO_MODEL_ENABLED=1`.
-- The diagram lane has a durable dollar cap shared by all instances.
-- The Campaign lane has a per-instance cap and 6 requests per address per hour. This is a **known gap**: it is not on
-  the durable ledger.
+- One durable dollar cap ($3 in production) shared by every instance and surviving restarts covers all lanes (since
+  revision 00034-xuj); Campaign also allows 6 model requests per address per hour, keyed on the address Cloud Run
+  appends, so a forged `X-Forwarded-For` does not reset it.
 - When the cap is reached, the page says so and offers the offline learner or the recorded REPLAY. It never silently
   downgrades.
 - The Nebius balance is $12.26, with a $10 reserve kept for judging.
@@ -272,7 +273,6 @@ Engine service (Node 22 + Playwright) → locked, offline headless Chromium runn
 
   The model's clearest value is in the diagram lane's hybrid result, and that is on small development samples.
 - **On the diagram lane's frozen evaluation, the asking policy does not beat the same model acting freely on learning.**
-- **The Campaign spend cap is per instance**, not on the durable ledger.
 - **Text measurement differs slightly between macOS and Linux Chromium near wrap boundaries.** The cross-check
   compares fit verdicts, not line counts (`docs/decisions.md` #61).
 - **The ledger runs about 11% below real spend.**

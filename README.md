@@ -90,7 +90,9 @@ What is and is not shown:
   Fabric (used only if the independent verifier passes it on a seen banner and two unseen ones). Latest live
   measurement ([`docs/evaluation/campaign_nemotron.md`](docs/evaluation/campaign_nemotron.md), run 4 of 4 on
   development fixtures): roles 6 of 6 with opaque layer ids (a simple heuristic also gets 6 of 6, so no gain is
-  shown); explanations 0 of 3 accepted under the strict fact check (the template was shown); procedures accepted on
+  shown there; on a pre-registered set of 24 harder agent-authored banners the shipped hybrid gets 14 of 24 against
+  the heuristic's 6, and our checker costs it 3 correct answers:
+  [`campaign_roles.md`](docs/evaluation/campaign_roles.md)); explanations 0 of 3 accepted under the strict fact check (the template was shown); procedures accepted on
   both engines (first and second attempt), but they follow the prompt's input contract almost verbatim, so this shows
   contract-following, not procedure design. A procedure request can cost about $0.25 because the model's reasoning is
   not bounded by its token limit.
@@ -189,7 +191,7 @@ We hold ourselves to the claims we can back with a command.
 - Reproduced native mismatch when a tool changes silently while the abstract model still passes, and binding-only repair with retained-case replay (a hard-coded "fix" is rejected).
 - Exact-arithmetic rule language, an AST-to-Z3 compiler with property-tested agreement, and typed witness search (`witness_found` / `no_witness_in_model` / `incomplete` / ...).
 - Four evidence axes (intent, symbolic, native, held-out) are kept separate everywhere; there is no combined score and no single "Verified" badge.
-- 1,500+ tests (1,523 in the unit, integration, contract and evaluation suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
+- 1,500+ tests (1,530 in the unit, integration, contract and evaluation suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
 
 **Measured with a live NVIDIA model (development split, small samples):** the model alone committed to a wrong rule 15 of 34 times (44%); an extra "audit" round did not help; unioning the model's proposals with a
 bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that alone does not show the model adds value. On six rules *outside* the search's grammar it does: search alone got 0 of 12 right, the model alone 5 of 12 (with 2 confident-wrong commits), and the hybrid committed 5 rules, all correct. Tiny samples, development split.

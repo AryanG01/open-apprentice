@@ -1,4 +1,16 @@
-# CURRENT STATE — 2026-10-22 (read first)
+# CURRENT STATE — 2026-10-23 (read first)
+
+**Production (2026-10-23, later):** revision `open-apprentice-00034-xuj` (image `demo:prod-29d6525`) at 100% with the
+`next` tag. Changes from 00032-dux: the demo model cap (Try-it-live and Campaign) is charged to the durable GCS ledger
+every instance reads, so it holds across restarts and scale-out; rate limits key on the rightmost `X-Forwarded-For`
+entry (uvicorn's `FORWARDED_ALLOW_IPS=*` made the leftmost, visitor-chosen entry the client); `DEMO_MODEL_MAX_USD=3`
+(ledger stood at $1.10, balance $12.26, keeps the $10 reserve). Smoke on the candidate: health cap $3, Konva run ready,
+live role proposal (origin model), ledger 1.0972 -> 1.0983. **Rollback:** `gcloud run services update-traffic
+open-apprentice --project oa-demo-1013-19737 --region us-central1 --to-revisions open-apprentice-00032-dux=100
+--update-tags next=open-apprentice-00032-dux` (that revision has DEMO_MODEL_MAX_USD=5 and the per-instance cap).
+Role-mapping comparison (pre-registered, 24 agent-authored banners, $0.075): `docs/evaluation/campaign_roles.md`.
+
+# EARLIER STATE — 2026-10-22
 
 **Production (2026-10-23):** https://open-apprentice-md76de375q-uc.a.run.app serves revision `open-apprentice-00032-dux`
 (image `demo:prod-874dd80`, master `874dd80`: story cards exported in full, role table keyed by real layer ids) at 100%, with the `next` tag (Cloud Tasks call back to the `next---` URL, so

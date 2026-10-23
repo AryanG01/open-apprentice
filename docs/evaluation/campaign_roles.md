@@ -62,7 +62,7 @@ prompts or set after sealing.
   7 layers for the owner to label.
 - **A flaw in the set:** the model sees images only as id, type and box, with no pixels and no asset names. So
   big_decor_image and big_logo (6 banners) ask which of two images is the product with nothing but size and shape to
-  go on. Every answer there is a guess. D abstained on 4 of the 6, which is the right behaviour. The set's author
+  go on. Every answer there is a guess. D abstained on 3 of the 6 (the right behaviour) and guessed right on 2. The set's author
   validated "a careful human reading the layer list could get it right" for text, not for images.
 - **Absent roles:** all arms "pass" the 3 abstain banners, but for different reasons. The heuristic and the hybrid
   return an incomplete mapping, and raw B too, because a 7-role mapping is impossible with 6 layers. Only D says why.
