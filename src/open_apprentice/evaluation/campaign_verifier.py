@@ -127,9 +127,12 @@ def _intersects(a: Box, b: Box) -> bool:
     return w > 0 and h > 0
 
 
-def verify_story(source: dict, final_native: dict, gold: dict | None) -> VerifierReport:
+def verify_story(
+    source: dict, final_native: dict, gold: dict | None, *, gold_applies: bool = True
+) -> VerifierReport:
     """Judge a committed story-card result. `source` is the banner scene, `gold` the authored expected scene (None when the
-    chosen outcome is not applicable, which always fails)."""
+    chosen outcome is not applicable, which always fails). `gold_applies=False` is for a reading the gold was not written
+    for (the owner's "scale like the example" choice): matches_gold is then left out, never counted as passed."""
     rep = VerifierReport()
     src, fin = source["nodes"], final_native["nodes"]
     cards = _cards(fin)
@@ -285,7 +288,9 @@ def verify_story(source: dict, final_native: dict, gold: dict | None) -> Verifie
                 changed.append(f"{n['id']}.{k}")
     rep.add("non_writable_unchanged", not changed, str(changed[:10]))
 
-    if gold is None:
+    if not gold_applies:
+        pass
+    elif gold is None:
         rep.add(
             "matches_gold", False, "no gold: the chosen outcome is not applicable to this banner"
         )

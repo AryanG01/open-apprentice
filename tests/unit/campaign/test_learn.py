@@ -1,5 +1,6 @@
 import asyncio
 import copy
+from fractions import Fraction
 
 import pytest
 
@@ -133,3 +134,76 @@ def test_model_candidate_with_different_stacking_is_rejected():
         c for c in _learn(provider=_model(rule), ledger=_ledger()).candidates if c.origin == "model"
     ][0]
     assert not model.reproduces and "stacking" in model.reason
+
+
+# One teaching pair, two readings of the product image: the same frame every time, or scaled like the example.
+from open_apprentice.campaign.learn import interpretations, probe_banner  # noqa: E402
+
+
+def _product_box(rule, scene):
+    objs = objects_for_rule(scene, "banner")
+    out = evaluate_layout(wrap_learned(rule), objs, FACTS)
+    pid = next(o["id"] for o in objs if o["role"] == "product_image")
+    t = out.targets[pid]
+    return (t.x, t.y, t.w, t.h)
+
+
+def test_both_readings_reproduce_the_teaching_pair_exactly():
+    readings = interpretations(_scene("teach_before"), _scene("teach_after"))
+    assert set(readings) == {"fixed", "relative"}
+    taught = _product_box(readings["fixed"], _scene("teach_before"))
+    assert _product_box(readings["relative"], _scene("teach_before")) == taught
+    for rule in readings.values():  # and every other role is placed identically
+        assert _boxes_after(rule, _scene("teach_before")) == _boxes_after(
+            readings["fixed"], _scene("teach_before")
+        )
+
+
+def _boxes_after(rule, scene):
+    objs = objects_for_rule(scene, "banner")
+    out = evaluate_layout(wrap_learned(rule), objs, FACTS)
+    return {t.node_id: (t.x, t.y, t.w, t.h) for t in out.targets.values()}
+
+
+def test_the_probe_banner_is_where_the_readings_disagree():
+    before = _scene("teach_before")
+    readings = interpretations(before, _scene("teach_after"))
+    probe = probe_banner(before)
+    fixed, rel = (_product_box(readings[k], probe) for k in ("fixed", "relative"))
+    assert fixed != rel
+    assert (
+        rel[2] < fixed[2] and rel[3] < fixed[3]
+    )  # a smaller photo stays smaller under the scaled reading
+    cx = lambda b: b[0] + b[2] / 2  # noqa: E731
+    assert cx(rel) == cx(fixed)  # both keep the taught centre
+    assert before == _scene("teach_before")  # the teaching banner itself is not modified
+
+
+def test_the_relative_reading_scales_by_the_taught_factor():
+    before, after = _scene("teach_before"), _scene("teach_after")
+    rel = interpretations(before, after)["relative"]
+    src = next(n for n in _scene("short_a")["nodes"] if n.get("role") == "product_image")
+    taught_src = next(n for n in before["nodes"] if n.get("role") == "product_image")
+    taught_out = next(n for n in after["nodes"] if n.get("role") == "product_image")
+    k = Fraction(str(taught_out["width"])) / Fraction(str(taught_src["width"]))
+    assert _product_box(rel, _scene("short_a"))[2] == Fraction(str(src["width"])) * k
+
+
+def test_learning_defaults_to_the_fixed_reading_and_can_take_the_other():
+    assert _learn().rule == interpretations(_scene("teach_before"), _scene("teach_after"))["fixed"]
+    rel = _learn(interpretation="relative")
+    assert rel.interpretation == "relative" and rel.origin == "search"
+    assert rel.rule == interpretations(_scene("teach_before"), _scene("teach_after"))["relative"]
+
+
+def test_a_learned_rule_reads_as_one_row_per_role():
+    from open_apprentice.campaign.learn import describe
+
+    readings = interpretations(_scene("teach_before"), _scene("teach_after"))
+    fixed = {r["role"]: r for r in describe(readings["fixed"])}
+    rel = {r["role"]: r for r in describe(readings["relative"])}
+    assert (
+        fixed["product_image"]["size"] == "720 × 720" and "scaled" in rel["product_image"]["size"]
+    )
+    assert rel["headline"] == fixed["headline"]
+    assert any(s.startswith("font") for s in fixed["headline"]["style"])

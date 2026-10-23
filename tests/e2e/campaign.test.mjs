@@ -82,6 +82,18 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     await page.waitForLoadState("networkidle");
     assert.match(await text(), /Learned by\s+search/i);
 
+    // one example, two readings of the product image: it asks once, both options rendered and verified on a test banner
+    const q = page.getByLabel("Teaching question");
+    assert.match(await q.innerText(), /fits two rules for the product image/);
+    assert.equal(await q.locator("img").count(), 3, "test banner plus one render per reading");
+    assert.ok(await page.getByRole("button", { name: /^short_a/ }).isDisabled(), "no run before the question is answered");
+    const chosen = page.waitForResponse((r) => /\/reading$/.test(r.url()) && r.request().method() === "POST");
+    await page.getByRole("button", { name: "Same frame every time" }).click();
+    await chosen;
+    await page.waitForLoadState("networkidle");
+    const work = await page.getByLabel("Learned rule").innerText();
+    assert.match(work, /same frame every time/);
+
     await run("short_a");
     assert.match(await text(), /15 of 15 checks passed/);
 

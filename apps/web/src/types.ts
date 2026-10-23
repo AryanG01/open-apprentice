@@ -379,9 +379,33 @@ export interface CampaignCandidate {
   reason: string;
 }
 
+export interface RuleRow {
+  role: string;
+  position: string;
+  size: string;
+  z: number | null;
+  style: string[];
+}
+
+export interface ReadingOption {
+  id: "fixed" | "relative";
+  label: string;
+  status: string;
+  png: string | null;
+  product_box: number[];
+  verification: CampaignVerification | null;
+}
+
+export interface ReadingQuestion {
+  kind: "reading";
+  text: string;
+  probe_png: string;
+  options: ReadingOption[];
+}
+
 export interface CampaignWorkspace {
   workspace_id: string;
-  learned: { origin: string; candidates: CampaignCandidate[] };
+  learned: { origin: string; reading: string | null; question: ReadingQuestion | null; rule_table: RuleRow[]; candidates: CampaignCandidate[] };
   teaching: { before_png: string; after_png: string };
 }
 

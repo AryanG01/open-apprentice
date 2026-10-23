@@ -3,6 +3,7 @@ candidates; every candidate must reproduce the teaching pair exactly through the
 
 from __future__ import annotations
 
+import copy
 import json
 import pathlib
 from dataclasses import dataclass, field
@@ -42,6 +43,7 @@ class Learned:
     rule: list
     origin: str
     candidates: list[CandidateReport] = field(default_factory=list)
+    interpretation: str = "fixed"  # how the product image generalises: see interpretations()
 
 
 class LearnError(Exception):
@@ -89,11 +91,26 @@ def _expected(before: dict, after: dict) -> dict[str, dict]:
     return out
 
 
-def _search_rule(expected: dict[str, dict]) -> list:
+def _scaled(me: dict, field_: str, k: Fraction) -> dict:
+    return {"op": "mul", "args": [{"op": "get", "args": [me, field_]}, _lit(k)]}
+
+
+def _search_rule(
+    expected: dict[str, dict], product_src: tuple[Fraction, Fraction] | None = None
+) -> list:
+    """Constant boxes per role. With `product_src` (the taught banner's product width and height), the product image is
+    instead scaled by the taught factor around the taught centre: the "relative" reading of the same example.
+    """
     me = {"ref": "locals.o"}
     branches = []
     for role, e in expected.items():
         x, y, w, h = (_lit(v) for v in e["box"])
+        if product_src is not None and role == "product_image":
+            bx, by, bw, bh = e["box"]
+            kw, kh = bw / product_src[0], bh / product_src[1]
+            w, h = _scaled(me, "w", kw), _scaled(me, "h", kh)
+            x = {"op": "sub", "args": [_lit(bx + bw / 2), _scaled(me, "w", kw / 2)]}
+            y = {"op": "sub", "args": [_lit(by + bh / 2), _scaled(me, "h", kh / 2)]}
         emits = [
             {
                 "op": "emit_target",
@@ -188,13 +205,58 @@ async def _model_candidates(
     return comp.parsed.candidates[:MAX_MODEL_CANDIDATES]
 
 
+READINGS = ("fixed", "relative")
+
+
+def interpretations(before: dict, after: dict) -> dict[str, list]:
+    """The two readings of one teaching pair for the product image: the same frame every time ("fixed"), or scaled by the
+    factor the example used ("relative"). Both reproduce the pair exactly; they differ only on a banner whose product
+    image is a different size, which is why the owner is asked (see probe_banner)."""
+    role_map(before, _board(before))
+    role_map(after, _board(after, "9:16"))
+    expected = _expected(before, after)
+    src = next(o for o in objects_for_rule(before, _board(before)) if o["role"] == "product_image")
+    out = {
+        "fixed": _search_rule(expected),
+        "relative": _search_rule(expected, (src["w"], src["h"])),
+    }
+    for name, rule in out.items():
+        ok, why = _check(rule, before, expected)
+        if not ok:
+            raise LearnError(f"the {name} reading does not reproduce the taught story: {why}")
+    return out
+
+
+PROBE_SCALE = Fraction(3, 5)
+
+
+def probe_banner(before: dict) -> dict:
+    """The teaching banner with its product image at 3/5 size around the same centre: an input on which the two readings
+    disagree, so both can be shown to the owner. The teaching banner itself is not changed."""
+    probe = copy.deepcopy(before)
+    n = next(n for n in probe["nodes"] if n.get("role") == "product_image")
+    w, h = Fraction(str(n["width"])), Fraction(str(n["height"]))
+    nw, nh = w * PROBE_SCALE, h * PROBE_SCALE
+    n["x"] = float(Fraction(str(n["x"])) + (w - nw) / 2)
+    n["y"] = float(Fraction(str(n["y"])) + (h - nh) / 2)
+    n["width"], n["height"] = float(nw), float(nh)
+    return probe
+
+
 async def learn_layout(
-    before: dict, after: dict, *, provider: Provider | None = None, ledger: Ledger | None = None
+    before: dict,
+    after: dict,
+    *,
+    provider: Provider | None = None,
+    ledger: Ledger | None = None,
+    interpretation: str = "fixed",
 ) -> Learned:
+    if interpretation not in READINGS:
+        raise LearnError(f"unknown reading {interpretation!r}")
     role_map(before, _board(before))  # a missing or doubled role stops here, before any model call
     role_map(after, _board(after, "9:16"))
     expected = _expected(before, after)
-    search = _search_rule(expected)
+    search = interpretations(before, after)[interpretation]
     ok, why = _check(search, before, expected)
     reports = [CandidateReport("search", search, ok, why)]
     if provider is not None:
@@ -206,4 +268,44 @@ async def learn_layout(
         raise LearnError(
             "no candidate reproduces the taught story: " + "; ".join(r.reason for r in reports)
         )
-    return Learned(chosen.rule, chosen.origin, reports)
+    return Learned(chosen.rule, chosen.origin, reports, interpretation)
+
+
+def _value(v: Any) -> Fraction:
+    return Fraction(v["rat"]) if isinstance(v, dict) else Fraction(v)
+
+
+def _fmt(f: Fraction) -> str:
+    return str(int(f)) if f.denominator == 1 else f"{float(f):.4g}"
+
+
+def describe(rule: list) -> list[dict]:
+    """A learned layout as rows a person can read: per role, where it goes, how big, stacking, and any restyle. Covers
+    the shape _search_rule writes; anything else is summarised as "computed"."""
+    rows = []
+    for branch in rule[0].get("body", []) if rule and isinstance(rule[0], dict) else []:
+        try:
+            role = branch["cond"]["args"][1]
+        except (KeyError, IndexError, TypeError):
+            continue
+        row = {"role": role, "position": "computed", "size": "computed", "z": None, "style": []}
+        for e in branch.get("then", []):
+            if e.get("kind") in ("place", "fit_image"):
+                if isinstance(e["w"], dict) and "op" in e["w"]:
+                    k = _value(e["w"]["args"][1])
+                    cx, cy = _value(e["x"]["args"][0]), _value(e["y"]["args"][0])
+                    row["size"] = f"scaled ×{float(k):.3g} from the banner's own"
+                    row["position"] = f"centred on {_fmt(cx)}, {_fmt(cy)}"
+                else:
+                    x, y, w, h = (_value(e[k]) for k in ("x", "y", "w", "h"))
+                    row["position"], row["size"] = f"{_fmt(x)}, {_fmt(y)}", f"{_fmt(w)} × {_fmt(h)}"
+                if e["kind"] == "fit_image":
+                    row["style"].append("image fitted inside, never cropped")
+                row["z"] = e.get("z")
+            elif e.get("kind") == "style":
+                if "fontSize" in e:
+                    row["style"].append(f"font {_fmt(_value(e['fontSize']))} px")
+                if "cornerRadius" in e:
+                    row["style"].append(f"corner radius {_fmt(_value(e['cornerRadius']))} px")
+        rows.append(row)
+    return rows

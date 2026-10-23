@@ -28,7 +28,8 @@ from open_apprentice.campaign.roles import (
     role_candidates,
 )
 from open_apprentice.campaign.fixtures import FIXTURE_IDS, load_fixture
-from open_apprentice.campaign.learn import Learned, learn_layout
+from open_apprentice.campaign.layout_rule import evaluate_layout, objects_for_rule, wrap_learned
+from open_apprentice.campaign.learn import READINGS, Learned, describe, learn_layout, probe_banner
 from open_apprentice.campaign.preferences import PreferenceConflict, PreferenceStore, scope_key
 from open_apprentice.campaign.run import CampaignRun, _hash, answer, close_run, start_run
 from open_apprentice.evaluation.campaign_gold import GOLD_KEYS, load_gold
@@ -72,6 +73,13 @@ class Workspace:
     procedures: dict[str, tuple[list, str]] = field(
         default_factory=dict
     )  # backend -> accepted model procedure
+    readings: dict[str, Learned] = field(
+        default_factory=dict
+    )  # both readings while the question is open
+    question: dict | None = None  # the open teaching question; runs wait until it is answered
+    teaching: dict = field(
+        default_factory=dict
+    )  # before/after thumbnails, returned again after the answer
 
 
 def _workspaces(request: Request) -> dict[str, Workspace]:
@@ -152,32 +160,140 @@ async def fixtures(request: Request) -> dict:
     }
 
 
-@router.post("/workspaces")
-async def create_workspace(request: Request) -> dict:
-    _rate_limit(request, "campaign")
-    harness = _harness(request)
-    before, after = load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"]
-    # search only: the model path stays off in this lane (plan 9C); the search is CPU work, kept off the event loop
-    learned = await asyncio.to_thread(asyncio.run, learn_layout(before, after))
-    before_png, after_png = await asyncio.to_thread(
-        lambda: (_thumb(harness, "teach_before"), _render(harness, after))
+class WorkspaceIn(BaseModel):
+    reading: Literal["fixed", "relative"] | None = (
+        None  # pre-answer the teaching question (tests, scripted runs)
     )
-    wid = uuid.uuid4().hex
-    spaces = _workspaces(request)
-    while len(spaces) >= MAX_WORKSPACES:
-        del spaces[min(spaces, key=lambda k: spaces[k].touched)]
-    spaces[wid] = Workspace(wid, learned, PreferenceStore(_store(request), namespace=wid))
+
+
+class ReadingIn(BaseModel):
+    choice: Literal["fixed", "relative"]
+
+
+READING_TEXT = {
+    "fixed": "Same frame every time: the product image always fills the taught frame",
+    "relative": "Scale like the example: the product image keeps its size relative to the banner",
+}
+
+
+def _product_box(learned: Learned, scene: dict) -> list[float]:
+    objs = objects_for_rule(scene, "banner")
+    out = evaluate_layout(
+        wrap_learned(learned.rule), objs, {"output_format": "9:16", "overflows": False}
+    )
+    pid = next(o["id"] for o in objs if o["role"] == "product_image")
+    t = out.targets[pid]
+    return [round(float(v), 1) for v in (t.x, t.y, t.w, t.h)]
+
+
+def _probe_option(
+    harness: EvaluatorHarness, probe: dict, name: str, learned: Learned, prefs
+) -> dict:
+    """One reading applied to the probe banner in the real engine, rendered and independently verified."""
+    run = start_run(
+        probe, load_fixture("teach_before")["locale"], learned, lambda sc: _open(harness, sc), prefs
+    )
+    try:
+        sess = run.sessions.get(run.result_session or "")
+        png = native = None
+        if sess is not None:
+            png = sess.call("export_scene", format="png")["data_url"]
+            native = harness.native(sess.session_id, OWNER)
+    except httpx.HTTPError as e:
+        raise HTTPException(503, BUSY) from e
+    finally:
+        close_run(run)
+    verification = None
+    if native is not None:
+        rep = verify_story(probe, native, None, gold_applies=False)
+        verification = {
+            "passed": rep.passed,
+            "failed": rep.failed(),
+            "checks": [
+                {"name": c.name, "passed": c.passed, "detail": c.detail} for c in rep.checks
+            ],
+        }
     return {
-        "workspace_id": wid,
+        "id": name,
+        "label": READING_TEXT[name],
+        "status": run.status,
+        "png": png,
+        "product_box": _product_box(learned, probe),
+        "verification": verification,
+    }
+
+
+def _workspace_out(ws: Workspace) -> dict:
+    learned = ws.learned
+    return {
+        "workspace_id": ws.id,
         "learned": {
             "origin": learned.origin,
+            "reading": None if ws.question else learned.interpretation,
+            "question": ws.question,
+            "rule_table": [] if ws.question else describe(learned.rule),
             "candidates": [
                 {"origin": c.origin, "reproduces": c.reproduces, "reason": c.reason}
                 for c in learned.candidates
             ],
         },
-        "teaching": {"before_png": before_png, "after_png": after_png},
+        "teaching": ws.teaching,
     }
+
+
+@router.post("/workspaces")
+async def create_workspace(request: Request, body: WorkspaceIn | None = None) -> dict:
+    _rate_limit(request, "campaign")
+    harness = _harness(request)
+    before, after = load_fixture("teach_before")["scene"], load_fixture("teach_after")["scene"]
+    wanted = (body.reading,) if body and body.reading else READINGS
+    # search only: the model path stays off in this lane (plan 9C); the search is CPU work, kept off the event loop
+    readings = {
+        k: await asyncio.to_thread(asyncio.run, learn_layout(before, after, interpretation=k))
+        for k in wanted
+    }
+    before_png, after_png = await asyncio.to_thread(
+        lambda: (_thumb(harness, "teach_before"), _render(harness, after))
+    )
+    wid = uuid.uuid4().hex
+    prefs = PreferenceStore(_store(request), namespace=wid)
+    ws = Workspace(
+        wid, readings[wanted[0]], prefs, teaching={"before_png": before_png, "after_png": after_png}
+    )
+    if len(readings) > 1:
+        # One example fits both readings; the probe banner (the same banner, smaller product) is where they differ.
+        probe = probe_banner(before)
+        scratch = PreferenceStore(
+            _store(request), namespace=uuid.uuid4().hex
+        )  # throwaway: the probe saves no choice
+        options = await asyncio.to_thread(
+            lambda: [_probe_option(harness, probe, k, readings[k], scratch) for k in READINGS]
+        )
+        ws.readings = readings
+        ws.question = {
+            "kind": "reading",
+            "text": (
+                "Your example fits two rules for the product image. They agree on this banner but not on one whose "
+                "product photo is a different size, like this test banner. Which did you mean?"
+            ),
+            "probe_png": await asyncio.to_thread(_render, harness, probe),
+            "options": options,
+        }
+    spaces = _workspaces(request)
+    while len(spaces) >= MAX_WORKSPACES:
+        del spaces[min(spaces, key=lambda k: spaces[k].touched)]
+    spaces[wid] = ws
+    return _workspace_out(ws)
+
+
+@router.post("/workspaces/{wid}/reading")
+async def choose_reading(request: Request, wid: str, body: ReadingIn) -> dict:
+    ws = _ws(request, wid)
+    async with ws.lock:
+        if ws.question is None:
+            raise HTTPException(409, "this workspace has no open teaching question")
+        ws.learned, ws.question, ws.readings = ws.readings[body.choice], None, {}
+        return _workspace_out(ws)
 
 
 def _scope_out(prefs: PreferenceStore, locale: str) -> dict:
@@ -240,6 +356,7 @@ class RunRecord:
     snapshots: dict[
         str, dict
     ]  # session id -> {png, native}; the sessions themselves are already closed
+    reading: str = "fixed"  # the learned reading the run used; the gold is written for "fixed" only
 
 
 def _gold(fid: str, outcome: str) -> dict | None:
@@ -249,11 +366,16 @@ def _gold(fid: str, outcome: str) -> dict | None:
     return None if gold is None else gold["scene"]
 
 
-def _verify(fid: str, outcome: str, native: dict, source: dict) -> dict:
+def _verify(fid: str, outcome: str, native: dict, source: dict, reading: str = "fixed") -> dict:
     """`outcome` is "layout" or a built-in name. An untagged banner is judged against the gold of the banner it was
     derived from (same layers, same ids)."""
     gold_fid = fid.removeprefix("untagged_")
-    report = verify_story(source, native, _gold(gold_fid, GOLD_OUTCOME.get(outcome, outcome)))
+    report = verify_story(
+        source,
+        native,
+        _gold(gold_fid, GOLD_OUTCOME.get(outcome, outcome)),
+        gold_applies=reading == "fixed",
+    )
     return {
         "passed": report.passed,
         "failed": report.failed(),
@@ -305,7 +427,11 @@ def _gate(rec: RunRecord) -> dict:
     run = rec.run
     outcome = "layout" if run.status == "ready" else run.preference.outcome
     verification = _verify(
-        rec.fixture_id, outcome, rec.snapshots[run.result_session]["native"], rec.source
+        rec.fixture_id,
+        outcome,
+        rec.snapshots[run.result_session]["native"],
+        rec.source,
+        rec.reading,
     )
     return _run_out(rec, None if verification["passed"] else "blocked", verification)
 
@@ -314,6 +440,10 @@ def _gate(rec: RunRecord) -> dict:
 async def start(request: Request, wid: str, body: RunIn) -> dict:
     _rate_limit(request, "campaign")
     ws = _ws(request, wid)
+    if ws.question is not None:
+        raise HTTPException(
+            409, "answer the teaching question first: which reading of the example did you mean?"
+        )
     fixture = _banner(body.fixture_id)
     source = fixture["scene"]
     roles_origin = "authored"
@@ -340,6 +470,7 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
     def attempt(procedure) -> dict:
         run = start_run(source, fixture["locale"], ws.learned, open_session, ws.prefs, procedure)
         run.provenance["roles_origin"] = roles_origin
+        run.provenance["reading"] = ws.learned.interpretation
         try:
             snapshots = {
                 sid: {
@@ -355,7 +486,9 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
             close_run(run)  # best effort: no session outlives the request
         if busy or run.engine_error:
             return {}
-        rec = RunRecord(run, body.fixture_id, body.backend, source, snapshots)
+        rec = RunRecord(
+            run, body.fixture_id, body.backend, source, snapshots, ws.learned.interpretation
+        )
         keep.append(rec)
         while len(ws.runs) >= MAX_RUNS:
             del ws.runs[next(iter(ws.runs))]
@@ -406,7 +539,9 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
         preview = run.previews.get(body.choice)
         if preview is not None and preview.fits:  # verify before anything is applied or saved
             snap = rec.snapshots[preview.session_id]
-            verification = _verify(rec.fixture_id, body.choice, snap["native"], rec.source)
+            verification = _verify(
+                rec.fixture_id, body.choice, snap["native"], rec.source, rec.reading
+            )
             if not verification["passed"]:
                 out = _run_out(rec, "blocked")
                 out["result"] = {"png": snap["png"], "verification": verification}

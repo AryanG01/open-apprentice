@@ -23,8 +23,9 @@ def _engine_sessions(c) -> int:
     return httpx.get(c.engine_url + "/health/live").json()["sessions"]
 
 
-def _workspace(c) -> dict:
-    r = c.post("/api/campaign/workspaces")
+def _workspace(c, reading: str | None = "fixed") -> dict:
+    """A workspace; `reading` pre-answers the teaching question (None leaves it open)."""
+    r = c.post("/api/campaign/workspaces", json={} if reading is None else {"reading": reading})
     assert r.status_code == 200, r.text
     return r.json()
 
@@ -552,3 +553,65 @@ def test_the_owner_role_table_is_keyed_like_the_mapping(client):
     ).json()
     assert {c["id"] for c in p["candidates"]} == set(p["mapping"])
     assert sorted(c["label"] for c in p["candidates"]) == [f"L{k}" for k in range(1, 8)]
+
+
+# The teaching question: one example, two readings of the product image, asked once with both rendered on a probe banner.
+def test_a_new_workspace_asks_which_reading_before_any_run(client):
+    ws = _workspace(client, None)
+    q = ws["learned"]["question"]
+    assert q["kind"] == "reading" and q["probe_png"].startswith("data:image/png")
+    opts = {o["id"]: o for o in q["options"]}
+    assert set(opts) == {"fixed", "relative"}
+    assert opts["fixed"]["product_box"] != opts["relative"]["product_box"]
+    assert opts["relative"]["product_box"][2] < opts["fixed"]["product_box"][2]
+    for o in opts.values():
+        assert o["png"].startswith("data:image/png")
+        assert o["verification"]["passed"], o["verification"]["failed"]
+        assert "matches_gold" not in [c["name"] for c in o["verification"]["checks"]]
+    r = client.post(
+        f"/api/campaign/workspaces/{ws['workspace_id']}/runs", json={"fixture_id": "short_a"}
+    )
+    assert r.status_code == 409 and "teaching question" in r.json()["detail"]
+    assert _engine_sessions(client) == 0
+
+
+def test_answering_the_reading_sets_the_rule_and_runs_use_it(client):
+    ws = _workspace(client, None)
+    wid = ws["workspace_id"]
+    assert (
+        client.post(
+            f"/api/campaign/workspaces/{wid}/reading", json={"choice": "sideways"}
+        ).status_code
+        == 422
+    )
+    out = client.post(f"/api/campaign/workspaces/{wid}/reading", json={"choice": "relative"}).json()
+    assert out["learned"]["reading"] == "relative" and out["learned"]["question"] is None
+    rows = {r["role"]: r for r in out["learned"]["rule_table"]}
+    assert "scaled" in rows["product_image"]["size"] and "scaled" not in rows["headline"]["size"]
+    again = client.post(f"/api/campaign/workspaces/{wid}/reading", json={"choice": "fixed"})
+    assert again.status_code == 409
+    run = client.post(f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "short_a"}).json()
+    assert run["provenance"]["reading"] == "relative"
+    assert run["status"] in ("ready", "blocked", "question")
+    if run["result"]:
+        assert "matches_gold" not in [c["name"] for c in run["result"]["verification"]["checks"]]
+
+
+def test_the_fixed_reading_keeps_the_gold_check_and_shows_its_rule(client):
+    ws = _workspace(client)
+    assert ws["learned"]["reading"] == "fixed" and ws["learned"]["question"] is None
+    rows = {r["role"]: r for r in ws["learned"]["rule_table"]}
+    assert {
+        "background",
+        "brand_mark",
+        "product_image",
+        "headline",
+        "price",
+        "cta",
+        "legal",
+    } <= set(rows)
+    run = client.post(
+        f"/api/campaign/workspaces/{ws['workspace_id']}/runs", json={"fixture_id": "short_a"}
+    ).json()
+    assert run["status"] == "ready" and run["provenance"]["reading"] == "fixed"
+    assert "matches_gold" in [c["name"] for c in run["result"]["verification"]["checks"]]

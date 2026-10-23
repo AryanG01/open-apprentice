@@ -1,4 +1,4 @@
-import type { Reasoning } from "./types";
+import type { CampaignWorkspace, Reasoning } from "./types";
 
 const count = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
@@ -48,6 +48,42 @@ export function TryItWork({ r }: { r: Reasoning }) {
         Solver budget used: {r.solver.calls} of {r.solver.max_calls} calls, {r.solver.elapsed_s} s. Method: candidates kept consistent with all
         teaching (a version space); the question is the input they disagree on most (query by committee); witnesses come from Z3.
       </p>
+    </details>
+  );
+}
+
+/** "Show the work" for the Campaign lane: the learned rule as one row per role, and which reading of the example it is. */
+export function CampaignWork({ ws }: { ws: CampaignWorkspace }) {
+  const l = ws.learned;
+  return (
+    <details className="work" open aria-label="Learned rule">
+      <summary>Show the work: the learned rule</summary>
+      <p>
+        Found by <strong>{l.origin}</strong>; {l.candidates.filter((c) => c.reproduces).length} of {l.candidates.length} candidate
+        {l.candidates.length === 1 ? "" : "s"} reproduce the example exactly through the rule interpreter. Reading of the product image:{" "}
+        <strong>{l.reading === "relative" ? "scale like the example" : "same frame every time"}</strong>.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Position on the 1080 × 1920 card</th>
+            <th>Size</th>
+            <th>Also</th>
+          </tr>
+        </thead>
+        <tbody>
+          {l.rule_table.map((r) => (
+            <tr key={r.role}>
+              <td>{r.role.replace(/_/g, " ")}</td>
+              <td>{r.position}</td>
+              <td>{r.size}</td>
+              <td>{[...(r.z !== null ? [`layer ${r.z}`] : []), ...r.style].join("; ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="muted">The rule runs in a sandboxed interpreter with exact fractions; the overflow question is built in, never learned.</p>
     </details>
   );
 }

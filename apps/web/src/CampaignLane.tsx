@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { CampaignEngine, CampaignFixture, CampaignPreview, CampaignProcedure, CampaignRoles, CampaignRun, CampaignScope, CampaignWorkspace } from "./types";
+import { CampaignWork } from "./ShowWork";
 
 const ROLE_NAMES = ["background", "brand_mark", "product_image", "headline", "price", "cta", "legal"];
 const origin = (o: string): string => (o === "model" ? "Nemotron" : o);
@@ -88,6 +89,12 @@ export function CampaignLane() {
       await refreshPrefs(w.workspace_id);
     });
 
+  const chooseReading = (choice: "fixed" | "relative") =>
+    go(async () => {
+      if (!ws) return;
+      setWs(await call<CampaignWorkspace>(`/api/campaign/workspaces/${ws.workspace_id}/reading`, { choice }));
+    });
+
   const start = (fid: string, confirmed?: Record<string, string>) =>
     go(async () => {
       if (!ws) return;
@@ -169,6 +176,37 @@ export function CampaignLane() {
             </span>
           ) : null}
         </div>
+        {ws?.learned.question ? (
+          <div className="question" aria-label="Teaching question">
+            <p>
+              <strong>One question before it runs.</strong> {ws.learned.question.text}
+            </p>
+            <div className="svgpair">
+              <figure>
+                <img src={ws.learned.question.probe_png} alt="Test banner with a smaller product photo" />
+                <figcaption>Test banner: the teaching banner with its product photo at 3/5 size</figcaption>
+              </figure>
+              {ws.learned.question.options.map((o) => (
+                <figure key={o.id}>
+                  {o.png ? <img src={o.png} alt={o.label} /> : <div className="placeholder">Not applicable ({o.status})</div>}
+                  <figcaption>
+                    {o.label}.{" "}
+                    {o.verification ? (
+                      <span className="muted small">
+                        {o.verification.checks.filter((c) => c.passed).length} of {o.verification.checks.length} verifier checks pass.
+                      </span>
+                    ) : null}
+                  </figcaption>
+                  <button className="btn" onClick={() => chooseReading(o.id)} disabled={busy}>
+                    {o.id === "fixed" ? "Same frame every time" : "Scale like the example"}
+                  </button>
+                </figure>
+              ))}
+            </div>
+          </div>
+        ) : ws ? (
+          <CampaignWork ws={ws} />
+        ) : null}
       </section>
 
       <section aria-labelledby="c-run">
@@ -185,7 +223,7 @@ export function CampaignLane() {
           {fixtures
             .filter((f) => f.kind !== "teaching")
             .map((f) => (
-              <button key={f.id} className={run?.fixture_id === f.id || roles?.fixture === f.id ? "samplebtn on" : "samplebtn"} disabled={busy || !ws} onClick={() => (f.kind === "untagged" ? proposeRoles(f.id) : start(f.id))}>
+              <button key={f.id} className={run?.fixture_id === f.id || roles?.fixture === f.id ? "samplebtn on" : "samplebtn"} disabled={busy || !ws || !!ws.learned.question} onClick={() => (f.kind === "untagged" ? proposeRoles(f.id) : start(f.id))}>
                 <img src={f.png} alt="" className="thumb" />
                 <strong>{f.id}</strong>
                 <span className="muted small">
@@ -270,7 +308,12 @@ export function CampaignLane() {
                       <strong>
                         {passedCount} of {verification.checks.length} checks passed
                       </strong>{" "}
-                      <span className="muted small">independent verifier, against the authored expected output</span>
+                      <span className="muted small">
+                        independent verifier
+                        {run?.provenance.reading === "relative"
+                          ? "; the authored expected output is for the other reading, so that comparison is left out and every other check runs"
+                          : ", against the authored expected output"}
+                      </span>
                     </p>
                     <div className="table-wrap">
                       <table className="data">
@@ -279,6 +322,7 @@ export function CampaignLane() {
                             <tr key={c.name}>
                               <td>{c.name.replace(/_/g, " ")}</td>
                               <td>{c.passed ? <span className="pill ok">pass</span> : <span className="pill bad">fail</span>}</td>
+                              <td className="muted small">{c.detail}</td>
                             </tr>
                           ))}
                         </tbody>

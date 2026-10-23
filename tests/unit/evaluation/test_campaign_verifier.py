@@ -258,3 +258,21 @@ def test_an_image_at_natural_size_without_its_scale_is_caught():
     hero = next(n for n in fab["nodes"] if n.get("role") == "product_image")
     hero["scaleX"] = hero["scaleY"] = 1
     assert "matches_gold" in verify_story(load_fixture("short_a")["scene"], fab, gold).failed()
+
+
+def test_without_applicable_gold_every_other_check_still_runs_and_none_is_waived():
+    """The owner's "scale like the example" reading has no gold (the gold is the fixed reading): matches_gold is left out,
+    not passed, and a broken result still fails its own check."""
+    source, final, _ = (
+        _case("short_a", "layout") if ("short_a", "layout") in GOLD_KEYS else _case(*APPLICABLE[0])
+    )
+    report = verify_story(source, final, None, gold_applies=False)
+    assert "matches_gold" not in [c.name for c in report.checks]
+    assert len(report.checks) == 14 and report.passed
+    _node(final, "legal")["fontSize"] = 4
+    assert "minimum_sizes" in verify_story(source, final, None, gold_applies=False).failed()
+
+
+def test_missing_gold_still_fails_when_gold_applies():
+    source, final, _ = _case(*APPLICABLE[0])
+    assert "matches_gold" in verify_story(source, final, None).failed()
