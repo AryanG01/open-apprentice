@@ -1,0 +1,30 @@
+{
+ "sealed_at": "2026-10-23",
+ "files": {
+  "absent_role_1.json": "56fcb30849b5d9021e9611594ed8ddfba531cbb4c3f67aa26a7977f3fe60ad18",
+  "absent_role_2.json": "41a222633dd7d7fd2b09b5ad7feaf807f687893df2a81579578647e639ea39a2",
+  "absent_role_3.json": "70c73182515cbc1393a431f56824ed5fe498df3cbc91dfd5f953ca7ab3ccf9da",
+  "big_decor_image_1.json": "b3c55babadf977cdc625b05d4bbc656ec0b6d73f23887bdc879afa3c4ac9b2c0",
+  "big_decor_image_2.json": "365c4679affd6443cc692aeba53ec850ee18868816cd395fffad13fa13ac61db",
+  "big_decor_image_3.json": "3fad8e81646c3bf916cbd98f8da81a86317b6b98f6e5c8e06977a39dc9d5ed97",
+  "big_logo_1.json": "0aee700b0c97e71582a0155b9126d089236c21f99d2f0526d39d91773695bb3e",
+  "big_logo_2.json": "7ddf3f34f0be91f63e4fc906b5125e18d706bbc58d4cd67b927e3242e3da8a0d",
+  "big_logo_3.json": "2eba9258729b6ac9848fd5abecf7d93886f8456539c2a6238d434351a8a6e4a6",
+  "extra_group_1.json": "264ce2c21e4b31a91eebe90c2892ee2f217e0e458637e80cf638c211bb7d5432",
+  "extra_group_2.json": "d5f535427e0eae5843a2e5d0fcde564328d5578d89c9e7ba3fd40d3c76a4f811",
+  "extra_group_3.json": "c190ee48e5f12768828f6ec2d9f0b96708839aef12cc466782c386f6c1e6a7ff",
+  "plain_1.json": "5598f9327620eab41cd300f07a35a05f1285e2712560c6afd8dfc48ab05faf3d",
+  "plain_2.json": "6097a8aae0188ba45e41d709c65a5ed98c2a64780e9e90e4a4d77dcacce1ec81",
+  "plain_3.json": "52f6454da09eb08f16fef1641678d0c76a3a594e4668ee14165a8f7f68bdff37",
+  "price_emphasis_1.json": "ee4b07ea31e77a6251d2710b13bc9f656a946f410d2272cf1f5309283a02023e",
+  "price_emphasis_2.json": "b501fcba86f66c3c0e6de4b0a640c0ff98ec59cb15e8a34a86f2014fab987493",
+  "price_emphasis_3.json": "4121b6621a424eb761bddf43b2b396b546a84a27417da844d4c3c6d985a0a37c",
+  "text_distractors_1.json": "01bb8e05d28ce6491574de9dd620839d3278074cb4638f27df41afe7133149a4",
+  "text_distractors_2.json": "a18c9a8872b84c12a84f21c2660f5f66330d29b2ce128d6dd6fc0efb99ace138",
+  "text_distractors_3.json": "35870e8ac9782d87bfff492a27681d15686ee5385db597cd8707689443ea3446",
+  "twin_prices_1.json": "f2172554532d12722640ae1098ccbb4571ff0ca020a4413263795127ded2346a",
+  "twin_prices_2.json": "78823f2453fb5afd1704e495cebb5e63fc8a5e6d62878c0c9d626436e8d7d40e",
+  "twin_prices_3.json": "fffe309676901fd037132bcc5fcce92117766b27641124c0888d02090eda20eb"
+ },
+ "combined_sha256": "2555549d0f5b546f4e1586445828583d145a530ffbe6b88e57a7891ffa222301"
+}

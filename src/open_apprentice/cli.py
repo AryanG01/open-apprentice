@@ -1210,6 +1210,107 @@ def eval_campaign_sealed_run(
     )
 
 
+@eval_app.command("campaign-roles")
+def eval_campaign_roles(
+    root: Path = typer.Option(
+        Path("benchmarks/final/campaign_roles"), "--root", help="the private untagged banners"
+    ),
+    manifest: Path = typer.Option(
+        Path("docs/evaluation/campaign_roles_manifest.json"), "--manifest", help="the hash manifest"
+    ),
+    seal_only: bool = typer.Option(False, "--seal", help="write the hash manifest and stop"),
+    live: bool = typer.Option(
+        False, "--live", help="spend real credit on Nebius Token Factory (required to run)"
+    ),
+    cap_usd: float = typer.Option(
+        0.40, "--cap-usd", help="hard cap for this run, checked before every call"
+    ),
+    out: Path = typer.Option(
+        Path("docs/evaluation/campaign_roles.md"), "--out", help="where to write the table"
+    ),
+) -> None:
+    """The pre-registered role-mapping comparison (docs/evaluation/campaign_roles_protocol.md)."""
+    import asyncio
+    import datetime
+    import hashlib
+
+    from open_apprentice.evaluation.campaign_roles_eval import (
+        load_cases,
+        render_markdown,
+        run_cases,
+    )
+    from open_apprentice.evaluation.campaign_sealed import SealError, _check_seal, _hashes
+
+    files = _hashes(root)
+    combined = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
+    if seal_only:
+        if not files:
+            typer.echo(f"no banners under {root}", err=True)
+            raise typer.Exit(1)
+        manifest.write_text(
+            json.dumps(
+                {
+                    "sealed_at": datetime.date.today().isoformat(),
+                    "files": files,
+                    "combined_sha256": combined,
+                },
+                indent=1,
+            )
+            + "\n"
+        )
+        typer.echo(
+            f"sealed {len(files)} files, combined {combined[:16]}; commit {manifest} before running"
+        )
+        return
+    try:
+        _check_seal(root, manifest)
+    except (SealError, FileNotFoundError) as e:
+        typer.echo(f"refused: {e}", err=True)
+        raise typer.Exit(1) from e
+    if not live:
+        typer.echo("this command spends money: pass --live", err=True)
+        raise typer.Exit(2)
+    from open_apprentice.config import load_settings
+    from open_apprentice.providers.factory import make_provider
+    from open_apprentice.providers.spend import SpendGuard
+
+    settings = load_settings()
+    if settings.provider_mode != "nebius":
+        typer.echo("set PROVIDER_MODE=nebius for a live run", err=True)
+        raise typer.Exit(2)
+    guard = SpendGuard(
+        make_provider(settings),
+        run_id=f"campaign-roles-{datetime.date.today().isoformat()}",
+        run_cap_usd=cap_usd,
+        merge_system=True,
+    )
+
+    async def go() -> list:
+        try:
+            return await run_cases(guard, load_cases(root))
+        finally:
+            try:
+                await guard.aclose()
+            except Exception:  # noqa: BLE001 - a failed close must not lose the measurement
+                pass
+
+    rows = asyncio.run(go())
+    out.write_text(
+        render_markdown(
+            rows,
+            model=settings.nebius_model,
+            spent_usd=guard.run_usd,
+            calls=guard.calls,
+            manifest=combined,
+        )
+    )
+    out.with_suffix(".json").write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n")
+    stopped = f"; stopped: {guard.stopped_reason}" if guard.stopped_reason else ""
+    typer.echo(
+        f"{guard.calls} calls, ${guard.run_usd:.3f} (ledger) of ${cap_usd:.2f}{stopped}; table in {out}"
+    )
+
+
 @eval_app.command("campaign-nemotron")
 def eval_campaign_nemotron(
     live: bool = typer.Option(

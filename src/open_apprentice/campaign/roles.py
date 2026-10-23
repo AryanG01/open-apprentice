@@ -28,6 +28,9 @@ class RoleProposal:
     problems: list[str] = field(
         default_factory=list
     )  # why a model proposal was rejected, if it was
+    proposed: dict[str, str] | None = (
+        None  # the model's own answer in real ids, kept even when rejected (for audit)
+    )
 
 
 def _layers(scene: dict, artboard: str) -> list[dict]:
@@ -162,8 +165,8 @@ async def propose_roles(
         scene, artboard, mapping
     )
     if problems:
-        return RoleProposal(heuristic_roles(scene, artboard), "heuristic", problems)
-    return RoleProposal(mapping, "model")
+        return RoleProposal(heuristic_roles(scene, artboard), "heuristic", problems, mapping)
+    return RoleProposal(mapping, "model", proposed=mapping)
 
 
 def apply_roles(scene: dict, artboard: str, mapping: dict[str, str]) -> dict:
