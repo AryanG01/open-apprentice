@@ -1,21 +1,21 @@
 {
- "url": "https://open-apprentice-md76de375q-uc.a.run.app",
+ "url": "https://cand---open-apprentice-md76de375q-uc.a.run.app",
  "live": true,
  "scale": 1.5,
  "marks": [
   {
    "name": "home",
-   "t": 15.188,
+   "t": 16.845,
    "box": null
   },
   {
    "name": "learn-click",
-   "t": 15.188,
+   "t": 16.846,
    "box": null
   },
   {
    "name": "learned",
-   "t": 19.007,
+   "t": 26.029,
    "box": {
     "x": 104,
     "y": 47.453125,
@@ -25,129 +25,179 @@
   },
   {
    "name": "learned-read",
-   "t": 23.008,
+   "t": 30.031,
+   "box": null
+  },
+  {
+   "name": "reading",
+   "t": 30.944,
+   "box": {
+    "x": 104,
+    "y": 19.71875,
+    "width": 1072,
+    "height": 643.171875
+   }
+  },
+  {
+   "name": "reading-read",
+   "t": 36.945,
+   "box": null
+  },
+  {
+   "name": "rule",
+   "t": 39.75,
+   "box": {
+    "x": 104,
+    "y": 19.71875,
+    "width": 1072,
+    "height": 395.21875
+   }
+  },
+  {
+   "name": "rule-read",
+   "t": 43.75,
    "box": null
   },
   {
    "name": "reuse-start",
-   "t": 23.91,
+   "t": 44.658,
    "box": null
   },
   {
    "name": "reuse-done",
-   "t": 28.401,
+   "t": 49.313,
    "box": {
     "x": 104,
-    "y": 20.421875,
+    "y": 19.640625,
     "width": 1072,
     "height": 998.125
    }
   },
   {
    "name": "reuse-read",
-   "t": 31.903,
+   "t": 52.813,
    "box": null
   },
   {
    "name": "ask-start",
-   "t": 32.814,
+   "t": 53.718,
    "box": null
   },
   {
    "name": "question",
-   "t": 42.069,
+   "t": 63.356,
    "box": {
     "x": 104,
-    "y": 19.6875,
+    "y": 19.90625,
     "width": 1072,
-    "height": 801.703125
+    "height": 777.703125
    }
   },
   {
    "name": "question-read",
-   "t": 47.071,
+   "t": 68.358,
    "box": null
   },
   {
    "name": "answered",
-   "t": 50.126,
+   "t": 71.413,
    "box": {
     "x": 104,
-    "y": 20.421875,
+    "y": 19.640625,
     "width": 1072,
-    "height": 720.4375
+    "height": 1041.96875
    }
   },
   {
    "name": "pref-reused",
-   "t": 60.214,
+   "t": 81.512,
    "box": {
     "x": 104,
-    "y": 20.421875,
+    "y": 19.640625,
     "width": 1072,
-    "height": 720.4375
+    "height": 1041.96875
    }
   },
   {
    "name": "prefs",
-   "t": 64.126,
+   "t": 85.429,
    "box": {
     "x": 104,
-    "y": 399.828125,
+    "y": 399.578125,
     "width": 1072,
     "height": 19.1875
    }
   },
   {
    "name": "prefs-read",
-   "t": 66.627,
+   "t": 87.929,
    "box": null
   },
   {
    "name": "roles-start",
-   "t": 67.531,
+   "t": 88.834,
    "box": null
   },
   {
    "name": "roles",
-   "t": 71.334,
+   "t": 92.597,
    "box": {
     "x": 104,
-    "y": 20.421875,
+    "y": 19.640625,
     "width": 1072,
     "height": 404.84375
    }
   },
   {
    "name": "roles-run",
-   "t": 79.728,
+   "t": 101.531,
    "box": {
     "x": 104,
-    "y": 20.421875,
+    "y": 19.640625,
     "width": 1072,
     "height": 998.125
    }
   },
   {
    "name": "fabric-start",
-   "t": 83.132,
+   "t": 104.936,
    "box": null
   },
   {
    "name": "fabric-done",
-   "t": 89.959,
+   "t": 112.293,
    "box": {
     "x": 104,
-    "y": 20.421875,
+    "y": 19.640625,
     "width": 1072,
     "height": 998.125
    }
   },
   {
    "name": "fabric-read",
-   "t": 93.978,
+   "t": 116.294,
+   "box": null
+  },
+  {
+   "name": "tryit-start",
+   "t": 118.951,
+   "box": null
+  },
+  {
+   "name": "tryit-work",
+   "t": 122.301,
+   "box": {
+    "x": 347,
+    "y": 247.890625,
+    "width": 526,
+    "height": 321.34375
+   }
+  },
+  {
+   "name": "tryit-read",
+   "t": 129.303,
    "box": null
   }
  ],
- "frameOffset": 0.021
+ "frameOffset": 0.028
 }
