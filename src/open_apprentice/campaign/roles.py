@@ -71,7 +71,7 @@ def role_candidates(scene: dict, artboard: str) -> list[dict]:
 
 # currencies written as letters; symbols ($ € £ ¥ ₹ ₩ ...) are found by their Unicode category instead
 _CURRENCY_WORDS = re.compile(
-    r"(?<![^\W\d_])(zł|kr|kn|kč|ft|lei|lv|chf|fr|rp|rm|zar|sek|nok|dkk|pln|czk|huf|eur|usd|gbp|brl)(?![^\W\d_])",
+    r"(?<![^\W\d_])(zł|kr|kn|kč|ft|lei|lv|tl|chf|fr|rp|rm|zar|sek|nok|dkk|pln|czk|huf|ron|try|eur|usd|gbp|brl|mxn|inr|jpy|cny|krw|aud|cad|nzd|sgd|hkd)(?![^\W\d_])",
     re.I,
 )
 

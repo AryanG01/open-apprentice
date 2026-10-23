@@ -148,7 +148,18 @@ def test_a_sale_banner_whose_price_outsizes_the_headline_is_accepted():
 
 
 @pytest.mark.parametrize(
-    "text", ["199 zł", "1 495 kr", "R$ 89,90", "CHF 49.–", "₹2,499", "49,99 Kč"]
+    "text",
+    [
+        "199 zł",
+        "1 495 kr",
+        "R$ 89,90",
+        "CHF 49.–",
+        "₹2,499",
+        "49,99 Kč",
+        "4.299 TL",
+        "RON 249",
+        "1.299 MXN",
+    ],
 )
 def test_prices_in_other_currencies_are_accepted(text):
     scene, truth = _short_b_with(price={"text": text})
