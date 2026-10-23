@@ -214,7 +214,7 @@ function Montage() {
   const real = Number(((marks as { marks: { name: string }[] }).marks.find((m) => m.name.startsWith("published-"))?.name ?? "published-0").split("-")[1]);
   const published = Math.round(interpolate(frame, [fps * 1.2, fps * 6.5], [0, real], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }));
   return (
-    <AbsoluteFill style={{ ...grid, padding: "120px 60px 60px" }}>
+    <AbsoluteFill style={{ ...grid, padding: "110px 60px 110px", justifyContent: "center" }}>
       <div style={{ position: "absolute", top: 36, left: 60, color: "#fff", fontSize: 48, fontWeight: 600 }}>
         Fix one diagram. It fixes the other hundred.
       </div>
