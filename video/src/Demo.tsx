@@ -400,7 +400,7 @@ function CampaignResults() {
     ["Asks exactly when the copy does not fit", "16 / 16", "banner × engine cases"],
     ["Same rule, two engines (development set)", "16 / 16", "verifier rows"],
     ["Nemotron role proposals, harder untagged banners", "17 / 24", "a simple size rule: 7 / 24"],
-    ["Nemotron's wording of the question", "0 / 3", "failed the fact check; template shown"],
+    ["Nemotron's wording of the question, fact-checked", "6 / 6", "factually right; our check misread 1, since fixed"],
   ];
   return (
     <AbsoluteFill style={{ ...grid, padding: "90px 140px", color: C.ink }}>
