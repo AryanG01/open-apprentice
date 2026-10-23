@@ -1,6 +1,6 @@
 # CURRENT STATE — 2026-10-23, evening (read first)
 
-**Production:** revision `open-apprentice-00036-poz` (image `demo:prod-c8aaa51`, master `c8aaa51`) at 100% with the
+**Production:** revision `open-apprentice-00038-naj` (image `demo:prod-b3ede59`, master `b3ede59`: adds the explanation check reading typographic apostrophes; rollback to `00036-poz`). Before it: `00036-poz` (image `demo:prod-c8aaa51`) at 100% with the
 `next` tag; `DEMO_MODEL_MAX_USD=3` on the durable ledger (about $1.10 used). New since 00034-xuj: the role checker
 accepts sale banners (price may outsize the headline; legal must still be the smallest text), any currency (symbols by
 Unicode category plus TL, RON, MXN, CHF, zł and other codes), and `""` labels as unlabelled. Smoke on the candidate:
