@@ -1,4 +1,17 @@
-# CURRENT STATE — 2026-10-23, evening (read first)
+# CURRENT STATE — 2026-10-24 (read first)
+
+**Candidate `open-apprentice-00041-pet`** (image `demo:prod-6ced560`) adds three features, pending the traffic switch:
+(1) Try-it "show the work" panel: candidate count, every Z3 pair search, the chosen input's split sizes and entropy, the
+final solver check (`reasoning` in the teach API; split sizes only, never which rule backs which option); (2) Campaign
+teaching question: the one example fits two readings of the product image (same frame / scale like the example), a test
+banner where they disagree is built (`campaign/learn.py` `interpretations`, `probe_banner`), both renders verified,
+answered once (`POST /workspaces/{wid}/reading`; runs 409 until then; `{"reading": "fixed"}` pre-answers); under
+"relative" the gold check is left out (`verify_story(gold_applies=False)`); (3) learned rule shown role by role, check
+details shown. Video re-captured on that candidate (2:55). Smoke: question both 14/14 checks, run refused before answer,
+relative short_a ready, fixed Konva/Fabric ready. **Switch:** `update-traffic ... --to-revisions
+open-apprentice-00041-pet=100 --update-tags next=open-apprentice-00041-pet`; rollback `00038-naj`.
+
+# EARLIER STATE — 2026-10-23, evening
 
 **Production:** revision `open-apprentice-00038-naj` (image `demo:prod-b3ede59`, master `b3ede59`: adds the explanation check reading typographic apostrophes; rollback to `00036-poz`). Before it: `00036-poz` (image `demo:prod-c8aaa51`) at 100% with the
 `next` tag; `DEMO_MODEL_MAX_USD=3` on the durable ledger (about $1.10 used). New since 00034-xuj: the role checker
@@ -8,7 +21,7 @@ short_b ready on Konva and Fabric, de_long_a asks, live role proposal origin mod
 **Rollback:** `gcloud run services update-traffic open-apprentice --project oa-demo-1013-19737 --region us-central1
 --to-revisions open-apprentice-00034-xuj=100 --update-tags next=open-apprentice-00034-xuj` (durable cap, old checker).
 Role comparison: run 1 `docs/evaluation/campaign_roles.md`, run 2 `campaign_roles_v2.md` (hybrid 17/24 vs heuristic
-7/24). Video re-rendered at 2:18 with those numbers; still to upload. Note: the auto-mode classifier blocks
+7/24). Video re-rendered at 2:55 with those numbers; still to upload. Note: the auto-mode classifier blocks
 `gcloud run deploy` and `update-traffic` from the agent; the owner runs them with `!`.
 
 # EARLIER STATE — 2026-10-23

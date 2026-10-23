@@ -14,7 +14,7 @@ Nemotron-3-Super on the live site, chosen by a pre-registered check, `docs/evalu
 ## Live demo
 
 **https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
-Video (2:18): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
+Video (2:55): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
 diagrams), confirm which box each note describes, drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
 document is right*. The apprentice's notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks.
 Then apply the skill to **the 100-diagram library** (ten themes drawn as flowcharts, architecture maps, org charts, roadmaps, network maps and floor plans;

@@ -6,7 +6,7 @@ built, it says so.
 
 - **Live demo:** https://open-apprentice-md76de375q-uc.a.run.app (no login, no key)
 - **Repository:** https://github.com/AryanG01/open-apprentice (MIT)
-- **Video:** 2:18, rendered locally (`video/out/open_apprentice_demo.mp4`), not yet on YouTube
+- **Video:** 2:55, rendered locally (`video/out/open_apprentice_demo.mp4`), not yet on YouTube
 - **Event:** Nebius × NVIDIA Global AI Hackathon, track *Best Apps and Agents*. Deadline 30 Oct 2026, 10:00 PDT. The
   demo must stay up until judging ends (15 Dec 2026). The rules require a runtime NVIDIA open model on Nebius, a public
   licensed repo, a working demo, a public video under 3 minutes and the Devpost form.

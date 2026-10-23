@@ -6,7 +6,7 @@ comes from a file in this repository. The file is named next to the claim so it 
 - **Track:** Best Apps and Agents
 - **Demo:** https://open-apprentice-md76de375q-uc.a.run.app
 - **Code:** https://github.com/AryanG01/open-apprentice (public, MIT)
-- **Video:** <YouTube link, public, 2:18>
+- **Video:** <YouTube link, public, 2:55>
 
 ---
 
