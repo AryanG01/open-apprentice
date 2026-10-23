@@ -54,3 +54,26 @@ programs are refused, and the explanation check requires every outcome stated wi
 Earlier runs (prompts before the review fixes; not comparable): run 1 lost its table to a CLI bug ($0.031); run 2
 ($0.040) explanations 3/3, procedures accepted at attempt 1 on both engines (programs not saved); run 3 ($0.032)
 explanations 2/3, procedures accepted at attempt 1, Konva program identical to the reference.
+
+## Overflow wording, re-measured 2026-10-23 (wording recorded this time)
+
+Why the table above says 0 of 3: run 4 did not record what Nemotron wrote, so the reason could not be told. Re-run with
+recording on, same development banners, Nemotron-3-Super, 2 tries per banner, 6 calls, $0.0037 (ledger):
+
+| banner | try | Nemotron's wording | check at the time |
+|---|---|---|---|
+| de_long_a | 1 | The headline needs 317 px but its frame provides only 160 px. Shrinking the hero image fits; splitting the content across two cards also fits. | used |
+| de_long_a | 2 | The headline needs 317 px but its frame provides only 160 px, causing overflow. Shrinking the product image and splitting across two cards both fit the space. | used |
+| de_long_b | 1 | Headline needs 317px but frame has 160px; legal needs 218px but frame has 160px. Shrinking the product image does not fit; splitting across two cards fits. | used |
+| de_long_b | 2 | Headline needs 317 px but frame has 160 px; legal needs 218 px vs 160 px. Shrinking hero image doesn’t fit; splitting into two cards fits. | **refused** |
+| fr_long | 1 | Headline needs 238 px but frame is 160 px tall. Shrinking the product image fits; splitting across two cards fits. | used |
+| fr_long | 2 | Headline needs 238 px but frame provides 160 px → overflow. Shrinking the product image fits; splitting across two cards fits. | used |
+
+- **All 6 wordings are factually right; the check used 5.** The refusal was a checker bug: Nemotron wrote a typographic
+  apostrophe (doesn’t), and the checker only recognised the plain one, so it read "doesn’t fit" as a claim that
+  shrinking works. The checker now normalises apostrophes (`test_a_curly_apostrophe_reads_like_a_straight_one`). With
+  that fix all 6 pass, but that is scored on the same texts that revealed the bug, so it is post hoc.
+- The 0 of 3 in run 4 is most likely the same kind of over-strictness, but that cannot be shown because those texts were
+  not kept.
+- Development banners only (not held out), and only 6 calls: this shows the wording is usually usable and checkable,
+  not a rate.

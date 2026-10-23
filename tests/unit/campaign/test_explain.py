@@ -114,3 +114,30 @@ def test_problem_messages_name_the_options_in_plain_words():
         "The headline needs 317 px of 160 px and the legal line 218 px of 160 px.", FACTS
     )
     assert any("splitting" in p for p in probs) and not any("spliting" in p for p in probs)
+
+
+# Seen live on 2026-10-23: a correct wording refused because the model typed a typographic apostrophe.
+DE_LONG_B = {
+    "violations": [
+        {"role": "headline", "kind": "text_overflow", "needed": 317, "available": 160},
+        {"role": "legal", "kind": "text_overflow", "needed": 218, "available": 160},
+    ],
+    "outcomes": {"builtin_shrink_hero": False, "builtin_split_two_cards": True},
+}
+
+
+@pytest.mark.parametrize("apostrophe", ["'", "’", "ʼ"])
+def test_a_curly_apostrophe_reads_like_a_straight_one(apostrophe):
+    text = (
+        "Headline needs 317 px but frame has 160 px; legal needs 218 px vs 160 px. "
+        f"Shrinking hero image doesn{apostrophe}t fit; splitting into two cards fits."
+    )
+    assert check_explanation(text, DE_LONG_B) == []
+
+
+def test_a_curly_apostrophe_cannot_hide_a_wrong_claim():
+    text = (
+        "Headline needs 317 px but frame has 160 px; legal needs 218 px vs 160 px. "
+        "Shrinking hero image fits; splitting into two cards doesn’t fit."
+    )
+    assert check_explanation(text, DE_LONG_B)

@@ -106,7 +106,9 @@ BANNED = re.compile(
 def check_explanation(text: str, facts: dict) -> list[str]:
     """Rejects any wording that adds, drops, swaps or contradicts a measured fact."""
     problems = []
-    low = text.lower()
+    low = (
+        text.lower().replace("\u2019", "'").replace("\u02bc", "'")
+    )  # typographic apostrophes read as "'"
     if len(text) > MAX_CHARS:
         problems.append(f"longer than {MAX_CHARS} characters")
     if BANNED.search(low):
