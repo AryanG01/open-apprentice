@@ -322,7 +322,7 @@ export function CampaignLane() {
                             <tr key={c.name}>
                               <td>{c.name.replace(/_/g, " ")}</td>
                               <td>{c.passed ? <span className="pill ok">pass</span> : <span className="pill bad">fail</span>}</td>
-                              <td className="muted small">{c.detail}</td>
+                              <td className="muted small">{c.passed ? "" : c.detail}</td>
                             </tr>
                           ))}
                         </tbody>

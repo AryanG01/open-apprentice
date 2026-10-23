@@ -46,47 +46,42 @@ function Scene({ b }: { b: Beat }) {
   );
 }
 
-/** A stretch of the real capture: sped up if it is longer than its narration, last frame held if shorter; gently zoomed on its focus. */
+// The whole screen, never zoomed or cropped, centred between a title band above and a caption band below, so no overlay
+// ever covers the page.
+const SCREEN = { scale: 0.7778, top: 84 };
+const SCREEN_W = Math.round(1920 * SCREEN.scale), SCREEN_H = Math.round(1080 * SCREEN.scale);
+
+/** A stretch of the real capture: sped up if it is longer than its narration, last frame held if shorter. */
 function Clip({ b }: { b: Beat }) {
-  const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const clip = b.clip!;
   const playFrames = Math.round(((clip.to - clip.from) / clip.rate) * fps);
-  const z = zoom(b.focus, frame, fps);
   const video = (from: number, rate: number) => (
     <OffthreadVideo src={staticFile("capture.mp4")} startFrom={Math.round(from * fps)} playbackRate={rate} muted
-      style={{ width: 1920, height: 1080, transform: z.transform, transformOrigin: z.origin }} />
+      style={{ width: 1920, height: 1080, transform: `scale(${SCREEN.scale})`, transformOrigin: "0 0" }} />
   );
   return (
     <AbsoluteFill style={{ background: C.table }}>
-      <Sequence durationInFrames={playFrames}>{video(clip.from, clip.rate)}</Sequence>
-      {clip.held > 0 ? (
-        <Sequence from={playFrames}>
-          <Freeze frame={0}>{video(Math.max(0, clip.to - 0.1), 1)}</Freeze>
-        </Sequence>
-      ) : null}
+      <div style={{ position: "absolute", left: (1920 - SCREEN_W) / 2, top: SCREEN.top, width: SCREEN_W, height: SCREEN_H, overflow: "hidden",
+        borderRadius: 12, boxShadow: "0 18px 60px rgba(0,0,0,.45)", border: "1px solid #2a4670" }}>
+        <Sequence durationInFrames={playFrames}>{video(clip.from, clip.rate)}</Sequence>
+        {clip.held > 0 ? (
+          <Sequence from={playFrames}>
+            <Freeze frame={0}>{video(Math.max(0, clip.to - 0.1), 1)}</Freeze>
+          </Sequence>
+        ) : null}
+      </div>
     </AbsoluteFill>
   );
-}
-
-function zoom(box: Box, frame: number, fps: number) {
-  // scale only as far as keeps the whole focus box in view, centre it, never reveal an edge of the frame
-  if (!box) return { transform: "none", origin: "0 0" };
-  const target = Math.max(1, Math.min(1.35, (1920 * 0.92) / box.width, (1080 * 0.82) / box.height));
-  const s = 1 + (target - 1) * spring({ frame, fps, config: { damping: 200 }, durationInFrames: 40 });
-  const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
-  const tx = Math.min(0, Math.max(1920 - 1920 * s, 960 - cx * s));
-  const ty = Math.min(0, Math.max(1080 - 1080 * s, 540 - cy * s));
-  return { transform: `translate(${tx}px, ${ty}px) scale(${s})`, origin: "0 0" };
 }
 
 function Headline({ text }: { text: string }) {
   const frame = useCurrentFrame();
   const o = interpolate(frame, [0, 12], [0, 1], { extrapolateRight: "clamp" });
   return (
-    <div style={{ position: "absolute", top: 36, left: 48, opacity: o, transform: `translateY(${(1 - o) * -10}px)`,
-      background: "rgba(8,20,38,.86)", border: `1px solid ${C.cyan}55`, color: "#fff", padding: "12px 20px", borderRadius: 10,
-      fontSize: 38, fontWeight: 600, letterSpacing: 0.2 }}>
+    <div style={{ position: "absolute", top: 10, left: (1920 - SCREEN_W) / 2, opacity: o, transform: `translateY(${(1 - o) * -10}px)`,
+      background: "rgba(8,20,38,.86)", border: `1px solid ${C.cyan}55`, color: "#fff", padding: "10px 18px", borderRadius: 10,
+      fontSize: 34, fontWeight: 600, letterSpacing: 0.2 }}>
       {text}
     </div>
   );
@@ -94,7 +89,7 @@ function Headline({ text }: { text: string }) {
 
 function Tags({ b }: { b: Beat }) {
   return (
-    <div style={{ position: "absolute", top: 40, right: 48, display: "flex", gap: 12, fontSize: 26, fontWeight: 600 }}>
+    <div style={{ position: "absolute", top: 22, right: (1920 - SCREEN_W) / 2, display: "flex", gap: 12, fontSize: 26, fontWeight: 600 }}>
       {b.live ? <span style={{ background: C.green, color: "#0b1d05", padding: "8px 14px", borderRadius: 8 }}>● Live run</span> : null}
 
     </div>
@@ -107,7 +102,7 @@ function Explainer({ steps, dur }: { steps: string[]; dur: number }) {
   const t = frame / FPS;
   const each = Math.max(0.8, (dur - 1) / steps.length);
   return (
-    <div style={{ position: "absolute", left: 48, bottom: 170, display: "flex", gap: 10, alignItems: "center" }}>
+    <div style={{ position: "absolute", left: 0, width: "100%", bottom: 96, display: "flex", gap: 10, alignItems: "center", justifyContent: "center" }}>
       {steps.map((s, i) => {
         const on = interpolate(t, [0.4 + i * each, 0.8 + i * each], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
         return (
@@ -135,7 +130,7 @@ function Captions({ b }: { b: Beat }) {
   }
   const g = groups.find((x) => ms <= x[x.length - 1].endMs + 250) ?? groups[groups.length - 1];
   return (
-    <div style={{ position: "absolute", bottom: 64, width: "100%", display: "flex", justifyContent: "center" }}>
+    <div style={{ position: "absolute", bottom: 14, width: "100%", display: "flex", justifyContent: "center" }}>
       <div style={{ background: "rgba(4,10,20,.82)", padding: "12px 26px", borderRadius: 12, fontSize: 44, fontWeight: 600, color: "#cfd9e6", maxWidth: 1500, textAlign: "center" }}>
         {g.map((w, i) => (
           <span key={i} style={{ color: ms >= w.startMs && ms <= w.endMs + 120 ? "#fff" : undefined, textShadow: ms >= w.startMs && ms <= w.endMs + 120 ? `0 0 18px ${C.cyan}` : undefined }}>
