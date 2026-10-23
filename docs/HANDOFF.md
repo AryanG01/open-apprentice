@@ -1,4 +1,17 @@
-# CURRENT STATE — 2026-10-23 (read first)
+# CURRENT STATE — 2026-10-23, evening (read first)
+
+**Production:** revision `open-apprentice-00036-poz` (image `demo:prod-c8aaa51`, master `c8aaa51`) at 100% with the
+`next` tag; `DEMO_MODEL_MAX_USD=3` on the durable ledger (about $1.10 used). New since 00034-xuj: the role checker
+accepts sale banners (price may outsize the headline; legal must still be the smallest text), any currency (symbols by
+Unicode category plus TL, RON, MXN, CHF, zł and other codes), and `""` labels as unlabelled. Smoke on the candidate:
+short_b ready on Konva and Fabric, de_long_a asks, live role proposal origin model, ledger 1.0983 -> 1.1000.
+**Rollback:** `gcloud run services update-traffic open-apprentice --project oa-demo-1013-19737 --region us-central1
+--to-revisions open-apprentice-00034-xuj=100 --update-tags next=open-apprentice-00034-xuj` (durable cap, old checker).
+Role comparison: run 1 `docs/evaluation/campaign_roles.md`, run 2 `campaign_roles_v2.md` (hybrid 17/24 vs heuristic
+7/24). Video re-rendered at 2:18 with those numbers; still to upload. Note: the auto-mode classifier blocks
+`gcloud run deploy` and `update-traffic` from the agent; the owner runs them with `!`.
+
+# EARLIER STATE — 2026-10-23
 
 **Production (2026-10-23, later):** revision `open-apprentice-00034-xuj` (image `demo:prod-29d6525`) at 100% with the
 `next` tag. Changes from 00032-dux: the demo model cap (Try-it-live and Campaign) is charged to the durable GCS ledger
