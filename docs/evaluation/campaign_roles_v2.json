@@ -1,0 +1,1910 @@
+[
+ {
+  "id": "absent_role_1",
+  "category": "absent_role",
+  "expect": "abstain",
+  "gold": {
+   "h3-a242": "background",
+   "k7-j234": "brand_mark",
+   "v1-u52": "product_image",
+   "k4-x549": "headline",
+   "n6-b244": "price",
+   "t2-w967": "cta"
+  },
+  "preds": {
+   "A": {
+    "h3-a242": "background",
+    "v1-u52": "product_image",
+    "k7-j234": "brand_mark",
+    "t2-w967": "cta",
+    "k4-x549": "headline",
+    "n6-b244": "price"
+   },
+   "B": {
+    "h3-a242": "background",
+    "k7-j234": "brand_mark",
+    "v1-u52": "product_image",
+    "k4-x549": "headline",
+    "n6-b244": "price",
+    "t2-w967": "cta"
+   },
+   "C": {
+    "h3-a242": "background",
+    "v1-u52": "product_image",
+    "k7-j234": "brand_mark",
+    "t2-w967": "cta",
+    "k4-x549": "headline",
+    "n6-b244": "price"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   }
+  },
+  "c_origin": "heuristic",
+  "c_problems": [
+   "role legal is missing"
+  ],
+  "d_reason": "legal",
+  "d_error": null,
+  "seconds": {
+   "BC": 5.23,
+   "D": 1.39
+  }
+ },
+ {
+  "id": "absent_role_2",
+  "category": "absent_role",
+  "expect": "abstain",
+  "gold": {
+   "e5-e950": "background",
+   "z6-x943": "product_image",
+   "d8-r709": "brand_mark",
+   "p2-u319": "headline",
+   "n9-u673": "cta",
+   "z4-s510": "legal"
+  },
+  "preds": {
+   "A": {
+    "e5-e950": "background",
+    "z6-x943": "product_image",
+    "d8-r709": "brand_mark",
+    "n9-u673": "cta",
+    "p2-u319": "headline",
+    "z4-s510": "price"
+   },
+   "B": {
+    "e5-e950": "background",
+    "n9-u673": "cta",
+    "d8-r709": "brand_mark",
+    "z4-s510": "legal",
+    "p2-u319": "headline",
+    "z6-x943": "product_image"
+   },
+   "C": {
+    "e5-e950": "background",
+    "z6-x943": "product_image",
+    "d8-r709": "brand_mark",
+    "n9-u673": "cta",
+    "p2-u319": "headline",
+    "z4-s510": "price"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   }
+  },
+  "c_origin": "heuristic",
+  "c_problems": [
+   "role price is missing"
+  ],
+  "d_reason": "price",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.79,
+   "D": 1.82
+  }
+ },
+ {
+  "id": "absent_role_3",
+  "category": "absent_role",
+  "expect": "abstain",
+  "gold": {
+   "x6-v112": "background",
+   "h7-z409": "product_image",
+   "k2-a587": "brand_mark",
+   "r8-f239": "headline",
+   "a1-w593": "price",
+   "f7-f906": "legal"
+  },
+  "preds": {
+   "A": {
+    "x6-v112": "background",
+    "h7-z409": "product_image",
+    "k2-a587": "brand_mark",
+    "r8-f239": "headline",
+    "a1-w593": "price",
+    "f7-f906": "legal"
+   },
+   "B": {
+    "x6-v112": "background",
+    "k2-a587": "brand_mark",
+    "h7-z409": "product_image",
+    "r8-f239": "headline",
+    "a1-w593": "price",
+    "f7-f906": "cta"
+   },
+   "C": {
+    "x6-v112": "background",
+    "h7-z409": "product_image",
+    "k2-a587": "brand_mark",
+    "r8-f239": "headline",
+    "a1-w593": "price",
+    "f7-f906": "legal"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": null
+   }
+  },
+  "c_origin": "heuristic",
+  "c_problems": [
+   "role legal is missing"
+  ],
+  "d_reason": "Missing brand_mark and cta roles",
+  "d_error": null,
+  "seconds": {
+   "BC": 3.0,
+   "D": 1.93
+  }
+ },
+ {
+  "id": "big_decor_image_1",
+  "category": "big_decor_image",
+  "expect": "map",
+  "gold": {
+   "g3-v262": "background",
+   "j9-n318": "product_image",
+   "k5-x380": "brand_mark",
+   "j6-z342": "headline",
+   "j6-v207": "price",
+   "e5-d42": "cta",
+   "t8-d977": "legal"
+  },
+  "preds": {
+   "A": {
+    "g3-v262": "background",
+    "v5-m418": "product_image",
+    "j9-n318": "brand_mark",
+    "e5-d42": "cta",
+    "j6-z342": "headline",
+    "j6-v207": "price",
+    "t8-d977": "legal"
+   },
+   "B": {
+    "g3-v262": "background",
+    "k5-x380": "brand_mark",
+    "j9-n318": "product_image",
+    "j6-z342": "headline",
+    "j6-v207": "price",
+    "e5-d42": "cta",
+    "t8-d977": "legal"
+   },
+   "C": {
+    "g3-v262": "background",
+    "k5-x380": "brand_mark",
+    "j9-n318": "product_image",
+    "j6-z342": "headline",
+    "j6-v207": "price",
+    "e5-d42": "cta",
+    "t8-d977": "legal"
+   },
+   "D": {
+    "g3-v262": "background",
+    "k5-x380": "brand_mark",
+    "j9-n318": "product_image",
+    "j6-z342": "headline",
+    "j6-v207": "price",
+    "e5-d42": "cta",
+    "t8-d977": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 3
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.76,
+   "D": 2.44
+  }
+ },
+ {
+  "id": "big_decor_image_2",
+  "category": "big_decor_image",
+  "expect": "map",
+  "gold": {
+   "a6-n474": "background",
+   "h8-h612": "product_image",
+   "e9-k641": "brand_mark",
+   "c9-s850": "headline",
+   "z2-h949": "price",
+   "m2-e317": "cta",
+   "k6-s204": "legal"
+  },
+  "preds": {
+   "A": {
+    "a6-n474": "background",
+    "e7-k298": "product_image",
+    "h8-h612": "brand_mark",
+    "m2-e317": "cta",
+    "c9-s850": "headline",
+    "z2-h949": "price",
+    "k6-s204": "legal"
+   },
+   "B": {
+    "a6-n474": "background",
+    "e9-k641": "brand_mark",
+    "h8-h612": "product_image",
+    "c9-s850": "headline",
+    "z2-h949": "price",
+    "m2-e317": "cta",
+    "k6-s204": "legal"
+   },
+   "C": {
+    "a6-n474": "background",
+    "e9-k641": "brand_mark",
+    "h8-h612": "product_image",
+    "c9-s850": "headline",
+    "z2-h949": "price",
+    "m2-e317": "cta",
+    "k6-s204": "legal"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 3
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": false,
+    "false_confident": false,
+    "corrections": 7
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "Cannot confidently identify which image layer is the brand_mark and which is the product_image",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.46,
+   "D": 2.51
+  }
+ },
+ {
+  "id": "big_decor_image_3",
+  "category": "big_decor_image",
+  "expect": "map",
+  "gold": {
+   "q9-t429": "background",
+   "c8-k239": "product_image",
+   "u8-s246": "brand_mark",
+   "p3-p441": "headline",
+   "g1-r258": "price",
+   "z3-j732": "cta",
+   "n2-e653": "legal"
+  },
+  "preds": {
+   "A": {
+    "q9-t429": "background",
+    "s2-d554": "product_image",
+    "c8-k239": "brand_mark",
+    "z3-j732": "cta",
+    "p3-p441": "headline",
+    "g1-r258": "price",
+    "n2-e653": "legal"
+   },
+   "B": {
+    "q9-t429": "background",
+    "u8-s246": "brand_mark",
+    "s2-d554": "product_image",
+    "p3-p441": "headline",
+    "g1-r258": "price",
+    "z3-j732": "cta",
+    "n2-e653": "legal"
+   },
+   "C": {
+    "q9-t429": "background",
+    "u8-s246": "brand_mark",
+    "s2-d554": "product_image",
+    "p3-p441": "headline",
+    "g1-r258": "price",
+    "z3-j732": "cta",
+    "n2-e653": "legal"
+   },
+   "D": {
+    "q9-t429": "background",
+    "u8-s246": "brand_mark",
+    "c8-k239": "product_image",
+    "p3-p441": "headline",
+    "g1-r258": "price",
+    "z3-j732": "cta",
+    "n2-e653": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 3
+   },
+   "B": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.98,
+   "D": 1.72
+  }
+ },
+ {
+  "id": "big_logo_1",
+  "category": "big_logo",
+  "expect": "map",
+  "gold": {
+   "m6-d236": "background",
+   "n9-m818": "brand_mark",
+   "k6-j665": "product_image",
+   "t6-z504": "headline",
+   "g1-s868": "price",
+   "r9-q215": "cta",
+   "m5-g733": "legal"
+  },
+  "preds": {
+   "A": {
+    "m6-d236": "background",
+    "n9-m818": "product_image",
+    "k6-j665": "brand_mark",
+    "r9-q215": "cta",
+    "t6-z504": "headline",
+    "g1-s868": "price",
+    "m5-g733": "legal"
+   },
+   "B": {
+    "m6-d236": "background",
+    "k6-j665": "brand_mark",
+    "n9-m818": "product_image",
+    "t6-z504": "headline",
+    "g1-s868": "price",
+    "r9-q215": "cta",
+    "m5-g733": "legal"
+   },
+   "C": {
+    "m6-d236": "background",
+    "k6-j665": "brand_mark",
+    "n9-m818": "product_image",
+    "t6-z504": "headline",
+    "g1-s868": "price",
+    "r9-q215": "cta",
+    "m5-g733": "legal"
+   },
+   "D": {
+    "m6-d236": "background",
+    "k6-j665": "brand_mark",
+    "n9-m818": "product_image",
+    "t6-z504": "headline",
+    "g1-s868": "price",
+    "r9-q215": "cta",
+    "m5-g733": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.47,
+   "D": 2.48
+  }
+ },
+ {
+  "id": "big_logo_2",
+  "category": "big_logo",
+  "expect": "map",
+  "gold": {
+   "r4-p905": "background",
+   "g3-x915": "brand_mark",
+   "a8-w375": "product_image",
+   "t2-z18": "headline",
+   "t4-r705": "price",
+   "a7-x148": "cta",
+   "v1-w252": "legal"
+  },
+  "preds": {
+   "A": {
+    "r4-p905": "background",
+    "g3-x915": "product_image",
+    "a8-w375": "brand_mark",
+    "a7-x148": "cta",
+    "t2-z18": "headline",
+    "t4-r705": "price",
+    "v1-w252": "legal"
+   },
+   "B": {
+    "r4-p905": "background",
+    "v1-w252": "legal",
+    "g3-x915": "product_image",
+    "t2-z18": "headline",
+    "a7-x148": "cta",
+    "a8-w375": "brand_mark",
+    "t4-r705": "price"
+   },
+   "C": {
+    "r4-p905": "background",
+    "v1-w252": "legal",
+    "g3-x915": "product_image",
+    "t2-z18": "headline",
+    "a7-x148": "cta",
+    "a8-w375": "brand_mark",
+    "t4-r705": "price"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": false,
+    "false_confident": false,
+    "corrections": 7
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "brand_mark",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.49,
+   "D": 2.65
+  }
+ },
+ {
+  "id": "big_logo_3",
+  "category": "big_logo",
+  "expect": "map",
+  "gold": {
+   "p2-g437": "background",
+   "w6-w813": "brand_mark",
+   "h8-h717": "product_image",
+   "b8-j305": "headline",
+   "u1-b402": "price",
+   "u6-h586": "cta",
+   "m6-g421": "legal"
+  },
+  "preds": {
+   "A": {
+    "p2-g437": "background",
+    "w6-w813": "product_image",
+    "h8-h717": "brand_mark",
+    "u6-h586": "cta",
+    "b8-j305": "headline",
+    "u1-b402": "price",
+    "m6-g421": "legal"
+   },
+   "B": {
+    "p2-g437": "background",
+    "h8-h717": "brand_mark",
+    "w6-w813": "product_image",
+    "b8-j305": "headline",
+    "u1-b402": "price",
+    "u6-h586": "cta",
+    "m6-g421": "legal"
+   },
+   "C": {
+    "p2-g437": "background",
+    "h8-h717": "brand_mark",
+    "w6-w813": "product_image",
+    "b8-j305": "headline",
+    "u1-b402": "price",
+    "u6-h586": "cta",
+    "m6-g421": "legal"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": false,
+    "false_confident": false,
+    "corrections": 7
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "Cannot determine which image layer is brand_mark and which is product_image",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.54,
+   "D": 2.02
+  }
+ },
+ {
+  "id": "extra_group_1",
+  "category": "extra_group",
+  "expect": "map",
+  "gold": {
+   "u7-d578": "background",
+   "b6-q400": "brand_mark",
+   "k9-v823": "product_image",
+   "f3-z180": "headline",
+   "s7-f255": "price",
+   "w9-r344": "cta",
+   "s9-s190": "legal"
+  },
+  "preds": {
+   "A": {
+    "u7-d578": "background",
+    "k9-v823": "product_image",
+    "b6-q400": "brand_mark",
+    "h6-s887": "cta",
+    "f3-z180": "headline",
+    "s7-f255": "price",
+    "s9-s190": "legal"
+   },
+   "B": {
+    "u7-d578": "background",
+    "b6-q400": "brand_mark",
+    "k9-v823": "product_image",
+    "f3-z180": "headline",
+    "s7-f255": "price",
+    "w9-r344": "cta",
+    "s9-s190": "legal"
+   },
+   "C": {
+    "u7-d578": "background",
+    "b6-q400": "brand_mark",
+    "k9-v823": "product_image",
+    "f3-z180": "headline",
+    "s7-f255": "price",
+    "w9-r344": "cta",
+    "s9-s190": "legal"
+   },
+   "D": {
+    "u7-d578": "background",
+    "b6-q400": "brand_mark",
+    "k9-v823": "product_image",
+    "f3-z180": "headline",
+    "s7-f255": "price",
+    "w9-r344": "cta",
+    "s9-s190": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 3.12,
+   "D": 2.04
+  }
+ },
+ {
+  "id": "extra_group_2",
+  "category": "extra_group",
+  "expect": "map",
+  "gold": {
+   "m1-a214": "background",
+   "k5-s911": "product_image",
+   "d6-b421": "brand_mark",
+   "j6-r587": "headline",
+   "m3-t668": "price",
+   "d4-m458": "cta",
+   "m8-g970": "legal"
+  },
+  "preds": {
+   "A": {
+    "m1-a214": "background",
+    "k5-s911": "product_image",
+    "d6-b421": "brand_mark",
+    "d4-m458": "cta",
+    "j6-r587": "headline",
+    "m3-t668": "price",
+    "m8-g970": "legal"
+   },
+   "B": {
+    "m1-a214": "background",
+    "d6-b421": "brand_mark",
+    "k5-s911": "product_image",
+    "j6-r587": "headline",
+    "m3-t668": "price",
+    "r4-z839": "cta",
+    "m8-g970": "legal"
+   },
+   "C": {
+    "m1-a214": "background",
+    "d6-b421": "brand_mark",
+    "k5-s911": "product_image",
+    "j6-r587": "headline",
+    "m3-t668": "price",
+    "r4-z839": "cta",
+    "m8-g970": "legal"
+   },
+   "D": {
+    "m1-a214": "background",
+    "d6-b421": "brand_mark",
+    "k5-s911": "product_image",
+    "j6-r587": "headline",
+    "m3-t668": "price",
+    "r4-z839": "cta",
+    "m8-g970": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "B": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 4.26,
+   "D": 3.65
+  }
+ },
+ {
+  "id": "extra_group_3",
+  "category": "extra_group",
+  "expect": "map",
+  "gold": {
+   "f9-r513": "background",
+   "m8-p952": "brand_mark",
+   "q9-t388": "product_image",
+   "f5-b330": "headline",
+   "g4-b767": "price",
+   "f4-w309": "cta",
+   "p5-z817": "legal"
+  },
+  "preds": {
+   "A": {
+    "f9-r513": "background",
+    "q9-t388": "product_image",
+    "m8-p952": "brand_mark",
+    "r6-a803": "cta",
+    "f5-b330": "headline",
+    "g4-b767": "price",
+    "p5-z817": "legal"
+   },
+   "B": {
+    "f9-r513": "background",
+    "m8-p952": "brand_mark",
+    "q9-t388": "product_image",
+    "f5-b330": "headline",
+    "g4-b767": "price",
+    "f4-w309": "cta",
+    "p5-z817": "legal"
+   },
+   "C": {
+    "f9-r513": "background",
+    "m8-p952": "brand_mark",
+    "q9-t388": "product_image",
+    "f5-b330": "headline",
+    "g4-b767": "price",
+    "f4-w309": "cta",
+    "p5-z817": "legal"
+   },
+   "D": {
+    "f9-r513": "background",
+    "m8-p952": "brand_mark",
+    "q9-t388": "product_image",
+    "f5-b330": "headline",
+    "g4-b767": "price",
+    "p5-z817": "legal",
+    "f4-w309": "cta"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.82,
+   "D": 3.83
+  }
+ },
+ {
+  "id": "plain_1",
+  "category": "plain",
+  "expect": "map",
+  "gold": {
+   "r3-x880": "background",
+   "t3-c960": "brand_mark",
+   "c3-h925": "product_image",
+   "g2-k689": "headline",
+   "z5-q227": "price",
+   "j3-u764": "cta",
+   "x3-b374": "legal"
+  },
+  "preds": {
+   "A": {
+    "r3-x880": "background",
+    "c3-h925": "product_image",
+    "t3-c960": "brand_mark",
+    "j3-u764": "cta",
+    "g2-k689": "headline",
+    "z5-q227": "price",
+    "x3-b374": "legal"
+   },
+   "B": {
+    "r3-x880": "background",
+    "t3-c960": "brand_mark",
+    "c3-h925": "product_image",
+    "g2-k689": "headline",
+    "z5-q227": "price",
+    "j3-u764": "cta",
+    "x3-b374": "legal"
+   },
+   "C": {
+    "r3-x880": "background",
+    "t3-c960": "brand_mark",
+    "c3-h925": "product_image",
+    "g2-k689": "headline",
+    "z5-q227": "price",
+    "j3-u764": "cta",
+    "x3-b374": "legal"
+   },
+   "D": {
+    "r3-x880": "background",
+    "t3-c960": "brand_mark",
+    "c3-h925": "product_image",
+    "g2-k689": "headline",
+    "z5-q227": "price",
+    "j3-u764": "cta",
+    "x3-b374": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.62,
+   "D": 2.52
+  }
+ },
+ {
+  "id": "plain_2",
+  "category": "plain",
+  "expect": "map",
+  "gold": {
+   "p8-j771": "background",
+   "t4-n668": "headline",
+   "p1-f135": "product_image",
+   "h6-g85": "brand_mark",
+   "n2-h638": "price",
+   "b5-c350": "cta",
+   "a2-h747": "legal"
+  },
+  "preds": {
+   "A": {
+    "p8-j771": "background",
+    "p1-f135": "product_image",
+    "h6-g85": "brand_mark",
+    "b5-c350": "cta",
+    "t4-n668": "headline",
+    "n2-h638": "price",
+    "a2-h747": "legal"
+   },
+   "B": {
+    "h6-g85": "brand_mark",
+    "b5-c350": "cta",
+    "p1-f135": "product_image",
+    "t4-n668": "headline",
+    "n2-h638": "price",
+    "p8-j771": "background",
+    "a2-h747": "legal"
+   },
+   "C": {
+    "h6-g85": "brand_mark",
+    "b5-c350": "cta",
+    "p1-f135": "product_image",
+    "t4-n668": "headline",
+    "n2-h638": "price",
+    "p8-j771": "background",
+    "a2-h747": "legal"
+   },
+   "D": {
+    "p8-j771": "background",
+    "h6-g85": "brand_mark",
+    "p1-f135": "product_image",
+    "t4-n668": "headline",
+    "n2-h638": "price",
+    "b5-c350": "cta",
+    "a2-h747": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.92,
+   "D": 2.19
+  }
+ },
+ {
+  "id": "plain_3",
+  "category": "plain",
+  "expect": "map",
+  "gold": {
+   "v5-e347": "background",
+   "p9-v103": "brand_mark",
+   "p8-d48": "product_image",
+   "u5-w753": "headline",
+   "c5-x60": "price",
+   "h4-c912": "cta",
+   "e8-k989": "legal"
+  },
+  "preds": {
+   "A": {
+    "v5-e347": "background",
+    "p8-d48": "product_image",
+    "p9-v103": "brand_mark",
+    "h4-c912": "cta",
+    "u5-w753": "headline",
+    "c5-x60": "price",
+    "e8-k989": "legal"
+   },
+   "B": {
+    "v5-e347": "background",
+    "p9-v103": "brand_mark",
+    "p8-d48": "product_image",
+    "u5-w753": "headline",
+    "c5-x60": "price",
+    "h4-c912": "cta",
+    "e8-k989": "legal"
+   },
+   "C": {
+    "v5-e347": "background",
+    "p9-v103": "brand_mark",
+    "p8-d48": "product_image",
+    "u5-w753": "headline",
+    "c5-x60": "price",
+    "h4-c912": "cta",
+    "e8-k989": "legal"
+   },
+   "D": {
+    "v5-e347": "background",
+    "p9-v103": "brand_mark",
+    "c5-x60": "price",
+    "u5-w753": "headline",
+    "h4-c912": "cta",
+    "p8-d48": "product_image",
+    "e8-k989": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.51,
+   "D": 1.85
+  }
+ },
+ {
+  "id": "price_emphasis_1",
+  "category": "price_emphasis",
+  "expect": "map",
+  "gold": {
+   "g1-d659": "background",
+   "z4-e90": "brand_mark",
+   "a5-j740": "product_image",
+   "k2-a943": "headline",
+   "h4-e524": "price",
+   "w8-u846": "cta",
+   "b2-e439": "legal"
+  },
+  "preds": {
+   "A": {
+    "g1-d659": "background",
+    "a5-j740": "product_image",
+    "z4-e90": "brand_mark",
+    "w8-u846": "cta",
+    "h4-e524": "headline",
+    "k2-a943": "price",
+    "b2-e439": "legal"
+   },
+   "B": {
+    "g1-d659": "background",
+    "z4-e90": "brand_mark",
+    "a5-j740": "product_image",
+    "k2-a943": "headline",
+    "h4-e524": "price",
+    "w8-u846": "cta",
+    "b2-e439": "legal"
+   },
+   "C": {
+    "g1-d659": "background",
+    "z4-e90": "brand_mark",
+    "a5-j740": "product_image",
+    "k2-a943": "headline",
+    "h4-e524": "price",
+    "w8-u846": "cta",
+    "b2-e439": "legal"
+   },
+   "D": {}
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": false,
+    "false_confident": false,
+    "corrections": 7
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "brand_mark",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.6,
+   "D": 1.66
+  }
+ },
+ {
+  "id": "price_emphasis_2",
+  "category": "price_emphasis",
+  "expect": "map",
+  "gold": {
+   "s6-x248": "background",
+   "z9-d643": "product_image",
+   "m1-e317": "brand_mark",
+   "b6-n828": "price",
+   "j3-n677": "headline",
+   "m9-w576": "cta",
+   "s6-f268": "legal"
+  },
+  "preds": {
+   "A": {
+    "s6-x248": "background",
+    "z9-d643": "product_image",
+    "m1-e317": "brand_mark",
+    "m9-w576": "cta",
+    "b6-n828": "headline",
+    "j3-n677": "price",
+    "s6-f268": "legal"
+   },
+   "B": {
+    "s6-x248": "background",
+    "m1-e317": "brand_mark",
+    "z9-d643": "product_image",
+    "j3-n677": "headline",
+    "b6-n828": "price",
+    "m9-w576": "cta",
+    "s6-f268": "legal"
+   },
+   "C": {
+    "s6-x248": "background",
+    "z9-d643": "product_image",
+    "m1-e317": "brand_mark",
+    "m9-w576": "cta",
+    "b6-n828": "headline",
+    "j3-n677": "price",
+    "s6-f268": "legal"
+   },
+   "D": {
+    "s6-x248": "background",
+    "m1-e317": "brand_mark",
+    "z9-d643": "product_image",
+    "j3-n677": "headline",
+    "b6-n828": "price",
+    "m9-w576": "cta",
+    "s6-f268": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "heuristic",
+  "c_problems": [
+   "price must contain a number and a currency"
+  ],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.39,
+   "D": 1.8
+  }
+ },
+ {
+  "id": "price_emphasis_3",
+  "category": "price_emphasis",
+  "expect": "map",
+  "gold": {
+   "z2-m217": "background",
+   "g6-r723": "brand_mark",
+   "u4-j601": "headline",
+   "b5-w528": "price",
+   "s7-v758": "product_image",
+   "b9-q654": "cta",
+   "q9-a504": "legal"
+  },
+  "preds": {
+   "A": {
+    "z2-m217": "background",
+    "s7-v758": "product_image",
+    "g6-r723": "brand_mark",
+    "b9-q654": "cta",
+    "b5-w528": "headline",
+    "u4-j601": "price",
+    "q9-a504": "legal"
+   },
+   "B": {
+    "z2-m217": "background",
+    "g6-r723": "brand_mark",
+    "s7-v758": "product_image",
+    "u4-j601": "headline",
+    "b5-w528": "price",
+    "b9-q654": "cta",
+    "q9-a504": "legal"
+   },
+   "C": {
+    "z2-m217": "background",
+    "g6-r723": "brand_mark",
+    "s7-v758": "product_image",
+    "u4-j601": "headline",
+    "b5-w528": "price",
+    "b9-q654": "cta",
+    "q9-a504": "legal"
+   },
+   "D": {
+    "z2-m217": "background",
+    "g6-r723": "brand_mark",
+    "s7-v758": "product_image",
+    "u4-j601": "headline",
+    "b5-w528": "price",
+    "b9-q654": "cta",
+    "q9-a504": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.86,
+   "D": 3.24
+  }
+ },
+ {
+  "id": "text_distractors_1",
+  "category": "text_distractors",
+  "expect": "map",
+  "gold": {
+   "c8-j670": "background",
+   "e5-c331": "brand_mark",
+   "k6-p427": "product_image",
+   "x5-z692": "headline",
+   "g8-v368": "price",
+   "k8-a757": "cta",
+   "q6-g942": "legal"
+  },
+  "preds": {
+   "A": {
+    "c8-j670": "background",
+    "k6-p427": "product_image",
+    "e5-c331": "brand_mark",
+    "k8-a757": "cta",
+    "x5-z692": "headline",
+    "g8-v368": "price",
+    "x2-b746": "legal"
+   },
+   "B": {
+    "c8-j670": "background",
+    "e5-c331": "brand_mark",
+    "k6-p427": "product_image",
+    "x5-z692": "headline",
+    "g8-v368": "price",
+    "k8-a757": "cta",
+    "q6-g942": "legal"
+   },
+   "C": {
+    "c8-j670": "background",
+    "e5-c331": "brand_mark",
+    "k6-p427": "product_image",
+    "x5-z692": "headline",
+    "g8-v368": "price",
+    "k8-a757": "cta",
+    "q6-g942": "legal"
+   },
+   "D": {
+    "c8-j670": "background",
+    "e5-c331": "brand_mark",
+    "k6-p427": "product_image",
+    "x5-z692": "headline",
+    "g8-v368": "price",
+    "k8-a757": "cta",
+    "q6-g942": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.27,
+   "D": 3.22
+  }
+ },
+ {
+  "id": "text_distractors_2",
+  "category": "text_distractors",
+  "expect": "map",
+  "gold": {
+   "z5-s59": "background",
+   "d4-s212": "brand_mark",
+   "u2-r328": "product_image",
+   "a6-s467": "headline",
+   "x3-b98": "price",
+   "r6-f985": "cta",
+   "r4-w400": "legal"
+  },
+  "preds": {
+   "A": {
+    "z5-s59": "background",
+    "u2-r328": "product_image",
+    "d4-s212": "brand_mark",
+    "r6-f985": "cta",
+    "w4-f536": "headline",
+    "a6-s467": "price",
+    "x3-b98": "legal"
+   },
+   "B": {
+    "z5-s59": "background",
+    "d4-s212": "brand_mark",
+    "u2-r328": "product_image",
+    "w4-f536": "headline",
+    "x3-b98": "price",
+    "r6-f985": "cta",
+    "r4-w400": "legal"
+   },
+   "C": {
+    "z5-s59": "background",
+    "d4-s212": "brand_mark",
+    "u2-r328": "product_image",
+    "w4-f536": "headline",
+    "x3-b98": "price",
+    "r6-f985": "cta",
+    "r4-w400": "legal"
+   },
+   "D": {
+    "z5-s59": "background",
+    "d4-s212": "brand_mark",
+    "u2-r328": "product_image",
+    "a6-s467": "headline",
+    "x3-b98": "price",
+    "r6-f985": "cta",
+    "r4-w400": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 4
+   },
+   "B": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "C": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.1,
+   "D": 1.49
+  }
+ },
+ {
+  "id": "text_distractors_3",
+  "category": "text_distractors",
+  "expect": "map",
+  "gold": {
+   "s4-k598": "background",
+   "w6-a987": "product_image",
+   "f3-z36": "brand_mark",
+   "g6-m808": "headline",
+   "j6-p597": "price",
+   "z8-e727": "cta",
+   "v6-g123": "legal"
+  },
+  "preds": {
+   "A": {
+    "s4-k598": "background",
+    "w6-a987": "product_image",
+    "f3-z36": "brand_mark",
+    "z8-e727": "cta",
+    "g6-m808": "headline",
+    "j6-p597": "price",
+    "x1-c930": "legal"
+   },
+   "B": {
+    "s4-k598": "background",
+    "f3-z36": "brand_mark",
+    "w6-a987": "product_image",
+    "g6-m808": "headline",
+    "j6-p597": "price",
+    "z8-e727": "cta",
+    "v6-g123": "legal"
+   },
+   "C": {
+    "s4-k598": "background",
+    "f3-z36": "brand_mark",
+    "w6-a987": "product_image",
+    "g6-m808": "headline",
+    "j6-p597": "price",
+    "z8-e727": "cta",
+    "v6-g123": "legal"
+   },
+   "D": {
+    "s4-k598": "background",
+    "f3-z36": "brand_mark",
+    "w6-a987": "product_image",
+    "g6-m808": "headline",
+    "j6-p597": "price",
+    "z8-e727": "cta",
+    "v6-g123": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.22,
+   "D": 2.1
+  }
+ },
+ {
+  "id": "twin_prices_1",
+  "category": "twin_prices",
+  "expect": "map",
+  "gold": {
+   "s9-c470": "background",
+   "j1-n929": "brand_mark",
+   "w3-v295": "product_image",
+   "n2-u353": "headline",
+   "t7-m176": "price",
+   "n2-p672": "cta",
+   "c7-g726": "legal"
+  },
+  "preds": {
+   "A": {
+    "s9-c470": "background",
+    "w3-v295": "product_image",
+    "j1-n929": "brand_mark",
+    "n2-p672": "cta",
+    "n2-u353": "headline",
+    "t7-m176": "price",
+    "c9-t119": "legal"
+   },
+   "B": {
+    "s9-c470": "background",
+    "j1-n929": "brand_mark",
+    "w3-v295": "product_image",
+    "n2-u353": "headline",
+    "t7-m176": "price",
+    "n2-p672": "cta",
+    "c7-g726": "legal"
+   },
+   "C": {
+    "s9-c470": "background",
+    "j1-n929": "brand_mark",
+    "w3-v295": "product_image",
+    "n2-u353": "headline",
+    "t7-m176": "price",
+    "n2-p672": "cta",
+    "c7-g726": "legal"
+   },
+   "D": {
+    "s9-c470": "background",
+    "j1-n929": "brand_mark",
+    "w3-v295": "product_image",
+    "n2-u353": "headline",
+    "t7-m176": "price",
+    "n2-p672": "cta",
+    "c7-g726": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.7,
+   "D": 3.35
+  }
+ },
+ {
+  "id": "twin_prices_2",
+  "category": "twin_prices",
+  "expect": "map",
+  "gold": {
+   "c6-b335": "background",
+   "n7-h359": "brand_mark",
+   "d6-p236": "product_image",
+   "w8-z609": "headline",
+   "f4-e639": "price",
+   "f3-f990": "cta",
+   "u2-u212": "legal"
+  },
+  "preds": {
+   "A": {
+    "c6-b335": "background",
+    "d6-p236": "product_image",
+    "n7-h359": "brand_mark",
+    "f3-f990": "cta",
+    "w8-z609": "headline",
+    "f4-e639": "price",
+    "p5-x422": "legal"
+   },
+   "B": {
+    "c6-b335": "background",
+    "n7-h359": "brand_mark",
+    "d6-p236": "product_image",
+    "w8-z609": "headline",
+    "f4-e639": "price",
+    "f3-f990": "cta",
+    "u2-u212": "legal"
+   },
+   "C": {
+    "c6-b335": "background",
+    "n7-h359": "brand_mark",
+    "d6-p236": "product_image",
+    "w8-z609": "headline",
+    "f4-e639": "price",
+    "f3-f990": "cta",
+    "u2-u212": "legal"
+   },
+   "D": {
+    "c6-b335": "background",
+    "n7-h359": "brand_mark",
+    "d6-p236": "product_image",
+    "w8-z609": "headline",
+    "f4-e639": "price",
+    "f3-f990": "cta",
+    "u2-u212": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 1.86,
+   "D": 2.13
+  }
+ },
+ {
+  "id": "twin_prices_3",
+  "category": "twin_prices",
+  "expect": "map",
+  "gold": {
+   "z9-m499": "background",
+   "v9-p364": "product_image",
+   "w4-m424": "brand_mark",
+   "v3-k946": "headline",
+   "r3-c631": "price",
+   "j8-t669": "cta",
+   "r3-c407": "legal"
+  },
+  "preds": {
+   "A": {
+    "z9-m499": "background",
+    "v9-p364": "product_image",
+    "w4-m424": "brand_mark",
+    "j8-t669": "cta",
+    "v3-k946": "headline",
+    "r3-c631": "price",
+    "e3-k594": "legal"
+   },
+   "B": {
+    "z9-m499": "background",
+    "w4-m424": "brand_mark",
+    "v9-p364": "product_image",
+    "v3-k946": "headline",
+    "r3-c631": "price",
+    "j8-t669": "cta",
+    "r3-c407": "legal"
+   },
+   "C": {
+    "z9-m499": "background",
+    "w4-m424": "brand_mark",
+    "v9-p364": "product_image",
+    "v3-k946": "headline",
+    "r3-c631": "price",
+    "j8-t669": "cta",
+    "r3-c407": "legal"
+   },
+   "D": {
+    "z9-m499": "background",
+    "w4-m424": "brand_mark",
+    "v9-p364": "product_image",
+    "v3-k946": "headline",
+    "r3-c631": "price",
+    "j8-t669": "cta",
+    "r3-c407": "legal"
+   }
+  },
+  "arms": {
+   "A": {
+    "exact": false,
+    "false_confident": true,
+    "corrections": 2
+   },
+   "B": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "C": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   },
+   "D": {
+    "exact": true,
+    "false_confident": false,
+    "corrections": 0
+   }
+  },
+  "c_origin": "model",
+  "c_problems": [],
+  "d_reason": "",
+  "d_error": null,
+  "seconds": {
+   "BC": 2.75,
+   "D": 2.84
+  }
+ }
+]
