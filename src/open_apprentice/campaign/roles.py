@@ -7,6 +7,7 @@ import copy
 import hashlib
 import pathlib
 import re
+import unicodedata
 from dataclasses import dataclass, field
 
 from open_apprentice.budget import Ledger
@@ -68,6 +69,19 @@ def role_candidates(scene: dict, artboard: str) -> list[dict]:
     return out
 
 
+# currencies written as letters; symbols ($ € £ ¥ ₹ ₩ ...) are found by their Unicode category instead
+_CURRENCY_WORDS = re.compile(
+    r"(?<![^\W\d_])(zł|kr|kn|kč|ft|lei|lv|chf|fr|rp|rm|zar|sek|nok|dkk|pln|czk|huf|eur|usd|gbp|brl)(?![^\W\d_])",
+    re.I,
+)
+
+
+def has_currency(text: str) -> bool:
+    return any(unicodedata.category(ch) == "Sc" for ch in text) or bool(
+        _CURRENCY_WORDS.search(text)
+    )
+
+
 def area(x: dict) -> float:
     return (x.get("width") or 0) * (x.get("height") or 0)
 
@@ -101,15 +115,15 @@ def check_role_mapping(scene: dict, artboard: str, mapping: dict[str, str]) -> l
         if n[r]["type"] != "text":
             problems.append(f"{r} must be text")
     if n["price"]["type"] == "text" and not (
-        re.search(r"\d", n["price"]["text"]) and re.search(r"[$€£¥]", n["price"]["text"])
+        re.search(r"\d", n["price"]["text"]) and has_currency(n["price"]["text"])
     ):
-        problems.append("price must contain a number and a currency sign")
+        problems.append("price must contain a number and a currency")
     texts = [n[r] for r in ("headline", "price", "legal")]
-    if (
-        all(t["type"] == "text" for t in texts)
-        and not texts[0]["fontSize"] > texts[1]["fontSize"] > texts[2]["fontSize"]
+    # sale banners set the price larger than the headline, so only the small print's size is checked
+    if all(t["type"] == "text" for t in texts) and not texts[2]["fontSize"] < min(
+        texts[0]["fontSize"], texts[1]["fontSize"]
     ):
-        problems.append("text sizes must run headline > price > legal")
+        problems.append("legal must be the smallest of headline, price and legal")
     if (
         n["product_image"]["type"] == "image"
         and n["brand_mark"]["type"] == "image"
@@ -159,8 +173,11 @@ async def propose_roles(
             heuristic_roles(scene, artboard), "heuristic", [res.error or "no reply"]
         )
     back = {v: k for k, v in opaque_ids(scene, artboard).items()}
-    unknown = [i for i in res.parsed.roles if i not in back]
-    mapping = {back[i]: r for i, r in res.parsed.roles.items() if i in back}
+    given = {
+        i: r for i, r in res.parsed.roles.items() if r
+    }  # "" means the model left the layer unlabelled
+    unknown = [i for i in given if i not in back]
+    mapping = {back[i]: r for i, r in given.items() if i in back}
     problems = [f"{i} is not a layer it was shown" for i in unknown] + check_role_mapping(
         scene, artboard, mapping
     )

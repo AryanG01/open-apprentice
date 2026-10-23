@@ -130,3 +130,51 @@ def test_a_proposal_in_opaque_ids_is_mapped_back():
     to_opaque = opaque_ids(scene, "banner")
     p, _ = _propose("untagged_de_long_a", {to_opaque[k]: v for k, v in _truth("de_long_a").items()})
     assert p.origin == "model" and p.mapping == _truth("de_long_a")
+
+
+# Fixes from the pre-registered role comparison (docs/evaluation/campaign_roles.md): the checker rejected correct answers.
+def _short_b_with(**changes):
+    scene = load_fixture("untagged_short_b")["scene"]
+    truth = _truth("short_b")
+    for role, fields in changes.items():
+        nid = next(k for k, v in truth.items() if v == role)
+        next(n for n in scene["nodes"] if n["id"] == nid).update(fields)
+    return scene, truth
+
+
+def test_a_sale_banner_whose_price_outsizes_the_headline_is_accepted():
+    scene, truth = _short_b_with(price={"fontSize": 120})
+    assert check_role_mapping(scene, "banner", truth) == []
+
+
+@pytest.mark.parametrize(
+    "text", ["199 zł", "1 495 kr", "R$ 89,90", "CHF 49.–", "₹2,499", "49,99 Kč"]
+)
+def test_prices_in_other_currencies_are_accepted(text):
+    scene, truth = _short_b_with(price={"text": text})
+    assert check_role_mapping(scene, "banner", truth) == []
+
+
+@pytest.mark.parametrize("text", ["Free shipping", "Since 2024", "kr"])
+def test_a_price_needs_both_a_number_and_a_currency(text):
+    scene, truth = _short_b_with(price={"text": text})
+    assert any("price" in p for p in check_role_mapping(scene, "banner", truth))
+
+
+def test_legal_must_still_be_the_smallest_text():
+    scene, truth = _short_b_with(legal={"fontSize": 200})
+    assert any("legal" in p for p in check_role_mapping(scene, "banner", truth))
+
+
+def test_layers_the_model_labels_with_an_empty_role_count_as_unlabelled():
+    from open_apprentice.campaign.roles import opaque_ids
+
+    scene = load_fixture("untagged_short_b")["scene"]
+    scene["nodes"].append(
+        {**next(n for n in scene["nodes"] if n.get("type") == "text"), "id": "decor"}
+    )
+    ids = opaque_ids(scene, "banner")
+    answer = {ids[k]: v for k, v in _truth("short_b").items()} | {ids["decor"]: ""}
+    provider = MockProvider({"campaign_roles": [{"roles": answer}]})
+    p = asyncio.run(propose_roles(provider, _ledger(), scene, "banner"))
+    assert p.origin == "model" and p.mapping == _truth("short_b")
