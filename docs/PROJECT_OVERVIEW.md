@@ -164,7 +164,7 @@ The setup:
 
 ### 3d. Engineering
 
-- **Tests:** 1,545 Python tests (unit, integration, contracts, evaluation) and 85 engine tests (Konva and Fabric in
+- **Tests:** 1,561 Python tests (unit, integration, contracts, evaluation) and 85 engine tests (Konva and Fabric in
   real Chromium), plus browser end-to-end journeys.
 - **CI:** GitHub Actions on Python 3.12: lint, import contracts, web build, engine, browser.
 - **Clean-clone check:** the README setup steps were re-run from a fresh clone on 22 Oct and all passed.

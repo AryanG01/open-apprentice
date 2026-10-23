@@ -104,6 +104,17 @@ try {
   await sleep(4000);
   await mark("learned-read");
 
+  // the example fits two readings of the product image: it renders both on a test banner and asks once
+  await scrollTo("[aria-label='Teaching question']", 20);
+  await mark("reading", "[aria-label='Teaching question']");
+  await sleep(6000);
+  await mark("reading-read");
+  await clickFor(page.getByRole("button", { name: "Same frame every time" }), /\/reading$/);
+  await scrollTo("[aria-label='Learned rule']", 20);
+  await mark("rule", "[aria-label='Learned rule']");
+  await sleep(4000);
+  await mark("rule-read");
+
   // reuse on a new banner (Konva), the verifier's checks
   await scrollTo("#c-run", 20);
   await mark("reuse-start");
@@ -165,6 +176,19 @@ try {
   await mark("fabric-done", ".runout");
   await sleep(4000);
   await mark("fabric-read");
+
+  // the Try-it lane's question shows its work: candidate rules, Z3's pair searches, how the chosen input splits them
+  await page.goto(`${URL_}/#home`, { waitUntil: "networkidle" });
+  await click(page.getByText("Try it live", { exact: true }).first());
+  await page.waitForLoadState("networkidle");
+  await click(page.getByLabel("Reference learner (free, no model)"));
+  await mark("tryit-start");
+  await clickFor(page.getByRole("button", { name: "Start teaching" }), /\/api\/teach$/);
+  await page.getByLabel("Show the work").waitFor({ timeout: 60_000 });
+  await scrollTo("[aria-label='Show the work']", 120);
+  await mark("tryit-work", "[aria-label='Show the work']");
+  await sleep(7000);
+  await mark("tryit-read");
   await cdp.send("Page.stopScreencast").catch(() => {});
 
   // real before/after renders for the opening montage, through the same public API (Konva)
@@ -184,7 +208,7 @@ try {
     }
   };
   const fx = (await (await page.request.get(`${URL_}/api/campaign/fixtures`)).json()).fixtures;
-  const ws = await api("/workspaces", {});
+  const ws = await api("/workspaces", { reading: "fixed" });
   const save = (name, dataUrl) => fs.writeFileSync(path.join(OUT, name), Buffer.from(dataUrl.split(",")[1], "base64"));
   const tiles = [];
   for (const [id, choice] of [["short_a"], ["fr_long", "builtin_shrink_hero"], ["short_b"], ["de_long_a", "builtin_split_two_cards"]]) {

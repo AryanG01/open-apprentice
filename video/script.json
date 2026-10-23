@@ -22,6 +22,16 @@
    "text": "I show it once: this wide headphone banner becomes a vertical story card. The logo, product, headline, price, button and legal line all move, resize and restyle. It learns the rule by each layer's role, not by pixel positions."
   },
   {
+   "id": "c-reading",
+   "clip": [
+    "reading",
+    "rule-read"
+   ],
+   "focus": "reading",
+   "onScreen": "Two rules fit one example · it asks once",
+   "text": "One example fits two rules: the product photo always fills the same frame, or it scales like the example. They only disagree when the photo is a different size, so it builds that test banner, renders both, verifies both, and asks me once. Then it shows the rule it learned, role by role."
+  },
+  {
    "id": "c-reuse",
    "clip": [
     "reuse-start",
@@ -77,6 +87,16 @@
    "focus": "fabric-done",
    "onScreen": "Same rule in Fabric · 16/16 parity",
    "text": "And the same learned rule runs unchanged in a second engine, Fabric, through the same sandboxed procedure."
+  },
+  {
+   "id": "c-z3",
+   "clip": [
+    "tryit-start",
+    "tryit-read"
+   ],
+   "focus": "tryit-work",
+   "onScreen": "Z3 finds where candidate rules disagree",
+   "text": "The same idea runs exactly in our badge lane. The Z3 solver compares every pair of rules that fit, finds a concrete input where they disagree, and it asks about the input that splits them most. You can open the work behind every question."
   },
   {
    "id": "c-diagrams",
