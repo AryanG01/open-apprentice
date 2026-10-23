@@ -18,6 +18,7 @@ import asyncio
 import os
 import random
 import time
+import logging
 import uuid
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -40,6 +41,7 @@ from open_apprentice.api.geometry import (
     view,
 )
 from open_apprentice.api.svg_export import build_svg
+from open_apprentice.api.v2.routes import client_key
 from open_apprentice.budget import BudgetExhausted, Ledger, Limits
 from open_apprentice.concepts.bindings import (
     BindingRegistry,
@@ -243,13 +245,44 @@ def _account(request: Request, live: Live) -> None:
     sp = _spend(request)
     sp["usd"] += max(d_usd, 0.0)
     sp["tokens"] += max(d_tokens, 0)
+    v2 = getattr(request.app.state, "v2", None)
+    if (
+        v2 is not None and d_usd > 0
+    ):  # the durable ledger every instance reads, so the cap survives restarts and scale-out
+        try:
+            v2.ledger.record(
+                uuid.uuid4().hex, f"demo:{getattr(live, 'id', '')}", Fraction(str(round(d_usd, 9)))
+            )
+        except (
+            Exception
+        ) as e:  # the money is spent either way; this process's counter still holds it
+            logging.getLogger(__name__).warning(
+                "demo spend not written to the durable ledger: %s", e
+            )
+
+
+def _server_spend(request: Request) -> float:
+    """Model spend on this server: the durable ledger shared by every instance, or this process's counter if that is higher."""
+    v2 = getattr(request.app.state, "v2", None)
+    if v2 is None:
+        return _spend(request)["usd"]
+    try:
+        durable = float(v2.ledger.exposure()["total"])
+    except Exception as e:
+        raise HTTPException(
+            503, f"the spend ledger is unavailable, so the model is not called: {type(e).__name__}"
+        )
+    return max(durable, _spend(request)["usd"])
 
 
 def _meter(request: Request, live: Live) -> Optional[dict]:
     if live.mode != "nemotron":
         return None
     snap = live.ledger.snapshot()
-    sp = _spend(request)
+    try:
+        server = round(_server_spend(request), 4)
+    except HTTPException:  # display only: the budget check itself fails closed
+        server = round(_spend(request)["usd"], 4)
     if live.replay:
         return {
             "model": live.model_id,
@@ -258,7 +291,7 @@ def _meter(request: Request, live: Live) -> Optional[dict]:
             "session_calls": snap["consumed"]["calls"],
             "session_usd": 0.0,
             "unknown_cost_calls": 0,
-            "server_spend_usd": round(sp["usd"], 4),
+            "server_spend_usd": server,
             "server_cap_usd": _cap_usd(),
             "note": f"recorded {request.app.state.tape.get('recorded_at', '')}; no model is called and nothing is billed now. Token counts are from the original run",
         }
@@ -269,7 +302,7 @@ def _meter(request: Request, live: Live) -> Optional[dict]:
         "session_calls": snap["consumed"]["calls"],
         "session_usd": round(live.counted_usd, 4),
         "unknown_cost_calls": snap["unknown_cost_calls"],
-        "server_spend_usd": round(sp["usd"], 4),
+        "server_spend_usd": server,
         "server_cap_usd": _cap_usd(),
         "note": "dollars use the rates configured on the server; they are an estimate, not a bill",
     }
@@ -278,15 +311,15 @@ def _meter(request: Request, live: Live) -> Optional[dict]:
 def _require_model_budget(request: Request, live: Optional[Live] = None) -> None:
     if live is not None and live.replay:
         return
-    sp = _spend(request)
+    spent = _server_spend(request)
     # STARTING a session needs the whole worst-case reserve. A session already admitted is stopped only when one more
     # call could cross the cap, otherwise a small cap would refuse a session that has barely spent anything. The cap is
     # therefore enforced to within about one call; the per-session token limit bounds each session separately.
     need = RESERVE_USD if live is None else ONE_CALL_RESERVE_USD
-    if sp["usd"] + need > _cap_usd():
+    if spent + need > _cap_usd():
         raise HTTPException(
             402,
-            f"the model budget for this server is used up (${sp['usd']:.2f} of ${_cap_usd():.2f}); use the reference learner instead",
+            f"the model budget for this server is used up (${spent:.2f} of ${_cap_usd():.2f}); use the reference learner instead",
         )
 
 
@@ -302,7 +335,7 @@ RATE_LIMITS = {
 
 def _rate_limit(request: Request, mode: str) -> None:
     """In-memory sliding window per client address. Enough to stop one visitor draining the model budget; a real deployment adds a proxy limit too."""
-    client = request.client.host if request.client else "unknown"
+    client = client_key(request)
     now = time.time()
     rate = request.app.state.rate
     if (

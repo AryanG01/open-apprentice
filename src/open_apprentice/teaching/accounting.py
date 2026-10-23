@@ -75,6 +75,22 @@ class Ledger:
 
         self._update(fn)
 
+    def record(self, attempt_id: str, action_id: str, actual_usd: Fraction) -> None:
+        """Spend that already happened elsewhere (the demo lanes' own metering): counted even past the cap, never refused."""
+
+        def fn(doc: dict) -> None:
+            doc["attempts"].setdefault(
+                attempt_id,
+                {
+                    "action_id": action_id,
+                    "worst": Fraction(actual_usd),
+                    "actual": Fraction(actual_usd),
+                    "state": "completed",
+                },
+            )
+
+        self._update(fn)
+
     def dispatched(self, attempt_id: str) -> None:
         self._transition(attempt_id, ("reserved",), "dispatched")
 

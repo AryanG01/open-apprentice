@@ -181,3 +181,39 @@ def test_a_placement_no_rule_can_express_ends_unresolved_honestly_not_forced(cli
 @pytest.mark.parametrize("bad", [{"width": 5}, {"inset_right": 9999}, {"height": 1000}])
 def test_demonstration_values_are_range_checked(client, bad):
     assert client.post("/api/teach", json={"demonstration": bad}).status_code == 422
+
+
+def test_rate_limit_keys_on_the_address_cloud_run_appended_not_a_spoofed_prefix(monkeypatch):
+    """Production runs uvicorn with FORWARDED_ALLOW_IPS=*, which makes request.client the LEFTMOST X-Forwarded-For entry:
+    whatever the visitor sent. Cloud Run appends the real address, so the limit must key on the rightmost one.
+    """
+    monkeypatch.setenv("OA_NO_LOCAL_ENGINE", "1")
+    monkeypatch.delenv("ENGINE_URL", raising=False)
+    from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
+
+    from open_apprentice.api import teach
+    from open_apprentice.api.app import app
+    from open_apprentice.providers.base import TruncatedOutput
+    from open_apprentice.providers.mock import MockProvider
+
+    class Failing(MockProvider):
+        async def _call(self, messages, *, max_tokens, ctx):
+            raise TruncatedOutput("x")
+
+    with TestClient(ProxyHeadersMiddleware(app, trusted_hosts="*")) as c:
+        app.state.provider = Failing({})
+        app.state.rate.clear()
+        limit = teach.RATE_LIMITS["nemotron"]
+        codes = [
+            c.post(
+                "/api/teach",
+                json={"mode": "nemotron"},
+                headers={"x-forwarded-for": f"10.9.9.{i}, 203.0.113.7"},
+            ).status_code
+            for i in range(limit + 1)
+        ]
+        assert codes[-1] == 429
+        other = c.post(
+            "/api/teach", json={"mode": "nemotron"}, headers={"x-forwarded-for": "203.0.113.8"}
+        )
+        assert other.status_code == 200

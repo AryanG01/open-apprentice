@@ -16,6 +16,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from open_apprentice.api.teach import _account, _engine, _rate_limit, _require_model_budget
+from open_apprentice.api.v2.routes import client_key
 from open_apprentice.budget import Ledger, Limits
 from open_apprentice.campaign.explain import explain, overflow_facts
 from open_apprentice.campaign.model_procedures import write_procedure
@@ -449,7 +450,7 @@ MODEL_REQUESTS_PER_HOUR = (
 
 
 def _model_quota(request: Request) -> bool:
-    client = request.client.host if request.client else "unknown"
+    client = client_key(request)
     now, hits = time.time(), request.app.state.rate.setdefault((client, "campaign_model"), [])
     hits[:] = [t for t in hits if now - t < 3600]
     if len(hits) >= MODEL_REQUESTS_PER_HOUR:
