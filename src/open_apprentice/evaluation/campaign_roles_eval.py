@@ -159,6 +159,12 @@ def verdicts(t: dict) -> list[str]:
         + ("MET" if c["false_confident"] < b["false_confident"] else "NOT MET"),
         "Bar 3 (a better prompt beats the shipped one): "
         + ("MET" if d["exact"] >= c["exact"] + 3 else "NOT MET"),
+        "Bar 4, run 2 addendum (the fixed checker no longer costs accuracy): "
+        + (
+            "MET"
+            if c["exact"] >= b["exact"] and c["false_confident"] <= b["false_confident"]
+            else "NOT MET"
+        ),
     ]
 
 
