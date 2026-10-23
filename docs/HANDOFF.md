@@ -1,6 +1,6 @@
 # CURRENT STATE — 2026-10-24 (read first)
 
-**Production `open-apprentice-00041-pet`** (image `demo:prod-6ced560`, 100% with the `next` tag since 24 Oct; public smoke passed) adds three features:
+**Production `open-apprentice-00043-voj`** (image `demo:prod-9f506bc`, 100% with the `next` tag since 24 Oct; same as `00041-pet` plus verifier details shown for failed checks only; public smoke passed; the 2:55 video was captured on it) adds three features:
 (1) Try-it "show the work" panel: candidate count, every Z3 pair search, the chosen input's split sizes and entropy, the
 final solver check (`reasoning` in the teach API; split sizes only, never which rule backs which option); (2) Campaign
 teaching question: the one example fits two readings of the product image (same frame / scale like the example), a test
@@ -9,7 +9,7 @@ answered once (`POST /workspaces/{wid}/reading`; runs 409 until then; `{"reading
 "relative" the gold check is left out (`verify_story(gold_applies=False)`); (3) learned rule shown role by role, check
 details shown. Video re-captured on that candidate (2:55). Smoke: question both 14/14 checks, run refused before answer,
 relative short_a ready, fixed Konva/Fabric ready. **Rollback:** `update-traffic ... --to-revisions
-open-apprentice-00038-naj=100 --update-tags next=open-apprentice-00038-naj`.
+open-apprentice-00041-pet=100 --update-tags next=open-apprentice-00041-pet`.
 
 # EARLIER STATE — 2026-10-23, evening
 

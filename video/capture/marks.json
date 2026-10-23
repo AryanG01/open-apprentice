@@ -5,17 +5,17 @@
  "marks": [
   {
    "name": "home",
-   "t": 16.845,
+   "t": 17.058,
    "box": null
   },
   {
    "name": "learn-click",
-   "t": 16.846,
+   "t": 17.059,
    "box": null
   },
   {
    "name": "learned",
-   "t": 26.029,
+   "t": 25.905,
    "box": {
     "x": 104,
     "y": 47.453125,
@@ -25,12 +25,12 @@
   },
   {
    "name": "learned-read",
-   "t": 30.031,
+   "t": 29.906,
    "box": null
   },
   {
    "name": "reading",
-   "t": 30.944,
+   "t": 30.817,
    "box": {
     "x": 104,
     "y": 19.71875,
@@ -40,12 +40,12 @@
   },
   {
    "name": "reading-read",
-   "t": 36.945,
+   "t": 36.816,
    "box": null
   },
   {
    "name": "rule",
-   "t": 39.75,
+   "t": 39.703,
    "box": {
     "x": 104,
     "y": 19.71875,
@@ -55,17 +55,17 @@
   },
   {
    "name": "rule-read",
-   "t": 43.75,
+   "t": 43.697,
    "box": null
   },
   {
    "name": "reuse-start",
-   "t": 44.658,
+   "t": 44.599,
    "box": null
   },
   {
    "name": "reuse-done",
-   "t": 49.313,
+   "t": 48.989,
    "box": {
     "x": 104,
     "y": 19.640625,
@@ -75,72 +75,72 @@
   },
   {
    "name": "reuse-read",
-   "t": 52.813,
+   "t": 52.486,
    "box": null
   },
   {
    "name": "ask-start",
-   "t": 53.718,
+   "t": 53.389,
    "box": null
   },
   {
    "name": "question",
-   "t": 63.356,
+   "t": 62.842,
    "box": {
     "x": 104,
     "y": 19.90625,
     "width": 1072,
-    "height": 777.703125
+    "height": 801.703125
    }
   },
   {
    "name": "question-read",
-   "t": 68.358,
+   "t": 67.841,
    "box": null
   },
   {
    "name": "answered",
-   "t": 71.413,
+   "t": 70.936,
    "box": {
     "x": 104,
     "y": 19.640625,
     "width": 1072,
-    "height": 1041.96875
+    "height": 720.4375
    }
   },
   {
    "name": "pref-reused",
-   "t": 81.512,
+   "t": 81.21,
    "box": {
     "x": 104,
     "y": 19.640625,
     "width": 1072,
-    "height": 1041.96875
+    "height": 720.4375
    }
   },
   {
    "name": "prefs",
-   "t": 85.429,
+   "t": 85.121,
    "box": {
     "x": 104,
-    "y": 399.578125,
+    "y": 400.046875,
     "width": 1072,
     "height": 19.1875
    }
   },
   {
    "name": "prefs-read",
-   "t": 87.929,
+   "t": 87.621,
    "box": null
   },
   {
    "name": "roles-start",
-   "t": 88.834,
+   "t": 88.526,
    "box": null
   },
   {
    "name": "roles",
-   "t": 92.597,
+   "t": 92.411,
    "box": {
     "x": 104,
     "y": 19.640625,
@@ -150,7 +150,7 @@
   },
   {
    "name": "roles-run",
-   "t": 101.531,
+   "t": 101.546,
    "box": {
     "x": 104,
     "y": 19.640625,
@@ -160,12 +160,12 @@
   },
   {
    "name": "fabric-start",
-   "t": 104.936,
+   "t": 104.951,
    "box": null
   },
   {
    "name": "fabric-done",
-   "t": 112.293,
+   "t": 111.475,
    "box": {
     "x": 104,
     "y": 19.640625,
@@ -175,17 +175,17 @@
   },
   {
    "name": "fabric-read",
-   "t": 116.294,
+   "t": 115.476,
    "box": null
   },
   {
    "name": "tryit-start",
-   "t": 118.951,
+   "t": 118.138,
    "box": null
   },
   {
    "name": "tryit-work",
-   "t": 122.301,
+   "t": 121.518,
    "box": {
     "x": 347,
     "y": 247.890625,
@@ -195,9 +195,9 @@
   },
   {
    "name": "tryit-read",
-   "t": 129.303,
+   "t": 128.519,
    "box": null
   }
  ],
- "frameOffset": 0.028
+ "frameOffset": 0.023
 }
