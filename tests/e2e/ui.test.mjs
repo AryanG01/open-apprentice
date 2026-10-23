@@ -77,6 +77,13 @@ async function openTryIt(page, url) {
 async function teachUntilSealed(page, pick = "first") {
   await page.getByRole("button", { name: /Start teaching/ }).click();
   await page.waitForSelector("text=/Which result did you mean|rule is sealed|No rule/", { timeout: 60_000 });
+  if (await page.getByRole("button", { name: "Submit answer" }).count()) {
+    // the question shows its work: candidate count, the Z3 pair searches, and the split (sizes only)
+    const work = await page.getByLabel("Show the work").innerText();
+    assert.match(work, /candidate rules? still reproduce/);
+    assert.match(work, /Z3 \d+\.\d+/);
+    assert.match(work, /splits the rules \d+ \/ \d+/);
+  }
   for (let i = 0; i < 6 && (await page.getByRole("button", { name: "Submit answer" }).count()); i++) {
     const radios = page.locator("input[name=live-opt]");
     await (pick === "first" ? radios.first() : radios.nth(1)).check();

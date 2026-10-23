@@ -86,6 +86,10 @@ class TeachingSession:
         True  # exactly one fit and no question yet: spend the 2nd round asking for different rules that also fit
     )
     _alt_done: bool = False
+    last_selection: Optional[dict] = (
+        None  # how the current question was chosen (sizes and scores only, no rules)
+    )
+    last_settle: Optional[dict] = None  # the final solver check when no question was left to ask
     correction_turn: bool = (
         True  # one counted numeric-feedback turn when no candidate fits (shared by all model-based methods)
     )
@@ -188,6 +192,7 @@ class TeachingSession:
             await self._settle_without_more_questions(rules)
             return
         # Solver work runs in a worker thread so one visitor's search never stalls the server for everyone else.
+        trace: dict = {}
         sc = await asyncio.to_thread(
             select_query,
             rules,
@@ -197,7 +202,18 @@ class TeachingSession:
             self.pool,
             self.seed + self.queries_asked,
             prefer_readable=self.prefer_readable_queries,
+            trace=trace,
         )
+        if sc is not None:
+            self.last_selection = {
+                "source": sc.source,
+                "split": sorted((len(g) for g in sc.groups), reverse=True),
+                "entropy_bits": round(sc.entropy, 3),
+                "cost_units": sc.cost_units,
+                "score": round(sc.score, 4),
+                "scenes_considered": trace.get("scenes_considered", 0),
+                "witness_searches": trace.get("witness_searches", []),
+            }
         if sc is None:
             await self._settle_without_more_questions(rules)
             return
@@ -225,6 +241,12 @@ class TeachingSession:
             budget=self.solver_budget,
             pool=self.pool,
         )
+        self.last_settle = {
+            "status": res.status,
+            "elapsed_ms": res.elapsed_ms,
+            "cases": len(res.cases),
+            "solver_version": res.solver_version,
+        }
         if res.status == "no_witness_in_model":
             self._ready(
                 (

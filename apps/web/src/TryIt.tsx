@@ -3,6 +3,7 @@ import { CARD_H, CARD_W, DemoCanvas, type Placement } from "./DemoCanvas";
 import { Attempts, AxisChips, Checks, Hash, ProgramDiff, VersionTable } from "./Evidence";
 import { Scene, frameOf, zoomFrame } from "./Scene";
 import type { Axes, BreakResult, LiveRepair, LiveRun, LiveState, Meter, ReadyInfo, ReplayResult } from "./types";
+import { TryItWork } from "./ShowWork";
 
 class ApiError extends Error {
   constructor(
@@ -449,6 +450,7 @@ export function TryIt() {
             <div className="controls"><button className="primary" onClick={submit} disabled={busy || !picked}>Submit answer</button></div>
           </>
         ) : null}
+        {live?.reasoning && (q || live.reasoning.settle) ? <TryItWork r={live.reasoning} /> : null}
 
         {live?.correction ? <p className="callout" role="note">{live.correction.message}</p> : null}
 

@@ -396,6 +396,23 @@ def _state(request: Request, live: Live) -> dict:
         "candidate_count": len(s.candidates),
         "note": s.unresolved_reason,
         "demonstration": live.demo,
+        # "show your work": how the question was chosen and what the solver did; split sizes only, never which rule
+        # predicts which option (that would steer the answer)
+        "reasoning": {
+            "candidate_count": len(s.candidates),
+            "rejected_count": len(s.rejected_summaries),
+            "selection": (
+                s.last_selection
+                if s.state == State.AWAITING_USER and s.pending_kind == "question"
+                else None
+            ),
+            "settle": s.last_settle,
+            "solver": {
+                "calls": s.solver_budget.calls,
+                "max_calls": s.solver_budget.max_calls,
+                "elapsed_s": round(s.solver_budget.elapsed_s, 2),
+            },
+        },
     }
     if s.state == State.AWAITING_USER and s.pending_kind == "question":
         q = s.public_question()

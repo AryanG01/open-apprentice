@@ -115,6 +115,7 @@ def propose_scenes(
     budget: SolverBudget,
     pool: Optional[SolverPool] = None,
     seed: int = 0,
+    trace: Optional[dict] = None,
 ) -> list[tuple[dict, str]]:
     """Up to 8 candidate scenes: one solver witness per disagreeing candidate pair, then sampled fill.
     Every returned scene is validated concretely when scored; solver output is never trusted alone.
@@ -129,6 +130,17 @@ def propose_scenes(
             res = find_disagreement(
                 [rules[i], rules[j]], object_counts, dom, budget=budget, pool=pool
             )
+            if (
+                trace is not None
+            ):  # what the solver did, for the "show your work" view (no rules, no indices)
+                trace.setdefault("witness_searches", []).append(
+                    {
+                        "status": res.status,
+                        "elapsed_ms": res.elapsed_ms,
+                        "cases": len(res.cases),
+                        "solver_version": res.solver_version,
+                    }
+                )
             if res.witness is not None:
                 scenes.append(
                     (
@@ -149,6 +161,7 @@ def select_query(
     pool: Optional[SolverPool] = None,
     seed: int = 0,
     prefer_readable: bool = False,
+    trace: Optional[dict] = None,
 ) -> Optional[ScoredScene]:
     """Pick the highest-scoring scene on which at least two candidates visibly disagree, else None.
 
@@ -158,8 +171,10 @@ def select_query(
     thr = dom.query_visible_difference_px
     scored = [
         score_scene(rules, s, src, thr)
-        for s, src in propose_scenes(rules, dom, object_counts, budget, pool, seed)
+        for s, src in propose_scenes(rules, dom, object_counts, budget, pool, seed, trace)
     ]
+    if trace is not None:
+        trace["scenes_considered"] = len(scored)
     scored = [s for s in scored if len(s.groups) >= 2]
     return max(
         scored,

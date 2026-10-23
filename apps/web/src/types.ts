@@ -190,6 +190,29 @@ export interface CandidatePool {
   model_error: string | null;
 }
 
+export interface WitnessSearch {
+  status: string;
+  elapsed_ms: number;
+  cases: number;
+  solver_version: string;
+}
+
+export interface Reasoning {
+  candidate_count: number;
+  rejected_count: number;
+  selection: {
+    source: string;
+    split: number[];
+    entropy_bits: number;
+    cost_units: number;
+    score: number;
+    scenes_considered: number;
+    witness_searches: WitnessSearch[];
+  } | null;
+  settle: WitnessSearch | null;
+  solver: { calls: number; max_calls: number; elapsed_s: number };
+}
+
 export interface LiveState {
   id: string;
   mode: string;
@@ -207,6 +230,7 @@ export interface LiveState {
   question?: LiveQuestion;
   correction?: { supported: boolean; message: string };
   concept?: LiveConcept;
+  reasoning?: Reasoning;
 }
 
 export interface LiveRun {

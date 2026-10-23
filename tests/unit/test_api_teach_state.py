@@ -1,5 +1,7 @@
 """Teaching API state machine WITHOUT the engine (no Chromium needed)."""
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -217,3 +219,34 @@ def test_rate_limit_keys_on_the_address_cloud_run_appended_not_a_spoofed_prefix(
             "/api/teach", json={"mode": "nemotron"}, headers={"x-forwarded-for": "203.0.113.8"}
         )
         assert other.status_code == 200
+
+
+WITNESS_STATUSES = {"witness_found", "no_witness_in_model", "incomplete", "timeout", "unsupported"}
+
+
+def test_the_question_shows_its_work_without_revealing_which_rule_gives_which_option(client):
+    st = client.post("/api/teach").json()
+    r = st["reasoning"]
+    assert r["candidate_count"] >= 2
+    sel = r["selection"]
+    assert sel["source"] == st["question"]["source"]
+    assert len(sel["split"]) >= 2 and sum(sel["split"]) <= r["candidate_count"]
+    assert sel["split"] == sorted(
+        sel["split"], reverse=True
+    )  # sizes only, not tied to option letters
+    assert sel["entropy_bits"] > 0 and sel["scenes_considered"] >= 1
+    for w in sel["witness_searches"]:
+        assert w["status"] in WITNESS_STATUSES and w["elapsed_ms"] >= 0
+        assert "rule" not in json.dumps(w).lower()
+    assert r["solver"]["max_calls"] >= r["solver"]["calls"] >= len(sel["witness_searches"])
+    assert "rule_text" not in json.dumps(r)
+
+
+def test_a_settled_session_reports_the_final_solver_check(client):
+    sid, st = _teach_to_ready(client)
+    assert st["state"] in ("INTENT_READY", "UNRESOLVED")
+    settle = st["reasoning"][
+        "settle"
+    ]  # None when the answers left one candidate and no final check was needed
+    assert settle is None or settle["status"] in WITNESS_STATUSES
+    assert st["reasoning"]["selection"] is None  # no open question
