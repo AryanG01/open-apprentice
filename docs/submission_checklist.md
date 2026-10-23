@@ -13,7 +13,7 @@ Owner = the person who must do it (some steps need the owner's accounts or are o
 - [x] LICENSE (MIT) present: yes. README setup steps re-run from a clean clone (22 Oct, HEAD 7078517: all pass; `.python-version` added so uv picks 3.12 on any machine).
 
 ## 2. Decide what the judges see (owner decides; agent recommends deploying)
-- [x] **Campaign lane in production?** Yes: revision `open-apprentice-00032-dux` (23 Oct; `00030-vel` on 22 Oct). Before it, `00027-jif` predated Plans 9A-9E. Deploying
+- [x] **Campaign lane in production?** Yes: revision `open-apprentice-00036-poz` (23 Oct: durable $3 cap, role checker fixes; `00032-dux` and `00034-xuj` earlier that day, `00030-vel` on 22 Oct). Before it, `00027-jif` predated Plans 9A-9E. Deploying
       means a new image, the canary routine in `docs/deploy.md`, and the e2e journey against the candidate URL.
       Environment: model mode as today; `CAMPAIGN_MODEL_PROCEDURES` unset (procedures off).
 - [x] If deployed: the full browser journey and the campaign journey pass against the public URL (agent).
