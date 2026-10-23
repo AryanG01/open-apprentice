@@ -191,7 +191,7 @@ We hold ourselves to the claims we can back with a command.
 - Reproduced native mismatch when a tool changes silently while the abstract model still passes, and binding-only repair with retained-case replay (a hard-coded "fix" is rejected).
 - Exact-arithmetic rule language, an AST-to-Z3 compiler with property-tested agreement, and typed witness search (`witness_found` / `no_witness_in_model` / `incomplete` / ...).
 - Four evidence axes (intent, symbolic, native, held-out) are kept separate everywhere; there is no combined score and no single "Verified" badge.
-- 1,500+ tests (1,530 in the unit, integration, contract and evaluation suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
+- 1,500+ tests (1,545 in the unit, integration, contract and evaluation suites), including engine-backed end-to-end tests (`OA_ENGINE_TESTS=1`) and an import-boundary contract that keeps the evaluator out of agent code.
 
 **Measured with a live NVIDIA model (development split, small samples):** the model alone committed to a wrong rule 15 of 34 times (44%); an extra "audit" round did not help; unioning the model's proposals with a
 bounded symbolic search cut it to 1 of 20 (5%). A non-model search alone also solves these tasks, so that alone does not show the model adds value. On six rules *outside* the search's grammar it does: search alone got 0 of 12 right, the model alone 5 of 12 (with 2 confident-wrong commits), and the hybrid committed 5 rules, all correct. Tiny samples, development split.
