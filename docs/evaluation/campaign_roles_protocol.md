@@ -66,3 +66,25 @@ between writing the set and the run.
 ## Budget
 
 48 calls (B and D). Run cap $0.40 through `SpendGuard`; the Nebius balance stays above the $10 reserve.
+
+## Addendum: run 2 (pre-registered 2026-10-23, after run 1 and before the run 2 set exists)
+
+Run 1 showed the checker rejecting correct answers, and it was changed in commit `08becc8`:
+- sale prices may be larger than the headline;
+- any currency counts;
+- `""` means unlabelled.
+
+Scoring the changed checker on the run 1 set would be tuning on it, so run 2 uses a **new set**:
+- 24 banners in `benchmarks/final/campaign_roles_v2/`, hashes in `campaign_roles_v2_manifest.json`;
+- the same 8 categories and the same rules for the author, written by a fresh agent that has not seen run 1's banners
+  or results;
+- the arms, model, metrics, prompts and budget are unchanged.
+
+Bars 1-3 are applied again, plus:
+
+4. "The fixed checker no longer costs accuracy" is claimed only if **C exact ≥ B exact** and **C false-confident ≤ B
+   false-confident**.
+
+Known before the run: image-only categories (big_decor_image, big_logo) cannot be decided from the input. The checker
+still requires the product image to be larger than the logo, so a correct answer on big_logo is rejected by design.
+Both are reported, not fixed.
