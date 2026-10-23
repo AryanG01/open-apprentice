@@ -14,7 +14,7 @@ Nemotron-3-Super on the live site, chosen by a pre-registered check, `docs/evalu
 ## Live demo
 
 **https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
-Video (2:11): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
+Video (2:18): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
 diagrams), confirm which box each note describes, drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
 document is right*. The apprentice's notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks.
 Then apply the skill to **the 100-diagram library** (ten themes drawn as flowcharts, architecture maps, org charts, roadmaps, network maps and floor plans;
@@ -90,9 +90,9 @@ What is and is not shown:
   Fabric (used only if the independent verifier passes it on a seen banner and two unseen ones). Latest live
   measurement ([`docs/evaluation/campaign_nemotron.md`](docs/evaluation/campaign_nemotron.md), run 4 of 4 on
   development fixtures): roles 6 of 6 with opaque layer ids (a simple heuristic also gets 6 of 6, so no gain is
-  shown there; on a pre-registered set of 24 harder agent-authored banners the shipped hybrid gets 14 of 24 against
-  the heuristic's 6, and our checker costs it 3 correct answers:
-  [`campaign_roles.md`](docs/evaluation/campaign_roles.md)); explanations 0 of 3 accepted under the strict fact check (the template was shown); procedures accepted on
+  shown there; on pre-registered sets of harder agent-authored banners the shipped hybrid gets 14 of 24 against the
+  heuristic's 6, then 17 of 24 against 7 after fixing a checker that rejected correct sale-banner answers:
+  [`campaign_roles.md`](docs/evaluation/campaign_roles.md), [`campaign_roles_v2.md`](docs/evaluation/campaign_roles_v2.md)); explanations 0 of 3 accepted under the strict fact check (the template was shown); procedures accepted on
   both engines (first and second attempt), but they follow the prompt's input contract almost verbatim, so this shows
   contract-following, not procedure design. A procedure request can cost about $0.25 because the model's reasoning is
   not bounded by its token limit.

@@ -399,7 +399,7 @@ function CampaignResults() {
     ["Sealed set: 8 new banners, 4 new languages", "22 / 22", "pass on Konva and Fabric"],
     ["Asks exactly when the copy does not fit", "16 / 16", "banner × engine cases"],
     ["Same rule, two engines (development set)", "16 / 16", "verifier rows"],
-    ["Nemotron role proposals", "6 / 6", "a simple rule of thumb also 6 / 6"],
+    ["Nemotron role proposals, harder untagged banners", "17 / 24", "a simple size rule: 7 / 24"],
     ["Nemotron's wording of the question", "0 / 3", "failed the fact check; template shown"],
   ];
   return (
@@ -417,7 +417,8 @@ function CampaignResults() {
         </tbody>
       </table>
       <div style={{ fontSize: 24, color: C.ink2, marginTop: 30, lineHeight: 1.4 }}>
-        The sealed set was written by a separate AI agent from the written rules only, not by us, and sealed by hash before it ran.
+        The sealed sets were written by a separate AI agent from the written rules only, not by us, and sealed by hash before they ran.
+        Role proposals: pre-registered run on 24 new banners with decoy layers, sale and twin prices; image content is not part of the input.
         Every screen in this video is a real session on the public demo (Nemotron-3-Super live); waiting time is shortened in the edit.
         Full results, including what did not work: github.com/AryanG01/open-apprentice
       </div>

@@ -6,7 +6,7 @@ comes from a file in this repository. The file is named next to the claim so it 
 - **Track:** Best Apps and Agents
 - **Demo:** https://open-apprentice-md76de375q-uc.a.run.app
 - **Code:** https://github.com/AryanG01/open-apprentice (public, MIT)
-- **Video:** <YouTube link, public, 2:11>
+- **Video:** <YouTube link, public, 2:18>
 
 ---
 
@@ -59,8 +59,9 @@ Nemotron-3-Super has two checked jobs here:
 - **Roles:** it proposes layer roles for banners that arrive untagged, and you confirm them. On 6 plain banners it and
   a simple rule of thumb both scored 6 of 6. On 24 harder held-out banners (decoy layers, sale prices, twin prices),
   pre-registered and written by a separate AI agent, the shipped Nemotron proposal was exactly right on 14 against the
-  rule of thumb's 6. The same run showed our own checker rejecting 3 correct sale-banner answers, so raw Nemotron did
-  better still (17).
+  rule of thumb's 6. That run also showed our own checker rejecting correct sale-banner answers. We fixed the checker
+  and ran again on a new set of 24: 17 against 7. Images are not part of the model's input, so image roles stay
+  guesses, and you confirm every mapping.
 - **Wording:** it phrases the overflow question. Its wording is used only if every number in it matches the measured
   facts. That happened on 0 of 3 banners, so the built-in wording is shown, and the page says so.
 

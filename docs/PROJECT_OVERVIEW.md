@@ -6,7 +6,7 @@ built, it says so.
 
 - **Live demo:** https://open-apprentice-md76de375q-uc.a.run.app (no login, no key)
 - **Repository:** https://github.com/AryanG01/open-apprentice (MIT)
-- **Video:** 2:11, rendered locally (`video/out/open_apprentice_demo.mp4`), not yet on YouTube
+- **Video:** 2:18, rendered locally (`video/out/open_apprentice_demo.mp4`), not yet on YouTube
 - **Event:** Nebius × NVIDIA Global AI Hackathon, track *Best Apps and Agents*. Deadline 30 Oct 2026, 10:00 PDT. The
   demo must stay up until judging ends (15 Dec 2026). The rules require a runtime NVIDIA open model on Nebius, a public
   licensed repo, a working demo, a public video under 3 minutes and the Devpost form.
@@ -52,8 +52,9 @@ There are two product lanes:
    handled without asking, and the preference can be rolled back. Another language asks again.
 5. **Untagged banners.** A banner can arrive without role tags. **Nemotron-3-Super proposes the roles live.** It sees
    the layers with their names hidden behind opaque ids (L1…L7) in a hashed order, so ids cannot give the roles away.
-   A deterministic checker rejects impossible mappings, for example: font sizes must run headline > price > legal, the
-   price must contain a currency sign, and the product image must be larger than the logo. A rule-of-thumb heuristic
+   A deterministic checker rejects impossible mappings, for example: the legal line must be the smallest text, the
+   price must contain a number and a currency, and the product image must be larger than the logo (sale prices may
+   outsize the headline since the 23 Oct fix). A rule-of-thumb heuristic
    is the fallback. The **owner confirms** the mapping before anything runs.
 6. **Second engine.** Switch to Fabric and the same learned rule runs unchanged through the same sandboxed procedure.
 7. **Native procedures (off in production).** Nemotron can also write the native procedure for each engine. It is
@@ -102,7 +103,8 @@ notes.
 | **Sealed held-out set**: 8 new banners, 4 new languages (es, nl, pl, it) | **22 / 22** rows pass on both engines | `docs/evaluation/campaign_sealed.md` |
 | Asks exactly when it should, on the sealed set | **16 / 16** banner × engine cases (no question on 3 short banners; question on 5 long ones; on the 2 extra-long ones "shrink" is correctly marked *does not fit*) | same |
 | Nemotron role proposals (live, opaque ids), plain dev banners | **6 / 6**, heuristic also 6/6: no gain there | `docs/evaluation/campaign_nemotron.md` |
-| Role proposals, 24 harder held-out banners (pre-registered, agent-authored) | shipped hybrid **14/24** vs heuristic **6/24**; raw Nemotron 17/24 (the checker wrongly rejects sale banners); strong prompt 18/24 | `docs/evaluation/campaign_roles.md` |
+| Role proposals, 24 harder held-out banners, run 1 (pre-registered, agent-authored) | shipped hybrid **14/24** vs heuristic **6/24**; raw Nemotron 17/24 (the checker wrongly rejected sale banners); strong prompt 18/24 | `docs/evaluation/campaign_roles.md` |
+| Run 2: checker fixed, new set of 24 | shipped hybrid **17/24** vs heuristic **7/24**; raw 18/24 (one "TL" price the checker did not know, fixed after); strong prompt 18/24 with 2 false-confident | `docs/evaluation/campaign_roles_v2.md` |
 | Nemotron wording of the overflow question | **0 / 3** passed the strict fact check in the measurement, so the template was shown. (In one later live recording the wording did pass, so acceptance varies from run to run.) | same |
 | Nemotron-written native procedures | Accepted on both engines (Konva on attempt 1, Fabric on attempt 2). They follow the prompt's input contract almost verbatim, which shows **contract-following, not procedure design**. | same |
 | Live measurement spend (4 runs) | $0.358 in the ledger (the latest run alone $0.255, mostly two cut-off procedure calls) | `docs/evaluation/campaign_nemotron.md` |
