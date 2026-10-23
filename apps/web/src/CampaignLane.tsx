@@ -181,7 +181,7 @@ export function CampaignLane() {
             <p>
               <strong>One question before it runs.</strong> {ws.learned.question.text}
             </p>
-            <div className="svgpair">
+            <div className="reading-grid">
               <figure>
                 <img src={ws.learned.question.probe_png} alt="Test banner with a smaller product photo" />
                 <figcaption>Test banner: the teaching banner with its product photo at 3/5 size</figcaption>

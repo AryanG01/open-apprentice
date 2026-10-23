@@ -60,7 +60,7 @@ export function CampaignWork({ ws }: { ws: CampaignWorkspace }) {
       <summary>Show the work: the learned rule</summary>
       <p>
         Found by <strong>{l.origin}</strong>; {l.candidates.filter((c) => c.reproduces).length} of {l.candidates.length} candidate
-        {l.candidates.length === 1 ? "" : "s"} reproduce the example exactly through the rule interpreter. Reading of the product image:{" "}
+        {l.candidates.length === 1 ? " reproduces" : "s reproduce"} the example exactly through the rule interpreter. Reading of the product image:{" "}
         <strong>{l.reading === "relative" ? "scale like the example" : "same frame every time"}</strong>.
       </p>
       <table>
