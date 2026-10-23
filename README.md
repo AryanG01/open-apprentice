@@ -92,7 +92,7 @@ What is and is not shown:
   development fixtures): roles 6 of 6 with opaque layer ids (a simple heuristic also gets 6 of 6, so no gain is
   shown there; on pre-registered sets of harder agent-authored banners the shipped hybrid gets 14 of 24 against the
   heuristic's 6, then 17 of 24 against 7 after fixing a checker that rejected correct sale-banner answers:
-  [`campaign_roles.md`](docs/evaluation/campaign_roles.md), [`campaign_roles_v2.md`](docs/evaluation/campaign_roles_v2.md)); explanations 0 of 3 accepted under the strict fact check (the template was shown); procedures accepted on
+  [`campaign_roles.md`](docs/evaluation/campaign_roles.md), [`campaign_roles_v2.md`](docs/evaluation/campaign_roles_v2.md)); explanations 0 of 3 accepted in that run (wording not recorded), then 6 of 6 factually right and 5 of 6 accepted when re-measured with recording, the refusal being our checker misreading a curly apostrophe (fixed); procedures accepted on
   both engines (first and second attempt), but they follow the prompt's input contract almost verbatim, so this shows
   contract-following, not procedure design. A procedure request can cost about $0.25 because the model's reasoning is
   not bounded by its token limit.

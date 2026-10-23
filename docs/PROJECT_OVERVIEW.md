@@ -105,7 +105,7 @@ notes.
 | Nemotron role proposals (live, opaque ids), plain dev banners | **6 / 6**, heuristic also 6/6: no gain there | `docs/evaluation/campaign_nemotron.md` |
 | Role proposals, 24 harder held-out banners, run 1 (pre-registered, agent-authored) | shipped hybrid **14/24** vs heuristic **6/24**; raw Nemotron 17/24 (the checker wrongly rejected sale banners); strong prompt 18/24 | `docs/evaluation/campaign_roles.md` |
 | Run 2: checker fixed, new set of 24 | shipped hybrid **17/24** vs heuristic **7/24**; raw 18/24 (one "TL" price the checker did not know, fixed after); strong prompt 18/24 with 2 false-confident | `docs/evaluation/campaign_roles_v2.md` |
-| Nemotron wording of the overflow question | **0 / 3** passed the strict fact check in the measurement, so the template was shown. (In one later live recording the wording did pass, so acceptance varies from run to run.) | same |
+| Nemotron wording of the overflow question | Run 4: 0/3 accepted, wording not recorded. Re-measured 23 Oct with recording: **6/6 factually right, 5/6 accepted**; the refusal was our checker misreading a curly apostrophe (fixed) | `docs/evaluation/campaign_nemotron.md` |
 | Nemotron-written native procedures | Accepted on both engines (Konva on attempt 1, Fabric on attempt 2). They follow the prompt's input contract almost verbatim, which shows **contract-following, not procedure design**. | same |
 | Live measurement spend (4 runs) | $0.358 in the ledger (the latest run alone $0.255, mostly two cut-off procedure calls) | `docs/evaluation/campaign_nemotron.md` |
 

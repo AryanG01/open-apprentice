@@ -63,7 +63,9 @@ Nemotron-3-Super has two checked jobs here:
   and ran again on a new set of 24: 17 against 7. Images are not part of the model's input, so image roles stay
   guesses, and you confirm every mapping.
 - **Wording:** it phrases the overflow question. Its wording is used only if every number in it matches the measured
-  facts. That happened on 0 of 3 banners, so the built-in wording is shown, and the page says so.
+  facts. Re-measured with every wording recorded: 6 of 6 were factually right. Our check refused one of them because
+  Nemotron typed a curly apostrophe ("doesn’t"), which the check misread. We fixed the check. If a wording is refused,
+  the built-in wording is shown and the page says so.
 
 Nemotron-written native procedures passed the verifier on both engines, but they closely follow the prompt's template.
 Each request can cost about $0.25, so they are switched off in the public demo. Those were public development
@@ -92,6 +94,22 @@ fixtures. On a sealed set of 8 new banners in 4 new languages, written by a fres
   (OIDC-authenticated), and a durable spending cap shared by every instance.
 - **Evaluation.** A frozen battery of 36 held-out episodes × 3 repeats, run live on Ultra. The learner runs in an isolated
   process that cannot read the answers, and an independent scorer grades the results (`docs/evaluation/final_results.md`).
+
+## The hard problems, and what we used to solve them
+
+Each row below runs in the live demo. The papers are the published idea we build on. We name them so you can see where
+the design comes from, not to claim we reproduced their results.
+
+| Problem | What we did | Built on | Measured |
+|---|---|---|---|
+| One example fits many rules. Which one did the user mean? | Keep every candidate rule that reproduces all teaching so far (a sampled version space). Ask the question the candidates disagree on most, scored by the entropy of how they split. | Version spaces (Mitchell, *Generalization as Search*, 1982). Query by committee (Seung, Opper & Sompolinsky, COLT 1992). | Asks on ambiguous examples where the free model asks on none (2/12 vs 0/12, frozen set) |
+| Finding the example that tells two rules apart | z3 searches for a concrete input where two surviving rules disagree, under a time and memory budget in a separate, killable process. The witness is re-run concretely before it is shown. "Unknown" is never treated as a pass. | Distinguishing inputs in oracle-guided synthesis (Jha, Gulwani, Seshia & Tiwari, ICSE 2010). The Z3 SMT solver (de Moura & Bjørner, TACAS 2008). | `concepts/witness.py`; five distinct result statuses, all tested |
+| Model output must never run as code | Nemotron writes programs in a small JSON rule language. A restricted interpreter with exact fractions runs them. There is no `eval`, and an import-linter contract keeps the evaluator out of agent code. | Programming by example with a domain-specific language (Gulwani, FlashFill, POPL 2011). | 2 import contracts kept; 1,545 tests |
+| A model should not grade its own work | An independent verifier re-measures every result: text height from the font file with fontTools, plus copy, image proportions and safe areas. It shares no geometry code with the engine. | Separating generation from verification | Campaign sealed set 22/22 on Konva and Fabric |
+| Layer names give the answer away | Nemotron sees layers under hashed opaque ids (L1…Ln), no asset names. A deterministic checker rejects impossible mappings, and the owner confirms. | Pre-registered held-out evaluation | Pre-registered, two runs on new banners written by a separate AI agent: 14/24 then 17/24 for the shipped hybrid against 6/24 and 7/24 for a size heuristic. Run 1 exposed checker bugs; we fixed them and re-ran on a new set |
+| Generated wording can invent numbers | Nemotron only words facts the engine measured. A checker refuses any number, element or claim of fit that is not in those facts, and a template is the fallback. | Constrained, fact-checked generation | 6/6 factually right in the re-measurement |
+| A public demo spending real money | One durable ledger in Cloud Storage, written with object-generation preconditions so concurrent instances cannot overwrite each other. The diagram lane reserves each call's worst case there before calling. The other lanes check the ledger before each call and record what they spent after it. So every Cloud Run instance shares one cap that survives restarts. Rate limits key on the address Cloud Run appends, so a forged header cannot reset them. | Optimistic concurrency control | Shared $3 cap verified on production |
+| Choosing the live model | Same flow on Nemotron-3-Super (120B total, 12B active; hybrid Mamba-2 and attention with LatentMoE, per NVIDIA's technical report) and Nemotron-3-Ultra, compared with a rule set before the run | Pre-registered model choice | Super: about 22 s per session against about 58 s, at roughly a tenth of the cost |
 
 ## Challenges we ran into
 
