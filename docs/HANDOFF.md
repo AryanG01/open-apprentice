@@ -1,11 +1,12 @@
 # CURRENT STATE — 2026-10-22 (read first)
 
-**Production (2026-10-22):** https://open-apprentice-md76de375q-uc.a.run.app serves revision `open-apprentice-00030-vel`
-(image `demo:prod-5a378e6`, master `5a378e6`) at 100%, with the `next` tag (Cloud Tasks call back to the `next---` URL, so
+**Production (2026-10-23):** https://open-apprentice-md76de375q-uc.a.run.app serves revision `open-apprentice-00032-dux`
+(image `demo:prod-874dd80`, master `874dd80`: story cards exported in full, role table keyed by real layer ids) at 100%, with the `next` tag (Cloud Tasks call back to the `next---` URL, so
 keep that tag on the serving revision). It adds the Campaign tab (Plans 9A-9E): banner to story card on Konva and Fabric,
 live Nemotron-3-Super role proposals and overflow explanations (checked, with fallbacks), Nemotron-written procedures OFF
 (`CAMPAIGN_MODEL_PROCEDURES` unset). **Rollback:** `gcloud run services update-traffic open-apprentice --project
-oa-demo-1013-19737 --region us-central1 --to-revisions open-apprentice-00027-jif=100 --update-tags next=open-apprentice-00027-jif`.
+oa-demo-1013-19737 --region us-central1 --to-revisions open-apprentice-00030-vel=100 --update-tags next=open-apprentice-00030-vel` (the Campaign lane
+before those two fixes); `00027-jif` predates the Campaign lane.
 Verified on 22 Oct: Apprentice journey against the public URL, Campaign smoke on the candidate (both engines, live roles and
 explanations). Known gap: Campaign (like Try-it-live) charges the in-memory per-instance demo cap, not the durable v2 ledger
 shown in `/health/ready`; with procedures off its calls cost about $0.0005 each and are limited to 6/hour per address.

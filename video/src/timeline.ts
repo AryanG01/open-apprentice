@@ -18,7 +18,7 @@ export type Beat = {
   dur: number;
   voSec: number;
   words: Word[];
-  card?: "title" | "results" | "montage" | "arch" | "breadth" | "finale";
+  card?: "title" | "results" | "montage" | "arch" | "breadth" | "finale" | "cmontage" | "cresults";
   clip?: { from: number; to: number; rate: number; held: number };
   focus: Box;
   live: boolean;
@@ -26,7 +26,7 @@ export type Beat = {
   explain?: string[];
 };
 
-type ScriptBeat = { id: string; text: string; clip?: [string, string]; card?: "title" | "results" | "montage" | "arch" | "breadth" | "finale"; focus?: string; live?: boolean; onScreen?: string; explain?: string[] };
+type ScriptBeat = { id: string; text: string; clip?: [string, string]; card?: "title" | "results" | "montage" | "arch" | "breadth" | "finale" | "cmontage" | "cresults"; focus?: string; live?: boolean; onScreen?: string; explain?: string[] };
 type Mark = { name: string; t: number; box: Box };
 
 const markList = (marks as { marks: Mark[]; frameOffset: number }).marks;

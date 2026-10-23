@@ -13,7 +13,7 @@ Owner = the person who must do it (some steps need the owner's accounts or are o
 - [x] LICENSE (MIT) present: yes. README setup steps re-run from a clean clone (22 Oct, HEAD 7078517: all pass; `.python-version` added so uv picks 3.12 on any machine).
 
 ## 2. Decide what the judges see (owner decides; agent recommends deploying)
-- [x] **Campaign lane in production?** Yes: revision `open-apprentice-00030-vel` (22 Oct). Before it, `00027-jif` predated Plans 9A-9E. Deploying
+- [x] **Campaign lane in production?** Yes: revision `open-apprentice-00032-dux` (23 Oct; `00030-vel` on 22 Oct). Before it, `00027-jif` predated Plans 9A-9E. Deploying
       means a new image, the canary routine in `docs/deploy.md`, and the e2e journey against the candidate URL.
       Environment: model mode as today; `CAMPAIGN_MODEL_PROCEDURES` unset (procedures off).
 - [x] If deployed: the full browser journey and the campaign journey pass against the public URL (agent).
@@ -27,9 +27,9 @@ Owner = the person who must do it (some steps need the owner's accounts or are o
 - [x] One pass of every number in README and submission against its source file.
 
 ## 4. Video (owner records or approves; under 3:00, public on YouTube)
-- [ ] Current cut: 2:37, draw.io lane (Remotion, `video/`). Either keep it, or add a ~20 s Campaign segment if the lane is
-      deployed (labelled "development fixtures"). Any live Nemotron call shown must be real; the recorded tape stays
-      labelled REPLAY.
+- [x] Cut rebuilt around the Campaign lane (23 Oct, 2:11, `video/out/open_apprentice_demo.mp4`; captured on the public
+      demo, live Nemotron role proposal; draw.io appears as one beat). Re-render: `node video/capture/campaign.mjs`,
+      `video/.venv/bin/python video/tools/encode.py`, `video/.venv/bin/python video/tools/tts.py`, `npm run render` in `video/`.
 - [ ] Upload as public; put the link in `docs/submission.md` and the Devpost form.
 
 ## 5. Keep the demo alive until 15 Dec (owner)

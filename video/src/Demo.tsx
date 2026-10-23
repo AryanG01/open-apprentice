@@ -1,5 +1,6 @@
 import montage from "../public/montage/index.json";
-import marks from "../public/marks.json";
+import marks from "../public/drawio-marks.json"; // the draw.io run behind the diagram wall
+import cmontage from "../public/cmontage/index.json";
 import { AbsoluteFill, Audio, Freeze, Img, OffthreadVideo, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { FPS, timeline, type Beat, type Box } from "./timeline";
 
@@ -36,7 +37,7 @@ export const Demo = () => {
 function Scene({ b }: { b: Beat }) {
   return (
     <AbsoluteFill>
-      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.card === "finale" ? <Finale b={b} /> : b.clip ? <Clip b={b} /> : null}
+      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.card === "finale" ? <Finale b={b} /> : b.card === "cmontage" ? <CampaignMontage /> : b.card === "cresults" ? <CampaignResults /> : b.clip ? <Clip b={b} /> : null}
       {b.onScreen ? <Headline text={b.onScreen} /> : null}
       {b.live ? <Tags b={b} /> : null}
       {b.explain ? <Explainer steps={b.explain} dur={b.dur} /> : null}
@@ -355,6 +356,70 @@ function Finale({ b }: { b: Beat }) {
       <div style={{ position: "absolute", right: 40, bottom: 160, background: "rgba(8,20,38,.92)", color: "#fff", fontSize: 32, fontWeight: 600,
         padding: "10px 18px", borderRadius: 10 }}>
         {wipe < 50 ? "As imported: 108 notes out of place" : "Published: 108 notes under their boxes"}
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+/** Opening: real banners from the deployed app turning into their story cards (the run's own renders, Konva). */
+function CampaignMontage() {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const tiles = cmontage as { id: string; locale: string }[];
+  return (
+    <AbsoluteFill style={{ ...grid, padding: "130px 70px 150px" }}>
+      <div style={{ position: "absolute", top: 36, left: 70, color: "#fff", fontSize: 50, fontWeight: 600 }}>One banner in. A story card out, in every language.</div>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${tiles.length}, 1fr)`, gap: 40 }}>
+        {tiles.map((t, i) => {
+          const s0 = fps * (0.3 + i * 0.9);
+          const show = interpolate(frame, [s0, s0 + 10], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          const card = interpolate(frame, [s0 + 18, s0 + 34], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+          return (
+            <div key={t.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, opacity: show }}>
+              <div style={{ position: "relative", width: "100%", aspectRatio: "16 / 9" }}>
+                <Img src={staticFile(`cmontage/${t.id}-before.png`)} style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 8, boxShadow: "0 0 0 1px #2a4670" }} />
+                <span style={{ position: "absolute", left: 10, top: 8, background: "rgba(8,20,38,.88)", color: "#fff", fontSize: 24, fontWeight: 600, padding: "4px 10px", borderRadius: 6 }}>{t.locale.toUpperCase()}</span>
+              </div>
+              <span style={{ color: C.cyan, fontSize: 44, lineHeight: 1, opacity: card }}>↓</span>
+              <div style={{ width: "100%", height: 440, opacity: card, transform: `translateY(${(1 - card) * -20}px)` }}>
+                <Img src={staticFile(`cmontage/${t.id}-after.png`)} style={{ width: "100%", height: "100%", objectFit: "contain",
+                  filter: card >= 1 ? `drop-shadow(0 0 6px ${C.green})` : "none" }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+}
+
+/** Close: the Campaign lane's measured results, with their limits on screen. */
+function CampaignResults() {
+  const rows: [string, string, string][] = [
+    ["Sealed set: 8 new banners, 4 new languages", "22 / 22", "pass on Konva and Fabric"],
+    ["Asks exactly when the copy does not fit", "16 / 16", "banner × engine cases"],
+    ["Same rule, two engines (development set)", "16 / 16", "verifier rows"],
+    ["Nemotron role proposals", "6 / 6", "a simple rule of thumb also 6 / 6"],
+    ["Nemotron's wording of the question", "0 / 3", "failed the fact check; template shown"],
+  ];
+  return (
+    <AbsoluteFill style={{ ...grid, padding: "90px 140px", color: C.ink }}>
+      <div style={{ fontSize: 64, fontWeight: 600, color: "#fff" }}>Measured, not claimed</div>
+      <table style={{ marginTop: 36, fontSize: 38, borderCollapse: "collapse", width: "100%" }}>
+        <tbody>
+          {rows.map(([q, v, note]) => (
+            <tr key={q} style={{ borderTop: "1px solid #2a4670" }}>
+              <td style={{ padding: "16px 10px" }}>{q}</td>
+              <td style={{ color: v.startsWith("0") ? C.amber : C.green, fontWeight: 600, whiteSpace: "nowrap", paddingRight: 30 }}>{v}</td>
+              <td style={{ color: C.ink2, fontSize: 28 }}>{note}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div style={{ fontSize: 24, color: C.ink2, marginTop: 30, lineHeight: 1.4 }}>
+        The sealed set was written by a separate AI agent from the written rules only, not by us, and sealed by hash before it ran.
+        Every screen in this video is a real session on the public demo (Nemotron-3-Super live); waiting time is shortened in the edit.
+        Full results, including what did not work: github.com/AryanG01/open-apprentice
       </div>
     </AbsoluteFill>
   );
