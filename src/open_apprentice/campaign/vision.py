@@ -90,6 +90,7 @@ class LayerProposal:
     )  # what check_layers found in the layers as proposed
     note: str = ""  # why the manual template was used, when it was
     tokens: int = 0
+    raw: Optional[dict] = None  # the model's reply as parsed, for audit
 
 
 @functools.cache
@@ -474,4 +475,5 @@ async def propose_layers(
         )
     proposal = from_vision(res.parsed)
     proposal.problems, proposal.tokens = check_layers(proposal.layers), res.tokens
+    proposal.raw = res.parsed.model_dump()
     return proposal

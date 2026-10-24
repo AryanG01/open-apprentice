@@ -1311,6 +1311,70 @@ def eval_campaign_roles(
     )
 
 
+@eval_app.command("campaign-vision")
+def eval_campaign_vision(
+    live: bool = typer.Option(
+        False, "--live", help="spend real credit on Nebius Token Factory (required)"
+    ),
+    cap_usd: float = typer.Option(
+        0.15, "--cap-usd", help="hard cap for this run, checked before every call"
+    ),
+    out: Path = typer.Option(
+        Path("docs/evaluation/campaign_vision_dev.md"), "--out", help="where to write the table"
+    ),
+) -> None:
+    """Development probe: can Nemotron VL read a banner image? Needs PROVIDER_MODE=nebius and NEBIUS_VISION_MODEL."""
+    import datetime
+    from contextlib import nullcontext
+
+    from open_apprentice.config import load_settings
+    from open_apprentice.evaluation.campaign_vision_eval import render_markdown, run_dev
+    from open_apprentice.evaluation.local_engine import local_engine
+    from open_apprentice.providers.factory import make_vision_provider
+    from open_apprentice.providers.spend import SpendGuard
+
+    if not live:
+        typer.echo("this command spends money: pass --live", err=True)
+        raise typer.Exit(2)
+    settings = load_settings()
+    inner = make_vision_provider(settings)
+    if inner is None:
+        typer.echo("set PROVIDER_MODE=nebius and NEBIUS_VISION_MODEL for a live run", err=True)
+        raise typer.Exit(2)
+    guard = SpendGuard(
+        inner,
+        run_id=f"campaign-vision-dev-{datetime.date.today().isoformat()}",
+        run_cap_usd=cap_usd,
+        merge_system=True,
+    )
+    url, token = os.environ.get("ENGINE_URL"), os.environ.get("EVALUATOR_TOKEN")
+
+    async def go(eng_url: str, eng_token: str):
+        try:
+            return await run_dev(guard, eng_url, eng_token)
+        finally:
+            try:
+                await guard.aclose()
+            except Exception:  # noqa: BLE001 - a failed close must not lose the measurement
+                pass
+
+    import asyncio
+
+    with nullcontext((url, token)) if url and token else local_engine(".") as (eng_url, eng_token):
+        rows = asyncio.run(go(eng_url, eng_token))
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        render_markdown(
+            rows, model=settings.nebius_vision_model, spent_usd=guard.run_usd, calls=guard.calls
+        )
+    )
+    out.with_suffix(".json").write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n")
+    stopped = f"; stopped: {guard.stopped_reason}" if guard.stopped_reason else ""
+    typer.echo(
+        f"{guard.calls} calls, ${guard.run_usd:.3f} (ledger) of ${cap_usd:.2f}{stopped}; table in {out}"
+    )
+
+
 @eval_app.command("campaign-nemotron")
 def eval_campaign_nemotron(
     live: bool = typer.Option(
