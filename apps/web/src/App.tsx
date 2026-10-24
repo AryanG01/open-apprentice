@@ -328,8 +328,9 @@ function Prototype() {
 
       <footer className="foot">
         <p>
-          Walkthrough recorded {demo.generated_at.slice(0, 16).replace("T", " ")} UTC. "Try it live", "Real SVG" and "Campaign" need the local API; Nemotron mode additionally needs
-          DEMO_MODEL_ENABLED=1 and a Nebius key. Not built yet: a skill inspector, entering a corrected example after "Neither", and model-written SVG patches. Compare reads stored results only.
+          This is the first-week prototype: placing a badge on a card, taught once and reused across two graphics engines. The recorded walkthrough was made{" "}
+          {demo.generated_at.slice(0, 10)}. "Try it live", "Real SVG" and "Campaign" run on the server, and the Nemotron option uses the demo's model budget. "Compare" shows stored results
+          only. Not built in this prototype: a skill inspector, entering a corrected example after "Neither", and model-written SVG patches.
         </p>
       </footer>
     </div>
