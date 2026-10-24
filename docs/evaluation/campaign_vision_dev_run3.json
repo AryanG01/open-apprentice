@@ -1,0 +1,1622 @@
+[
+ {
+  "banner": "teach_before",
+  "gold": {
+   "brand_mark": {
+    "box": [
+     80.0,
+     60.0,
+     240.0,
+     60.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "product_image": {
+    "box": [
+     100.0,
+     190.0,
+     620.0,
+     620.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "headline": {
+    "box": [
+     800.0,
+     200.0,
+     720.0,
+     220.0
+    ],
+    "text": "Silence the city.",
+    "font_px": 64.0
+   },
+   "price": {
+    "box": [
+     800.0,
+     440.0,
+     720.0,
+     64.0
+    ],
+    "text": "Now $179 (was $249)",
+    "font_px": 48.0
+   },
+   "cta": {
+    "box": [
+     800.0,
+     540.0,
+     320.0,
+     96.0
+    ],
+    "text": "Shop now",
+    "font_px": 36.0
+   },
+   "legal": {
+    "box": [
+     800.0,
+     700.0,
+     720.0,
+     140.0
+    ],
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "font_px": 20.0
+   }
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     55.0,
+     64.8,
+     194.6,
+     45.4
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     139.5,
+     210.2,
+     369.9,
+     349.9
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     164.9,
+     369.9,
+     55.4
+    ],
+    "text": "Silence the city.",
+    "font_px": 64.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     355.0,
+     369.9,
+     45.4
+    ],
+    "text": "Now $179 (was $249)",
+    "font_px": 40.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     429.8,
+     249.6,
+     79.9
+    ],
+    "text": "Shop now",
+    "font_px": 32.0,
+    "bold": true,
+    "color": "#2d2d2d",
+    "fill": "#ffc94d"
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     565.2,
+     380.2,
+     19.4
+    ],
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "font_px": 16.0,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      43.0,
+      90.0,
+      195.0,
+      153.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      109.0,
+      292.0,
+      398.0,
+      778.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      229.0,
+      789.0,
+      306.0
+     ],
+     "text": "Silence the city.",
+     "font_px": 64.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      493.0,
+      789.0,
+      556.0
+     ],
+     "text": "Now $179 (was $249)",
+     "font_px": 40.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      597.0,
+      695.0,
+      708.0
+     ],
+     "text": "Shop now",
+     "font_px": 32.0,
+     "bold": true,
+     "color": "#2d2d2d",
+     "fill": "#ffc94d"
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      785.0,
+      797.0,
+      812.0
+     ],
+     "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+     "font_px": 16.0,
+     "bold": false,
+     "color": "#ffffff",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 7287,
+  "frame": [
+   1600.0,
+   900.0
+  ],
+  "score": {
+   "roles_present": true,
+   "all_matched": false,
+   "iou": {
+    "brand_mark": 0.472,
+    "product_image": 0.526,
+    "headline": 0.202,
+    "price": 0.569,
+    "cta": 0.938,
+    "legal": 0.114
+   },
+   "inside": {
+    "brand_mark": 0.655,
+    "product_image": 1.0,
+    "headline": 1.0,
+    "price": 1.0,
+    "cta": 0.961,
+    "legal": 1.0
+   },
+   "text_exact": 4,
+   "text_roles": 4,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "banner": "short_a",
+  "gold": {
+   "brand_mark": {
+    "box": [
+     64.0,
+     48.0,
+     192.0,
+     48.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "product_image": {
+    "box": [
+     80.0,
+     152.0,
+     496.0,
+     496.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "headline": {
+    "box": [
+     640.0,
+     160.0,
+     576.0,
+     176.0
+    ],
+    "text": "Hear only what matters.",
+    "font_px": 51.2
+   },
+   "price": {
+    "box": [
+     640.0,
+     352.0,
+     576.0,
+     51.2
+    ],
+    "text": "Now $159 (was $229)",
+    "font_px": 38.4
+   },
+   "cta": {
+    "box": [
+     640.0,
+     432.0,
+     256.0,
+     76.8
+    ],
+    "text": "Shop now",
+    "font_px": 28.8
+   },
+   "legal": {
+    "box": [
+     640.0,
+     560.0,
+     576.0,
+     112.0
+    ],
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "font_px": 16.0
+   }
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     70.4,
+     46.8,
+     185.6,
+     39.6
+    ],
+    "text": "",
+    "font_px": 60.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     166.4,
+     151.2,
+     499.2,
+     259.2
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     819.2,
+     122.4,
+     179.2,
+     64.8
+    ],
+    "text": "Hear only what\nmatters.",
+    "font_px": 60.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     819.2,
+     252.0,
+     204.8,
+     36.0
+    ],
+    "text": "Now $159 (was $229)",
+    "font_px": 40.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     819.2,
+     309.6,
+     320.0,
+     57.6
+    ],
+    "text": "Shop now",
+    "font_px": 30.0,
+    "bold": true,
+    "color": "#000000",
+    "fill": "#fcc419"
+   },
+   {
+    "role": "legal",
+    "box": [
+     819.2,
+     403.2,
+     204.8,
+     21.6
+    ],
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "font_px": 14.0,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      55.0,
+      65.0,
+      200.0,
+      120.0
+     ],
+     "text": "",
+     "font_px": 60.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      130.0,
+      210.0,
+      520.0,
+      570.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      640.0,
+      170.0,
+      780.0,
+      260.0
+     ],
+     "text": "Hear only what\nmatters.",
+     "font_px": 60.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      640.0,
+      350.0,
+      800.0,
+      400.0
+     ],
+     "text": "Now $159 (was $229)",
+     "font_px": 40.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      640.0,
+      430.0,
+      890.0,
+      510.0
+     ],
+     "text": "Shop now",
+     "font_px": 30.0,
+     "bold": true,
+     "color": "#000000",
+     "fill": "#fcc419"
+    },
+    {
+     "role": "legal",
+     "box": [
+      640.0,
+      560.0,
+      800.0,
+      590.0
+     ],
+     "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+     "font_px": 14.0,
+     "bold": false,
+     "color": "#ffffff",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 5044,
+  "frame": [
+   1280.0,
+   720.0
+  ],
+  "score": {
+   "roles_present": true,
+   "all_matched": false,
+   "iou": {
+    "brand_mark": 0.755,
+    "product_image": 0.393,
+    "headline": 0.045,
+    "price": 0.0,
+    "cta": 0.0,
+    "legal": 0.0
+   },
+   "inside": {
+    "brand_mark": 0.97,
+    "product_image": 0.818,
+    "headline": 0.42,
+    "price": 0.0,
+    "cta": 0.0,
+    "legal": 0.0
+   },
+   "text_exact": 4,
+   "text_roles": 4,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "banner": "short_b",
+  "gold": {
+   "brand_mark": {
+    "box": [
+     96.0,
+     72.0,
+     288.0,
+     72.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "product_image": {
+    "box": [
+     120.0,
+     228.0,
+     744.0,
+     744.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "headline": {
+    "box": [
+     960.0,
+     240.0,
+     864.0,
+     264.0
+    ],
+    "text": "Your commute, muted.",
+    "font_px": 76.8
+   },
+   "price": {
+    "box": [
+     960.0,
+     528.0,
+     864.0,
+     76.8
+    ],
+    "text": "Now $199 (was $279)",
+    "font_px": 57.6
+   },
+   "cta": {
+    "box": [
+     960.0,
+     648.0,
+     384.0,
+     115.2
+    ],
+    "text": "Shop now",
+    "font_px": 43.2
+   },
+   "legal": {
+    "box": [
+     960.0,
+     840.0,
+     864.0,
+     168.0
+    ],
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "font_px": 24.0
+   }
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     60.2,
+     59.8,
+     189.4,
+     50.4
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     139.5,
+     210.2,
+     380.2,
+     349.9
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     164.9,
+     550.4,
+     45.4
+    ],
+    "text": "Your commute, muted.",
+    "font_px": 64.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     349.9,
+     359.7,
+     45.4
+    ],
+    "text": "Now $199 (was $279)",
+    "font_px": 48.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     429.8,
+     259.8,
+     79.9
+    ],
+    "text": "Shop now",
+    "font_px": 34.0,
+    "bold": true,
+    "color": "#1a1a2e",
+    "fill": "#ffc107"
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     560.2,
+     610.6,
+     24.5
+    ],
+    "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+    "font_px": 16.0,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      47.0,
+      83.0,
+      195.0,
+      153.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      109.0,
+      292.0,
+      406.0,
+      778.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      229.0,
+      930.0,
+      292.0
+     ],
+     "text": "Your commute, muted.",
+     "font_px": 64.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      486.0,
+      781.0,
+      549.0
+     ],
+     "text": "Now $199 (was $279)",
+     "font_px": 48.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      597.0,
+      703.0,
+      708.0
+     ],
+     "text": "Shop now",
+     "font_px": 34.0,
+     "bold": true,
+     "color": "#1a1a2e",
+     "fill": "#ffc107"
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      778.0,
+      977.0,
+      812.0
+     ],
+     "text": "Offer ends 31 Oct 2026. While stocks last. Terms apply.",
+     "font_px": 16.0,
+     "bold": false,
+     "color": "#ffffff",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 7113,
+  "frame": [
+   1920.0,
+   1080.0
+  ],
+  "score": {
+   "roles_present": true,
+   "all_matched": false,
+   "iou": {
+    "brand_mark": 0.558,
+    "product_image": 0.541,
+    "headline": 0.246,
+    "price": 0.515,
+    "cta": 0.947,
+    "legal": 0.216
+   },
+   "inside": {
+    "brand_mark": 0.704,
+    "product_image": 1.0,
+    "headline": 1.0,
+    "price": 0.954,
+    "cta": 0.947,
+    "legal": 0.943
+   },
+   "text_exact": 4,
+   "text_roles": 4,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "banner": "de_long_a",
+  "gold": {
+   "brand_mark": {
+    "box": [
+     80.0,
+     60.0,
+     240.0,
+     60.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "product_image": {
+    "box": [
+     100.0,
+     190.0,
+     620.0,
+     620.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "headline": {
+    "box": [
+     800.0,
+     200.0,
+     720.0,
+     220.0
+    ],
+    "text": "Bring die Stadt endlich zum Schweigen – mit aktiver Geräuschunterdrückung.",
+    "font_px": 64.0
+   },
+   "price": {
+    "box": [
+     800.0,
+     440.0,
+     720.0,
+     64.0
+    ],
+    "text": "Jetzt 179 € (statt 249 €)",
+    "font_px": 48.0
+   },
+   "cta": {
+    "box": [
+     800.0,
+     540.0,
+     320.0,
+     96.0
+    ],
+    "text": "Jetzt kaufen",
+    "font_px": 36.0
+   },
+   "legal": {
+    "box": [
+     800.0,
+     700.0,
+     720.0,
+     140.0
+    ],
+    "text": "Angebot gültig bis 31.10.2026, solange der Vorrat reicht. Es gelten die AGB der Halden Audio GmbH. Abbildung ähnlich.",
+    "font_px": 20.0
+   }
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     64.0,
+     43.2,
+     192.0,
+     43.2
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     140.8,
+     144.0,
+     384.0,
+     259.2
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     627.2,
+     115.2,
+     576.0,
+     208.8
+    ],
+    "text": "Bring die Stadt endlich\nzum Schweigen – mit\naktiver",
+    "font_px": 64.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     627.2,
+     345.6,
+     435.2,
+     57.6
+    ],
+    "text": "Jetzt 179 € (statt 249 €)",
+    "font_px": 40.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     627.2,
+     432.0,
+     268.8,
+     72.0
+    ],
+    "text": "Jetzt kaufen",
+    "font_px": 32.0,
+    "bold": true,
+    "color": "#000000",
+    "fill": "#ffc107"
+   },
+   {
+    "role": "legal",
+    "box": [
+     627.2,
+     561.6,
+     588.8,
+     43.2
+    ],
+    "text": "Angebot gültig bis 31.10.2026, solange der Vorrat reicht. Es gelten die AGB der Halden Audio GmbH. Abbildung ähnlich.",
+    "font_px": 16.0,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "de",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      50.0,
+      60.0,
+      200.0,
+      120.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      110.0,
+      200.0,
+      410.0,
+      560.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      490.0,
+      160.0,
+      940.0,
+      450.0
+     ],
+     "text": "Bring die Stadt endlich\nzum Schweigen – mit\naktiver",
+     "font_px": 64.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      490.0,
+      480.0,
+      830.0,
+      560.0
+     ],
+     "text": "Jetzt 179 € (statt 249 €)",
+     "font_px": 40.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      490.0,
+      600.0,
+      700.0,
+      700.0
+     ],
+     "text": "Jetzt kaufen",
+     "font_px": 32.0,
+     "bold": true,
+     "color": "#000000",
+     "fill": "#ffc107"
+    },
+    {
+     "role": "legal",
+     "box": [
+      490.0,
+      780.0,
+      950.0,
+      840.0
+     ],
+     "text": "Angebot gültig bis 31.10.2026, solange der Vorrat reicht. Es gelten die AGB der Halden Audio GmbH. Abbildung ähnlich.",
+     "font_px": 16.0,
+     "bold": false,
+     "color": "#ffffff",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 6822,
+  "frame": [
+   1600.0,
+   900.0
+  ],
+  "score": {
+   "roles_present": true,
+   "all_matched": false,
+   "iou": {
+    "brand_mark": 0.727,
+    "product_image": 0.387,
+    "headline": 0.714,
+    "price": 0.657,
+    "cta": 0.896,
+    "legal": 0.382
+   },
+   "inside": {
+    "brand_mark": 0.889,
+    "product_image": 0.969,
+    "headline": 0.768,
+    "price": 0.863,
+    "cta": 0.952,
+    "legal": 0.978
+   },
+   "text_exact": 3,
+   "text_roles": 4,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "banner": "de_long_b",
+  "gold": {
+   "brand_mark": {
+    "box": [
+     80.0,
+     60.0,
+     240.0,
+     60.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "product_image": {
+    "box": [
+     100.0,
+     190.0,
+     620.0,
+     620.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "headline": {
+    "box": [
+     800.0,
+     200.0,
+     720.0,
+     220.0
+    ],
+    "text": "Bring die Stadt endlich zum Schweigen – mit aktiver Geräuschunterdrückung.",
+    "font_px": 64.0
+   },
+   "price": {
+    "box": [
+     800.0,
+     440.0,
+     720.0,
+     64.0
+    ],
+    "text": "Jetzt 179 € (statt 249 €)",
+    "font_px": 48.0
+   },
+   "cta": {
+    "box": [
+     800.0,
+     540.0,
+     320.0,
+     96.0
+    ],
+    "text": "Jetzt kaufen",
+    "font_px": 36.0
+   },
+   "legal": {
+    "box": [
+     800.0,
+     700.0,
+     720.0,
+     140.0
+    ],
+    "text": "Angebot gültig bis 31.10.2026 und nur, solange der Vorrat reicht. Es gelten die Allgemeinen Geschäftsbedingungen der Halden Audio GmbH, Musterstraße 1, 10115 Berlin. Unverbindliche Preisempfehlung des Herstellers. Alle Preise inklusive gesetzlicher Mehrwertsteuer. Abbildung ähnlich, Farbabweichungen möglich. Versandkostenfrei innerhalb Deutschlands ab einem Bestellwert von 50 €. Rückgabe innerhalb von 30 Tagen nach Erhalt der Ware möglich. Die gesetzliche Gewährleistung bleibt unberührt.",
+    "font_px": 20.0
+   }
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     64.0,
+     43.2,
+     192.0,
+     50.4
+    ],
+    "text": "",
+    "font_px": 60.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     153.6,
+     144.0,
+     422.4,
+     252.0
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     627.2,
+     115.2,
+     576.0,
+     208.8
+    ],
+    "text": "Bring die Stadt endlich\nzum Schweigen – mit\naktiver",
+    "font_px": 60.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     627.2,
+     345.6,
+     422.4,
+     50.4
+    ],
+    "text": "Jetzt 179 € (statt 249 €)",
+    "font_px": 40.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     627.2,
+     432.0,
+     268.8,
+     72.0
+    ],
+    "text": "Jetzt kaufen",
+    "font_px": 32.0,
+    "bold": true,
+    "color": "#2A1A00",
+    "fill": "#F6C42B"
+   },
+   {
+    "role": "legal",
+    "box": [
+     627.2,
+     561.6,
+     576.0,
+     122.4
+    ],
+    "text": "Angebot gültig bis 31.10.2026 und nur, solange der Vorrat reicht. Es gelten die Allgemeinen Geschäftsbedingungen der Halden Audio GmbH, Musterstraße 1, 10115 Berlin. Unverbindliche Preisempfehlung des Herstellers. Alle Preise inklusive gesetzlicher Mehrwertsteuer. Abbildung ähnlich, Farbabweichungen möglich. Versandkostenfrei innerhalb Deutschlands ab einem Bestellwert von 50",
+    "font_px": 16.0,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "de",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      50.0,
+      60.0,
+      200.0,
+      130.0
+     ],
+     "text": "",
+     "font_px": 60.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      120.0,
+      200.0,
+      450.0,
+      550.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      490.0,
+      160.0,
+      940.0,
+      450.0
+     ],
+     "text": "Bring die Stadt endlich\nzum Schweigen – mit\naktiver",
+     "font_px": 60.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      490.0,
+      480.0,
+      820.0,
+      550.0
+     ],
+     "text": "Jetzt 179 € (statt 249 €)",
+     "font_px": 40.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      490.0,
+      600.0,
+      700.0,
+      700.0
+     ],
+     "text": "Jetzt kaufen",
+     "font_px": 32.0,
+     "bold": true,
+     "color": "#2A1A00",
+     "fill": "#F6C42B"
+    },
+    {
+     "role": "legal",
+     "box": [
+      490.0,
+      780.0,
+      940.0,
+      950.0
+     ],
+     "text": "Angebot gültig bis 31.10.2026 und nur, solange der Vorrat reicht. Es gelten die Allgemeinen Geschäftsbedingungen der Halden Audio GmbH, Musterstraße 1, 10115 Berlin. Unverbindliche Preisempfehlung des Herstellers. Alle Preise inklusive gesetzlicher Mehrwertsteuer. Abbildung ähnlich, Farbabweichungen möglich. Versandkostenfrei innerhalb Deutschlands ab einem Bestellwert von 50",
+     "font_px": 16.0,
+     "bold": false,
+     "color": "#ffffff",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 5999,
+  "frame": [
+   1600.0,
+   900.0
+  ],
+  "score": {
+   "roles_present": true,
+   "all_matched": false,
+   "iou": {
+    "brand_mark": 0.864,
+    "product_image": 0.413,
+    "headline": 0.714,
+    "price": 0.55,
+    "cta": 0.896,
+    "legal": 0.854
+   },
+   "inside": {
+    "brand_mark": 0.905,
+    "product_image": 0.968,
+    "headline": 0.768,
+    "price": 0.847,
+    "cta": 0.952,
+    "legal": 0.882
+   },
+   "text_exact": 2,
+   "text_roles": 4,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "banner": "fr_long",
+  "gold": {
+   "brand_mark": {
+    "box": [
+     80.0,
+     60.0,
+     240.0,
+     60.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "product_image": {
+    "box": [
+     100.0,
+     190.0,
+     620.0,
+     620.0
+    ],
+    "text": "",
+    "font_px": 0
+   },
+   "headline": {
+    "box": [
+     800.0,
+     200.0,
+     720.0,
+     220.0
+    ],
+    "text": "Faites taire la ville grâce à la réduction de bruit active nouvelle génération.",
+    "font_px": 64.0
+   },
+   "price": {
+    "box": [
+     800.0,
+     440.0,
+     720.0,
+     64.0
+    ],
+    "text": "179 € au lieu de 249 €",
+    "font_px": 48.0
+   },
+   "cta": {
+    "box": [
+     800.0,
+     540.0,
+     320.0,
+     96.0
+    ],
+    "text": "Acheter",
+    "font_px": 36.0
+   },
+   "legal": {
+    "box": [
+     800.0,
+     700.0,
+     720.0,
+     140.0
+    ],
+    "text": "Offre valable jusqu'au 31/10/2026 dans la limite des stocks disponibles. Voir conditions générales.",
+    "font_px": 20.0
+   }
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     64.0,
+     43.2,
+     192.0,
+     50.4
+    ],
+    "text": "",
+    "font_px": 60.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     140.8,
+     208.8,
+     371.2,
+     367.2
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     627.2,
+     158.4,
+     576.0,
+     165.6
+    ],
+    "text": "Faites taire la ville\ngrâce à la réduction de\nbruit active nouvelle",
+    "font_px": 55.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     627.2,
+     352.8,
+     396.8,
+     43.2
+    ],
+    "text": "179 € au lieu de 249 €",
+    "font_px": 42.0,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     627.2,
+     432.0,
+     268.8,
+     79.2
+    ],
+    "text": "Acheter",
+    "font_px": 32.0,
+    "bold": true,
+    "color": "#1a1a2e",
+    "fill": "#f5c518"
+   },
+   {
+    "role": "legal",
+    "box": [
+     627.2,
+     554.4,
+     550.4,
+     43.2
+    ],
+    "text": "Offre valable jusqu'au 31/10/2026 dans la limite des stocks disponibles. Voir conditions générales.",
+    "font_px": 16.0,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "fr",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      50.0,
+      60.0,
+      200.0,
+      130.0
+     ],
+     "text": "",
+     "font_px": 60.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      110.0,
+      290.0,
+      400.0,
+      800.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      490.0,
+      220.0,
+      940.0,
+      450.0
+     ],
+     "text": "Faites taire la ville\ngrâce à la réduction de\nbruit active nouvelle",
+     "font_px": 55.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      490.0,
+      490.0,
+      800.0,
+      550.0
+     ],
+     "text": "179 € au lieu de 249 €",
+     "font_px": 42.0,
+     "bold": true,
+     "color": "#ffffff",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      490.0,
+      600.0,
+      700.0,
+      710.0
+     ],
+     "text": "Acheter",
+     "font_px": 32.0,
+     "bold": true,
+     "color": "#1a1a2e",
+     "fill": "#f5c518"
+    },
+    {
+     "role": "legal",
+     "box": [
+      490.0,
+      770.0,
+      920.0,
+      830.0
+     ],
+     "text": "Offre valable jusqu'au 31/10/2026 dans la limite des stocks disponibles. Voir conditions générales.",
+     "font_px": 16.0,
+     "bold": false,
+     "color": "#ffffff",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 9334,
+  "frame": [
+   1600.0,
+   900.0
+  ],
+  "score": {
+   "roles_present": true,
+   "all_matched": false,
+   "iou": {
+    "brand_mark": 0.864,
+    "product_image": 0.554,
+    "headline": 0.885,
+    "price": 0.552,
+    "cta": 0.924,
+    "legal": 0.297
+   },
+   "inside": {
+    "brand_mark": 0.905,
+    "product_image": 1.0,
+    "headline": 0.968,
+    "price": 0.968,
+    "cta": 0.924,
+    "legal": 0.85
+   },
+   "text_exact": 3,
+   "text_roles": 4,
+   "origin": "model",
+   "problems": []
+  }
+ }
+]

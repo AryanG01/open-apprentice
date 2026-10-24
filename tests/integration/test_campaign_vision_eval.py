@@ -5,6 +5,7 @@ import asyncio
 
 from open_apprentice.evaluation.campaign_vision_eval import (
     DEV_BANNERS,
+    banner_frame,
     gold_layers,
     run_dev,
     verdict,
@@ -18,7 +19,10 @@ from .conftest import TOKEN
 def test_the_probe_renders_scores_and_decides_on_the_mock(engine_url):
     replies = []
     for fid in DEV_BANNERS:
-        gold = gold_layers(load_fixture(fid)["scene"])
+        scene = load_fixture(fid)["scene"]
+        gold, (fw, fh) = gold_layers(scene), banner_frame(
+            scene
+        )  # a model's boxes are relative to the image, whatever its size
         replies.append(
             {
                 "language": "en",
@@ -26,10 +30,10 @@ def test_the_probe_renders_scores_and_decides_on_the_mock(engine_url):
                     {
                         "role": r,
                         "box": [
-                            g["box"][0] / 1.28,
-                            g["box"][1] / 0.72,
-                            (g["box"][0] + g["box"][2]) / 1.28,
-                            (g["box"][1] + g["box"][3]) / 0.72,
+                            g["box"][0] / fw * 1000,
+                            g["box"][1] / fh * 1000,
+                            (g["box"][0] + g["box"][2]) / fw * 1000,
+                            (g["box"][1] + g["box"][3]) / fh * 1000,
                         ],
                         "text": g["text"],
                         "font_px": g["font_px"] or 20,
