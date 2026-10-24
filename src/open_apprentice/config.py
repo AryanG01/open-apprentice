@@ -23,6 +23,9 @@ class Settings:
     nebius_base_url: str = "https://api.tokenfactory.nebius.com/v1/"
     nebius_model: str = "nvidia/nemotron-3-super-120b-a12b"
     provider_mode: str = "mock"
+    nebius_vision_model: str = (
+        ""  # a Nemotron VL model for reading banner images; empty = no vision (manual editor only)
+    )
     live_run_max_usd: Optional[str] = None
     max_provider_concurrency: int = 2
     nebius_completion_cap: int = (
@@ -75,9 +78,9 @@ def _read_dotenv(path: str) -> dict[str, str]:
     return out
 
 
-def load_settings(dotenv_path: str = ".env") -> Settings:
-    """Process environment wins over .env; .env fills the gaps."""
-    env = {**_read_dotenv(dotenv_path), **os.environ}
+def load_settings(dotenv_path: str = ".env", env: Optional[dict] = None) -> Settings:
+    """Process environment wins over .env; .env fills the gaps. `env` replaces both (tests)."""
+    env = dict(env) if env is not None else {**_read_dotenv(dotenv_path), **os.environ}
     return Settings(
         app_env=env.get("APP_ENV", "development"),
         app_base_url=env.get("APP_BASE_URL", "http://localhost:8080"),
@@ -87,6 +90,7 @@ def load_settings(dotenv_path: str = ".env") -> Settings:
         nebius_base_url=env.get("NEBIUS_BASE_URL", "https://api.tokenfactory.nebius.com/v1/"),
         nebius_model=env.get("NEBIUS_MODEL", "nvidia/nemotron-3-super-120b-a12b"),
         provider_mode=env.get("PROVIDER_MODE", "mock"),
+        nebius_vision_model=env.get("NEBIUS_VISION_MODEL", ""),
         live_run_max_usd=env.get("LIVE_RUN_MAX_USD") or None,
         max_provider_concurrency=int(env.get("MAX_PROVIDER_CONCURRENCY", "2")),
         nebius_reasoning_effort=env.get("NEBIUS_REASONING_EFFORT") or None,

@@ -26,7 +26,7 @@ from open_apprentice.providers.base import (
     Provider,
     ProviderTimeout,
     RawCompletion,
-    estimate_tokens,
+    prompt_estimate,
 )
 
 ROOT = pathlib.Path("results/redesign")
@@ -126,7 +126,7 @@ class SpendGuard(Provider):
     async def _call(
         self, messages: list[Message], *, max_tokens: int, ctx: CallContext
     ) -> RawCompletion:
-        worst_tokens = estimate_tokens(json.dumps([m.__dict__ for m in messages])) + max_tokens
+        worst_tokens = prompt_estimate(messages) + max_tokens
         worst = worst_tokens * CONSERVATIVE_USD_PER_MILLION / 1e6
         with self._ledger():
             budget = load_budget(self._root)
@@ -148,9 +148,16 @@ class SpendGuard(Provider):
         if self._merge_system and messages and messages[0].role == "system":
             # observed 2026-10-14: the endpoint sometimes ignores the system turn and answers the evidence JSON as if it
             # were the task. Instructions travel in the user turn instead.
-            first = Message(
-                "user", f"{messages[0].content}\n\n=== INPUT ===\n{messages[1].content}"
-            )
+            body = messages[1].content
+            if isinstance(
+                body, list
+            ):  # vision: the instructions become the first text part, the image stays a part
+                first = Message(
+                    "user",
+                    [{"type": "text", "text": f"{messages[0].content}\n\n=== INPUT ==="}, *body],
+                )
+            else:
+                first = Message("user", f"{messages[0].content}\n\n=== INPUT ===\n{body}")
             messages = [first, *messages[2:]]
         try:
             # httpx's read timeout is per read, not per call: a trickling or stalled connection can wait far longer

@@ -15,6 +15,7 @@ from open_apprentice.providers.base import (
     Provider,
     RawCompletion,
     estimate_tokens,
+    prompt_estimate,
 )
 
 
@@ -55,7 +56,7 @@ class MockProvider(Provider):
             model_id=self.requested_model,
             request_id=f"mock-{len(self.calls)}",
             finish_reason="stop",
-            prompt_tokens=estimate_tokens(json.dumps([m.__dict__ for m in messages])),
+            prompt_tokens=prompt_estimate(messages),
             completion_tokens=estimate_tokens(text),
             latency_ms=0.0,
             usd=0.0,

@@ -40,8 +40,17 @@ async def call_model(
     payload: dict,
     schema: type[StrictModel],
     max_tokens: int,
+    image: (
+        str | None
+    ) = None,  # a data URL: the user turn becomes [json text, image] content parts (vision models)
 ) -> ModelResult:
-    msgs = [Message("system", prompt.read_text()), Message("user", json.dumps(payload))]
+    text = json.dumps(payload)
+    user = (
+        text
+        if image is None
+        else [{"type": "text", "text": text}, {"type": "image_url", "image_url": {"url": image}}]
+    )
+    msgs = [Message("system", prompt.read_text()), Message("user", user)]
     tokens = 0
     for attempt in (0, 1):
         try:

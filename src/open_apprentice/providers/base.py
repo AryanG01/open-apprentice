@@ -56,7 +56,9 @@ class WrongModelIdentity(ProviderError):
 @dataclass(frozen=True)
 class Message:
     role: str
-    content: str
+    content: (
+        str | list[dict]
+    )  # text, or OpenAI-style content parts ({"type": "text"|"image_url", ...}) for vision
 
 
 @dataclass(frozen=True)
@@ -100,6 +102,25 @@ def estimate_tokens(text: str) -> int:
     return max(1, len(text) // 3)  # deliberately conservative; used only for reservations
 
 
+IMAGE_TOKENS_EST = 3000  # per image part: a base64 data URL must never be counted as text (200 KB would read as ~70k tokens)
+
+
+def prompt_estimate(messages: list["Message"]) -> int:
+    """Reservation estimate for a prompt: text parts by length, each image part at a fixed size."""
+    total = 0
+    for m in messages:
+        if isinstance(m.content, str):
+            total += estimate_tokens(m.role + m.content)
+            continue
+        total += estimate_tokens(m.role)
+        for part in m.content:
+            if part.get("type") == "image_url":
+                total += IMAGE_TOKENS_EST
+            else:
+                total += estimate_tokens(json.dumps(part))
+    return max(1, total)
+
+
 class Provider(ABC):
     label: str = "UNSET"
     requested_model: str = ""
@@ -130,7 +151,7 @@ class Provider(ABC):
         msgs = list(messages)
         corrections = 0
         while True:
-            prompt_est = estimate_tokens(json.dumps([m.__dict__ for m in msgs]))
+            prompt_est = prompt_estimate(msgs)
             res = ledger.reserve(
                 ctx.category if corrections == 0 else "schema_correction",
                 tokens=prompt_est + max_tokens,
@@ -215,4 +236,6 @@ __all__ = [
     "ValidatedCompletion",
     "WrongModelIdentity",
     "estimate_tokens",
+    "prompt_estimate",
+    "IMAGE_TOKENS_EST",
 ]

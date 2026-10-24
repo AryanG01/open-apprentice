@@ -226,3 +226,35 @@ async def test_a_settled_call_leaves_only_its_actual_cost_in_the_ledger(tmp_path
     assert spent_so_far(r) == pytest.approx(0.02)  # the reservation and its release net to zero
     kinds = [json.loads(x)["kind"] for x in (r / "spend.jsonl").read_text().splitlines()]
     assert kinds == ["reserve", "stop", "release"]
+
+
+IMG = {"type": "image_url", "image_url": {"url": "data:image/png;base64," + "A" * 400_000}}
+
+
+async def test_an_image_prompt_is_reserved_at_its_estimate_not_its_base64_length(tmp_path):
+    inner = Fake()
+    g = SpendGuard(inner, run_id="r", run_cap_usd=0.05, root=root(tmp_path))
+    msgs = [Message("system", "read it"), Message("user", [{"type": "text", "text": "{}"}, IMG])]
+    await g._call(
+        msgs, max_tokens=1500, ctx=CTX
+    )  # worst case ~4.5k tokens, ~$0.02: inside the $0.05 cap
+    assert inner.sent == 1
+
+
+async def test_merging_the_system_turn_keeps_the_image_as_a_part(tmp_path):
+    seen = {}
+
+    class Spy(Fake):
+        async def _call(self, messages, *, max_tokens, ctx):
+            seen["m"] = messages
+            return await super()._call(messages, max_tokens=max_tokens, ctx=ctx)
+
+    g = SpendGuard(Spy(), run_id="r", run_cap_usd=1, root=root(tmp_path), merge_system=True)
+    msgs = [
+        Message("system", "INSTRUCTIONS"),
+        Message("user", [{"type": "text", "text": "{}"}, IMG]),
+    ]
+    await g._call(msgs, max_tokens=1500, ctx=CTX)
+    (only,) = seen["m"]
+    assert only.role == "user" and isinstance(only.content, list)
+    assert "INSTRUCTIONS" in only.content[0]["text"] and only.content[-1]["type"] == "image_url"

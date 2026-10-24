@@ -19,7 +19,7 @@ from open_apprentice.api.teach import replay_router, router as teach_router
 from open_apprentice.api.v2 import routes as v2_routes
 from open_apprentice.api.v2.context import make_v2
 from open_apprentice.config import load_settings
-from open_apprentice.providers.factory import MissingCredential, make_provider
+from open_apprentice.providers.factory import MissingCredential, make_provider, make_vision_provider
 from open_apprentice.providers.replay import RecordingProvider, load_tape
 from open_apprentice.concepts.witness import SolverPool
 from open_apprentice.evaluation.local_engine import local_engine
@@ -44,6 +44,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     app.state.spend = {"usd": 0.0, "tokens": 0}
     app.state.rate = {}
     app.state.provider = None
+    app.state.vision_provider = (
+        None  # Nemotron VL for the banner flow; never recorded to tapes (uploads are private)
+    )
     app.state.model_error = None
     async with AsyncExitStack() as stack:
         # Model mode costs real money, so it is OFF unless the operator opts in with DEMO_MODEL_ENABLED=1 (and has credentials).
@@ -53,6 +56,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 stack.push_async_callback(app.state.provider.aclose)
             except MissingCredential as e:
                 app.state.model_error = str(e)[:160]
+            try:
+                app.state.vision_provider = make_vision_provider(load_settings())
+                if app.state.vision_provider is not None:
+                    stack.push_async_callback(app.state.vision_provider.aclose)
+            except MissingCredential:
+                app.state.vision_provider = None
             record = os.environ.get("DEMO_RECORD_TAPE")
             if (
                 record and app.state.provider is not None
