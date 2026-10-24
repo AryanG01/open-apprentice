@@ -32,6 +32,7 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
   app.post("/sessions", async (req, reply) => {
     const { scene, owner, private_config, backend } = req.body ?? {};
     if (private_config !== undefined) return reply.code(403).send({ error: { code: "FORBIDDEN", message: "private config is evaluator-only" } });
+    if (scene && typeof scene === "object" && "assets" in scene) return reply.code(403).send({ error: { code: "FORBIDDEN", message: "uploaded assets are a product path, not an agent tool" } });
     try { return await engine.create(scene, { owner, backend }); } catch (e) { return fail(reply, e); }
   });
   app.post("/sessions/:id/actions", async (req, reply) => {
@@ -48,10 +49,10 @@ export function buildServer(engine, { evaluatorToken = process.env.EVALUATOR_TOK
     try { return await engine.renderDrawio(xml, { wantPng: want_png !== false, wantSvg: want_svg === true }); } catch (e) { return fail(reply, e); }
   });
 
-  app.post("/internal/sessions", async (req, reply) => {
+  app.post("/internal/sessions", { bodyLimit: 4 * 1024 * 1024 }, async (req, reply) => { // uploaded crops travel in the scene
     if (!guard(req, reply)) return;
     const { scene, owner, private_config, backend } = req.body ?? {};
-    try { return await engine.create(scene, { owner, privateConfig: private_config, backend }); } catch (e) { return fail(reply, e); }
+    try { return await engine.create(scene, { owner, privateConfig: private_config, backend, uploads: true }); } catch (e) { return fail(reply, e); }
   });
   app.post("/internal/svg/measure", async (req, reply) => {
     if (!guard(req, reply)) return;

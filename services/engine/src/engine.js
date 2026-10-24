@@ -19,6 +19,37 @@ const BACKENDS = {
 const ASSETS = Object.fromEntries([["h7-headphones", 1000, 1000], ["halden-wordmark", 480, 120]].map(([id, width, height]) =>
   [id, { data_url: `data:image/svg+xml;base64,${read(`assets/${id}.svg`).toString("base64")}`, width, height }]));
 
+// Uploaded assets (the "bring your own banner" path): the owner's two crops travel with the scene as PNG data URLs. They are
+// validated here, before any browser context exists, and only the product path (uploads: true) may pass them.
+const UPLOAD_ID = /^u-[0-9a-f]{12}-(brand_mark|product_image)$/;
+const UPLOAD_PREFIX = "data:image/png;base64,";
+const PNG_SIG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const MAX_UPLOADS = 2, MAX_UPLOAD_BYTES = 1_000_000, MAX_UPLOAD_DIM = 2048;
+const invalidScene = (m) => Object.assign(new Error(m), { code: "INVALID_SCENE" });
+
+function uploadedAssets(raw) {
+  if (raw === undefined || raw === null) return {};
+  if (typeof raw !== "object" || Array.isArray(raw)) throw invalidScene("uploaded assets must be an object");
+  const ids = Object.keys(raw);
+  for (const id of ids) if (!UPLOAD_ID.test(id)) throw invalidScene("bad uploaded asset id");
+  if (ids.length > MAX_UPLOADS) throw invalidScene("too many uploaded assets");
+  const out = {};
+  for (const id of ids) {
+    const url = raw[id];
+    if (typeof url !== "string" || !url.startsWith(UPLOAD_PREFIX)) throw invalidScene("uploaded assets must be PNG data URLs");
+    const b64 = url.slice(UPLOAD_PREFIX.length);
+    if (b64.length > Math.ceil((MAX_UPLOAD_BYTES * 4) / 3) + 8) throw invalidScene("uploaded asset is too large");
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(b64)) throw invalidScene("uploaded asset is not valid base64");
+    const buf = Buffer.from(b64, "base64");
+    if (buf.length > MAX_UPLOAD_BYTES) throw invalidScene("uploaded asset is too large");
+    if (buf.length < 24 || !buf.subarray(0, 8).equals(PNG_SIG) || buf.subarray(12, 16).toString("latin1") !== "IHDR") throw invalidScene("uploaded asset is not a PNG");
+    const width = buf.readUInt32BE(16), height = buf.readUInt32BE(20);
+    if (width < 1 || height < 1 || width > MAX_UPLOAD_DIM || height > MAX_UPLOAD_DIM) throw invalidScene(`uploaded asset size ${width}x${height} is outside 1..${MAX_UPLOAD_DIM}`);
+    out[id] = { data_url: url, width, height }; // the header says how big it is; nothing is decoded here
+  }
+  return out;
+}
+
 const MAX_SESSIONS = 4;          // spec 19.2 parallel browser contexts
 const ACTION_DEADLINE_MS = 5000; // per-action deadline (spec 6.5)
 const MEASURE_TIMEOUT_MS = 10000; // an SVG measurement that hangs is abandoned and its context closed
@@ -83,8 +114,15 @@ export class Engine {
   }
 
   // privateConfig is accepted ONLY from the evaluator path (server.js enforces the token).
-  async create(scene, { owner, privateConfig, backend = "konva" } = {}) {
+  async create(scene, { owner, privateConfig, backend = "konva", uploads = false } = {}) {
     if (!BACKENDS[backend]) throw Object.assign(new Error(`unknown backend ${backend}`), { code: "INVALID_ARGUMENT" });
+    let extra = {};
+    if (scene && typeof scene === "object" && "assets" in scene) {
+      if (!uploads) throw invalidScene("uploaded assets are not accepted here");
+      extra = uploadedAssets(scene.assets);
+      const { assets: _assets, ...rest } = scene;
+      scene = rest;
+    }
     await this.#reapIdle();
     if (this.#sessions.size >= MAX_SESSIONS) throw Object.assign(new Error("session limit"), { code: "LIMIT" });
     // Reserve the slot BEFORE the first await, so parallel creates cannot all pass the cap check.
@@ -108,7 +146,7 @@ export class Engine {
       await page.addScriptTag({ path: BACKENDS[backend].dispatcher });
       let loaded;
       try {
-        loaded = await page.evaluate(([sc, c, a]) => window.__engine.load(sc, c, a), [scene, privateConfig ?? null, ASSETS]);
+        loaded = await page.evaluate(([sc, c, a]) => window.__engine.load(sc, c, a), [scene, privateConfig ?? null, { ...extra, ...ASSETS }]); // fixed assets always win over an upload
       } catch (e) {
         throw Object.assign(new Error(String(e.message).split("\n")[0].slice(0, 200)), { code: "INVALID_SCENE" });
       }
