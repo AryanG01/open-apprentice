@@ -276,3 +276,22 @@ def test_without_applicable_gold_every_other_check_still_runs_and_none_is_waived
 def test_missing_gold_still_fails_when_gold_applies():
     source, final, _ = _case(*APPLICABLE[0])
     assert "matches_gold" in verify_story(source, final, None).failed()
+
+
+# Uploaded banners: the verifier reads each crop's natural size from its OWN header parse of source["assets"].
+def test_uploaded_asset_sizes_come_from_the_png_headers_and_anything_odd_is_left_out():
+    from open_apprentice.evaluation.campaign_verifier import uploaded_sizes
+    from tests.pngs import jpeg_url, png_url
+
+    ok = {"u-0123456789ab-brand_mark": png_url(192, 48), "u-0123456789ab-product_image": png_url(480, 400)}
+    assert uploaded_sizes(ok) == {
+        "u-0123456789ab-brand_mark": {"width": 192, "height": 48},
+        "u-0123456789ab-product_image": {"width": 480, "height": 400},
+    }
+    odd = {
+        "halden-wordmark": png_url(10, 10),  # not an upload id
+        "u-0123456789ab-brand_mark": jpeg_url(10, 10),  # not a PNG
+        "u-0123456789ab-product_image": "data:image/png;base64,AAAA",  # no header
+    }
+    assert uploaded_sizes(odd) == {}
+    assert uploaded_sizes(None) == {}

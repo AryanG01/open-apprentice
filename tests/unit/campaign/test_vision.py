@@ -266,3 +266,40 @@ def test_no_provider_or_a_failed_call_gives_the_manual_template():
     assert asyncio.run(propose_layers(None, None, PNG)).origin == "manual"
     p = _propose(MockProvider({"campaign_vision": ["not json at all", "still not json"]}))
     assert p.origin == "manual" and p.note
+
+
+def test_a_layer_has_a_four_number_box_and_bounded_strings():
+    from pydantic import ValidationError
+
+    for bad in (
+        dict(role="headline", box=[1, 2, 3]),
+        dict(role="headline", box=[1, 2, 3, 4, 5]),
+        dict(role="headline", box=[1, 2, 3, 4], text="x" * 601),
+        dict(role="x" * 40, box=[1, 2, 3, 4]),
+        dict(role="headline", box=[1, 2, 3, 4], color="#" + "f" * 30),
+    ):
+        with pytest.raises(ValidationError):
+            Layer(**bad)
+    assert Layer(role="headline", box=[1, 2, 3, 4]).font_px == 0
+
+
+def test_a_real_length_legal_line_is_fine_and_an_oversized_model_reply_falls_back_instead_of_crashing():
+    long_legal = (
+        "Angebot gültig bis 31.10.2026 und nur, solange der Vorrat reicht. " * 8
+    )  # ~520 characters
+    assert check_layers(edit(layers_from(), "legal", text=long_legal), BG) == []
+    reply = {
+        "language": "en",
+        "layers": [
+            {
+                "role": "headline",
+                "box": [0, 0, 500, 200],
+                "text": "x" * 5000,
+                "font_px": 40,
+                "bold": True,
+                "color": "",
+            }
+        ],
+    }
+    p = _propose(_scripted(reply))
+    assert p.origin == "manual" and "usable" in p.note

@@ -615,3 +615,251 @@ def test_the_fixed_reading_keeps_the_gold_check_and_shows_its_rule(client):
     ).json()
     assert run["status"] == "ready" and run["provenance"]["reading"] == "fixed"
     assert "matches_gold" in [c["name"] for c in run["result"]["verification"]["checks"]]
+
+
+# ---------------------------------------------------------------- bring your own banner (upload -> confirm -> run)
+from open_apprentice.campaign.fixtures import load_fixture  # noqa: E402
+from open_apprentice.providers.mock import MockProvider  # noqa: E402
+from tests.pngs import jpeg_url, png_url  # noqa: E402
+
+SHORT_A_BG = "#1d1240"
+
+
+def _gold_layers(fid="short_a", **text):
+    """The fixture's layers as the editor would hold them (pixel boxes on a 1280x720 banner)."""
+    nodes = load_fixture(fid)["scene"]["nodes"]
+    out = []
+    for n in nodes:
+        if n.get("parent") != "banner" or n.get("role") in (None, "background"):
+            continue
+        t, w, h = n, n.get("width"), n.get("height")
+        if n["role"] == "cta":
+            kids = [k for k in nodes if k.get("parent") == n["id"]]
+            plate, t = next(k for k in kids if k["type"] == "shape"), next(
+                k for k in kids if k["type"] == "text"
+            )
+            w, h = plate["width"], plate["height"]
+        out.append(
+            {
+                "role": n["role"],
+                "box": [n["x"], n["y"], w, h],
+                "text": text.get(n["role"], t.get("text", "")),
+                "font_px": t.get("fontSize", 0),
+                "bold": t.get("fontStyle") == "bold",
+                "color": "#1d1240" if n["role"] == "cta" else t.get("fill", ""),
+                "fill": "#ffd23f" if n["role"] == "cta" else "",
+            }
+        )
+    return out
+
+
+def _vision_reply(layers):
+    g = lambda b: [
+        b[0] / 1.28,
+        b[1] / 0.72,
+        (b[0] + b[2]) / 1.28,
+        (b[1] + b[3]) / 0.72,
+    ]  # noqa: E731
+    return {"language": "en", "layers": [{**l, "box": g(l["box"])} for l in layers]}
+
+
+def _crops(layers):
+    return {
+        l["role"]: png_url(round(l["box"][2]), round(l["box"][3]))
+        for l in layers
+        if l["role"] in ("brand_mark", "product_image")
+    }
+
+
+def _upload(c, wid, image=None):
+    return c.post(
+        f"/api/campaign/workspaces/{wid}/uploads", json={"image": image or png_url(1280, 720)}
+    )
+
+
+def _confirm(c, wid, uid, layers, **over):
+    body = {
+        "layers": layers,
+        "background": SHORT_A_BG,
+        "locale": "en",
+        "link": "https://halden.example/h7-sale",
+        "crops": _crops(layers),
+    } | over
+    return c.post(f"/api/campaign/workspaces/{wid}/uploads/{uid}/confirm", json=body)
+
+
+def test_without_a_vision_model_an_upload_gets_the_manual_template(client):
+    wid = _workspace(client)["workspace_id"]
+    client.app.state.vision_provider = None
+    r = _upload(client, wid)
+    assert r.status_code == 200, r.text
+    out = r.json()
+    assert (
+        out["origin"] == "manual"
+        and out["note"]
+        and len(out["layers"]) == 6
+        and len(out["upload_id"]) == 12
+    )
+    assert {l["role"] for l in out["layers"]} == {
+        "brand_mark",
+        "product_image",
+        "headline",
+        "price",
+        "cta",
+        "legal",
+    }
+    assert _engine_sessions(client) == 0
+
+
+@pytest.mark.parametrize(
+    "image,needle",
+    [
+        (png_url(640, 360), "1280"),
+        (png_url(1280, 800), "1280"),
+        ("data:image/svg+xml;base64,PHN2Zz48L3N2Zz4=", "PNG or JPEG"),
+        ("not an image", "data URL"),
+    ],
+)
+def test_an_upload_must_be_a_1280_by_720_png_or_jpeg(client, image, needle):
+    wid = _workspace(client)["workspace_id"]
+    r = _upload(client, wid, image)
+    assert r.status_code == 422 and needle in r.json()["detail"]
+
+
+def test_the_model_reads_the_banner_and_the_owner_confirms_it_into_a_story_card(client):
+    layers = _gold_layers()
+    client.app.state.vision_provider = MockProvider({"campaign_vision": [_vision_reply(layers)]})
+    wid = _workspace(client)["workspace_id"]
+    up = _upload(client, wid, jpeg_url(1280, 720)).json()
+    assert up["origin"] == "model" and up["problems"] == [] and up["model"]
+    user = client.app.state.vision_provider.calls[0][1][-1].content
+    assert user[-1]["type"] == "image_url"  # the image really went to the model
+    got = _confirm(client, wid, up["upload_id"], up["layers"])
+    assert got.status_code == 200, got.text
+    banner = got.json()
+    assert banner["banner_id"] == f"u-{up['upload_id']}" and banner["png"].startswith(
+        "data:image/png"
+    )
+    assert (
+        client.app.state.campaign[wid].uploads == {}
+    ), "the original image is dropped once confirmed"
+    run = client.post(
+        f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": banner["banner_id"]}
+    ).json()
+    assert run["status"] == "ready", run
+    assert run["provenance"]["source"] == "upload" and run["locale"] == "en"
+    names = [c["name"] for c in run["result"]["verification"]["checks"]]
+    assert (
+        run["result"]["verification"]["passed"]
+        and "image_aspect" in names
+        and "matches_gold" not in names
+    )
+    assert _engine_sessions(client) == 0
+
+
+def test_a_long_german_headline_on_an_uploaded_banner_asks_and_the_answer_is_kept_per_language(
+    client,
+):
+    long_head = "Bring die Stadt endlich zum Schweigen – mit aktiver Geräuschunterdrückung der nächsten Generation."
+    layers = _gold_layers(
+        headline=long_head,
+        price="Jetzt 179 € (statt 249 €)",
+        cta="Jetzt kaufen",
+        legal="Angebot gültig bis 31.10.2026.",
+    )
+    client.app.state.vision_provider = MockProvider({"campaign_vision": [_vision_reply(layers)]})
+    wid = _workspace(client)["workspace_id"]
+    up = _upload(client, wid).json()
+    banner = _confirm(client, wid, up["upload_id"], up["layers"], locale="de").json()
+    run = client.post(
+        f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": banner["banner_id"]}
+    ).json()
+    assert run["status"] == "question" and {p["outcome"] for p in run["previews"]} == {
+        "builtin_shrink_hero",
+        "builtin_split_two_cards",
+    }
+    done = client.post(
+        f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/answer",
+        json={"choice": "builtin_split_two_cards"},
+    ).json()
+    assert (
+        done["status"] == "applied" and done["preference"]["outcome"] == "builtin_split_two_cards"
+    )
+    assert done["result"]["verification"]["passed"], done["result"]["verification"]["failed"]
+    scopes = {
+        s["locale"]: s
+        for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]
+    }
+    assert scopes["de"]["active"]["outcome"] == "builtin_split_two_cards"
+
+
+def test_confirm_refuses_bad_layers_bad_crops_and_unknown_uploads_with_reasons(client):
+    layers = _gold_layers()
+    client.app.state.vision_provider = MockProvider({"campaign_vision": [_vision_reply(layers)]})
+    wid = _workspace(client)["workspace_id"]
+    up = _upload(client, wid).json()
+    uid = up["upload_id"]
+    bad = _gold_layers(price="Free shipping")
+    r = _confirm(client, wid, uid, bad)
+    assert r.status_code == 422 and "price" in r.json()["detail"]
+    r = _confirm(
+        client,
+        wid,
+        uid,
+        up["layers"],
+        crops={**_crops(up["layers"]), "brand_mark": png_url(10, 10)},
+    )
+    assert r.status_code == 422 and "brand mark" in r.json()["detail"]
+    r = _confirm(client, wid, uid, up["layers"], crops={"brand_mark": png_url(192, 48)})
+    assert r.status_code == 422 and "crop" in r.json()["detail"]
+    r = _confirm(client, wid, uid, up["layers"], link="javascript:alert(1)")
+    assert r.status_code == 422 and "https" in r.json()["detail"]
+    assert _confirm(client, wid, "0" * 12, up["layers"]).status_code == 404
+    assert client.app.state.campaign[
+        wid
+    ].uploads, "a refused confirm keeps the upload so the owner can fix it"
+    assert _engine_sessions(client) == 0
+
+
+def test_a_workspace_holds_four_banners_at_most_and_runs_wait_for_the_question(client):
+    layers = _gold_layers()
+    client.app.state.vision_provider = None
+    wid = _workspace(client)["workspace_id"]
+    for _ in range(4):
+        up = _upload(client, wid).json()
+        assert _confirm(client, wid, up["upload_id"], layers).status_code == 200
+    assert _upload(client, wid).status_code == 409
+    assert (
+        client.post(
+            f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": "u-ffffffffffff"}
+        ).status_code
+        == 404
+    )
+
+
+def test_the_per_address_vision_limit_falls_back_to_the_manual_template(client, monkeypatch):
+    from open_apprentice.api import campaign
+
+    monkeypatch.setattr(campaign, "VISION_REQUESTS_PER_HOUR", 1)
+    layers = _gold_layers()
+    client.app.state.vision_provider = MockProvider(
+        {"campaign_vision": [_vision_reply(layers), _vision_reply(layers)]}
+    )
+    client.app.state.rate.clear()
+    first = _upload(client, _workspace(client)["workspace_id"]).json()
+    second = _upload(client, _workspace(client)["workspace_id"]).json()
+    assert (
+        first["origin"] == "model" and second["origin"] == "manual" and "per hour" in second["note"]
+    )
+
+
+def test_a_confirmed_banners_language_gets_its_own_preference_scope(client):
+    client.app.state.vision_provider = None
+    wid = _workspace(client)["workspace_id"]
+    up = _upload(client, wid).json()
+    assert _confirm(client, wid, up["upload_id"], _gold_layers(), locale="es").status_code == 200
+    scopes = [
+        s["locale"]
+        for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]
+    ]
+    assert {"de", "en", "fr", "es"} <= set(scopes)

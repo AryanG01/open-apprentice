@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import re
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -20,6 +21,7 @@ from open_apprentice.api.v2.routes import client_key
 from open_apprentice.budget import Ledger, Limits
 from open_apprentice.campaign.explain import explain, overflow_facts
 from open_apprentice.campaign.model_procedures import write_procedure
+from open_apprentice.campaign.vision import Layer, build_scene, propose_layers
 from open_apprentice.campaign.roles import (
     apply_roles,
     opaque_ids,
@@ -28,6 +30,7 @@ from open_apprentice.campaign.roles import (
     role_candidates,
 )
 from open_apprentice.campaign.fixtures import FIXTURE_IDS, load_fixture
+from open_apprentice.campaign.imageinfo import ImageError, image_size
 from open_apprentice.campaign.layout_rule import evaluate_layout, objects_for_rule, wrap_learned
 from open_apprentice.campaign.learn import READINGS, Learned, describe, learn_layout, probe_banner
 from open_apprentice.campaign.preferences import PreferenceConflict, PreferenceStore, scope_key
@@ -54,7 +57,13 @@ _PNG_CACHE: dict[str, str] = {}  # fixture id -> rendered thumbnail, once per pr
 # Per workspace. A live call RESERVES max(max_tokens, NEBIUS_COMPLETION_CAP) tokens (32000 in production) before it is
 # reconciled to what it really used (< 1000 here), so the token limit must hold one floor-sized reservation; the spend
 # guards are the server-wide demo cap and the per-address model quota.
-WORKSPACE_MODEL_LIMITS = Limits(tokens=100_000, calls=8)
+WORKSPACE_MODEL_LIMITS = Limits(tokens=200_000, calls=14)
+MAX_UPLOADS = 4  # per workspace: open uploads and confirmed banners are each held in memory until the workspace expires
+UPLOAD_W, UPLOAD_H = 1280, 720
+VISION_REQUESTS_PER_HOUR = (
+    10  # per address: reading an image with Nemotron VL is the scarce, paid step of this lane
+)
+UPLOAD_ID = re.compile(r"u-[0-9a-f]{12}")
 
 
 @dataclass
@@ -80,6 +89,12 @@ class Workspace:
     teaching: dict = field(
         default_factory=dict
     )  # before/after thumbnails, returned again after the answer
+    uploads: dict[str, dict] = field(
+        default_factory=dict
+    )  # upload id -> {image}: the owner's image, until confirmed
+    banners: dict[str, dict] = field(
+        default_factory=dict
+    )  # "u-<id>" -> {scene, locale, png}: confirmed uploaded banners
 
 
 def _workspaces(request: Request) -> dict[str, Workspace]:
@@ -315,8 +330,9 @@ def _scope_out(prefs: PreferenceStore, locale: str) -> dict:
 @router.get("/workspaces/{wid}/preferences")
 async def preferences(request: Request, wid: str) -> dict:
     ws = _ws(request, wid)
+    locales = [*LOCALES, *sorted({b["locale"] for b in ws.banners.values()} - set(LOCALES))]
     return {
-        "scopes": await asyncio.to_thread(lambda: [_scope_out(ws.prefs, loc) for loc in LOCALES])
+        "scopes": await asyncio.to_thread(lambda: [_scope_out(ws.prefs, loc) for loc in locales])
     }
 
 
@@ -369,13 +385,18 @@ def _gold(fid: str, outcome: str) -> dict | None:
 def _verify(fid: str, outcome: str, native: dict, source: dict, reading: str = "fixed") -> dict:
     """`outcome` is "layout" or a built-in name. An untagged banner is judged against the gold of the banner it was
     derived from (same layers, same ids)."""
-    gold_fid = fid.removeprefix("untagged_")
-    report = verify_story(
-        source,
-        native,
-        _gold(gold_fid, GOLD_OUTCOME.get(outcome, outcome)),
-        gold_applies=reading == "fixed",
-    )
+    if UPLOAD_ID.fullmatch(
+        fid
+    ):  # the owner's banner: no authored expected output exists, so that comparison is left out
+        report = verify_story(source, native, None, gold_applies=False)
+    else:
+        gold_fid = fid.removeprefix("untagged_")
+        report = verify_story(
+            source,
+            native,
+            _gold(gold_fid, GOLD_OUTCOME.get(outcome, outcome)),
+            gold_applies=reading == "fixed",
+        )
     return {
         "passed": report.passed,
         "failed": report.failed(),
@@ -444,9 +465,16 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
         raise HTTPException(
             409, "answer the teaching question first: which reading of the example did you mean?"
         )
-    fixture = _banner(body.fixture_id)
+    uploaded = ws.banners.get(body.fixture_id)
+    if UPLOAD_ID.fullmatch(body.fixture_id) and uploaded is None:
+        raise HTTPException(404, "unknown or expired banner")
+    fixture = (
+        {"scene": uploaded["scene"], "locale": uploaded["locale"]}
+        if uploaded
+        else _banner(body.fixture_id)
+    )
     source = fixture["scene"]
-    roles_origin = "authored"
+    roles_origin = "owner" if uploaded else "authored"
     if body.fixture_id.startswith("untagged_"):
         if not body.roles:
             raise HTTPException(
@@ -470,6 +498,8 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
     def attempt(procedure) -> dict:
         run = start_run(source, fixture["locale"], ws.learned, open_session, ws.prefs, procedure)
         run.provenance["roles_origin"] = roles_origin
+        if uploaded:
+            run.provenance["source"] = "upload"
         run.provenance["reading"] = ws.learned.interpretation
         try:
             snapshots = {
@@ -523,6 +553,131 @@ async def start(request: Request, wid: str, body: RunIn) -> dict:
     return out
 
 
+class UploadIn(BaseModel):
+    image: str = Field(min_length=1, max_length=2_800_000)
+
+
+class ConfirmIn(BaseModel):
+    layers: list[Layer] = Field(max_length=12)
+    background: str = Field(pattern=r"^#[0-9a-fA-F]{6}$")
+    locale: str = Field(pattern=r"^[a-z]{2}$")
+    link: str | None = Field(default=None, max_length=500)
+    crops: dict[str, str] = Field(max_length=2)
+
+
+def _vision_quota(request: Request) -> bool:
+    client = client_key(request)
+    now, hits = time.time(), request.app.state.rate.setdefault((client, "campaign_vision"), [])
+    hits[:] = [t for t in hits if now - t < 3600]
+    if len(hits) >= VISION_REQUESTS_PER_HOUR:
+        return False
+    hits.append(now)
+    return True
+
+
+def _vision(request: Request, ws: Workspace):
+    """(provider, note): Nemotron VL when this server has one, this address has requests left and the demo budget allows it;
+    otherwise (None, why) and the owner places the boxes on the manual template."""
+    provider = getattr(request.app.state, "vision_provider", None)
+    if provider is None:
+        return None, "no vision model is configured on this server: place the boxes yourself"
+    try:
+        _require_model_budget(request, None if ws.counted_usd == 0 else ws)
+    except HTTPException as e:
+        return None, f"{e.detail}; place the boxes yourself"
+    if not _vision_quota(request):
+        return None, (
+            f"reading images with Nemotron is limited to {VISION_REQUESTS_PER_HOUR} per hour per address on this demo: "
+            "place the boxes yourself"
+        )
+    return provider, ""
+
+
+@router.post("/workspaces/{wid}/uploads")
+async def upload_banner(request: Request, wid: str, body: UploadIn) -> dict:
+    """Nemotron VL reads the owner's banner image and proposes its layers. Nothing it says is trusted: the reply is checked,
+    returned with its problems, and only the owner's confirmed layers ever become a banner."""
+    _rate_limit(request, "campaign")
+    ws = _ws(request, wid)
+    try:
+        kind, w, h = image_size(body.image)
+    except ImageError as e:
+        raise HTTPException(422, str(e)) from e
+    if (w, h) != (UPLOAD_W, UPLOAD_H):
+        raise HTTPException(
+            422, f"the banner must be {UPLOAD_W} x {UPLOAD_H} pixels (16:9); this one is {w} x {h}"
+        )
+    async with ws.lock:
+        if len(ws.uploads) + len(ws.banners) >= MAX_UPLOADS:
+            raise HTTPException(
+                409, f"a workspace holds {MAX_UPLOADS} banners at most; start a new one"
+            )
+        provider, note = _vision(request, ws)
+        try:
+            proposal = await propose_layers(provider, ws.ledger, body.image)
+        finally:
+            _account(request, ws)
+        if (
+            provider is None
+        ):  # say why this server (or this address, right now) did not read the image
+            proposal.note = note
+        uid = uuid.uuid4().hex[:12]
+        ws.uploads[uid] = {"image": body.image}
+    return {
+        "upload_id": uid,
+        "origin": proposal.origin,
+        "language": proposal.language,
+        "layers": [l.model_dump() for l in proposal.layers],
+        "problems": proposal.problems,
+        "note": proposal.note,
+        "model": (
+            getattr(provider, "requested_model", "")
+            if provider and proposal.origin == "model"
+            else ""
+        ),
+    }
+
+
+@router.post("/workspaces/{wid}/uploads/{uid}/confirm")
+async def confirm_banner(request: Request, wid: str, uid: str, body: ConfirmIn) -> dict:
+    """The owner's corrected layers and the two crops measured in their browser become an editable banner. The original
+    image is dropped once this succeeds; a refusal keeps it so the layers can be fixed and confirmed again.
+    """
+    _rate_limit(request, "campaign")
+    ws = _ws(request, wid)
+    if uid not in ws.uploads:
+        raise HTTPException(404, "unknown or expired upload")
+    harness = _harness(request)
+    by_role = {l.role: l for l in body.layers}
+    for role in ("brand_mark", "product_image"):
+        url, layer = body.crops.get(role), by_role.get(role)
+        name = role.replace("_", " ")
+        if url is None or layer is None:
+            raise HTTPException(422, f"the {name} crop is missing")
+        try:
+            kind, cw, ch = image_size(url, max_bytes=1_000_000)
+        except ImageError as e:
+            raise HTTPException(422, f"the {name} crop is not usable: {e}") from e
+        if kind != "png" or abs(cw - layer.box[2]) > 2 or abs(ch - layer.box[3]) > 2:
+            raise HTTPException(422, f"the {name} crop ({cw} x {ch}) does not match its box")
+    try:
+        scene = build_scene(
+            body.layers,
+            background=body.background,
+            crops=dict(body.crops),
+            uid=uid,
+            link=body.link,
+            locale=body.locale,
+        )
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+    png = await asyncio.to_thread(_render, harness, scene)
+    async with ws.lock:
+        ws.uploads.pop(uid, None)
+        ws.banners[f"u-{uid}"] = {"scene": scene, "locale": body.locale, "png": png}
+    return {"banner_id": f"u-{uid}", "locale": body.locale, "png": png}
+
+
 @router.post("/workspaces/{wid}/runs/{rid}/answer")
 async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> dict:
     ws = _ws(request, wid)
@@ -563,7 +718,7 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
 @router.post("/workspaces/{wid}/preferences/rollback")
 async def rollback(request: Request, wid: str, body: RollbackIn) -> dict:
     ws = _ws(request, wid)
-    if body.locale not in LOCALES:
+    if body.locale not in LOCALES and body.locale not in {b["locale"] for b in ws.banners.values()}:
         raise HTTPException(404, "unknown locale")
 
     def work() -> dict:

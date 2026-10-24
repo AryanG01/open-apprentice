@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from fontTools.ttLib import TTFont
+from pydantic import Field
 
 from open_apprentice.budget import Ledger
 from open_apprentice.campaign.imageinfo import ImageError, image_size
@@ -44,7 +45,7 @@ TEXT_ROLES = ("headline", "price", "legal", "cta")
 ASSET_ID = re.compile(r"u-[0-9a-f]{12}-(brand_mark|product_image)")
 UID = re.compile(r"[0-9a-f]{12}")
 HEX = re.compile(r"#[0-9a-fA-F]{6}")
-MAX_TEXT = {"headline": 200, "price": 80, "legal": 300, "cta": 40}
+MAX_TEXT = {"headline": 240, "price": 80, "legal": 600, "cta": 40}
 MIN_IMAGE_SIDE = 24
 MIN_CTA_W, MIN_CTA_H = 60, 24
 MAX_OVERLAP = 0.15  # an image box may share this fraction of its area with a text box before its crop would hold words
@@ -56,13 +57,13 @@ DEFAULT_PLATE = "#ffd23f"
 class Layer(StrictModel):
     """One layer as the owner edits it: a pixel box [x, y, w, h] on the 1280x720 banner."""
 
-    role: str
-    box: list[float]
-    text: str = ""
-    font_px: float = 0
+    role: str = Field(max_length=20)
+    box: list[float] = Field(min_length=4, max_length=4)
+    text: str = Field(default="", max_length=600)
+    font_px: float = Field(default=0, ge=0, le=1000)
     bold: bool = False
-    color: str = ""  # text colour; for the button, the label colour
-    fill: str = ""  # the button plate's colour (button only)
+    color: str = Field(default="", max_length=7)  # text colour; for the button, the label colour
+    fill: str = Field(default="", max_length=7)  # the button plate's colour (button only)
 
 
 class VisionLayer(StrictModel):
@@ -473,7 +474,18 @@ async def propose_layers(
         return LayerProposal(
             manual_template(), "en", "manual", note=res.error or "no reply", tokens=res.tokens
         )
-    proposal = from_vision(res.parsed)
+    try:
+        proposal = from_vision(res.parsed)
+    except (
+        ValueError
+    ) as e:  # a field outside the Layer bounds (e.g. a 5000-character "headline"): not a usable reading
+        return LayerProposal(
+            manual_template(),
+            "en",
+            "manual",
+            note=f"Nemotron's reading was not usable ({type(e).__name__})",
+            tokens=res.tokens,
+        )
     proposal.problems, proposal.tokens = check_layers(proposal.layers), res.tokens
     proposal.raw = res.parsed.model_dump()
     return proposal

@@ -7,6 +7,9 @@ geometry from raw node attrs, text fit from the font tables (`text_layout`). It 
 
 from __future__ import annotations
 
+import base64
+import re
+import struct
 from typing import Any
 
 from open_apprentice.campaign.limits import (
@@ -127,6 +130,28 @@ def _intersects(a: Box, b: Box) -> bool:
     return w > 0 and h > 0
 
 
+_UPLOAD_ID = re.compile(r"u-[0-9a-f]{12}-(brand_mark|product_image)")
+
+
+def uploaded_sizes(raw: dict | None) -> dict[str, dict]:
+    """Natural size of each uploaded crop, read from its PNG header here (not through the agent's or the engine's code).
+    Anything that is not a PNG data URL under an upload id is left out, so image_aspect fails for it."""
+    out: dict[str, dict] = {}
+    for aid, url in (raw or {}).items():
+        prefix = "data:image/png;base64,"
+        if not _UPLOAD_ID.fullmatch(aid) or not isinstance(url, str) or not url.startswith(prefix):
+            continue
+        try:
+            head = base64.b64decode(url[len(prefix) : len(prefix) + 64], validate=False)
+        except ValueError:
+            continue
+        if len(head) >= 24 and head[:8] == b"\x89PNG\r\n\x1a\n" and head[12:16] == b"IHDR":
+            w, h = struct.unpack(">II", head[16:24])
+            if w > 0 and h > 0:
+                out[aid] = {"width": w, "height": h}
+    return out
+
+
 def verify_story(
     source: dict, final_native: dict, gold: dict | None, *, gold_applies: bool = True
 ) -> VerifierReport:
@@ -144,6 +169,7 @@ def verify_story(
         for k, v in _manifest()["files"].items()
         if k.startswith("assets/")
     }
+    assets |= uploaded_sizes(source.get("assets"))
 
     want, got = _copy(src), _copy(fin)
     rep.add(
