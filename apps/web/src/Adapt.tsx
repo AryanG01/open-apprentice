@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, ORDER, hexOr, isImageRole } from "./LayerEditor";
+import { backgroundOf as backgroundInfo, snapBox } from "./snap";
+import type { Rgb } from "./snap";
 import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace } from "./types";
 
 const SAMPLES = ["short_a", "short_b"];
@@ -71,14 +73,6 @@ function colourAt(d: ImageData, pts: [number, number][]): string {
   return hex(median(ch[0]), median(ch[1]), median(ch[2]));
 }
 
-/** The flat background: the median colour along the four edges of the banner. */
-function backgroundOf(d: ImageData): string {
-  const pts: [number, number][] = [];
-  for (let x = 0; x < BANNER_W; x += 8) pts.push([x, 2], [x, BANNER_H - 3]);
-  for (let y = 0; y < BANNER_H; y += 8) pts.push([2, y], [BANNER_W - 3, y]);
-  return colourAt(d, pts);
-}
-
 /** The button plate: the median colour of a thin ring just inside its box. */
 function plateOf(d: ImageData, [x, y, w, h]: number[]): string {
   const pts: [number, number][] = [];
@@ -126,7 +120,10 @@ export function Adapt() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [over, setOver] = useState(false);
+  const [snapNote, setSnapNote] = useState("");
+  const [flat, setFlat] = useState(false);
   const imgEl = useRef<HTMLImageElement | null>(null);
+  const pix = useRef<{ d: ImageData; rgb: Rgb } | null>(null);
   const started = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
 
@@ -190,8 +187,15 @@ export function Adapt() {
         up = await post();
       }
       const d = pixelsOf(img);
-      const bg = backgroundOf(d);
-      const filled = up.layers.map((l) => {
+      const info = backgroundInfo(d);
+      const bg = hex(...info.rgb);
+      pix.current = { d, rgb: info.rgb };
+      // Nemotron's boxes are often too narrow or too loose; pixels are measured exactly, so on a flat background they are
+      // grown to the content and tightened to it (and the owner is told).
+      const snapped = up.origin === "model" && info.flat ? up.layers.map((l) => ({ ...l, box: snapBox(d, l.box, info.rgb).map(Math.round) })) : up.layers;
+      setFlat(info.flat);
+      setSnapNote(up.origin === "model" && info.flat ? "The boxes were snapped to what is in the image." : info.flat ? "" : "This banner's background is not a flat colour, so boxes are not snapped: place them yourself.");
+      const filled = snapped.map((l) => {
         const plate = l.role === "cta" ? hexOr(l.fill, plateOf(d, l.box)) : "";
         return { ...l, fill: plate, color: hexOr(l.color, readableOn(l.role === "cta" ? plate : bg)) };
       });
@@ -201,6 +205,13 @@ export function Adapt() {
       setBackground(bg);
       setLanguage(up.language || "en");
     });
+
+  const snapAll = () => {
+    const c = pix.current;
+    if (!c) return;
+    setLayers((ls) => ls.map((l) => ({ ...l, box: snapBox(c.d, l.box, c.rgb, { flat }).map(Math.round) })));
+    setSnapNote("The boxes were snapped to what is in the image.");
+  };
 
   const onFile = async (file: File | undefined) => {
     if (!file) return;
@@ -338,8 +349,12 @@ export function Adapt() {
               </ul>
             ) : null}
           </p>
+          {snapNote ? <p className="muted small">{snapNote}</p> : null}
           <LayerEditor image={image} layers={layers} onChange={setLayers} disabled={busy} />
           <div className="lextras">
+            <button type="button" className="btn" onClick={snapAll} disabled={busy || !flat} title={flat ? undefined : "Only works on a flat background"}>
+              Snap boxes to the content
+            </button>
             <label>
               Background colour
               <input type="color" value={hexOr(background, "#000000")} onChange={(e) => setBackground(e.target.value)} />

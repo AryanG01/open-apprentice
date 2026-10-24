@@ -46,6 +46,8 @@ jobs:
 
       - name: Web geometry and state helpers
         run: npm run test:geometry
+      - name: Banner snapping (pure pixel logic)
+        run: npm run test:snap
 
       - name: Python tests, including engine-backed integration tests
         run: OA_ENGINE_TESTS=1 uv run pytest -q tests
