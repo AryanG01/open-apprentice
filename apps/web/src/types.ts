@@ -486,3 +486,30 @@ export interface CampaignScope {
   active: { outcome: string; version: number } | null;
   history: { version: number; outcome: string; parent: number | null }[];
 }
+
+/** One layer of a banner as the editor holds it: a pixel box [x, y, w, h] on the 1280 x 720 image. */
+export interface AdaptLayer {
+  role: string;
+  box: number[];
+  text: string;
+  font_px: number;
+  bold: boolean;
+  color: string;
+  fill: string;
+}
+
+export interface AdaptUpload {
+  upload_id: string;
+  origin: "model" | "manual";
+  language: string;
+  layers: AdaptLayer[];
+  problems: string[];
+  note: string;
+  model: string;
+}
+
+export interface AdaptBanner {
+  banner_id: string;
+  locale: string;
+  png: string;
+}

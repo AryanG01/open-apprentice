@@ -8,6 +8,7 @@ import { SvgLane } from "./SvgLane";
 import { TryIt } from "./TryIt";
 import { Apprentice } from "./v2/Apprentice";
 import type { Demo, Evidence, Step } from "./types";
+import { Adapt } from "./Adapt";
 
 type Mode = "Home" | "Learn" | "Reuse" | "Transfer" | "Challenge" | "Compare" | "Try it live" | "Real SVG" | "Campaign";
 const MODES: Mode[] = ["Home", "Learn", "Reuse", "Transfer", "Challenge", "Compare", "Try it live", "Real SVG", "Campaign"];
@@ -336,11 +337,14 @@ function Prototype() {
 }
 
 
-type Area = "apprentice" | "prototype";
+type Area = "adapt" | "apprentice" | "prototype";
 
-const areaFromHash = (): Area => (window.location.hash === "" || window.location.hash.startsWith("#apprentice") ? "apprentice" : "prototype");
+const areaFromHash = (): Area => {
+  const h = window.location.hash;
+  return h === "" || h.startsWith("#adapt") ? "adapt" : h.startsWith("#apprentice") ? "apprentice" : "prototype";
+};
 
-/** The new teach → correct → reuse flow is the product; the badge demo stays, unchanged, under "Earlier prototype". */
+/** "Adapt a banner" is the front door; the diagram skill and the earlier prototype stay one click away. */
 export function App() {
   const [area, setArea] = useState<Area>(areaFromHash());
   useEffect(() => {
@@ -349,7 +353,7 @@ export function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
   const pick = (a: Area) => {
-    window.location.hash = a === "apprentice" ? "apprentice" : "home";
+    window.location.hash = a === "adapt" ? "adapt" : a === "apprentice" ? "apprentice" : "home";
     setArea(a);
   };
   return (
@@ -367,7 +371,7 @@ export function App() {
           }
         }}
       >
-        {area === "apprentice" ? "Skip to the content" : "Skip to the canvas"}
+        {area === "prototype" ? "Skip to the canvas" : "Skip to the content"}
       </a>
       <header className="shell">
         <div className="mark">
@@ -378,11 +382,16 @@ export function App() {
           </svg>
           <div>
             <p className="name">Open Apprentice</p>
-            <p className="tagline">Show it once. It asks when unsure, then fixes every diagram and proves each edit.</p>
+            <p className="tagline">{area === "apprentice" ? "Show it once. It asks when unsure, then fixes every diagram and proves each edit." : "Bring a banner. It rebuilds it as editable layers, asks before it guesses and checks every result."}</p>
           </div>
         </div>
         <nav aria-label="Areas" className="areas">
           <ul className="tabs" role="tablist">
+            <li>
+              <button role="tab" aria-selected={area === "adapt"} className={area === "adapt" ? "tab on" : "tab"} onClick={() => pick("adapt")}>
+                Adapt a banner
+              </button>
+            </li>
             <li>
               <button role="tab" aria-selected={area === "apprentice"} className={area === "apprentice" ? "tab on" : "tab"} onClick={() => pick("apprentice")}>
                 Diagrams
@@ -396,7 +405,7 @@ export function App() {
           </ul>
         </nav>
       </header>
-      {area === "apprentice" ? <Apprentice /> : <Prototype />}
+      {area === "adapt" ? <Adapt /> : area === "apprentice" ? <Apprentice /> : <Prototype />}
     </>
   );
 }

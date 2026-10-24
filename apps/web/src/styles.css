@@ -586,3 +586,43 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .reading-grid img { width: 100%; max-height: 420px; object-fit: contain; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
 .reading-grid figcaption { font-size: 0.85rem; margin: 6px 0; }
 @media (max-width: 720px) { .reading-grid { grid-template-columns: 1fr 1fr; } .reading-grid figure:first-child { grid-column: 1 / -1; } }
+
+/* Adapt a banner */
+.adapt .who { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 12px 0; padding: 0; counter-reset: who; font-size: 0.9rem; }
+.adapt .who li { counter-increment: who; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+.adapt .who li::before { content: counter(who) ". "; color: var(--muted, #667); }
+.adapt .status { min-height: 1.4em; margin: 4px 0; }
+.adapt .drop { border: 2px dashed var(--line); border-radius: var(--radius); padding: 18px; margin: 12px 0; }
+.adapt .drop.over { border-color: var(--ok, #2a7a3a); background: var(--ok-soft); }
+.adapt .filebtn { position: relative; display: inline-block; cursor: pointer; }
+.adapt .filebtn input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.adapt .filebtn:focus-within { outline: 3px solid var(--focus, #2a6df4); outline-offset: 2px; }
+.adapt .samples-row { margin-top: 14px; }
+.editor { margin: 10px 0; }
+.lstage { position: relative; width: 100%; max-width: 1000px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #000; user-select: none; touch-action: none; }
+.lstage img { width: 100%; height: 100%; display: block; }
+.lbox { position: absolute; border: 2px solid #ffd23f; background: rgba(255, 210, 63, 0.12); cursor: move; box-sizing: border-box; touch-action: none; }
+.lbox.on { border-color: #19e0a0; background: rgba(25, 224, 160, 0.18); z-index: 2; }
+.lbox:focus-visible { outline: 3px solid #2a6df4; outline-offset: 1px; }
+.ltag { position: absolute; left: -2px; top: -22px; background: #111; color: #fff; font-size: 12px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; pointer-events: none; }
+.lhandle { position: absolute; right: -7px; bottom: -7px; width: 14px; height: 14px; background: #19e0a0; border: 2px solid #111; border-radius: 3px; cursor: nwse-resize; touch-action: none; }
+.lfields { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; margin: 12px 0; }
+.lrow { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px 12px; background: var(--surface); }
+.lrow.on { border-color: #19e0a0; }
+.lrow.missing { border-style: dashed; }
+.lrow label { display: block; font-size: 0.85rem; margin-top: 6px; }
+.lrow textarea, .lrow input[type="text"] { width: 100%; box-sizing: border-box; }
+.lnums { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; }
+.lnums input[type="number"] { width: 5.2rem; }
+.lnums label.inline { display: flex; gap: 4px; align-items: center; margin-bottom: 4px; }
+.lextras { display: flex; flex-wrap: wrap; gap: 16px; margin: 8px 0 12px; }
+.lextras label { font-size: 0.9rem; display: flex; flex-direction: column; gap: 2px; }
+.trio { display: flex; gap: 10px; align-items: center; margin: 12px 0; }
+.trio figure { flex: 1; margin: 0; min-width: 0; }
+.trio figure img, .trio .placeholder { width: 100%; max-height: 420px; object-fit: contain; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+.trio figure:last-child { flex: 0.62; }
+.trio .arrow { font-size: 1.6rem; color: var(--muted, #667); }
+.trio .pending { opacity: 0.7; }
+.limits { margin-top: 24px; font-size: 0.92rem; }
+.adapt .previews { display: flex; gap: 14px; flex-wrap: wrap; margin: 10px 0; }
+@media (max-width: 720px) { .trio { flex-direction: column; } .trio .arrow { transform: rotate(90deg); } .trio figure:last-child { flex: 1; } }

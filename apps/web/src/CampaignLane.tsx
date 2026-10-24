@@ -9,9 +9,9 @@ const OUTCOME_LABEL: Record<string, string> = {
   builtin_shrink_hero: "Shrink the product image",
   builtin_split_two_cards: "Split across two cards",
 };
-const outcomeLabel = (o: string): string => OUTCOME_LABEL[o] ?? o;
+export const outcomeLabel = (o: string): string => OUTCOME_LABEL[o] ?? o;
 
-async function call<T>(path: string, body?: object): Promise<T> {
+export async function call<T>(path: string, body?: object): Promise<T> {
   const res = await fetch(path, { method: body ? "POST" : "GET", headers: body ? { "Content-Type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined });
   if (!res.ok) {
     let detail = `HTTP ${res.status}`;
@@ -27,7 +27,7 @@ async function call<T>(path: string, body?: object): Promise<T> {
   return (await res.json()) as T;
 }
 
-function PreviewCard({ p, busy, onPick }: { p: CampaignPreview; busy: boolean; onPick: (o: string) => void }) {
+export function PreviewCard({ p, busy, onPick }: { p: CampaignPreview; busy: boolean; onPick: (o: string) => void }) {
   return (
     <figure className={p.fits ? "preview" : "preview nofit"}>
       <img src={p.png} alt={`${outcomeLabel(p.outcome)} preview`} />
