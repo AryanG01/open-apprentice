@@ -35,7 +35,7 @@ export function backgroundOf(p: Pixels): { rgb: Rgb; flat: boolean } {
 }
 
 /** Grow `box` ([x, y, w, h] in pixels) to the content it sits on, then tighten it. */
-export function snapBox(p: Pixels, box: number[], bg: Rgb, opts: { flat?: boolean } = {}): number[] {
+export function snapBox(p: Pixels, box: number[], bg: Rgb, opts: { flat?: boolean; maxGrow?: number } = {}): number[] {
   const original = [...box];
   if (opts.flat === false || box.length !== 4) return original;
   const [bx, by, bw, bh] = box;
@@ -44,6 +44,8 @@ export function snapBox(p: Pixels, box: number[], bg: Rgb, opts: { flat?: boolea
   let R = clamp(Math.round(bx + bw), L + 1, p.width); // exclusive
   let B = clamp(Math.round(by + bh), T + 1, p.height);
   const w0 = R - L, h0 = B - T;
+  const grow = opts.maxGrow ?? Infinity; // images: the model is mostly right about them, so they may only grow a little
+  const minL = Math.max(0, L - grow), minT = Math.max(0, T - grow), maxR = Math.min(p.width, R + grow), maxB = Math.min(p.height, B + grow);
   const gap = clamp(Math.round(0.5 * h0), 8, 24);
   const ink = (x: number, y: number): boolean => d2(px(p, x, y), bg) > INK_DIST2;
   const rowInk = (y: number, a: number, b: number): boolean => {
@@ -57,10 +59,10 @@ export function snapBox(p: Pixels, box: number[], bg: Rgb, opts: { flat?: boolea
 
   for (let guard = 0, changed = true; changed && guard < 4000; guard++) {
     changed = false;
-    for (let k = 1; k <= gap && T - k >= 0; k++) if (rowInk(T - k, L, R)) { T -= k; changed = true; break; }
-    for (let k = 0; k < gap && B + k < p.height; k++) if (rowInk(B + k, L, R)) { B += k + 1; changed = true; break; }
-    for (let k = 1; k <= gap && L - k >= 0; k++) if (colInk(L - k, T, B)) { L -= k; changed = true; break; }
-    for (let k = 0; k < gap && R + k < p.width; k++) if (colInk(R + k, T, B)) { R += k + 1; changed = true; break; }
+    for (let k = 1; k <= gap && T - k >= minT; k++) if (rowInk(T - k, L, R)) { T -= k; changed = true; break; }
+    for (let k = 0; k < gap && B + k < maxB; k++) if (rowInk(B + k, L, R)) { B += k + 1; changed = true; break; }
+    for (let k = 1; k <= gap && L - k >= minL; k++) if (colInk(L - k, T, B)) { L -= k; changed = true; break; }
+    for (let k = 0; k < gap && R + k < maxR; k++) if (colInk(R + k, T, B)) { R += k + 1; changed = true; break; }
     if (R - L > 3 * w0 + 80 || B - T > 3 * h0 + 60) return original; // it is leaking into something that is not this layer
   }
 
@@ -77,4 +79,25 @@ export function snapBox(p: Pixels, box: number[], bg: Rgb, opts: { flat?: boolea
   if (x1 < x0 || y1 < y0) return original; // no content here
   const sx = Math.max(0, x0 - PAD), sy = Math.max(0, y0 - PAD);
   return [sx, sy, Math.min(p.width, x1 + 1 + PAD) - sx, Math.min(p.height, y1 + 1 + PAD) - sy];
+}
+
+const NAME: Record<string, string> = { brand_mark: "Logo", product_image: "Product image", headline: "headline", price: "price", cta: "button", legal: "small print" };
+const MAX_IMAGE_SHARE = 0.15; // mirrors campaign/vision.py: the server applies the same rule when the layers are confirmed
+const MAX_TEXT_SHARE = 0.2;
+
+/** Image boxes whose crop would hold words: by the image's share of the overlap, or by the text box's share. */
+export function imageTextOverlaps(layers: { role: string; box: number[] }[]): string[] {
+  const out: string[] = [];
+  const area = (b: number[]): number => b[2] * b[3];
+  for (const img of layers.filter((l) => l.role === "brand_mark" || l.role === "product_image")) {
+    for (const t of layers.filter((l) => ["headline", "price", "cta", "legal"].includes(l.role))) {
+      const w = Math.min(img.box[0] + img.box[2], t.box[0] + t.box[2]) - Math.max(img.box[0], t.box[0]);
+      const h = Math.min(img.box[1] + img.box[3], t.box[1] + t.box[3]) - Math.max(img.box[1], t.box[1]);
+      const shared = w > 0 && h > 0 ? w * h : 0;
+      if (shared > 0 && (shared / area(img.box) > MAX_IMAGE_SHARE || shared / area(t.box) > MAX_TEXT_SHARE)) {
+        out.push(`${NAME[img.role]} box overlaps the ${NAME[t.role]} text: its crop would contain words`);
+      }
+    }
+  }
+  return out;
 }

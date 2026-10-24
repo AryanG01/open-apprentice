@@ -62,3 +62,24 @@ test("growth is capped: ink that fills the canvas does not swallow the box", () 
   rect(p, 100, 100, 40, 20, BG); // a hole in the middle, so the box sits on background
   assert.deepEqual(snapBox(p, [105, 105, 20, 10], BG), [105, 105, 20, 10]);
 });
+
+test("an image box may only grow a little: maxGrow stops it following ink far beyond what the model drew", () => {
+  const p = canvas();
+  rect(p, 100, 50, 160, 60); // a wide object
+  const free = snapBox(p, [100, 50, 40, 60], BG);
+  const capped = snapBox(p, [100, 50, 40, 60], BG, { maxGrow: 12 });
+  assert.ok(free[2] >= 160, String(free));
+  assert.ok(capped[2] <= 40 + 12 + 6 && capped[2] < free[2], String(capped));
+});
+
+test("overlap problems name an image box that holds a text box, by either share", async () => {
+  const { imageTextOverlaps } = await import("../../apps/web/src/snap.ts");
+  const L = (role: string, box: number[]) => ({ role, box });
+  const clean = [L("brand_mark", [60, 40, 190, 50]), L("product_image", [80, 150, 480, 480]), L("headline", [640, 160, 576, 170]), L("price", [640, 350, 576, 50]), L("cta", [640, 430, 256, 76]), L("legal", [640, 560, 576, 80])];
+  assert.deepEqual(imageTextOverlaps(clean), []);
+  const swallow = clean.map((l) => (l.role === "product_image" ? L("product_image", [80, 150, 680, 480]) : l)); // reaches 120 px into the headline
+  const got = imageTextOverlaps(swallow);
+  assert.ok(got.some((m: string) => /Product image box overlaps the headline/.test(m)), String(got));
+  const touch = clean.map((l) => (l.role === "product_image" ? L("product_image", [80, 150, 570, 480]) : l)); // 10 px: tolerated
+  assert.deepEqual(imageTextOverlaps(touch), []);
+});

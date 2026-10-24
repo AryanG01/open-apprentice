@@ -21,6 +21,9 @@ For every layer give:
 
 Also give "language": the two-letter code of the text language (for example "en", "de", "fr").
 
+A picture layer (logo, product_image) must not contain any of the text layers: draw its box around the picture only. Boxes of
+different layers do not overlap, except the button's words, which sit inside the button.
+
 If a role is not in the banner, leave it out. Do not guess one. Ignore decorative shapes, stickers, badges and
 background photos: they are not layers.
 

@@ -49,6 +49,7 @@ MAX_TEXT = {"headline": 240, "price": 80, "legal": 600, "cta": 40}
 MIN_IMAGE_SIDE = 24
 MIN_CTA_W, MIN_CTA_H = 60, 24
 MAX_OVERLAP = 0.15  # an image box may share this fraction of its area with a text box before its crop would hold words
+MAX_TEXT_COVERED = 0.2  # ...or this fraction of the text box's area lies inside the image box
 MIN_CONTRAST = 3.0  # WCAG ratio for large text
 LINE_HEIGHT = {"headline": 1.1, "price": 1.1, "legal": 1.3, "cta": 1.1}
 DEFAULT_PLATE = "#ffd23f"
@@ -247,11 +248,12 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
         img = one[ir]
         area = img.box[2] * img.box[3] if len(img.box) == 4 else 0
         for tr in TEXT_ROLES:
-            if (
-                area > 0
-                and len(one[tr].box) == 4
-                and _overlap(img.box, one[tr].box) / area > MAX_OVERLAP
-            ):
+            if area <= 0 or len(one[tr].box) != 4:
+                continue
+            shared = _overlap(img.box, one[tr].box)
+            text_area = one[tr].box[2] * one[tr].box[3]
+            # by the image's share, or by the words' share: a small slice of a big image can still hold a third of a headline
+            if shared / area > MAX_OVERLAP or (text_area > 0 and shared / text_area > MAX_TEXT_COVERED):
                 problems.append(
                     f"{label[ir]} box overlaps the {label[tr]} text: its crop would contain words"
                 )

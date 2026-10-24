@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, ORDER, hexOr, isImageRole } from "./LayerEditor";
-import { backgroundOf as backgroundInfo, snapBox } from "./snap";
+import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
 import type { Rgb } from "./snap";
 import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace } from "./types";
 
@@ -101,6 +101,34 @@ function cropPng(img: HTMLImageElement, [x, y, w, h]: number[]): string {
   return c.toDataURL("image/png");
 }
 
+/** Text boxes may grow to the words; image boxes only a little (the model is mostly right about them). */
+function snapLayer(d: ImageData, l: AdaptLayer, rgb: Rgb, flat: boolean): AdaptLayer {
+  const box = snapBox(d, l.box, rgb, { flat, maxGrow: isImageRole(l.role) ? 14 : undefined }).map(Math.round);
+  return { ...l, box };
+}
+
+/** What each image layer will cut out of the banner, so a crop that holds words is obvious before confirming. */
+function CropPreview({ img, layers }: { img: HTMLImageElement | null; layers: AdaptLayer[] }) {
+  const crops = useMemo(
+    () => (img ? layers.filter((l) => isImageRole(l.role) && l.box.length === 4 && l.box[2] > 0 && l.box[3] > 0).map((l) => ({ role: l.role, url: cropPng(img, l.box) })) : []),
+    [img, layers],
+  );
+  if (!crops.length) return null;
+  return (
+    <div className="crops" aria-label="What will be cut out as pictures">
+      <p className="muted small">These two parts are cut out as pictures. Everything else is rebuilt as editable text and shapes, so a picture should not contain any words.</p>
+      <div className="cropthumbs">
+        {crops.map((c) => (
+          <figure key={c.role}>
+            <img src={c.url} alt={`${LABEL[c.role]} crop`} />
+            <figcaption>{LABEL[c.role]}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------- the page
 type Banners = { original: string; rebuilt: string };
 
@@ -128,6 +156,7 @@ export function Adapt() {
   const heading = useRef<HTMLHeadingElement>(null);
 
   const step = run ? 3 : upload ? 2 : 1;
+  const overlaps = useMemo(() => imageTextOverlaps(layers), [layers]);
   useEffect(() => {
     heading.current?.focus();
   }, [step, run?.status]);
@@ -192,7 +221,7 @@ export function Adapt() {
       pix.current = { d, rgb: info.rgb };
       // Nemotron's boxes are often too narrow or too loose; pixels are measured exactly, so on a flat background they are
       // grown to the content and tightened to it (and the owner is told).
-      const snapped = up.origin === "model" && info.flat ? up.layers.map((l) => ({ ...l, box: snapBox(d, l.box, info.rgb).map(Math.round) })) : up.layers;
+      const snapped = up.origin === "model" && info.flat ? up.layers.map((l) => snapLayer(d, l, info.rgb, true)) : up.layers;
       setFlat(info.flat);
       setSnapNote(up.origin === "model" && info.flat ? "The boxes were snapped to what is in the image." : info.flat ? "" : "This banner's background is not a flat colour, so boxes are not snapped: place them yourself.");
       const filled = snapped.map((l) => {
@@ -209,7 +238,7 @@ export function Adapt() {
   const snapAll = () => {
     const c = pix.current;
     if (!c) return;
-    setLayers((ls) => ls.map((l) => ({ ...l, box: snapBox(c.d, l.box, c.rgb, { flat }).map(Math.round) })));
+    setLayers((ls) => ls.map((l) => snapLayer(c.d, l, c.rgb, flat)));
     setSnapNote("The boxes were snapped to what is in the image.");
   };
 
@@ -350,7 +379,18 @@ export function Adapt() {
             ) : null}
           </p>
           {snapNote ? <p className="muted small">{snapNote}</p> : null}
+          {overlaps.length ? (
+            <div className="callout bad" role="alert">
+              <strong>Fix before continuing:</strong>
+              <ul>
+                {overlaps.map((m) => (
+                  <li key={m}>{m}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <LayerEditor image={image} layers={layers} onChange={setLayers} disabled={busy} />
+          <CropPreview img={imgEl.current} layers={layers} />
           <div className="lextras">
             <button type="button" className="btn" onClick={snapAll} disabled={busy || !flat} title={flat ? undefined : "Only works on a flat background"}>
               Snap boxes to the content

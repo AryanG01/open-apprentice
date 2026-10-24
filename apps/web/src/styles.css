@@ -630,3 +630,8 @@ ul.pairs button { border: 1px solid var(--line); background: var(--surface); col
 .adapt .samplebtn { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding: 8px; max-width: 240px; }
 .adapt .samplebtn .thumb { width: 220px; height: auto; border-radius: 6px; border: 1px solid var(--line); }
 .lextras .btn { align-self: flex-end; }
+.crops { margin: 10px 0; }
+.cropthumbs { display: flex; gap: 14px; align-items: flex-end; }
+.cropthumbs figure { margin: 0; }
+.cropthumbs img { max-height: 130px; max-width: 260px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); display: block; }
+.cropthumbs figcaption { font-size: 0.8rem; color: var(--muted, #667); }

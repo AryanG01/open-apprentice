@@ -37,3 +37,15 @@ Run 1 (`campaign_vision_dev_run1.md`): decision **partial** as first scored. Two
 Run 2 changes only the vision token cap (4,000 to 8,000). Same model, prompt, banners, rule and cap. Both runs are
 reported. A **post hoc** column (share of a text box lying inside its authored frame) is added because the model draws boxes
 tight around the visible words while the authored frames are generous; it is not part of the registered decision.
+
+## Addendum 2, written before probe run 3 (2026-10-25)
+Live use of the built app showed one failure the probe could not: a product-image box that reached into the headline, so the
+picture crop held the first words. Changes made because of it (all outside the probe's scoring):
+- the server's overlap rule now also fires when more than 20% of a *text* box lies inside an image box;
+- the browser snaps boxes to the content on flat backgrounds (images may grow at most 14 px) and shows the two crops;
+- `prompts/campaign_vision.md` gains two sentences: a picture box must not contain words, and boxes must not overlap
+  (except the button's words inside the button).
+
+Run 3 re-runs the six development banners with that prompt (same model, rule and cap). If it is not worse than run 2 on the
+registered rule, the prompt is **frozen** for the held-out evaluation (Part B); if it is worse, the run 2 prompt is restored
+and frozen instead. Whatever happens, all three runs are reported.

@@ -303,3 +303,16 @@ def test_a_real_length_legal_line_is_fine_and_an_oversized_model_reply_falls_bac
     }
     p = _propose(_scripted(reply))
     assert p.origin == "manual" and "usable" in p.note
+
+
+def test_an_image_box_that_swallows_most_of_a_text_box_is_refused_even_when_it_is_a_small_part_of_the_image():
+    """Seen live: the product box (a wide, tall region) covered the first letters of the headline. Judged by the image's share
+    that is only ~8%, but a third of the headline's words would be inside the crop."""
+    ls = edit(layers_from(), "product_image", box=[80, 152, 640 - 80 + 120, 496])  # reaches 120 px into the headline box
+    head = next(l for l in ls if l.role == "headline")
+    overlap = 120 * 176  # the headline frame is 576 x 176
+    assert overlap / (head.box[2] * head.box[3]) > 0.2 and overlap / (ls[1].box[2] * ls[1].box[3]) < 0.15
+    assert any("overlaps" in p for p in check_layers(ls, BG))
+    # a touch of overlap (a few pixels of a loose box) is tolerated
+    ok = edit(layers_from(), "product_image", box=[80, 152, 640 - 80 + 10, 496])
+    assert not any("overlaps" in p for p in check_layers(ok, BG))
