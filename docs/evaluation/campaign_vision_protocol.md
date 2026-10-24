@@ -26,3 +26,14 @@ layers (role, box, words, size, colour) well enough that the owner only needs to
 Six banners from one author and one brand style, rendered by our own engine in Liberation Sans on flat colours: this tests
 the plumbing and the model's basic reading, not real-world banners. It says nothing about photographic backgrounds, other
 fonts, or other designers' layouts.
+
+## Addendum, written after run 1 and before run 2 (2026-10-24)
+Run 1 (`campaign_vision_dev_run1.md`): decision **partial** as first scored. Two things were found afterwards:
+1. **A scoring bug:** the fixtures are not all 1280x720 (three are 1600x900, one 1920x1080) and run 1 compared the model's
+   boxes with the authored boxes as if they were. Fixed (boxes are compared in the banner's own frame); the stored replies
+   were re-scored with no new call. The registered rule is unchanged and still gives **partial** (median text-layer IoU 0.46).
+2. **One banner's reply was cut off twice** at the 4,000-token cap and fell back to the manual template.
+
+Run 2 changes only the vision token cap (4,000 to 8,000). Same model, prompt, banners, rule and cap. Both runs are
+reported. A **post hoc** column (share of a text box lying inside its authored frame) is added because the model draws boxes
+tight around the visible words while the authored frames are generous; it is not part of the registered decision.

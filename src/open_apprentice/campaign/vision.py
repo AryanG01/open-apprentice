@@ -466,7 +466,7 @@ async def propose_layers(
         prompt=PROMPT,
         payload={"task": "read this banner", "canvas": {"width": CANVAS_W, "height": CANVAS_H}},
         schema=VisionOut,
-        max_tokens=4000,
+        max_tokens=8000,  # a long headline made the reasoning model hit 4000 twice (probe run 1)
         image=data_url,
     )
     if res.parsed is None:

@@ -62,3 +62,48 @@ def test_the_decision_follows_the_rule_set_before_the_run():
     assert verdict(shifted)["decision"] == "partial"  # roles and words right, boxes wrong
     off = [score_case(_proposal_from(g, dx=400, text="x"), g)] * 6
     assert verdict(off)["decision"] == "no-go"
+
+
+def test_boxes_are_compared_in_the_banners_own_frame_not_assumed_1280_by_720():
+    from open_apprentice.evaluation.campaign_vision_eval import banner_frame
+
+    scene = load_fixture("short_b")["scene"]
+    w, h = banner_frame(scene)
+    assert (w, h) != (
+        1280,
+        720,
+    )  # this fixture is larger: the first probe scored it as if it were 1280x720
+    g = gold_layers(scene)
+    layers = [
+        Layer(
+            role=r,
+            box=[b * k for b, k in zip(v["box"], (1280 / w, 720 / h, 1280 / w, 720 / h))],
+            text=v["text"],
+            font_px=20,
+        )
+        for r, v in g.items()
+    ]  # what the model's boxes become after from_vision(): pixels of a 1280x720 banner
+    proposal = LayerProposal(layers, "en", "model")
+    assert score_case(proposal, g, frame=(w, h))["all_matched"]
+    assert not score_case(proposal, g)["all_matched"]  # the old assumption fails on purpose
+
+
+def test_a_tight_box_inside_a_generous_frame_is_reported_as_contained_not_as_a_match():
+    g = gold_layers(load_fixture("short_a")["scene"])
+    head = g["headline"]["box"]
+    tight = [
+        head[0],
+        head[1],
+        head[2] * 0.4,
+        head[3] * 0.3,
+    ]  # words that fill a corner of their frame
+    layers = [
+        Layer(role=r, box=list(v["box"]), text=v["text"], font_px=20)
+        for r, v in g.items()
+        if r != "headline"
+    ]
+    layers.append(Layer(role="headline", box=tight, text=g["headline"]["text"], font_px=20))
+    s = score_case(LayerProposal(layers, "en", "model"), g)
+    assert (
+        s["iou"]["headline"] < 0.5 and s["inside"]["headline"] == 1.0
+    )  # not "found" by the registered rule, but inside

@@ -45,6 +45,20 @@ def iou(a: list[float], b: list[float]) -> float:
     return inter / union if union > 0 else 0.0
 
 
+def banner_frame(scene: dict) -> tuple[float, float]:
+    """The banner artboard's size: the fixtures are not all 1280 x 720, and a model's boxes are relative to the image."""
+    b = next(n for n in scene["nodes"] if n["type"] == "artboard")
+    return float(b["width"]), float(b["height"])
+
+
+def contained(box: list[float], frame: list[float]) -> float:
+    """Share of `box` that lies inside `frame` (1.0 = fully inside)."""
+    w = min(box[0] + box[2], frame[0] + frame[2]) - max(box[0], frame[0])
+    h = min(box[1] + box[3], frame[1] + frame[3]) - max(box[1], frame[1])
+    area = box[2] * box[3]
+    return (w * h) / area if w > 0 and h > 0 and area > 0 else 0.0
+
+
 def gold_layers(scene: dict) -> dict[str, dict]:
     """role -> {box, text, font_px} from the banner's own authored nodes (the button's box is its plate)."""
     nodes = scene["nodes"]
@@ -70,20 +84,34 @@ def gold_layers(scene: dict) -> dict[str, dict]:
     return out
 
 
-def score_case(proposal: LayerProposal, gold: dict[str, dict]) -> dict[str, Any]:
+def score_case(
+    proposal: LayerProposal, gold: dict[str, dict], frame: tuple[float, float] = (1280, 720)
+) -> dict[str, Any]:
+    """`frame` is the banner's size in the gold's units; proposal boxes are pixels of a 1280 x 720 banner and are scaled to it."""
+    kx, ky = frame[0] / 1280, frame[1] / 720
     by: dict[str, list] = {}
     for l in proposal.layers:
         by.setdefault(l.role, []).append(l)
-    scores, text_hits = {}, 0
+    scores, inside, text_hits = {}, {}, 0
     for r, g in gold.items():
         got = by.get(r, [])
-        scores[r] = iou(got[0].box, g["box"]) if len(got) == 1 and len(got[0].box) == 4 else 0.0
+        one = len(got) == 1 and len(got[0].box) == 4
+        box = (
+            [got[0].box[0] * kx, got[0].box[1] * ky, got[0].box[2] * kx, got[0].box[3] * ky]
+            if one
+            else None
+        )
+        scores[r] = iou(box, g["box"]) if one else 0.0
+        inside[r] = contained(box, g["box"]) if one else 0.0
         if r in TEXT_ROLES and len(got) == 1 and norm(got[0].text) == norm(g["text"]):
             text_hits += 1
     return {
         "roles_present": set(by) == set(gold) and all(len(v) == 1 for v in by.values()),
         "all_matched": all(s >= MATCH_IOU for s in scores.values()),
         "iou": {r: round(s, 3) for r, s in scores.items()},
+        "inside": {
+            r: round(s, 3) for r, s in inside.items()
+        },  # POST HOC: not part of the registered rule
         "text_exact": text_hits,
         "text_roles": sum(r in TEXT_ROLES for r in gold),
         "origin": proposal.origin,
@@ -97,6 +125,7 @@ def verdict(cases: list[dict]) -> dict[str, Any]:
     present = sum(c["roles_present"] for c in cases)
     text_ious = [c["iou"][r] for c in cases for r in TEXT_ROLES if r in c["iou"]]
     median = statistics.median(text_ious) if text_ious else 0.0
+    inside = [c["inside"][r] for c in cases for r in TEXT_ROLES if r in c.get("inside", {})]
     words = sum(c["text_exact"] for c in cases) / max(1, sum(c["text_roles"] for c in cases))
     if matched >= min(GO_BANNERS, n) and median >= GO_MEDIAN_IOU:
         decision = "go"
@@ -110,8 +139,32 @@ def verdict(cases: list[dict]) -> dict[str, Any]:
         "roles_present": present,
         "median_text_iou": round(median, 3),
         "words_exact": round(words, 3),
+        "median_text_inside": round(statistics.median(inside), 3) if inside else None,  # post hoc
         "decision": decision,
     }
+
+
+def rescore(rows: list[dict]) -> list[dict]:
+    """Score stored replies again (no model call): rebuilds each proposal from the raw reply and applies the current scoring."""
+    from open_apprentice.campaign.vision import check_layers, from_vision
+
+    out = []
+    for r in rows:
+        scene = load_fixture(r["banner"])["scene"]
+        gold = gold_layers(scene)
+        if r.get("raw"):
+            proposal = from_vision(r["raw"])
+            proposal.problems = check_layers(proposal.layers)
+        else:  # the manual template was used: nothing the model said
+            proposal = LayerProposal([], "en", "manual", note=r.get("note", ""))
+        out.append(
+            {
+                **r,
+                "frame": list(banner_frame(scene)),
+                "score": score_case(proposal, gold, banner_frame(scene)),
+            }
+        )
+    return out
 
 
 def render_png(harness: EvaluatorHarness, scene: dict) -> str:
@@ -139,7 +192,8 @@ async def run_dev(provider: Provider | None, engine_url: str, token: str) -> lis
                 "raw": proposal.raw,
                 "note": proposal.note,
                 "tokens": proposal.tokens,
-                "score": score_case(proposal, gold),
+                "frame": list(banner_frame(scene)),
+                "score": score_case(proposal, gold, banner_frame(scene)),
             }
         )
     return rows
