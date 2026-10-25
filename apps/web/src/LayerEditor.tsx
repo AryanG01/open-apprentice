@@ -13,6 +13,8 @@ export const LABEL: Record<string, string> = {
   cta: "Button",
   legal: "Small print",
 };
+/** Logo, product image and headline are needed; price, button and small print are used only when the banner has them. */
+export const REQUIRED = ["brand_mark", "product_image", "headline"] as const;
 const IMAGE_ROLES = new Set(["brand_mark", "product_image"]);
 const MIN_SIDE = 24;
 const HEX = /^#[0-9a-fA-F]{6}$/;
@@ -133,7 +135,7 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
             return (
               <fieldset key={role} className="lrow missing">
                 <legend>{LABEL[role]}</legend>
-                <p>Not found in the banner.</p>
+                <p>{(REQUIRED as readonly string[]).includes(role) ? "Not found in the banner. This part is needed." : "Not in this banner. That is fine, this part is optional."}</p>
                 <button type="button" className="btn" disabled={disabled} onClick={() => onChange([...layers, defaultLayer(role)])}>
                   Add a {LABEL[role].toLowerCase()} box
                 </button>
@@ -144,6 +146,11 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
           return (
             <fieldset key={role} className={sel === role ? "lrow on" : "lrow"} onFocus={() => setSel(role)} disabled={disabled}>
               <legend>{LABEL[role]}</legend>
+              {(REQUIRED as readonly string[]).includes(role) ? null : (
+                <button type="button" className="btn" onClick={() => onChange(layers.filter((x) => x.role !== role))}>
+                  This banner has no {LABEL[role].toLowerCase()}: remove it
+                </button>
+              )}
               {text ? (
                 role === "headline" || role === "legal" ? (
                   <label>

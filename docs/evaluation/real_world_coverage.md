@@ -19,4 +19,10 @@ Our own measurement, not user research. Written 25 Oct 2026, before deciding whe
 
 **Reading:** Crello is general design templates (posters, social posts), not retail ads, so the price and small-print counts understate retail banners. Even so, requiring all six parts would reject nearly every real design we can find online. Our current flow is honest about this in its limits panel, but it is a real completeness ceiling.
 
-**Decision input:** make price, small print and button optional (headline, logo and picture stay required), if the learned layout, the checks and the verifier can skip an absent part without weakening any check.
+**Decision (25 Oct 2026):** price, small print and button are now optional; logo, product image and headline stay required. Every part that is present is checked exactly as before (price needs a number and a currency, small print must be the smallest text, the button is a plate plus words, contrast, glyphs, overlap). Absent parts are handled by:
+- the role gate and the editor checks (only the three required parts can be "missing");
+- the stacking order, which is re-ranked when a part is absent so the engine never gets an index past the last layer;
+- the split option (a second card), which is offered only when there is a price, button or small print to put on it;
+- the verifier, where a banner without a button must not gain one.
+
+Tests: `tests/unit/campaign/test_optional_roles.py` (role gates), `tests/integration/test_campaign_api.py` (a banner without each part, and without all three, is adapted and passes every independent check; the split is offered only when card 2 has content) and `tests/e2e/adapt.test.mjs` (remove the parts in the editor and still get a verified card).

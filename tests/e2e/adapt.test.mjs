@@ -117,6 +117,26 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     assert.deepEqual(problems, []);
   });
 
+  test("a banner with no price, button or small print: remove those parts and still get a verified story card", async () => {
+    const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 } })).newPage();
+    const text = async () => (await page.locator("body").innerText()).replace(/\s+/g, " ");
+    await page.goto(`${API}/`, { waitUntil: "networkidle" });
+    const fx = (await (await fetch(`${API}/api/campaign/fixtures`)).json()).fixtures.find((f) => f.id === "short_a");
+    await page.waitForFunction(() => !document.querySelector("input[type=file]").disabled);
+    await page.locator("input[type=file]").setInputFiles({ name: "banner.png", mimeType: "image/png", buffer: Buffer.from(fx.png.split(",")[1], "base64") });
+    await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 60_000 });
+    for (const part of ["price", "button", "small print"]) await page.getByRole("button", { name: new RegExp(`has no ${part}: remove it`) }).click();
+    assert.equal(await page.locator(".lbox").count(), 3);
+    assert.match(await text(), /That is fine, this part is optional/);
+    const row = page.locator("fieldset.lrow", { has: page.locator("legend", { hasText: "Headline" }) });
+    await row.locator("textarea").fill("Hear only what matters.");
+    await page.getByRole("button", { name: "Looks right: make the story card" }).click();
+    await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
+    assert.match(await text(), /\d+ of \d+ checks passed/);
+    assert.doesNotMatch(await text(), /Add the missing part/);
+    assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
+  });
+
   test("a banner that is not 16:9 is refused in plain words, and a non-image is refused too", async () => {
     const page = await (await browser.newContext()).newPage();
     await page.goto(`${API}/`, { waitUntil: "networkidle" });

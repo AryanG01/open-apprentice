@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
-import { BANNER_H, BANNER_W, LABEL, LayerEditor, ORDER, hexOr, isImageRole } from "./LayerEditor";
+import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
 import type { Rgb } from "./snap";
 import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace } from "./types";
@@ -270,7 +270,7 @@ export function Adapt() {
     go("Rebuilding your banner as editable layers…", async () => {
       const img = imgEl.current;
       if (!wid || !upload || !img || !image) return;
-      const missing = ORDER.filter((r) => !layers.some((l) => l.role === r));
+      const missing = REQUIRED.filter((r) => !layers.some((l) => l.role === r));
       if (missing.length) throw new Error(`Add the missing part${missing.length > 1 ? "s" : ""}: ${missing.map((r) => LABEL[r].toLowerCase()).join(", ")}.`);
       const crops: Record<string, string> = {};
       for (const l of layers) if (isImageRole(l.role)) crops[l.role] = cropPng(img, l.box);
@@ -542,7 +542,7 @@ export function Adapt() {
         <ul>
           <li>It works best on flat or simple backgrounds: the logo and product are cropped as rectangles and the rest is rebuilt as a solid colour.</li>
           <li>Text is rebuilt in Liberation Sans; scripts that font cannot draw (Chinese, Japanese, Korean, Arabic, Hindi) are refused.</li>
-          <li>All six parts are required (logo, product image, headline, price, button, small print), and the product image must be larger than the logo.</li>
+          <li>The logo, the product image and the headline are required, and the product image must be larger than the logo. The price, the button and the small print are optional: remove any the banner does not have.</li>
           <li>Banners must be 16:9; one story-card layout (1080 × 1920) is learned from a single example.</li>
           <li>Nemotron can misplace or merge boxes, so you confirm every layer. The checks are structural: they cannot judge whether the result is beautiful.</li>
           <li>Measured so far: roles and words are read well, boxes come back tight around the text (see the evaluation in the repository). No people have been studied.</li>
