@@ -21,7 +21,7 @@ short_b ready on Konva and Fabric, de_long_a asks, live role proposal origin mod
 **Rollback:** `gcloud run services update-traffic open-apprentice --project oa-demo-1013-19737 --region us-central1
 --to-revisions open-apprentice-00034-xuj=100 --update-tags next=open-apprentice-00034-xuj` (durable cap, old checker).
 Role comparison: run 1 `docs/evaluation/campaign_roles.md`, run 2 `campaign_roles_v2.md` (hybrid 17/24 vs heuristic
-7/24). Video re-rendered at 2:55 with those numbers; still to upload. Note: the auto-mode classifier blocks
+7/24). Video re-rendered at 2:55 with those numbers; superseded by the 1:42 banner-led cut of 25 Oct (`video/out/open_apprentice_demo.mp4`, recorded live on 00048-wuq); still to upload. Note: the auto-mode classifier blocks
 `gcloud run deploy` and `update-traffic` from the agent; the owner runs them with `!`.
 
 # EARLIER STATE — 2026-10-23
