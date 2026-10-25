@@ -11,7 +11,6 @@ from typing import Any
 from open_apprentice.budget import Ledger, Limits
 from open_apprentice.campaign.fixtures import load_fixture
 from open_apprentice.campaign.vision import (
-    IMAGE_ROLES,
     LAYER_ROLES,
     TEXT_ROLES,
     LayerProposal,

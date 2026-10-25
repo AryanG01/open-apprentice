@@ -283,7 +283,10 @@ def test_uploaded_asset_sizes_come_from_the_png_headers_and_anything_odd_is_left
     from open_apprentice.evaluation.campaign_verifier import uploaded_sizes
     from tests.pngs import jpeg_url, png_url
 
-    ok = {"u-0123456789ab-brand_mark": png_url(192, 48), "u-0123456789ab-product_image": png_url(480, 400)}
+    ok = {
+        "u-0123456789ab-brand_mark": png_url(192, 48),
+        "u-0123456789ab-product_image": png_url(480, 400),
+    }
     assert uploaded_sizes(ok) == {
         "u-0123456789ab-brand_mark": {"width": 192, "height": 48},
         "u-0123456789ab-product_image": {"width": 480, "height": 400},

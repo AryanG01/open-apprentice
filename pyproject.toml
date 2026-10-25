@@ -57,6 +57,9 @@ target-version = "py312"
 "scripts/**" = ["E731"]
 "src/open_apprentice/concepts/**" = ["E731", "E741"]
 "src/open_apprentice/evaluation/episodes.py" = ["E731"]
+"src/open_apprentice/campaign/vision.py" = ["E741"]  # `l` for a layer, like the editor code
+"src/open_apprentice/api/campaign.py" = ["E741"]
+"src/open_apprentice/evaluation/campaign_vision_eval.py" = ["E741"]
 "src/open_apprentice/api/fixtures.py" = ["E731"]
 
 [tool.black]
