@@ -1,0 +1,112 @@
+{
+ "note": "Campaign-led cut (2026-10-22). Each beat: what is said (Kokoro), what is on screen, and which part of the real capture plays (between two marks from capture/marks.json). 'speed' is filled in by the edit so the clip fits the voice; anything sped up shows a 'sped up' tag.",
+ "beats": [
+  {
+   "id": "c-hook",
+   "card": "cmontage",
+   "text": "Every campaign ships the same ad in a dozen shapes and languages, and designers rebuild each one by hand."
+  },
+  {
+   "id": "c-title",
+   "card": "title",
+   "text": "Open Apprentice learns the change from one example, asks when it is unsure, and proves every result. Powered by NVIDIA Nemotron on Nebius Token Factory."
+  },
+  {
+   "id": "c-teach",
+   "clip": [
+    "learn-click",
+    "learned-read"
+   ],
+   "focus": "learned",
+   "onScreen": "Show it once",
+   "text": "I show it once: this wide headphone banner becomes a vertical story card. The logo, product, headline, price, button and legal line all move, resize and restyle. It learns the rule by each layer's role, not by pixel positions."
+  },
+  {
+   "id": "c-reading",
+   "clip": [
+    "reading",
+    "rule-read"
+   ],
+   "focus": "reading",
+   "onScreen": "Two rules fit one example · it asks once",
+   "text": "One example fits two rules: the product photo always fills the same frame, or it scales like the example. They only disagree when the photo is a different size, so it builds that test banner, renders both, verifies both, and asks me once. Then it shows the rule it learned, role by role."
+  },
+  {
+   "id": "c-reuse",
+   "clip": [
+    "reuse-start",
+    "reuse-read"
+   ],
+   "focus": "reuse-done",
+   "onScreen": "Reused in Konva · checked independently",
+   "text": "On a new banner it applies the rule in a real graphics engine, Konva. An independent verifier checks the exact copy, image proportions, safe areas, minimum sizes, and whether the text fits, measured from the font itself."
+  },
+  {
+   "id": "c-ask",
+   "clip": [
+    "ask-start",
+    "question-read"
+   ],
+   "focus": "question",
+   "onScreen": "It asks instead of guessing",
+   "text": "Now a German banner. The headline is too long for the card. A blind tool would squeeze it, or let it overflow. Instead it stops and shows me both real options, already rendered: shrink the product image, or split the story across two cards."
+  },
+  {
+   "id": "c-answer",
+   "clip": [
+    "question-read",
+    "prefs-read"
+   ],
+   "focus": "pref-reused",
+   "onScreen": "Saved per language · versioned",
+   "text": "I pick split. That answer is saved as a versioned preference for German, so the next long German banner is split without asking, and I can roll it back."
+  },
+  {
+   "id": "c-roles",
+   "clip": [
+    "roles-start",
+    "roles-run"
+   ],
+   "focus": "roles",
+   "live": true,
+   "onScreen": "Nemotron proposes · a checker decides",
+   "explain": [
+    "Layer names hidden",
+    "Nemotron proposes roles",
+    "Checker validates",
+    "Owner confirms"
+   ],
+   "text": "Real banners often arrive without labels. Nemotron, live on Nebius, looks at the layers with their names hidden, and proposes which is the headline, the price, the logo. A checker rejects impossible answers, and I confirm before anything runs."
+  },
+  {
+   "id": "c-fabric",
+   "clip": [
+    "fabric-start",
+    "fabric-read"
+   ],
+   "focus": "fabric-done",
+   "onScreen": "Same rule in Fabric · 16/16 parity",
+   "text": "And the same learned rule runs unchanged in a second engine, Fabric, through the same sandboxed procedure."
+  },
+  {
+   "id": "c-z3",
+   "clip": [
+    "tryit-start",
+    "tryit-read"
+   ],
+   "focus": "tryit-work",
+   "onScreen": "Z3 finds where candidate rules disagree",
+   "text": "The same idea runs exactly in our badge lane. The Z3 solver compares every pair of rules that fit, finds a concrete input where they disagree, and it asks about the input that splits them most. You can open the work behind every question."
+  },
+  {
+   "id": "c-diagrams",
+   "card": "montage",
+   "text": "The same show, ask and check loop also tidies diagrams: one example, a hundred draw dot io files, every edit re-measured before it is saved."
+  },
+  {
+   "id": "c-close",
+   "card": "cresults",
+   "text": "On a sealed set of new banners in four new languages, written by a separate AI agent, every result passed, on both engines. On harder unlabeled banners, Nemotron's role proposals were right seventeen times in twenty-four; a simple size rule, seven. Nemotron proposes, checks decide, and you confirm. Open Apprentice."
+  }
+ ]
+}

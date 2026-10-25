@@ -1,203 +1,113 @@
 {
- "url": "https://cand---open-apprentice-md76de375q-uc.a.run.app",
+ "url": "http://127.0.0.1:8771",
  "live": true,
  "scale": 1.5,
  "marks": [
   {
    "name": "home",
-   "t": 17.058,
+   "t": 2.659,
    "box": null
   },
   {
-   "name": "learn-click",
-   "t": 17.059,
+   "name": "drop",
+   "t": 3.857,
    "box": null
   },
   {
-   "name": "learned",
-   "t": 25.905,
+   "name": "parts",
+   "t": 6.061,
    "box": {
-    "x": 104,
-    "y": 47.453125,
-    "width": 1072,
-    "height": 963.265625
+    "x": 124,
+    "y": 40.125,
+    "width": 1032,
+    "height": 1167.671875
    }
   },
   {
-   "name": "learned-read",
-   "t": 29.906,
+   "name": "parts-read",
+   "t": 10.562,
    "box": null
   },
   {
-   "name": "reading",
-   "t": 30.817,
+   "name": "fix-start",
+   "t": 10.567,
+   "box": null
+  },
+  {
+   "name": "fix-done",
+   "t": 18.461,
+   "box": null
+  },
+  {
+   "name": "keys",
+   "t": 20.626,
+   "box": null
+  },
+  {
+   "name": "confirm",
+   "t": 22.157,
+   "box": null
+  },
+  {
+   "name": "rebuilt",
+   "t": 26.166,
    "box": {
-    "x": 104,
-    "y": 19.71875,
-    "width": 1072,
-    "height": 643.171875
+    "x": 124,
+    "y": 59.9375,
+    "width": 1032,
+    "height": 233.8125
    }
-  },
-  {
-   "name": "reading-read",
-   "t": 36.816,
-   "box": null
-  },
-  {
-   "name": "rule",
-   "t": 39.703,
-   "box": {
-    "x": 104,
-    "y": 19.71875,
-    "width": 1072,
-    "height": 395.21875
-   }
-  },
-  {
-   "name": "rule-read",
-   "t": 43.697,
-   "box": null
-  },
-  {
-   "name": "reuse-start",
-   "t": 44.599,
-   "box": null
-  },
-  {
-   "name": "reuse-done",
-   "t": 48.989,
-   "box": {
-    "x": 104,
-    "y": 19.640625,
-    "width": 1072,
-    "height": 998.125
-   }
-  },
-  {
-   "name": "reuse-read",
-   "t": 52.486,
-   "box": null
-  },
-  {
-   "name": "ask-start",
-   "t": 53.389,
-   "box": null
   },
   {
    "name": "question",
-   "t": 62.842,
+   "t": 30.58,
    "box": {
-    "x": 104,
-    "y": 19.90625,
-    "width": 1072,
-    "height": 801.703125
+    "x": 124,
+    "y": 19.75,
+    "width": 1032,
+    "height": 585.265625
    }
   },
   {
    "name": "question-read",
-   "t": 67.841,
+   "t": 37.081,
    "box": null
   },
   {
    "name": "answered",
-   "t": 70.936,
+   "t": 39.744,
    "box": {
-    "x": 104,
-    "y": 19.640625,
-    "width": 1072,
-    "height": 720.4375
+    "x": 124,
+    "y": 246.9375,
+    "width": 1032,
+    "height": 233.8125
    }
   },
   {
-   "name": "pref-reused",
-   "t": 81.21,
-   "box": {
-    "x": 104,
-    "y": 19.640625,
-    "width": 1072,
-    "height": 720.4375
-   }
-  },
-  {
-   "name": "prefs",
-   "t": 85.121,
-   "box": {
-    "x": 104,
-    "y": 400.046875,
-    "width": 1072,
-    "height": 19.1875
-   }
-  },
-  {
-   "name": "prefs-read",
-   "t": 87.621,
+   "name": "checks",
+   "t": 44.787,
    "box": null
   },
   {
-   "name": "roles-start",
-   "t": 88.526,
+   "name": "checks-read",
+   "t": 49.789,
    "box": null
   },
   {
-   "name": "roles",
-   "t": 92.411,
+   "name": "limits",
+   "t": 51.223,
    "box": {
-    "x": 104,
-    "y": 19.640625,
-    "width": 1072,
-    "height": 404.84375
+    "x": 124,
+    "y": 467.53125,
+    "width": 1032,
+    "height": 213.421875
    }
   },
   {
-   "name": "roles-run",
-   "t": 101.546,
-   "box": {
-    "x": 104,
-    "y": 19.640625,
-    "width": 1072,
-    "height": 998.125
-   }
-  },
-  {
-   "name": "fabric-start",
-   "t": 104.951,
-   "box": null
-  },
-  {
-   "name": "fabric-done",
-   "t": 111.475,
-   "box": {
-    "x": 104,
-    "y": 19.640625,
-    "width": 1072,
-    "height": 998.125
-   }
-  },
-  {
-   "name": "fabric-read",
-   "t": 115.476,
-   "box": null
-  },
-  {
-   "name": "tryit-start",
-   "t": 118.138,
-   "box": null
-  },
-  {
-   "name": "tryit-work",
-   "t": 121.518,
-   "box": {
-    "x": 347,
-    "y": 247.890625,
-    "width": 526,
-    "height": 321.34375
-   }
-  },
-  {
-   "name": "tryit-read",
-   "t": 128.519,
+   "name": "limits-read",
+   "t": 58.224,
    "box": null
   }
  ],
- "frameOffset": 0.023
+ "frameOffset": 0.018
 }

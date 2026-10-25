@@ -391,10 +391,10 @@ function CampaignMontage() {
 /** Close: the Campaign lane's measured results, with their limits on screen. */
 function CampaignResults() {
   const rows: [string, string, string][] = [
+    ["Nemotron-3.5-Super-VL names every part (6 test banners)", "6 / 6", "words 83% exact; boxes only partly right, so you confirm them"],
+    ["Real 16:9 designs with all six original parts", "0 / 274", "so price, button and small print are optional"],
+    ["Independent checks on a story card", "14 / 14", "for the banner in this video; no authored answer exists"],
     ["Sealed set: 8 new banners, 4 new languages", "22 / 22", "pass on Konva and Fabric"],
-    ["Asks exactly when the copy does not fit", "16 / 16", "banner × engine cases"],
-    ["Same rule, two engines (development set)", "16 / 16", "verifier rows"],
-    ["Nemotron role proposals, harder untagged banners", "17 / 24", "a simple size rule: 7 / 24"],
     ["Nemotron's wording of the question, fact-checked", "6 / 6", "factually right; our check misread 1, since fixed"],
   ];
   return (
@@ -412,9 +412,9 @@ function CampaignResults() {
         </tbody>
       </table>
       <div style={{ fontSize: 24, color: C.ink2, marginTop: 30, lineHeight: 1.4 }}>
-        The sealed sets were written by a separate AI agent from the written rules only, not by us, and sealed by hash before they ran.
-        Role proposals: pre-registered run on 24 new banners with decoy layers, sale and twin prices; image content is not part of the input.
-        Every screen in this video is a real session on the public demo (Nemotron-3-Super live); waiting time is shortened in the edit.
+        The reading probe is one pre-registered run on 6 development banners (partly right). The 274 designs are a public dataset we scanned ourselves: our own
+        measurement, not user research. The sealed set was written by a separate AI agent from the written rules only. Every screen in this video is a real
+        session on the public demo (Nemotron-3.5-Super-VL and Nemotron-3-Super live); waiting time is shortened in the edit.
         Full results, including what did not work: github.com/AryanG01/open-apprentice
       </div>
     </AbsoluteFill>
