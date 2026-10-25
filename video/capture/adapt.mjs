@@ -72,7 +72,7 @@ const click = async (locator, pause = 350) => {
 const scrollTo = async (selector, offset = 90) => {
   await page.evaluate(([s, o]) => {
     const el = document.querySelector(s);
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - o, behavior: "smooth" });
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - o - 72, behavior: "smooth" }); // 72: the sticky header
   }, [selector, offset]);
   await sleep(900);
 };
