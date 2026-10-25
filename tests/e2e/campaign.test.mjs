@@ -132,7 +132,7 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     assert.match(await text(), /15 of 15 checks passed/);
 
     await run("missing_role");
-    assert.match(await page.getByRole("alert").innerText(), /role price is missing/);
+    assert.match(await page.getByRole("alert").innerText(), /role headline is missing/);
 
     assert.deepEqual(problems, []);
   });
