@@ -16,6 +16,7 @@ from open_apprentice.campaign.builtins import (
     BUILTINS,
     ORIGIN as BUILTIN_ORIGIN,
     shrink_hero,
+    split_applicable,
     split_two_cards,
 )
 from open_apprentice.campaign.layout_rule import evaluate_layout, objects_for_rule, wrap_learned
@@ -134,6 +135,7 @@ def start_run(
         asked = evaluate_layout(
             wrap_learned(learned.rule), objs, {"output_format": "9:16", "overflows": True}
         ).ask
+        asked = [o for o in asked if o != BUILTINS[1] or split_applicable(base)]
         pref = prefs.get(scope_key(locale))
         for outcome in ([pref.outcome] if pref else []) + [
             o for o in asked if not pref or o != pref.outcome

@@ -135,7 +135,8 @@ _UPLOAD_ID = re.compile(r"u-[0-9a-f]{12}-(brand_mark|product_image)")
 
 def uploaded_sizes(raw: dict | None) -> dict[str, dict]:
     """Natural size of each uploaded crop, read from its PNG header here (not through the agent's or the engine's code).
-    Anything that is not a PNG data URL under an upload id is left out, so image_aspect fails for it."""
+    Anything that is not a PNG data URL under an upload id is left out, so image_aspect fails for it.
+    """
     out: dict[str, dict] = {}
     for aid, url in (raw or {}).items():
         prefix = "data:image/png;base64,"
@@ -157,7 +158,8 @@ def verify_story(
 ) -> VerifierReport:
     """Judge a committed story-card result. `source` is the banner scene, `gold` the authored expected scene (None when the
     chosen outcome is not applicable, which always fails). `gold_applies=False` is for a reading the gold was not written
-    for (the owner's "scale like the example" choice): matches_gold is then left out, never counted as passed."""
+    for (the owner's "scale like the example" choice): matches_gold is then left out, never counted as passed.
+    """
     rep = VerifierReport()
     src, fin = source["nodes"], final_native["nodes"]
     cards = _cards(fin)
@@ -181,11 +183,15 @@ def verify_story(
     counts = {k: sum(1 for t in texts if t["text"] == v) for k, v in want.items()}
     rep.add("copy_once", all(c == 1 for c in counts.values()), str(counts))
 
-    src_cta = next(n for n in src if n.get("role") == "cta")
+    src_cta = next((n for n in src if n.get("role") == "cta"), None)
     ctas = [n for n in fin if n.get("role") == "cta"]
     rep.add(
         "link_preserved",
-        len(ctas) == 1 and ctas[0].get("link") == src_cta.get("link"),
+        (
+            len(ctas) == 1 and ctas[0].get("link") == src_cta.get("link")
+            if src_cta
+            else not ctas  # a banner without a button must not grow one
+        ),
         str([c.get("link") for c in ctas]),
     )
 

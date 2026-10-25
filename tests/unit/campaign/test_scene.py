@@ -13,7 +13,7 @@ def test_teach_after_has_every_role_once():
 def test_missing_role_is_named():
     with pytest.raises(RoleError) as e:
         role_map(load_fixture("missing_role")["scene"], "banner")
-    assert any("price" in p and "missing" in p for p in e.value.problems)
+    assert any("headline" in p and "missing" in p for p in e.value.problems)
 
 
 def test_duplicate_role_is_named():

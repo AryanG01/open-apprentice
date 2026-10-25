@@ -19,7 +19,7 @@ from pydantic import Field
 
 from open_apprentice.budget import Ledger
 from open_apprentice.campaign.imageinfo import ImageError, image_size
-from open_apprentice.campaign.limits import ROLES
+from open_apprentice.campaign.limits import REQUIRED_ROLES, ROLES
 from open_apprentice.campaign.model import call_model
 from open_apprentice.campaign.roles import check_role_mapping, has_currency
 from open_apprentice.campaign.scene import RoleError, role_map
@@ -193,7 +193,9 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
     for l in layers:
         by_role.setdefault(l.role, []).append(l)
     problems += [f"unknown role {r}" for r in by_role if r not in LAYER_ROLES]
-    problems += [f"role {r} is missing" for r in LAYER_ROLES if r not in by_role]
+    problems += [
+        f"role {r} is missing" for r in REQUIRED_ROLES if r != "background" and r not in by_role
+    ]
     problems += [
         f"role {r} is given to more than one layer" for r, ls in by_role.items() if len(ls) > 1
     ]
@@ -224,6 +226,8 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
         if l.fill and not HEX.fullmatch(l.fill):
             problems.append(f"{label[r]} fill colour must be a #rrggbb value")
     for r in TEXT_ROLES:
+        if r not in one:
+            continue
         l = one[r]
         if not l.text.strip():
             problems.append(f"{label[r]} text is empty: type the words that are in the image")
@@ -237,23 +241,32 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
                 )
         if l.font_px <= 0:
             problems.append(f"{label[r]} text size is missing")
-    if all(one[r].text.strip() for r in ("price",)) and not (
-        re.search(r"\d", one["price"].text) and has_currency(one["price"].text)
+    if (
+        "price" in one
+        and one["price"].text.strip()
+        and not (re.search(r"\d", one["price"].text) and has_currency(one["price"].text))
     ):
         problems.append("price must contain a number and a currency")
-    sizes = [one[r].font_px for r in ("headline", "price", "legal")]
-    if all(s > 0 for s in sizes) and not sizes[2] < min(sizes[0], sizes[1]):
+    sizes = [one[r].font_px for r in ("headline", "price") if r in one]
+    if (
+        "legal" in one
+        and all(s > 0 for s in sizes)
+        and one["legal"].font_px > 0
+        and not one["legal"].font_px < min(sizes)
+    ):
         problems.append("legal must be the smallest text (smaller than the headline and the price)")
     for ir in IMAGE_ROLES:
         img = one[ir]
         area = img.box[2] * img.box[3] if len(img.box) == 4 else 0
         for tr in TEXT_ROLES:
-            if area <= 0 or len(one[tr].box) != 4:
+            if tr not in one or area <= 0 or len(one[tr].box) != 4:
                 continue
             shared = _overlap(img.box, one[tr].box)
             text_area = one[tr].box[2] * one[tr].box[3]
             # by the image's share, or by the words' share: a small slice of a big image can still hold a third of a headline
-            if shared / area > MAX_OVERLAP or (text_area > 0 and shared / text_area > MAX_TEXT_COVERED):
+            if shared / area > MAX_OVERLAP or (
+                text_area > 0 and shared / text_area > MAX_TEXT_COVERED
+            ):
                 problems.append(
                     f"{label[ir]} box overlaps the {label[tr]} text: its crop would contain words"
                 )
@@ -262,11 +275,17 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
             problems.append("background colour must be a #rrggbb value")
         else:
             for r in ("headline", "price", "legal"):
-                c = one[r].color
+                c = one[r].color if r in one else ""
                 if c and HEX.fullmatch(c) and contrast(c, background) < MIN_CONTRAST:
                     problems.append(f"{label[r]} text has too little contrast with the background")
-            cta = one["cta"]
-            if cta.color and cta.fill and HEX.fullmatch(cta.color) and HEX.fullmatch(cta.fill):
+            cta = one.get("cta")
+            if (
+                cta
+                and cta.color
+                and cta.fill
+                and HEX.fullmatch(cta.color)
+                and HEX.fullmatch(cta.fill)
+            ):
                 if contrast(cta.color, cta.fill) < MIN_CONTRAST:
                     problems.append("the button label has too little contrast with its plate")
     return problems
@@ -373,11 +392,15 @@ def build_scene(
             }
         )
     text_color = {
-        r: one[r].color or readable_on(background) for r in ("headline", "price", "legal")
+        r: one[r].color or readable_on(background)
+        for r in ("headline", "price", "legal")
+        if r in one
     }
     for z, (r, short) in enumerate(
         (("headline", "head"), ("price", "price"), ("legal", "legal")), start=3
     ):
+        if r not in one:
+            continue
         l = one[r]
         x, y, w, h = l.box
         lh = LINE_HEIGHT[r]
@@ -387,55 +410,56 @@ def build_scene(
         )
         node["role"] = r
         nodes.append(node)
-    cta = one["cta"]
-    x, y, w, h = cta.box
-    plate = cta.fill or DEFAULT_PLATE
-    label = cta.color or readable_on(plate)
-    size = round(min(cta.font_px, fit_font(cta.text, w, h * 0.7, True, 1.1)), 1)
-    label_h = round(size * 1.33, 1)
-    group = {
-        "id": f"{p}-cta",
-        "type": "group",
-        "parent": "banner",
-        "role": "cta",
-        "x": x,
-        "y": y,
-        "z": 5,
-    }
-    if link is not None:
-        group["link"] = link
-    nodes.append(group)
-    nodes.append(
-        {
-            "id": f"{p}-cta-plate",
-            "type": "shape",
-            "parent": f"{p}-cta",
-            "x": 0,
-            "y": 0,
-            "width": w,
-            "height": h,
-            "fill": plate,
-            "cornerRadius": round(h / 2, 1),
-            "z": 0,
+    if "cta" in one:
+        cta = one["cta"]
+        x, y, w, h = cta.box
+        plate = cta.fill or DEFAULT_PLATE
+        label = cta.color or readable_on(plate)
+        size = round(min(cta.font_px, fit_font(cta.text, w, h * 0.7, True, 1.1)), 1)
+        label_h = round(size * 1.33, 1)
+        group = {
+            "id": f"{p}-cta",
+            "type": "group",
+            "parent": "banner",
+            "role": "cta",
+            "x": x,
+            "y": y,
+            "z": 5,
         }
-    )
-    nodes.append(
-        _text_node(
-            f"{p}-cta-label",
-            f"{p}-cta",
-            cta.text,
-            size,
-            True,
-            label,
-            "center",
-            0,
-            max(0.0, round((h - label_h) / 2, 1)),
-            w,
-            label_h,
-            1,
-            1.1,
+        if link is not None:
+            group["link"] = link
+        nodes.append(group)
+        nodes.append(
+            {
+                "id": f"{p}-cta-plate",
+                "type": "shape",
+                "parent": f"{p}-cta",
+                "x": 0,
+                "y": 0,
+                "width": w,
+                "height": h,
+                "fill": plate,
+                "cornerRadius": round(h / 2, 1),
+                "z": 0,
+            }
         )
-    )
+        nodes.append(
+            _text_node(
+                f"{p}-cta-label",
+                f"{p}-cta",
+                cta.text,
+                size,
+                True,
+                label,
+                "center",
+                0,
+                max(0.0, round((h - label_h) / 2, 1)),
+                w,
+                label_h,
+                1,
+                1.1,
+            )
+        )
     scene = {"canvas": {"width": CANVAS_W, "height": CANVAS_H}, "nodes": nodes, "assets": assets}
     # second, independent gate: the same role checks the roles lane applies to an owner-confirmed mapping
     mapping = {n["id"]: n["role"] for n in nodes if n.get("role")}

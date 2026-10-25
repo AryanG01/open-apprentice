@@ -73,7 +73,7 @@ def test_missing_role_opens_no_session(tmp_path):
         no_session,
         PreferenceStore(LocalStore(tmp_path)),
     )
-    assert run.status == "needs_roles" and any("price" in p for p in run.problems)
+    assert run.status == "needs_roles" and any("headline" in p for p in run.problems)
 
 
 def test_an_answer_for_a_changed_source_is_refused_and_changes_nothing(tmp_path):

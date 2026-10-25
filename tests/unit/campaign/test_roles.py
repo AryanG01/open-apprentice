@@ -74,9 +74,9 @@ def test_a_swapped_price_and_headline_is_rejected_and_the_heuristic_is_used():
 
 
 def test_a_mapping_missing_a_role_is_rejected():
-    partial = {k: v for k, v in _truth("short_b").items() if v != "legal"}
+    partial = {k: v for k, v in _truth("short_b").items() if v != "headline"}
     assert any(
-        "legal" in x
+        "headline" in x
         for x in check_role_mapping(load_fixture("untagged_short_b")["scene"], "banner", partial)
     )
 

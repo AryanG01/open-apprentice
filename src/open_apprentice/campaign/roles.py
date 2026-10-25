@@ -11,7 +11,7 @@ import unicodedata
 from dataclasses import dataclass, field
 
 from open_apprentice.budget import Ledger
-from open_apprentice.campaign.limits import ROLES
+from open_apprentice.campaign.limits import REQUIRED_ROLES, ROLES
 from open_apprentice.campaign.model import call_model
 from open_apprentice.providers.base import Provider, StrictModel
 
@@ -94,7 +94,7 @@ def check_role_mapping(scene: dict, artboard: str, mapping: dict[str, str]) -> l
     for nid, role in mapping.items():
         by_role.setdefault(role, []).append(nid)
     problems += [f"unknown role {r}" for r in by_role if r not in ROLES]
-    problems += [f"role {r} is missing" for r in ROLES if r not in by_role]
+    problems += [f"role {r} is missing" for r in REQUIRED_ROLES if r not in by_role]
     problems += [
         f"role {r} is given to more than one layer" for r, ids in by_role.items() if len(ids) > 1
     ]
@@ -111,28 +111,31 @@ def check_role_mapping(scene: dict, artboard: str, mapping: dict[str, str]) -> l
     for r in ("brand_mark", "product_image"):
         if n[r]["type"] != "image":
             problems.append(f"{r} must be an image")
-    for r in ("headline", "price", "legal"):
+    copy = [r for r in ("headline", "price", "legal") if r in n]
+    for r in copy:
         if n[r]["type"] != "text":
             problems.append(f"{r} must be text")
-    if n["price"]["type"] == "text" and not (
-        re.search(r"\d", n["price"]["text"]) and has_currency(n["price"]["text"])
+    if (
+        "price" in n
+        and n["price"]["type"] == "text"
+        and not (re.search(r"\d", n["price"]["text"]) and has_currency(n["price"]["text"]))
     ):
         problems.append("price must contain a number and a currency")
-    texts = [n[r] for r in ("headline", "price", "legal")]
     # sale banners set the price larger than the headline, so only the small print's size is checked
-    if all(t["type"] == "text" for t in texts) and not texts[2]["fontSize"] < min(
-        texts[0]["fontSize"], texts[1]["fontSize"]
-    ):
-        problems.append("legal must be the smallest of headline, price and legal")
+    if "legal" in n and all(n[r]["type"] == "text" for r in copy):
+        others = [n[r]["fontSize"] for r in copy if r != "legal"]
+        if not n["legal"]["fontSize"] < min(others):
+            problems.append("legal must be the smallest of headline, price and legal")
     if (
         n["product_image"]["type"] == "image"
         and n["brand_mark"]["type"] == "image"
         and area(n["product_image"]) <= area(n["brand_mark"])
     ):
         problems.append("the product image must be larger than the brand mark")
-    kids = sorted(k["type"] for k in _children(scene, n["cta"]["id"]))
-    if n["cta"]["type"] != "group" or kids != ["shape", "text"]:
-        problems.append("cta must be a group holding a shape and a text")
+    if "cta" in n:
+        kids = sorted(k["type"] for k in _children(scene, n["cta"]["id"]))
+        if n["cta"]["type"] != "group" or kids != ["shape", "text"]:
+            problems.append("cta must be a group holding a shape and a text")
     return problems
 
 

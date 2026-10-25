@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from open_apprentice.campaign.limits import ROLES
+from open_apprentice.campaign.limits import REQUIRED_ROLES, ROLES
 
 
 class RoleError(Exception):
@@ -17,7 +17,7 @@ def role_map(scene: dict, artboard_id: str) -> dict[str, str]:
     for n in scene["nodes"]:
         if n.get("parent") == artboard_id and n.get("role"):
             found.setdefault(n["role"], []).append(n["id"])
-    problems = [f"role {r} is missing" for r in ROLES if r not in found]
+    problems = [f"role {r} is missing" for r in REQUIRED_ROLES if r not in found]
     problems += [
         f"role {r} is claimed by more than one node: {', '.join(ids)}"
         for r, ids in found.items()

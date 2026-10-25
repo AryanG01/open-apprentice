@@ -88,8 +88,8 @@ def test_each_bad_layer_is_named(role, changes, needle):
 
 
 def test_a_missing_or_doubled_role_is_named():
-    ls = [l for l in layers_from() if l.role != "legal"]
-    assert any("legal" in p and "missing" in p for p in check_layers(ls, BG))
+    ls = [l for l in layers_from() if l.role != "headline"]
+    assert any("headline" in p and "missing" in p for p in check_layers(ls, BG))
     ls = layers_from() + [layers_from()[0]]
     assert any("more than one" in p for p in check_layers(ls, BG))
     ls = layers_from() + [Layer(role="sticker", box=[0, 0, 100, 100])]

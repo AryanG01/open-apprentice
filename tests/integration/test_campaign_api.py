@@ -136,7 +136,7 @@ def test_runs_questions_answers_and_reuse(client):
 
     assert _run(client, wid, "fr_long")["status"] == "question"
     broken = _run(client, wid, "missing_role")
-    assert broken["status"] == "needs_roles" and any("price" in p for p in broken["problems"])
+    assert broken["status"] == "needs_roles" and any("headline" in p for p in broken["problems"])
 
     prefs = {
         s["locale"]: s
@@ -746,7 +746,7 @@ def test_the_model_reads_the_banner_and_the_owner_confirms_it_into_a_story_card(
     run = client.post(
         f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": banner["banner_id"]}
     ).json()
-    assert run["status"] == "ready", run
+    assert run["status"] == "ready", run["problems"]
     assert run["provenance"]["source"] == "upload" and run["locale"] == "en"
     names = [c["name"] for c in run["result"]["verification"]["checks"]]
     assert (
@@ -863,3 +863,37 @@ def test_a_confirmed_banners_language_gets_its_own_preference_scope(client):
         for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]
     ]
     assert {"de", "en", "fr", "es"} <= set(scopes)
+
+
+def _run_upload(client, drop, locale="en", **text):
+    layers = [l for l in _gold_layers(**text) if l["role"] not in drop]
+    client.app.state.vision_provider = MockProvider({"campaign_vision": [_vision_reply(layers)]})
+    wid = _workspace(client)["workspace_id"]
+    up = _upload(client, wid).json()
+    got = _confirm(client, wid, up["upload_id"], layers, locale=locale)
+    assert got.status_code == 200, got.text
+    run = client.post(
+        f"/api/campaign/workspaces/{wid}/runs", json={"fixture_id": got.json()["banner_id"]}
+    ).json()
+    return wid, run
+
+
+@pytest.mark.parametrize("drop", [("price",), ("cta",), ("legal",), ("price", "cta", "legal")])
+def test_a_banner_without_price_button_or_small_print_is_adapted_and_verified(client, drop):
+    _, run = _run_upload(client, drop)
+    assert run["status"] == "ready", run["problems"]
+    v = run["result"]["verification"]
+    assert v["passed"], v["failed"]
+    assert _engine_sessions(client) == 0
+
+
+LONG = "Bring die Stadt endlich zum Schweigen – mit aktiver Geräuschunterdrückung der nächsten Generation."
+
+
+def test_the_split_option_is_offered_only_when_there_is_something_for_a_second_card(client):
+    _, bare = _run_upload(client, ("price", "cta", "legal"), locale="de", headline=LONG)
+    assert bare["status"] == "question"
+    assert {p["outcome"] for p in bare["previews"]} == {"builtin_shrink_hero"}
+    _, some = _run_upload(client, ("price",), locale="de", headline=LONG)
+    assert some["status"] == "question"
+    assert "builtin_split_two_cards" in {p["outcome"] for p in some["previews"]}

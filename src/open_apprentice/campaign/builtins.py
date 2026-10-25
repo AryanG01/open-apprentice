@@ -17,6 +17,16 @@ CARD2_PRICE_TOP = 800  # split: card 2's offer block starts here
 OFFER_GAP = 32  # split: price to CTA
 CARD2_LEGAL_H = 320  # split: legal frame height, bottom-anchored
 BOTTOM = STORY_H - SAFE["bottom"]
+OFFER = (
+    "price",
+    "cta",
+    "legal",
+)  # the parts card 2 carries; any of them may be absent from a banner
+
+
+def split_applicable(base: LayoutPlan) -> bool:
+    """A banner with no price, button or small print has nothing to put on a second card."""
+    return any(role in OFFER for role in _by_role(base))
 
 
 def _by_role(plan: LayoutPlan) -> dict[str, Target]:
@@ -50,15 +60,20 @@ def split_two_cards(base: LayoutPlan) -> LayoutPlan:
         copies.append(c)
         plan.kinds[c.node_id] = plan.kinds[src.node_id]
         plan.roles[c.node_id] = plan.roles[src.node_id]
-    head, price, cta, legal = r["headline"], r["price"], r["cta"], r["legal"]
+    head = r["headline"]
     head.h = BOTTOM - head.y
-    price.y = CARD2_PRICE_TOP
-    cta.y = price.y + price.h + OFFER_GAP
-    legal.h = CARD2_LEGAL_H
-    legal.y = BOTTOM - CARD2_LEGAL_H
+    offer = [r[k] for k in OFFER if k in r]
+    top = CARD2_PRICE_TOP
+    for part in offer:  # price, then button below it, then the small print bottom-anchored
+        if part is r.get("legal"):
+            part.h = CARD2_LEGAL_H
+            part.y = BOTTOM - CARD2_LEGAL_H
+        else:
+            part.y = top
+            top += part.h + OFFER_GAP
     cards = {
         "story-1": [bg, logo, r["product_image"], head],
-        "story-2": [*copies, price, cta, legal],
+        "story-2": [*copies, *offer],
     }
     for card_id, members in cards.items():
         for z, t in enumerate(members):  # each card stacks from zero, in reading order

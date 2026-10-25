@@ -87,8 +87,7 @@
     "y": 160.0,
     "width": 576.0,
     "height": 176.0,
-    "z": 3,
-    "role": "headline"
+    "z": 3
    },
    {
     "id": "mr-price",
@@ -106,7 +105,8 @@
     "y": 352.0,
     "width": 576.0,
     "height": 51.2,
-    "z": 4
+    "z": 4,
+    "role": "price"
    },
    {
     "id": "mr-cta",

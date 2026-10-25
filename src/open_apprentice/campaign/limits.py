@@ -16,6 +16,9 @@ ROLES: tuple[str, ...] = (
     "cta",
     "legal",
 )
+# real designs rarely carry all of these (docs/evaluation/real_world_coverage.md); each one present is still fully checked
+OPTIONAL_ROLES: tuple[str, ...] = ("price", "cta", "legal")
+REQUIRED_ROLES: tuple[str, ...] = tuple(r for r in ROLES if r not in OPTIONAL_ROLES)
 
 
 def fit_limits() -> dict:
