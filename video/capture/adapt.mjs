@@ -192,6 +192,8 @@ try {
   await mark("checks-read");
 
   // what it cannot do yet
+  await page.getByText("See every check").click(); // fold the table away so the limits panel is the thing on screen
+  await sleep(500);
   await page.getByText("What it cannot do yet").click();
   await sleep(500);
   await scrollTo("details.limits", 40);
