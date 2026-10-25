@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
+import { ArrowRight, CheckCircle, DownloadSimple, UploadSimple } from "@phosphor-icons/react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
@@ -295,72 +296,95 @@ export function Adapt() {
   const passed = verification ? verification.checks.filter((c) => c.passed).length : 0;
   const finished = run && (run.status === "ready" || run.status === "applied");
 
-  return (
-    <main className="page adapt" id="stage">
-      <p className="eyebrow">Adapt a banner</p>
-      <h2 tabIndex={-1} ref={heading}>
-        {step === 1 ? "Bring a banner. Get story cards you can trust." : step === 2 ? "Check what Nemotron found" : finished ? "Your story card" : run?.status === "question" ? "It needs one decision from you" : "Your banner"}
-      </h2>
-      <p className="lede">
-        Drop a 16:9 banner image. Nemotron reads its parts, you check them, and the apprentice rebuilds it as editable layers, adapts it to a 9:16 story card, asks before it
-        guesses, and checks every result before you see it.
-      </p>
-
-      <ol className="who" aria-label="Who does what">
-        <li>
-          <strong>Nemotron-3.5-Super-VL</strong> reads your banner
-        </li>
-        <li>
-          <strong>You</strong> check the parts
-        </li>
-        <li>
-          <strong>Deterministic checks and an independent verifier</strong> decide
-        </li>
-        <li>
-          <strong>Nemotron-3-Super</strong> words the question when the copy does not fit
-        </li>
-      </ol>
-
+  const title = step === 1 ? "Bring a banner. Get story cards you can trust." : step === 2 ? "Check what Nemotron found" : finished ? "Your story card" : run?.status === "question" ? "It needs one decision from you" : "Your banner";
+  const notices = (
+    <>
       {error ? (
         <p className="callout bad" role="alert">
           {error}
         </p>
       ) : null}
-      <p className="status" role="status" aria-live="polite">
+      <p className={busy ? "status busy" : "status"} role="status" aria-live="polite">
         {busy ? status : ""}
       </p>
+    </>
+  );
+
+  return (
+    <main className="page adapt" id="stage">
+      {step === 1 ? (
+        <section aria-labelledby="a-choose" className={over ? "hero-grid drop over" : "hero-grid drop"} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={onDrop}>
+          <div className="hero-copy">
+            <h2 tabIndex={-1} ref={heading} className="display">
+              {title}
+            </h2>
+            <p className="lede">Nemotron reads its parts, you check them, and every result is independently verified before you see it.</p>
+            <h3 id="a-choose" className="visually-hidden">
+              Choose a banner
+            </h3>
+            {notices}
+            <div className="cta-row">
+              <label className="btn primary filebtn">
+                <UploadSimple size={18} weight="bold" aria-hidden="true" />
+                Choose a banner
+                <input type="file" accept="image/png,image/jpeg" disabled={busy || !wid} onChange={(e) => void onFile(e.target.files?.[0])} />
+              </label>
+              <span className="muted small">PNG or JPEG, 16:9. Or drop one anywhere here.</span>
+            </div>
+            {samples.length ? (
+              <div className="samples-row">
+                <p className="label">Or start from a sample</p>
+                <div className="samples">
+                  {samples.map((f) => (
+                    <button key={f.id} className="samplebtn" disabled={busy || !wid} onClick={() => void readBanner(f.png)}>
+                      <img src={f.png} alt="" className="thumb" />
+                      <strong>{f.id === "short_a" ? "Headphones, English" : "Headphones, new copy"}</strong>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <p className="privacy small">Your banner is sent to NVIDIA Nemotron on Nebius Token Factory to read its layers, and kept in server memory for 30 minutes. Fonts are replaced with Liberation Sans.</p>
+          </div>
+          <div className="hero-visual">
+            <img className="hv-banner" src="/hero-banner.webp" width={1100} height={619} alt="A wide headphone banner for Halden with a headline, a price, a button and small print on a dark purple background" />
+            <img className="hv-card" src="/hero-card.webp" width={563} height={1000} alt="The same banner adapted to a tall story card" />
+          </div>
+        </section>
+      ) : (
+        <>
+          <h2 tabIndex={-1} ref={heading}>
+            {title}
+          </h2>
+          {notices}
+        </>
+      )}
 
       {step === 1 ? (
-        <section aria-labelledby="a-choose" className={over ? "drop over" : "drop"} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={onDrop}>
-          <h3 id="a-choose">1. Choose a banner</h3>
-          <label className="btn primary filebtn">
-            Choose a banner image (PNG or JPEG)
-            <input type="file" accept="image/png,image/jpeg" disabled={busy || !wid} onChange={(e) => void onFile(e.target.files?.[0])} />
-          </label>
-          <span className="muted"> or drop one here. 16:9 works best (for example 1600 × 900).</span>
-          {samples.length ? (
-            <div className="samples-row">
-              <p className="muted small">Or try a sample banner:</p>
-              <div className="samples">
-                {samples.map((f) => (
-                  <button key={f.id} className="samplebtn" disabled={busy || !wid} onClick={() => void readBanner(f.png)}>
-                    <img src={f.png} alt="" className="thumb" />
-                    <strong>{f.id === "short_a" ? "Headphones, English" : "Headphones, new copy"}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-          <p className="muted small">
-            Your banner is sent to NVIDIA Nemotron on Nebius Token Factory to read its layers, and kept in server memory for 30 minutes. Fonts are replaced with Liberation Sans.
-          </p>
-        </section>
+        <ol className="who" aria-label="Who does what">
+          <li>
+            <strong>Nemotron-3.5-Super-VL</strong> reads your banner
+          </li>
+          <li>
+            <strong>You</strong> check the parts
+          </li>
+          <li>
+            <strong>Deterministic checks and an independent verifier</strong> decide
+          </li>
+          <li>
+            <strong>Nemotron-3-Super</strong> words the question when the copy does not fit
+          </li>
+        </ol>
       ) : null}
 
       {step === 2 && upload && image ? (
         <section aria-labelledby="a-check">
-          <h3 id="a-check">2. Check the parts</h3>
-          <p className={upload.origin === "model" ? "callout ok" : "callout"}>
+          <h3 id="a-check" className="visually-hidden">
+            Check the parts
+          </h3>
+          <div className={upload.origin === "model" ? "callout ok" : "callout"}>
+            {upload.origin === "model" ? <CheckCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" /> : null}
+            <div>
             {upload.origin === "model" ? (
               <>
                 <strong>Nemotron read this banner</strong> ({upload.model.replace(/^nvidia\//, "")}). Boxes can be tight around the words; fix anything that is off, then continue.
@@ -377,7 +401,8 @@ export function Adapt() {
                 ))}
               </ul>
             ) : null}
-          </p>
+            </div>
+          </div>
           {snapNote ? <p className="muted small">{snapNote}</p> : null}
           {overlaps.length ? (
             <div className="callout bad" role="alert">
@@ -437,18 +462,24 @@ export function Adapt() {
 
       {step === 3 && run && banner ? (
         <section aria-labelledby="a-result">
-          <h3 id="a-result">3. Your story cards</h3>
+          <h3 id="a-result" className="visually-hidden">
+            Your story cards
+          </h3>
           <div className="trio">
             <figure>
               <img src={banner.original} alt="Your banner" />
               <figcaption>Your banner</figcaption>
             </figure>
-            <span aria-hidden="true" className="arrow">→</span>
+            <span aria-hidden="true" className="arrow">
+              <ArrowRight size={18} />
+            </span>
             <figure>
               <img src={banner.rebuilt} alt="Your banner rebuilt as editable layers" />
               <figcaption>Rebuilt as editable layers</figcaption>
             </figure>
-            <span aria-hidden="true" className="arrow">→</span>
+            <span aria-hidden="true" className="arrow">
+              <ArrowRight size={18} />
+            </span>
             <figure className={finished ? "" : "pending"}>
               {run.result ? <img src={run.result.png} alt="The story card" /> : <div className="placeholder">{run.status === "question" ? "Waiting for your decision" : "No result yet"}</div>}
               <figcaption>{finished ? "Story card, 1080 × 1920" : "Story card"}</figcaption>
@@ -488,20 +519,23 @@ export function Adapt() {
 
           {finished && verification ? (
             <>
-              <p className="callout ok">
-                <strong>
-                  {passed} of {verification.checks.length} checks passed
-                </strong>{" "}
-                <span className="muted small">
-                  independent verifier: exact copy, link, logo, image proportions, safe areas, minimum sizes, text fit. It has no authored expected output for your banner, so that comparison is not part of these checks.
-                </span>
-                {run.preference ? (
-                  <>
-                    {" "}
-                    <span className="pill ok">saved: {outcomeLabel(run.preference.outcome)} for {run.locale}</span>
-                  </>
-                ) : null}
-              </p>
+              <div className="callout ok">
+                <CheckCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" />
+                <div>
+                  <strong>
+                    {passed} of {verification.checks.length} checks passed
+                  </strong>{" "}
+                  <span className="small">
+                    independent verifier: exact copy, link, logo, image proportions, safe areas, minimum sizes, text fit. It has no authored expected output for your banner, so that comparison is not part of these checks.
+                  </span>
+                  {run.preference ? (
+                    <>
+                      {" "}
+                      <span className="pill ok">saved: {outcomeLabel(run.preference.outcome)} for {run.locale}</span>
+                    </>
+                  ) : null}
+                </div>
+              </div>
               <details>
                 <summary>See every check</summary>
                 <div className="table-wrap">
@@ -520,6 +554,7 @@ export function Adapt() {
               </details>
               <div className="controls">
                 <a className="btn primary" href={run.result?.png} download="story-card.png">
+                  <DownloadSimple size={18} weight="bold" aria-hidden="true" />
                   Download the story card (PNG)
                 </a>
                 <button className="btn" onClick={reset}>

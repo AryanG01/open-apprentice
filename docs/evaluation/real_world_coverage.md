@@ -26,3 +26,14 @@ Our own measurement, not user research. Written 25 Oct 2026, before deciding whe
 - the verifier, where a banner without a button must not gain one.
 
 Tests: `tests/unit/campaign/test_optional_roles.py` (role gates), `tests/integration/test_campaign_api.py` (a banner without each part, and without all three, is adapted and passes every independent check; the split is offered only when card 2 has content) and `tests/e2e/adapt.test.mjs` (remove the parts in the editor and still get a verified card).
+
+## Under the current rule (re-measured 25 Oct 2026, same 274 designs)
+
+The current rule needs a headline (some text) and two pictures (logo and product); price, button and small print are optional.
+
+| By element count in Crello's metadata | Designs (of 274) |
+|---|---|
+| two or more pictures (photos or vector illustrations) and some text | **252 (92%)** |
+| two or more photos (not counting vector illustrations) and some text | 23 (8%) |
+
+**How to read it.** The 92% is an **upper bound**: Crello's vector elements are often decorative art, not a logo or a product. The 8% is a lower bound. The truth is between them, and element counts cannot tell where. We have **not** run the flow on these designs: that would need their preview images, a verified dataset licence and vision calls. Do not read 92% as "the app works on 92% of designs"; read it as "the old six-part rule excluded all of them, and the current rule no longer does for most".

@@ -90,6 +90,7 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
 
   return (
     <div className="editor">
+      <div className="editor-left">
       <div className="lstage" ref={stage} style={{ aspectRatio: `${BANNER_W} / ${BANNER_H}` }}>
         <img src={image} alt="Your banner" draggable={false} />
         {ORDER.map((role) => {
@@ -127,6 +128,7 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
       <p className="muted small" id="editor-help">
         Drag a box to move it, drag its corner to resize it. With the keyboard: arrow keys move the focused box, Shift plus arrows resize it.
       </p>
+      </div>
 
       <div className="lfields">
         {ORDER.map((role) => {
@@ -147,7 +149,7 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
             <fieldset key={role} className={sel === role ? "lrow on" : "lrow"} onFocus={() => setSel(role)} disabled={disabled}>
               <legend>{LABEL[role]}</legend>
               {(REQUIRED as readonly string[]).includes(role) ? null : (
-                <button type="button" className="btn" onClick={() => onChange(layers.filter((x) => x.role !== role))}>
+                <button type="button" className="btn small quiet remove" onClick={() => onChange(layers.filter((x) => x.role !== role))}>
                   This banner has no {LABEL[role].toLowerCase()}: remove it
                 </button>
               )}

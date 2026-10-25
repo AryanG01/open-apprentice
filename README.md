@@ -18,7 +18,7 @@ Who does what: **Nemotron-3.5-Super-VL** reads the banner; **you** confirm the p
 separate pictures; image content is judged only by Nemotron and then you. Reading quality: roles 6/6 and 83% of words exact on 6 development
 banners, but boxes only partly accurate (median overlap 0.55), which is why you confirm them
 ([`docs/evaluation/campaign_vision_dev_run3.md`](docs/evaluation/campaign_vision_dev_run3.md)). Of 274 real 16:9 designs we scanned, none had all six
-original parts, so price, button and small print are optional
+original parts, so price, button and small print are now optional: 252 of 274 meet the current rule by element count (an upper bound, because vector art counts as pictures; 23 if it does not), and we have not run the flow on them
 ([`docs/evaluation/real_world_coverage.md`](docs/evaluation/real_world_coverage.md)); that scan is our own measurement, not user research.
 
 ## Live demo

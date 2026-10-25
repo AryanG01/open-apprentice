@@ -383,7 +383,6 @@ export function App() {
           </svg>
           <div>
             <p className="name">Open Apprentice</p>
-            <p className="tagline">{area === "apprentice" ? "Show it once. It asks when unsure, then fixes every diagram and proves each edit." : "Bring a banner. It rebuilds it as editable layers, asks before it guesses and checks every result."}</p>
           </div>
         </div>
         <nav aria-label="Areas" className="areas">

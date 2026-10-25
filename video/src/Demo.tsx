@@ -392,7 +392,7 @@ function CampaignMontage() {
 function CampaignResults() {
   const rows: [string, string, string][] = [
     ["Nemotron-3.5-Super-VL names every part (6 test banners)", "6 / 6", "words 83% exact; boxes only partly right, so you confirm them"],
-    ["Real 16:9 designs with all six original parts", "0 / 274", "so price, button and small print are optional"],
+    ["Real 16:9 designs that fit the current rule", "252 / 274", "upper bound, by element count; the old six-part rule: 0 / 274"],
     ["Independent checks on a story card", "14 / 14", "for the banner in this video; no authored answer exists"],
     ["Sealed set: 8 new banners, 4 new languages", "22 / 22", "pass on Konva and Fabric"],
     ["Nemotron's wording of the question, fact-checked", "6 / 6", "factually right; our check misread 1, since fixed"],
