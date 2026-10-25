@@ -1,33 +1,44 @@
 # Open Apprentice
 
-**Teach a visual layout rule by demonstration on a real `.drawio` file. It asks when your example is ambiguous, applies the rule to other documents through checked edits, and takes corrections.**
+**Drop any banner. Nemotron sees its parts, you fix what it got wrong, and the apprentice turns it into a 9:16 story card, asks before it guesses, and checks every result independently.**
 
-You move a few labels to where they belong on one diagram. Several different rules usually fit that example, so Open Apprentice finds a
-case where they disagree, renders each outcome and asks which one you meant. The agreed rule becomes a versioned skill. You preview it on other
-documents (a result that would break a layout is shown as blocked and cannot be approved), apply it, download the edited `.drawio`, and correct
-any result you dislike. Edits are byte-exact patches of label `x`/`y` only, and three separate checks (measured conformance,
-preservation of everything else in the file, layout safety) gate every publish.
+Nemotron-3.5-Super-VL (live, on Nebius Token Factory) looks at a 16:9 banner image and proposes its parts: logo, product image,
+headline, and the price, button and small print when the banner has them. You check them in an editor (drag a box, or move it with the
+arrow keys; boxes snap to the content they surround). The app rebuilds the banner as editable layers, adapts it to a story card with a
+layout rule it learned from one worked example, and, when the copy does not fit (a long German headline), stops and shows two fully
+rendered outcomes instead of squeezing. Every result is checked by an independent verifier (copy preserved, link kept, logo kept, image
+proportions, safe areas, minimum sizes, text fits, no overlaps) before you see it. The same show, ask and check loop also fixes
+`.drawio` diagrams (below).
 
-Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents; submission text in `docs/submission.md`). Live model: NVIDIA Nemotron through Nebius Token Factory (Nemotron-3-Ultra in the evaluation;
-Nemotron-3-Super on the live site, chosen by a pre-registered check, `docs/evaluation/product_model_check.md`). Everything else runs offline.
+Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents; submission text in `docs/submission.md`).
+Who does what: **Nemotron-3.5-Super-VL** reads the banner; **you** confirm the parts; **deterministic checks and the independent verifier** decide;
+**Nemotron-3-Super** words the overflow question. Everything else runs offline.
+
+**What it cannot do yet:** flat or simple backgrounds only; fonts replaced by Liberation Sans; 16:9 input; Latin scripts; logo and product must be
+separate pictures; image content is judged only by Nemotron and then you. Reading quality: roles 6/6 and 83% of words exact on 6 development
+banners, but boxes only partly accurate (median overlap 0.55), which is why you confirm them
+([`docs/evaluation/campaign_vision_dev_run3.md`](docs/evaluation/campaign_vision_dev_run3.md)). Of 274 real 16:9 designs we scanned, none had all six
+original parts, so price, button and small print are optional
+([`docs/evaluation/real_world_coverage.md`](docs/evaluation/real_world_coverage.md)); that scan is our own measurement, not user research.
 
 ## Live demo
 
 **https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
-Video (2:55): <YouTube link>. To try it: press **Try a sample: Online order journey** and **Hiring process** (plain-language
-diagrams), confirm which box each note describes, drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
+Video: <YouTube link>. To try it: on the landing page, pick a sample banner (or drop a 16:9 image), check the parts, press
+**Looks right: make the story card**, answer the question if it asks, and download the PNG. Your image is sent to Nebius Token Factory to be read
+and kept in memory for 30 minutes; at most 10 vision reads per address per hour, under a durable spending cap.
+
+The other lane, **diagrams** (Diagrams tab): press **Try a sample: Online order journey** and **Hiring process**, confirm which box each note describes,
+drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole
 document is right*. The apprentice's notebook shows what Nemotron proposed, how many rules still fit, the test diagram it drew and why it asks.
-Then apply the skill to **the 100-diagram library** (ten themes drawn as flowcharts, architecture maps, org charts, roadmaps, network maps and floor plans;
-`docs/corpus/library_provenance.md`) and to **The big one**, a 217-object platform map, and compare before and after. Teaching works on pages of up
+Then apply the skill to **the 100-diagram library** (`docs/corpus/library_provenance.md`) and to **The big one**, a 217-object platform map. Teaching works on pages of up
 to 32 objects; a learned skill applies to pages of up to 400 objects and 200 notes. Every session and run states `Model: … · Teacher: …` (and `· Policy: product-1` for live sessions, a
 disclosed difference from the evaluated policy: `docs/evaluation/product_policy.md`). Live use runs under a **durable** dollar cap
 (`DEMO_MODEL_MAX_USD`, shared by all instances and surviving restarts) and 3 live sessions per visitor per hour. When the cap is reached the page says so
 and offers the offline learner; it never silently downgrades. The first request after idle can take a few seconds.
 
-The **Campaign** tab (banner to story card, below) is also live on the demo, on development fixtures. There Nemotron-3-Super
-proposes roles for untagged banners and words the overflow question, each with a labelled fallback. Nemotron-written
-procedures are off in production (`CAMPAIGN_MODEL_PROCEDURES` unset). Campaign model calls are capped per server instance
-(at most 6 requests per address per hour) rather than by the durable ledger: a known gap.
+The **Campaign** tab shows the learned rule, the teaching question and the other development banners; Nemotron-written
+procedures are off in production (`CAMPAIGN_MODEL_PROCEDURES` unset).
 
 ## How well does it work? (read before judging)
 

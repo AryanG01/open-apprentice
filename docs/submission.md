@@ -12,18 +12,60 @@ comes from a file in this repository. The file is named next to the claim so it 
 
 ## Tagline (one line)
 
-Show an AI how you want your diagrams laid out, once. It asks when it isn't sure, then fixes every diagram you have,
-and proves each edit.
+Drop any banner. Nemotron sees its parts, you fix what it got wrong, and the apprentice turns it into a story card, asks
+before it guesses, and proves every result.
 
 ## Inspiration
 
-Every team has the same diagrams: architecture maps, process flows, org charts, floor plans. Every team has the same
-mess too, with notes drifting around their boxes as people edit. Style rules are easy to show and hard to write down. AI
-tools that "just fix it" guess, and a guess applied to a hundred files is a hundred chances to be quietly wrong. We wanted
-an apprentice instead of an autopilot. It learns from one example, asks the one question your example leaves open, and
-never changes a file it can't prove it changed correctly.
+Every campaign ships the same ad in a dozen shapes and languages, and someone rebuilds each one by hand. A tool that
+"just adapts it" guesses, and a guess applied to every banner is a lot of chances to be quietly wrong: a headline cut off,
+a price too small to read, a logo squeezed. We wanted an apprentice instead of an autopilot. It looks at the banner,
+shows you what it understood, asks the one question your banner leaves open, and never shows a result it has not checked.
 
 ## What it does
+
+**The product: Adapt a banner (the landing page).**
+1. **Drop a 16:9 banner image**, or try the sample. **Nemotron-3.5-Super-VL**, called live through Nebius Token Factory,
+   looks at the picture and proposes its parts: logo, product image, headline, and (when the banner has them) price,
+   button and small print, each with its box, its words, its size and its colour.
+2. **You check the parts.** Every box can be dragged or moved with the arrow keys, and every word, size and colour is a
+   labelled field. Boxes snap to the content they surround; a part the banner does not have can be removed. Deterministic
+   checks stop anything unusable (a price with no number, a picture box that would swallow words, letters the font cannot
+   draw, too little contrast) before it goes further, and say why in plain words.
+3. **It rebuilds the banner as editable layers** (the logo and product are cropped in your browser, the rest becomes
+   text and shapes) and shows original and rebuilt side by side.
+4. **It adapts it to a 9:16 story card** with a layout rule it learned from a worked example, by each part's role. When
+   the copy does not fit (a long German headline, say) it stops and shows two fully rendered outcomes, shrink the product
+   or split across two cards, worded by **Nemotron-3-Super**. Your answer is saved per language.
+5. **Every result is checked by an independent verifier** (copy exactly preserved, link kept, logo kept, image proportions,
+   safe areas, minimum sizes, text fits, no overlaps) before you see it, then downloaded as a PNG. For your own banners
+   there is no authored expected answer, and the app says so instead of counting one.
+
+**Who does what** (shown on the page): Nemotron-3.5-Super-VL reads the banner; you confirm the parts; deterministic
+checks and the independent verifier decide; Nemotron-3-Super words the question.
+
+**What it cannot do yet** (also on the page): flat or simple backgrounds only (the logo and product are cropped as
+rectangles); fonts are replaced by Liberation Sans; 16:9 input only; Latin scripts only; the logo and the product must be
+separate pictures and the product larger than the logo; image content is judged only by Nemotron and then you; the
+sealed-set and role results below were measured on our own fixtures, not on real customer banners. Your image is sent to
+Nebius Token Factory to be read and kept in memory for 30 minutes.
+
+**How well does the reading work?** Probe on 6 development banners, one run, pre-registered rule, $0.03
+(`docs/evaluation/campaign_vision_dev_run3.md`): all six roles were named correctly on 6 of 6, and 83% of the words were read
+exactly. The boxes are the weak part: median overlap with the true box was 0.55, short of our 0.6 bar, so the result is
+**partial**, and that is why the editor, snapping and checks exist. After the fact (not part of the registered rule), the median text box lay 94% inside the authored frame (mean 79%): the model
+draws boxes tight around the words, which is what the snapping grows back to the content. A live test found the product box swallowing headline letters; we added a
+rule (a picture box may not contain words), crop previews and a limit on how far snapping may grow an image box, and wrote
+it up (`docs/evaluation/campaign_vision_protocol.md`, Addendum 2).
+
+**Real-world check (our own, not user research).** We scanned 274 real 16:9 designs from the Crello dataset: none had all
+six of our original parts, which is why price, button and small print are now optional
+(`docs/evaluation/real_world_coverage.md`).
+
+**Also in the app (the same show, ask and check loop):** diagrams, where you move notes on one `.drawio` diagram and it
+fixes a hundred (below), and an earlier UI-components prototype on two graphics engines.
+
+### The diagram lane
 
 1. **Bring your diagrams.** Import real `.drawio` files, or try a sample or the 100-diagram library. The real draw.io
    engine draws each one and measures every box. The apprentice matches each note to its box and you check its guess.
@@ -112,6 +154,8 @@ the design comes from, not to claim we reproduced their results.
 | A model should not grade its own work | An independent verifier re-measures every result: text height from the font file with fontTools, plus copy, image proportions and safe areas. It shares no geometry code with the engine. | Separating generation from verification | Campaign sealed set 22/22 on Konva and Fabric |
 | Layer names give the answer away | Nemotron sees layers under hashed opaque ids (L1…Ln), no asset names. A deterministic checker rejects impossible mappings, and the owner confirms. | Pre-registered held-out evaluation | Pre-registered, two runs on new banners written by a separate AI agent: 14/24 then 17/24 for the shipped hybrid against 6/24 and 7/24 for a size heuristic. Run 1 exposed checker bugs; we fixed them and re-ran on a new set |
 | Generated wording can invent numbers | Nemotron only words facts the engine measured. A checker refuses any number, element or claim of fit that is not in those facts, and a template is the fallback. | Constrained, fact-checked generation | 6/6 factually right in the re-measurement |
+| A model that sees a picture is imprecise about where things are | Nemotron-3.5-Super-VL proposes parts and words; boxes are checked, snapped to the ink they surround in the browser (pure pixel logic, tested), shown with crop thumbnails, and confirmed by the owner. A picture box may not contain words, so crops never hide text. | Human-in-the-loop correction of model proposals (Horvitz, *Principles of Mixed-Initiative User Interfaces*, CHI 1999; Lau, *Why PbD systems fail*, AI Magazine 2009: usability, not AI, is what blocks programming by demonstration) | Probe on 6 banners: roles 6/6, words 83% exact, box overlap median 0.55 (partial, reported as such) |
+| Real banners rarely have every part | Price, button and small print are optional; logo, product image and headline are required. Absent parts change nothing else: the stacking order is re-ranked, the split-in-two outcome is offered only when there is something for card 2, and the verifier refuses a result that adds a button | Measured need: 0 of 274 real 16:9 Crello designs had all six original parts | `docs/evaluation/real_world_coverage.md`; API and browser tests |
 | A public demo spending real money | One durable ledger in Cloud Storage, written with object-generation preconditions so concurrent instances cannot overwrite each other. The diagram lane reserves each call's worst case there before calling. The other lanes check the ledger before each call and record what they spent after it. So every Cloud Run instance shares one cap that survives restarts. Rate limits key on the address Cloud Run appends, so a forged header cannot reset them. | Optimistic concurrency control | Shared $3 cap verified on production |
 | Choosing the live model | Same flow on Nemotron-3-Super (120B total, 12B active; hybrid Mamba-2 and attention with LatentMoE, per NVIDIA's technical report) and Nemotron-3-Ultra, compared with a rule set before the run | Pre-registered model choice | Super: about 22 s per session against about 58 s, at roughly a tenth of the cost |
 
@@ -135,6 +179,11 @@ the design comes from, not to claim we reproduced their results.
   checked against what the real engine rendered.
 - A reproducible, isolated evaluation with its failures published.
 
+- **A vision model drew the product box over the headline.** A live test of the built app showed crops that held the first
+  words of the headline, and every check still passed. We added a rule (a picture box may not contain words), crop previews,
+  a cap on image growth in snapping, and two prompt sentences, and recorded the change before re-running the probe
+  (`docs/evaluation/campaign_vision_protocol.md`, Addendum 2).
+
 ## What we learned
 
 Asking is cheap and guessing is expensive. One well-chosen question, backed by a rendered picture, settles what pages of
@@ -149,7 +198,7 @@ and Ultra does the heavy evaluation.
 
 ## Built with
 
-nvidia-nemotron, nebius-token-factory, python, fastapi, react, typescript, playwright, draw.io, konva, fabric.js, google-cloud-run,
+nvidia-nemotron, nemotron-vl, nebius-token-factory, python, fastapi, react, typescript, playwright, draw.io, konva, fabric.js, google-cloud-run,
 cloud-tasks, cloud-storage, z3, remotion
 
 ## Feedback on Nebius Token Factory and NVIDIA models (required field)
@@ -177,13 +226,20 @@ What would help:
    - Prices and numeric rate limits are not on the reference page.
 3. **Latency:** a long Ultra reasoning reply can take minutes. Streaming the reasoning progress, or an estimated time
    budget per request, would let apps show meaningful progress.
-4. **Billing visibility:** an API view of spend per key or per day would let apps enforce caps against the real balance.
+4. **Vision model:** `Nemotron-3.5-Super-VL` worked through the same OpenAI-style chat endpoint with `image_url` content parts. It named
+   every role correctly in our probe, but its boxes were loose or tight by 10 to 40% between runs. A documented coordinate
+   convention (and a way to ask for pixel boxes) would help. Image tokens are not in the pricing page; we estimate 3,000 per
+   image and cap spend per run.
+5. **Billing visibility:** an API view of spend per key or per day would let apps enforce caps against the real balance.
    We keep our own durable ledger, and it ran about 11% below the real spend on the dashboard because of our rate assumptions.
 
 ## Testing instructions (for judges)
 
 Open the demo URL; no login is needed.
-1. Press **Try a sample: Online order journey** and **Hiring process**, then **Confirm mapping** on each.
+0. **The main flow:** the landing page is **Adapt a banner**. Pick a banner under **Or try a sample banner** (or drop a 1280 x 720 or 16:9
+   banner image), check the parts it found, press **Looks right: make the story card**, answer the overflow question if it asks, then read
+   the checks and download the PNG. Remove price, button or small print with the buttons in the editor if your banner has none.
+1. Optional, diagrams: press **Try a sample: Online order journey** and **Hiring process**, then **Confirm mapping** on each.
 2. Under *Show it once*, drag each note under its box, lined up with its left edge.
 3. Tick **Use the live model** and press **This whole document is right**.
 4. Answer the question, approve the preview, then apply the skill to the other documents. Optionally press **Load the
