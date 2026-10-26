@@ -391,11 +391,11 @@ function CampaignMontage() {
 /** Close: the Campaign lane's measured results, with their limits on screen. */
 function CampaignResults() {
   const rows: [string, string, string][] = [
-    ["Nemotron-3.5-Super-VL names every part (6 test banners)", "6 / 6", "words 83% exact; boxes only partly right, so you confirm them"],
+    ["Nemotron-3.5-Super-VL names every part (6 banners)", "6 / 6", "words 83% exact; boxes only partly right, so you confirm them"],
+    ["Sketch reading (6 synthetic wireframes)", "6 / 6", "roles named; every layer found on 2 of 6: partial, boxes come back loose"],
     ["Real 16:9 designs that fit the current rule", "252 / 274", "upper bound, by element count; the old six-part rule: 0 / 274"],
     ["Independent checks on a story card", "14 / 14", "for the banner in this video; no authored answer exists"],
     ["Sealed set: 8 new banners, 4 new languages", "22 / 22", "pass on Konva and Fabric"],
-    ["Nemotron's wording of the question, fact-checked", "6 / 6", "factually right; our check misread 1, since fixed"],
   ];
   return (
     <AbsoluteFill style={{ ...grid, padding: "90px 140px", color: C.ink }}>
@@ -414,7 +414,7 @@ function CampaignResults() {
       <div style={{ fontSize: 24, color: C.ink2, marginTop: 30, lineHeight: 1.4 }}>
         The reading probe is one pre-registered run on 6 development banners (partly right). The 274 designs are a public dataset we scanned ourselves: our own
         measurement, not user research. The sealed set was written by a separate AI agent from the written rules only. Every screen in this video is a real
-        session on the public demo (Nemotron-3.5-Super-VL and Nemotron-3-Super live); waiting time is shortened in the edit.
+        session on the public demo (Nemotron-3.5-Super-VL, Nemotron-3-Super and Tavily live); waiting time is shortened in the edit.
         Full results, including what did not work: github.com/AryanG01/open-apprentice
       </div>
     </AbsoluteFill>

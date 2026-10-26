@@ -5,17 +5,97 @@
  "marks": [
   {
    "name": "home",
-   "t": 5.271,
+   "t": 5.235,
+   "box": null
+  },
+  {
+   "name": "s-open",
+   "t": 5.235,
+   "box": null
+  },
+  {
+   "name": "s-sketch",
+   "t": 9.458,
+   "box": null
+  },
+  {
+   "name": "s-page",
+   "t": 11.6,
+   "box": null
+  },
+  {
+   "name": "s-read",
+   "t": 12.53,
+   "box": null
+  },
+  {
+   "name": "s-parts",
+   "t": 14.085,
+   "box": null
+  },
+  {
+   "name": "s-copy",
+   "t": 17.504,
+   "box": {
+    "x": 763.15625,
+    "y": 92.234375,
+    "width": 404.828125,
+    "height": 551.5
+   }
+  },
+  {
+   "name": "s-copy-read",
+   "t": 25.812,
+   "box": null
+  },
+  {
+   "name": "s-pics",
+   "t": 28.911,
+   "box": null
+  },
+  {
+   "name": "s-build",
+   "t": 30.431,
+   "box": null
+  },
+  {
+   "name": "s-done",
+   "t": 34.095,
+   "box": {
+    "x": 112,
+    "y": 132.1875,
+    "width": 1056,
+    "height": 411.4375
+   }
+  },
+  {
+   "name": "s-check",
+   "t": 39.509,
+   "box": {
+    "x": 112,
+    "y": 383.875,
+    "width": 1056,
+    "height": 111.765625
+   }
+  },
+  {
+   "name": "s-check-read",
+   "t": 45.012,
+   "box": null
+  },
+  {
+   "name": "b-home",
+   "t": 47.149,
    "box": null
   },
   {
    "name": "drop",
-   "t": 6.47,
+   "t": 48.3,
    "box": null
   },
   {
    "name": "parts",
-   "t": 8.68,
+   "t": 50.869,
    "box": {
     "x": 112,
     "y": 112.296875,
@@ -25,32 +105,32 @@
   },
   {
    "name": "parts-read",
-   "t": 13.18,
+   "t": 55.369,
    "box": null
   },
   {
    "name": "fix-start",
-   "t": 13.19,
+   "t": 55.378,
    "box": null
   },
   {
    "name": "fix-done",
-   "t": 21.06,
+   "t": 63.254,
    "box": null
   },
   {
    "name": "keys",
-   "t": 23.233,
+   "t": 65.416,
    "box": null
   },
   {
    "name": "confirm",
-   "t": 24.753,
+   "t": 66.93,
    "box": null
   },
   {
    "name": "rebuilt",
-   "t": 28.832,
+   "t": 71,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -60,7 +140,7 @@
   },
   {
    "name": "question",
-   "t": 33.244,
+   "t": 75.415,
    "box": {
     "x": 112,
     "y": 92,
@@ -70,12 +150,12 @@
   },
   {
    "name": "question-read",
-   "t": 39.744,
+   "t": 81.915,
    "box": null
   },
   {
    "name": "answered",
-   "t": 42.423,
+   "t": 84.572,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -85,17 +165,17 @@
   },
   {
    "name": "checks",
-   "t": 47.466,
+   "t": 89.611,
    "box": null
   },
   {
    "name": "checks-read",
-   "t": 52.468,
+   "t": 94.612,
    "box": null
   },
   {
    "name": "limits",
-   "t": 54.422,
+   "t": 96.564,
    "box": {
     "x": 112,
     "y": 231.703125,
@@ -105,9 +185,9 @@
   },
   {
    "name": "limits-read",
-   "t": 61.423,
+   "t": 103.565,
    "box": null
   }
  ],
- "frameOffset": 0.009
+ "frameOffset": 0.007
 }

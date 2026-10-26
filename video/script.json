@@ -1,76 +1,97 @@
 {
- "note": "Banner-led cut (2026-10-25): about two minutes, the aha in the first 30 seconds. Each beat: what is said (Kokoro), what is on screen, and which part of the real capture plays (between two marks from capture/marks.json).",
+ "note": "Two-door cut (2026-10-26): sketch + page first (aha in 30 s), then a banner with the overflow question, limits, results. One live capture: capture/full.mjs.",
  "beats": [
   {
-   "id": "a-hook",
+   "id": "d-hook",
    "card": "cmontage",
    "text": "Every campaign ships the same ad in a dozen shapes and languages, and someone rebuilds each one by hand."
   },
   {
-   "id": "a-drop",
+   "id": "d-sketch",
    "clip": [
-    "home",
-    "parts"
+    "s-open",
+    "s-parts"
    ],
    "live": true,
-   "onScreen": "Drop in any banner",
-   "text": "So I drop in a banner. Nemotron 3.5 Super VL, live on Nebius Token Factory, looks at the picture and proposes its parts: the logo, the product, the headline, the price, the button and the small print.",
-   "say": "So I drop in a banner. Nemotron three point five Super V L, live on Nebius Token Factory, looks at the picture and proposes its parts: the logo, the product, the headline, the price, the button and the small print."
+   "onScreen": "Start from a rough sketch",
+   "text": "So I start from a rough sketch, and point at the product page. Nemotron 3.5 Super VL reads the boxes I drew, and Tavily reads the page.",
+   "say": "So I start from a rough sketch, and point at the product page. Nemotron three point five Super V L reads the boxes I drew, and Tavily reads the page."
   },
   {
-   "id": "a-fix",
+   "id": "d-facts",
    "clip": [
-    "parts",
+    "s-copy",
+    "s-copy-read"
+   ],
+   "live": true,
+   "onScreen": "Facts from your page, with their quotes",
+   "text": "Nemotron 3 Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number or a name that is not on the page is thrown away.",
+   "say": "Nemotron three Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number or a name that is not on the page is thrown away."
+  },
+  {
+   "id": "d-build",
+   "clip": [
+    "s-pics",
+    "s-done"
+   ],
+   "live": true,
+   "onScreen": "Your pictures, your colours, built as layers",
+   "text": "I add my own logo and product picture, pick a colour, and build. The banner is rebuilt as editable layers, and adapted to a story card."
+  },
+  {
+   "id": "d-check",
+   "clip": [
+    "s-check",
+    "s-check-read"
+   ],
+   "live": true,
+   "onScreen": "Checked independently, and against your page",
+   "text": "Fourteen independent checks pass. And a page check compares the price on the banner with your page. Here it matches. If it did not, the app would say so."
+  },
+  {
+   "id": "d-banner",
+   "clip": [
+    "drop",
     "fix-done"
    ],
    "live": true,
-   "onScreen": "You check the parts",
-   "text": "I check what it found. Its boxes for the logo and the product are too tight, so I drag them onto the whole picture. Boxes snap to the content, everything also works by keyboard, and checks refuse anything unusable."
+   "onScreen": "Banners you already have work too",
+   "text": "Banners you already have work too. Nemotron reads the parts, and I drag the boxes it got wrong."
   },
   {
-   "id": "a-adapt",
+   "id": "d-ask",
    "clip": [
-    "fix-done",
-    "rebuilt"
-   ],
-   "live": true,
-   "onScreen": "Rebuilt as editable layers",
-   "text": "Then it rebuilds the banner as editable layers, and adapts it to a vertical story card with a layout rule it learned from one example."
-  },
-  {
-   "id": "a-ask",
-   "clip": [
-    "question",
+    "confirm",
     "question-read"
    ],
    "live": true,
    "onScreen": "It asks before it guesses",
-   "text": "The German headline is too long for the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron 3 Super words the question.",
-   "say": "The German headline is too long for the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron three Super words the question."
+   "text": "A long German headline does not fit the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron 3 Super words the question.",
+   "say": "A long German headline does not fit the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron three Super words the question."
   },
   {
-   "id": "a-answer",
+   "id": "d-answer",
    "clip": [
     "question-read",
     "checks-read"
    ],
    "live": true,
    "onScreen": "Every result is checked independently",
-   "text": "I pick split. An independent verifier re-measures the result, and fourteen of fourteen checks pass. For my own banner there is no authored answer, and the app says so instead of counting one."
+   "text": "I pick split, and the independent verifier re-checks the result. For my own banner there is no authored answer, and the app says so instead of counting one."
   },
   {
-   "id": "a-limits",
+   "id": "d-limits",
    "clip": [
     "limits",
     "limits-read"
    ],
    "onScreen": "What it cannot do yet",
-   "text": "It also says what it cannot do: flat backgrounds, one font, sixteen by nine only. Nemotron named all six parts on our six test banners, but its boxes were only partly right, which is why you confirm them. And of two hundred seventy four real designs we scanned, none had all six parts, so three are optional."
+   "text": "It also says what it cannot do: flat backgrounds, one font, sixteen by nine only, and no generated pictures. Sketch reading was only partly right on our tests, which is why you confirm the boxes."
   },
   {
-   "id": "a-close",
+   "id": "d-close",
    "card": "cresults",
-   "text": "The numbers, and the failures, are in the repository. Open Apprentice: drop in any banner, and trust the result."
+   "text": "The numbers, and the failures, are in the repository. Open Apprentice: bring a banner or a sketch, and trust the result."
   }
  ]
 }

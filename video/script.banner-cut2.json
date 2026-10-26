@@ -1,0 +1,76 @@
+{
+ "note": "Banner-led cut (2026-10-25): about two minutes, the aha in the first 30 seconds. Each beat: what is said (Kokoro), what is on screen, and which part of the real capture plays (between two marks from capture/marks.json).",
+ "beats": [
+  {
+   "id": "a-hook",
+   "card": "cmontage",
+   "text": "Every campaign ships the same ad in a dozen shapes and languages, and someone rebuilds each one by hand."
+  },
+  {
+   "id": "a-drop",
+   "clip": [
+    "home",
+    "parts"
+   ],
+   "live": true,
+   "onScreen": "Drop in any banner",
+   "text": "So I drop in a banner. Nemotron 3.5 Super VL, live on Nebius Token Factory, looks at the picture and proposes its parts: the logo, the product, the headline, the price, the button and the small print.",
+   "say": "So I drop in a banner. Nemotron three point five Super V L, live on Nebius Token Factory, looks at the picture and proposes its parts: the logo, the product, the headline, the price, the button and the small print."
+  },
+  {
+   "id": "a-fix",
+   "clip": [
+    "parts",
+    "fix-done"
+   ],
+   "live": true,
+   "onScreen": "You check the parts",
+   "text": "I check what it found. Its boxes for the logo and the product are too tight, so I drag them onto the whole picture. Boxes snap to the content, everything also works by keyboard, and checks refuse anything unusable."
+  },
+  {
+   "id": "a-adapt",
+   "clip": [
+    "fix-done",
+    "rebuilt"
+   ],
+   "live": true,
+   "onScreen": "Rebuilt as editable layers",
+   "text": "Then it rebuilds the banner as editable layers, and adapts it to a vertical story card with a layout rule it learned from one example."
+  },
+  {
+   "id": "a-ask",
+   "clip": [
+    "question",
+    "question-read"
+   ],
+   "live": true,
+   "onScreen": "It asks before it guesses",
+   "text": "The German headline is too long for the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron 3 Super words the question.",
+   "say": "The German headline is too long for the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron three Super words the question."
+  },
+  {
+   "id": "a-answer",
+   "clip": [
+    "question-read",
+    "checks-read"
+   ],
+   "live": true,
+   "onScreen": "Every result is checked independently",
+   "text": "I pick split. An independent verifier re-measures the result, and fourteen of fourteen checks pass. For my own banner there is no authored answer, and the app says so instead of counting one."
+  },
+  {
+   "id": "a-limits",
+   "clip": [
+    "limits",
+    "limits-read"
+   ],
+   "onScreen": "What it cannot do yet",
+   "text": "It also says what it cannot do: flat backgrounds, one font, sixteen by nine only. Nemotron named all six parts on our six test banners, but its boxes were only partly right, which is why you confirm them. And of two hundred seventy four real designs we scanned, none had all six parts, so three are optional."
+  },
+  {
+   "id": "a-close",
+   "card": "cresults",
+   "text": "The numbers, and the failures, are in the repository. Open Apprentice: drop in any banner, and trust the result."
+  }
+ ]
+}
