@@ -1,5 +1,15 @@
 # CURRENT STATE — 2026-10-24 (read first)
 
+## 26 Oct 2026: the sketch door, Tavily page reading, grounded copy, page check (read this first)
+
+- **What was added.** "Start from a sketch": a photo of a rough wireframe plus an optional product page address becomes layers (Nemotron-3.5-Super-VL, `campaign/sketch.py`), facts with source quotes and headline options (Tavily Extract via `campaign/pages.py`, Nemotron-3-Super via `campaign/facts.py` and `campaign/copy.py`, each fact and headline kept only if grounded in the page text), then the existing confirm, adapt, ask and verify pipeline. `evaluation/page_check.py` (independent of agent code) compares the banner's price with the page and returns match, mismatch or unknown (advisory). Spec: `docs/superpowers/specs/2026-10-26-sketch-to-banner-design.md`. Design: `DESIGN.md`, Figma `LhsRAlpHtI4Jg93Uh9V2It`, `docs/design/sketch-flow-prototype.html`.
+- **Config.** `PAGE_MODE=tavily` and `TAVILY_API_KEY` (Secret Manager secret `tavily-api-key`, readable by `oa-prod@`) on Cloud Run; without a key or with `PAGE_MODE=mock` the offline page reader answers only for `/samples/halden-h7.html` (and `-de`). Quotas per address per hour: 10 vision reads (shared by banners and sketches), 6 pages; 3 pages per workspace.
+- **Evidence.** Sketch probe run 1 on 6 synthetic wireframes: partial, $0.027 (`docs/evaluation/campaign_sketch_dev_run1.md`). Live smoke on the candidate (00050-cib): sketch read, page read, grounded facts, headline, build, 14/14 checks, page check match. Not yet measured: real hand-drawn sketches; Nemotron's headline quality beyond grounding.
+- **3D waiting state.** `headphones3d.ts` (img2threejs: only the blockout pass was completed, the module is hand-written; `docs/evaluation/headphones3d_img2threejs.md`), loaded lazily by `ReadingLoader.tsx`.
+- **Spend rules.** Owner authorised $5 of live development spend on 26 Oct; running tally is in the conversation, not in the repo. The public demo's durable cap is separate (`DEMO_MODEL_MAX_USD`).
+- **Pitfall.** `/tmp` venvs are purged by macOS after a few days: rebuild with `UV_PROJECT_ENVIRONMENT=/tmp/claude-501/venv312 uv sync --frozen --python 3.12`.
+
+
 **Production `open-apprentice-00048-wuq`** (image `demo:prod-dc3f884`, 100% since 25 Oct; adds sized question previews on the Adapt page; rollback `00046-wuc`). Before it `open-apprentice-00046-wuc` (image `demo:prod-cfe8b93`; landing is "Adapt a banner": Nemotron-3.5-Super-VL reads any 16:9 image, owner edits the parts, rebuilt layers, story card, checks; price, button and small print optional; smoke passed live; rollback `open-apprentice-00043-voj=100`). Previous production `open-apprentice-00043-voj` (image `demo:prod-9f506bc`, 100% with the `next` tag since 24 Oct; same as `00041-pet` plus verifier details shown for failed checks only; public smoke passed; the 2:55 video was captured on it) adds three features:
 (1) Try-it "show the work" panel: candidate count, every Z3 pair search, the chosen input's split sizes and entropy, the
 final solver check (`reasoning` in the teach API; split sizes only, never which rule backs which option); (2) Campaign
