@@ -2,7 +2,7 @@
 
 Our own measurement, not user research. Written 25 Oct 2026, before deciding whether parts may be optional.
 
-**Data:** Crello (`cyberagent/crello`, validation split, 1,852 designs) read through the Hugging Face dataset-server API. Licence (CDLA-Permissive-2.0 per the dataset card) is **not yet verified against the LICENSE file**; only metadata (element types and text) was read, no images are copied into the repo.
+**Data:** Crello (`cyberagent/crello`, validation split, 1,852 designs) read through the Hugging Face dataset-server API. The dataset card (checked 26 Oct 2026) says the dataset is distributed under CDLA-Permissive-2.0, that the distributor does **not own the copyright of the original design templates** and does not redistribute the original files, and that a user "must agree to the VistaCreate License Agreements". We have **not** accepted those terms, so we read only metadata (element types and text counts) and used **no images**: none were downloaded, run through the app or copied into the repo. Running the app on the preview images would need the owner's explicit agreement to those terms; until then the flow has not been run on any third-party design.
 
 **Method:** keep designs whose canvas ratio is 1.6 to 1.95 (274 designs). Count by element type and text with simple patterns (a currency sign with a digit = price; terms/valid/apply/copyright/asterisk = small print; a short imperative phrase of 4 words or fewer = button). The patterns are crude, so treat the counts as rough.
 
