@@ -6,7 +6,7 @@ import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
 import type { Rgb } from "./snap";
-import { ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
+import { ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
 import type { Picture } from "./SketchPanels";
 import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace, PageCheck, PageInfo } from "./types";
 
@@ -17,6 +17,24 @@ const sentence = (t: string): string => {
   const x = t.trim().replace(/[.\s]+$/, "");
   return x ? `${x[0].toUpperCase()}${x.slice(1)}.` : "";
 };
+/** A sketch's text boxes are drawn small and loose. Give each text block the free space below it (down to the next part that
+ *  overlaps it in x, or the bottom margin) and generous type caps, so the rebuilt banner reads as designed, not as a wireframe
+ *  with words in it. The server still fits the size to the box; the owner can drag any box. */
+const TEXT_CAP: Record<string, number> = { headline: 72, price: 48, cta: 36, legal: 20 };
+const TEXT_MAX_H: Record<string, number> = { headline: 230, price: 80, legal: 100 };
+function growText(ls: AdaptLayer[]): AdaptLayer[] {
+  const GAP = 20;
+  return ls.map((l) => {
+    if (isImageRole(l.role)) return l;
+    const cap = TEXT_CAP[l.role];
+    const [x, y, w, h] = l.box;
+    if (l.role === "cta") return { ...l, font_px: cap };
+    const below = ls.filter((o) => o !== l && o.box[1] > y + 4 && o.box[0] < x + w && o.box[0] + o.box[2] > x).map((o) => o.box[1]);
+    const free = (below.length ? Math.min(...below) : BANNER_H - 48) - GAP - y;
+    const nh = Math.round(Math.min(Math.max(h, free), TEXT_MAX_H[l.role] ?? h));
+    return { ...l, box: [x, y, w, nh], font_px: cap };
+  });
+}
 const PUBLIC_DEMO = "https://open-apprentice-md76de375q-uc.a.run.app";
 /** The sample product page Tavily reads. On an https deployment it is this server's own copy (so a candidate revision tests itself);
  *  locally the public demo's address stands in (the offline page reader answers for it without any network). */
@@ -310,8 +328,8 @@ export function Adapt() {
   };
   const sampleSketch = () =>
     go("Loading the sample sketch…", async () => {
-      const blob = await (await fetch("/samples/sketches/sketch-1.png")).blob();
-      setSketchSrc(await readFileAsDataUrl(new File([blob], "sketch-1.png", { type: blob.type || "image/png" })));
+      const blob = await (await fetch("/samples/sketches/sketch-4.png")).blob();
+      setSketchSrc(await readFileAsDataUrl(new File([blob], "sketch-4.png", { type: blob.type || "image/png" })));
     });
 
   const readBanner = (src: string) =>
@@ -387,7 +405,7 @@ export function Adapt() {
       setKind("sketch");
       setImage(url);
       setUpload(up);
-      setLayers(up.layers.map((l) => ({ ...l, color: "", fill: "", text: isImageRole(l.role) ? "" : textFor(l.role, l.text) })));
+      setLayers(growText(up.layers.map((l) => ({ ...l, color: "", fill: "", text: isImageRole(l.role) ? "" : textFor(l.role, l.text) }))));
       setBackground(PALETTE[0]);
       setLanguage(pg?.language || up.language || "en");
       setPage(pg);
@@ -534,6 +552,7 @@ export function Adapt() {
                 Use the sample sketch
               </button>
             </div>
+            <p className="muted small">The sample is a generated wireframe, not a hand drawing. A photo of your own sketch is the real test.</p>
             {sketchSrc ? <img className="sketch-preview" src={sketchSrc} alt="Your sketch" /> : null}
           </div>
           <div className="panel">
@@ -846,6 +865,7 @@ export function Adapt() {
                 </div>
               </details>
               {page || checkNote ? <PageCheckBox check={pageCheck} error={pageCheck ? "" : checkNote} /> : null}
+              {kind === "sketch" && upload ? <Provenance model={upload.origin === "model" ? upload.model : ""} layers={layers} page={page} choice={choice} pics={pics} background={background} /> : null}
               <div className="controls">
                 <a className="btn primary" href={run.result?.png} download="story-card.png">
                   <DownloadSimple size={18} weight="bold" aria-hidden="true" />

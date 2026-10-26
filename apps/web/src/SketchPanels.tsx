@@ -224,3 +224,49 @@ export function PageCheckBox({ check, error }: { check: PageCheck | null; error:
     </section>
   );
 }
+
+interface ProvenanceProps {
+  model: string;
+  layers: AdaptLayer[];
+  page: PageInfo | null;
+  choice: string;
+  pics: Record<string, Picture>;
+  background: string;
+}
+
+/** Where every part of a sketch-built banner came from, so nothing looks conjured: what the sketch gave, what the page
+ *  gave (with the quote), what the owner supplied. */
+export function Provenance({ model, layers, page, choice, pics, background }: ProvenanceProps) {
+  const text = (role: string) => layers.find((l) => l.role === role)?.text ?? "";
+  const rows: [string, string, string][] = [["Layout", `Your sketch, read by ${model.replace(/^nvidia\//, "") || "you (manual boxes)"}`, `${layers.length} boxes; you can drag any of them`]];
+  const option = page?.copy.options.find((o) => o.id === choice);
+  const nameQuote = page?.facts.product_name?.quote;
+  if (text("headline")) {
+    rows.push(["Headline", option && option.headline === text("headline") ? "Drafted by Nemotron-3-Super from your page's facts" : "Typed by you", option && nameQuote ? `Every number and name is on your page, for example “${nameQuote}”` : ""]);
+  }
+  const price = page?.facts.prices.find((p) => text("price").includes(p.text));
+  if (text("price")) rows.push(["Price", price ? "Your page, word for word" : "Typed by you", price ? `“${price.quote}”` : ""]);
+  if (text("cta")) rows.push(["Button label", page && text("cta") === page.copy.cta ? "A fixed table of button words for the page's language" : "Typed by you", ""]);
+  const legal = page?.facts.legal.find((f) => text("legal").includes(f.text.replace(/\.$/, "")));
+  if (text("legal")) rows.push(["Small print", legal ? "Your page, word for word" : "Typed by you", legal ? `“${legal.quote}”` : ""]);
+  for (const role of ["brand_mark", "product_image"]) {
+    if (layers.some((l) => l.role === role)) rows.push([LABEL[role], `Your file${pics[role] ? `: ${pics[role].name}` : ""}`, "Never generated or altered, only fitted inside its box"]);
+  }
+  rows.push(["Background", "The colour you picked", background]);
+  return (
+    <details className="provenance">
+      <summary>Where every part came from</summary>
+      <table className="data">
+        <tbody>
+          {rows.map(([k, v, note]) => (
+            <tr key={k}>
+              <td>{k}</td>
+              <td>{v}</td>
+              <td className="muted small">{note}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </details>
+  );
+}

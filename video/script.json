@@ -1,24 +1,55 @@
 {
- "note": "Two-door cut (2026-10-26): sketch + page first (aha in 30 s), then a banner with the overflow question, limits, results. One live capture: capture/full.mjs.",
+ "note": "Honest two-door cut (26 Oct, v2): the proven banner flow first, the sketch and page flow as the extension, provenance on screen. One live capture: capture/full.mjs.",
  "beats": [
   {
-   "id": "d-hook",
+   "id": "e-hook",
    "card": "cmontage",
    "text": "Every campaign ships the same ad in a dozen shapes and languages, and someone rebuilds each one by hand."
   },
   {
-   "id": "d-sketch",
+   "id": "e-banner",
+   "clip": [
+    "drop",
+    "fix-done"
+   ],
+   "live": true,
+   "onScreen": "Drop in a banner. Check what it found.",
+   "text": "I drop in a banner. Nemotron 3.5 Super VL reads its parts, and I drag the boxes it got wrong. Nothing it says is trusted until I confirm it.",
+   "say": "I drop in a banner. Nemotron three point five Super V L reads its parts, and I drag the boxes it got wrong. Nothing it says is trusted until I confirm it."
+  },
+  {
+   "id": "e-ask",
+   "clip": [
+    "confirm",
+    "question-read"
+   ],
+   "live": true,
+   "onScreen": "It asks before it guesses",
+   "text": "A long German headline does not fit the story card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron 3 Super words the question.",
+   "say": "A long German headline does not fit the story card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron three Super words the question."
+  },
+  {
+   "id": "e-answer",
+   "clip": [
+    "question-read",
+    "checks-read"
+   ],
+   "live": true,
+   "onScreen": "Every result is checked independently",
+   "text": "I pick split, and an independent verifier re-measures the result. For my own banner there is no authored answer, and the app says so instead of counting one."
+  },
+  {
+   "id": "e-sketch",
    "clip": [
     "s-open",
     "s-parts"
    ],
    "live": true,
-   "onScreen": "Start from a rough sketch",
-   "text": "So I start from a rough sketch, and point at the product page. Nemotron 3.5 Super VL reads the boxes I drew, and Tavily reads the page.",
-   "say": "So I start from a rough sketch, and point at the product page. Nemotron three point five Super V L reads the boxes I drew, and Tavily reads the page."
+   "onScreen": "No banner yet? A sketch and your product page.",
+   "text": "No banner yet? Start from a sketch and your product page. This is a sample sketch we generated. Nemotron reads its boxes, and Tavily reads the page."
   },
   {
-   "id": "d-facts",
+   "id": "e-facts",
    "clip": [
     "s-copy",
     "s-copy-read"
@@ -29,67 +60,36 @@
    "say": "Nemotron three Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number or a name that is not on the page is thrown away."
   },
   {
-   "id": "d-build",
+   "id": "e-build",
    "clip": [
     "s-pics",
     "s-done"
    ],
    "live": true,
-   "onScreen": "Your pictures, your colours, built as layers",
-   "text": "I add my own logo and product picture, pick a colour, and build. The banner is rebuilt as editable layers, and adapted to a story card."
+   "onScreen": "Your own pictures, built as editable layers",
+   "text": "I add my own logo and product picture, and build. The banner is rebuilt as editable layers, and adapted to a story card."
   },
   {
-   "id": "d-check",
+   "id": "e-prov",
    "clip": [
     "s-check",
-    "s-check-read"
+    "s-prov-read"
    ],
    "live": true,
-   "onScreen": "Checked independently, and against your page",
-   "text": "Fourteen independent checks pass. And a page check compares the price on the banner with your page. Here it matches. If it did not, the app would say so."
+   "onScreen": "Checked against your page. Nothing is conjured.",
+   "text": "A page check compares the price with the page. And this panel says where every part came from: the layout from the sketch, the words from the page, the pictures from me."
   },
   {
-   "id": "d-banner",
-   "clip": [
-    "drop",
-    "fix-done"
-   ],
-   "live": true,
-   "onScreen": "Banners you already have work too",
-   "text": "Banners you already have work too. Nemotron reads the parts, and I drag the boxes it got wrong."
-  },
-  {
-   "id": "d-ask",
-   "clip": [
-    "confirm",
-    "question-read"
-   ],
-   "live": true,
-   "onScreen": "It asks before it guesses",
-   "text": "A long German headline does not fit the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron 3 Super words the question.",
-   "say": "A long German headline does not fit the card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron three Super words the question."
-  },
-  {
-   "id": "d-answer",
-   "clip": [
-    "question-read",
-    "checks-read"
-   ],
-   "live": true,
-   "onScreen": "Every result is checked independently",
-   "text": "I pick split, and the independent verifier re-checks the result. For my own banner there is no authored answer, and the app says so instead of counting one."
-  },
-  {
-   "id": "d-limits",
+   "id": "e-limits",
    "clip": [
     "limits",
     "limits-read"
    ],
    "onScreen": "What it cannot do yet",
-   "text": "It also says what it cannot do: flat backgrounds, one font, sixteen by nine only, and no generated pictures. Sketch reading was only partly right on our tests, which is why you confirm the boxes."
+   "text": "It also says what it cannot do: flat backgrounds, one font, sixteen by nine, and no generated pictures. On our test, sketch reading named every part but its boxes were loose, which is why you drag them."
   },
   {
-   "id": "d-close",
+   "id": "e-close",
    "card": "cresults",
    "text": "The numbers, and the failures, are in the repository. Open Apprentice: bring a banner or a sketch, and trust the result."
   }

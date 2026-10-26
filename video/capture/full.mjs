@@ -98,86 +98,6 @@ try {
   await sleep(1800);
   await mark("home");
 
-  // ---- door 2: a rough sketch and the owner's product page --------------------------------------------------------------
-  await mark("s-open");
-  await click(page.getByRole("button", { name: "Start from a sketch" }));
-  await page.getByRole("heading", { name: "Start from a sketch" }).waitFor();
-  await sleep(900);
-  if (SKETCH) {
-    const f = await page.locator("input[type=file]").first();
-    await f.setInputFiles(SKETCH);
-  } else {
-    await click(page.getByRole("button", { name: "Use the sample sketch" }));
-  }
-  await page.locator("img[alt='Your sketch']").waitFor();
-  await sleep(1400);
-  await mark("s-sketch");
-  await click(page.getByRole("button", { name: "Use the sample page" }));
-  await sleep(1200);
-  await mark("s-page");
-  const readSketch = page.waitForResponse((r) => /\/sketches$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
-  await click(page.getByRole("button", { name: "Read my sketch" }));
-  await mark("s-read");
-  const skRes = await readSketch;
-  if (!skRes.ok()) throw new Error(`reading the sketch failed: HTTP ${skRes.status()} ${(await skRes.text()).slice(0, 200)}`);
-  const sk = await skRes.json();
-  console.log(`  sketch: origin ${sk.origin}, model ${sk.model}, layers ${sk.layers.map((l) => l.role).join(",")}`);
-  await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 120_000 });
-  await sleep(1500);
-  await mark("s-parts");
-  await sleep(2500);
-  const copyPanel = page.locator("section[aria-labelledby=p-copy]");
-  await copyPanel.waitFor({ timeout: 60_000 });
-  await scrollTo("section[aria-labelledby=p-copy]", 20);
-  await mark("s-copy", "section[aria-labelledby=p-copy]");
-  await sleep(6500);
-  const opts = page.locator("label.opt");
-  const lens = await opts.evaluateAll((els) => els.map((e) => e.textContent.length));
-  if (lens.length > 1) await click(opts.nth(lens.indexOf(Math.min(...lens)))); // the shortest option fits the story card without a question
-  await sleep(1800);
-  await mark("s-copy-read");
-  await click(page.getByRole("button", { name: "Use the sample pictures" }));
-  await page.locator("img[alt='Logo you chose']").waitFor();
-  await sleep(1200);
-  await click(page.getByRole("radio", { name: "#1d1240" }));
-  await mark("s-pics");
-  await sleep(1500);
-  const removeLegal = page.getByRole("button", { name: /has no small print: remove it/ });
-  const legalBox = page.locator("fieldset.lrow", { has: page.locator("legend", { hasText: "Small print" }) }).locator("textarea");
-  if ((await legalBox.count()) && (await legalBox.inputValue()) === "") await click(removeLegal);
-  const built = page.waitForResponse((r) => /\/runs$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
-  const buildBtn = page.getByRole("button", { name: "Looks right: make the story card" });
-  await buildBtn.scrollIntoViewIfNeeded();
-  await mark("s-build");
-  await click(buildBtn);
-  const alertText = page.getByRole("alert").first().waitFor({ timeout: 25_000 }).then(async () => (await page.getByRole("alert").first().innerText()).replace(/\s+/g, " "), () => "");
-  const first = await Promise.race([built.then(() => "ok", () => "timeout"), alertText.then((t) => (t ? `alert: ${t}` : new Promise(() => undefined)))]);
-  if (first !== "ok") {
-    await page.screenshot({ path: "/tmp/claude-501/design/capture-error.png", fullPage: true });
-    throw new Error(`building the banner did not start: ${first}`);
-  }
-  const sr = await (await built).json();
-  console.log(`  sketch run: ${sr.status}`);
-  if (sr.status === "question") {
-    const answered0 = page.waitForResponse((r) => /\/answer$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
-    await click(page.getByRole("button", { name: "Shrink the product image" }).first());
-    await answered0;
-  }
-  await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 120_000 });
-  await sleep(1200);
-  await scrollTo(".trio", 60);
-  await mark("s-done", ".trio");
-  await sleep(4500);
-  if (await page.locator("section.pagecheck").count()) {
-    await scrollTo("section.pagecheck", 160);
-    await mark("s-check", "section.pagecheck");
-    await sleep(5500);
-  }
-  await mark("s-check-read");
-  await click(page.getByRole("button", { name: "Adapt another banner" }));
-  await sleep(1200);
-  await mark("b-home");
-
   // drop a banner: the cursor goes to the button, then the German banner is loaded and Nemotron reads it
   const choose = page.locator("label.filebtn");
   const cb = await choose.boundingBox();
@@ -271,6 +191,99 @@ try {
   await mark("checks");
   await sleep(5000);
   await mark("checks-read");
+  await click(page.getByRole("button", { name: "Adapt another banner" }));
+  await sleep(1500);
+  await mark("s-home");
+
+  // ---- door 2: a rough sketch and the owner's product page --------------------------------------------------------------
+  await mark("s-open");
+  await click(page.getByRole("button", { name: "Start from a sketch" }));
+  await page.getByRole("heading", { name: "Start from a sketch" }).waitFor();
+  await sleep(900);
+  if (SKETCH) {
+    const f = await page.locator("input[type=file]").first();
+    await f.setInputFiles(SKETCH);
+  } else {
+    await click(page.getByRole("button", { name: "Use the sample sketch" }));
+  }
+  await page.locator("img[alt='Your sketch']").waitFor();
+  await sleep(1400);
+  await mark("s-sketch");
+  await click(page.getByRole("button", { name: "Use the sample page" }));
+  await sleep(1200);
+  await mark("s-page");
+  const readSketch = page.waitForResponse((r) => /\/sketches$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
+  await click(page.getByRole("button", { name: "Read my sketch" }));
+  await mark("s-read");
+  const skRes = await readSketch;
+  if (!skRes.ok()) throw new Error(`reading the sketch failed: HTTP ${skRes.status()} ${(await skRes.text()).slice(0, 200)}`);
+  const sk = await skRes.json();
+  console.log(`  sketch: origin ${sk.origin}, model ${sk.model}, layers ${sk.layers.map((l) => l.role).join(",")}`);
+  await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 120_000 });
+  await sleep(1500);
+  await mark("s-parts");
+  await sleep(2500);
+  const copyPanel = page.locator("section[aria-labelledby=p-copy]");
+  await copyPanel.waitFor({ timeout: 60_000 });
+  await scrollTo("section[aria-labelledby=p-copy]", 20);
+  await mark("s-copy", "section[aria-labelledby=p-copy]");
+  await sleep(6500);
+  const opts = page.locator("label.opt");
+  const lens = await opts.evaluateAll((els) => els.map((e) => e.textContent.length));
+  if (lens.length > 1) await click(opts.nth(lens.indexOf(Math.min(...lens)))); // the shortest option fits the story card without a question
+  await sleep(1800);
+  await mark("s-copy-read");
+  // the owner's own files, one at a time (the OS file dialog cannot be filmed, so the chosen thumbnails show them arriving)
+  const PIC = (n) => path.join(HERE, "..", "..", "apps", "web", "public", "samples", "pictures", n);
+  await moveTo(...(await (async () => { const b = await page.locator("label.filebtn", { hasText: "Choose" }).first().boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; })()));
+  await sleep(500);
+  await page.locator("input[aria-label='Logo picture']").setInputFiles(PIC("halden-wordmark.png"));
+  await page.locator("img[alt='Logo you chose']").waitFor();
+  await sleep(1300);
+  await page.locator("input[aria-label='Product image picture']").setInputFiles(PIC("h7-headphones.png"));
+  await page.locator("img[alt='Product image you chose']").waitFor();
+  await sleep(1500);
+  await click(page.getByRole("radio", { name: "#1d1240" }));
+  await mark("s-pics");
+  await sleep(1500);
+  const removeLegal = page.getByRole("button", { name: /has no small print: remove it/ });
+  const legalBox = page.locator("fieldset.lrow", { has: page.locator("legend", { hasText: "Small print" }) }).locator("textarea");
+  if ((await legalBox.count()) && (await legalBox.inputValue()) === "") await click(removeLegal);
+  const built = page.waitForResponse((r) => /\/runs$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
+  const buildBtn = page.getByRole("button", { name: "Looks right: make the story card" });
+  await buildBtn.scrollIntoViewIfNeeded();
+  await mark("s-build");
+  await click(buildBtn);
+  const alertText = page.getByRole("alert").first().waitFor({ timeout: 25_000 }).then(async () => (await page.getByRole("alert").first().innerText()).replace(/\s+/g, " "), () => "");
+  const first = await Promise.race([built.then(() => "ok", () => "timeout"), alertText.then((t) => (t ? `alert: ${t}` : new Promise(() => undefined)))]);
+  if (first !== "ok") {
+    await page.screenshot({ path: "/tmp/claude-501/design/capture-error.png", fullPage: true });
+    throw new Error(`building the banner did not start: ${first}`);
+  }
+  const sr = await (await built).json();
+  console.log(`  sketch run: ${sr.status}`);
+  if (sr.status === "question") {
+    const answered0 = page.waitForResponse((r) => /\/answer$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
+    await click(page.getByRole("button", { name: "Shrink the product image" }).first());
+    await answered0;
+  }
+  await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 120_000 });
+  await sleep(1200);
+  await scrollTo(".trio", 60);
+  await mark("s-done", ".trio");
+  await sleep(4500);
+  if (await page.locator("section.pagecheck").count()) {
+    await scrollTo("section.pagecheck", 160);
+    await mark("s-check", "section.pagecheck");
+    await sleep(5500);
+  }
+  await mark("s-check-read");
+  await click(page.getByText("Where every part came from"));
+  await sleep(600);
+  await scrollTo("details.provenance", 120);
+  await mark("s-prov", "details.provenance");
+  await sleep(7000);
+  await mark("s-prov-read");
 
   // what it cannot do yet
   await page.getByText("See every check").click(); // fold the table away so the limits panel is the thing on screen
