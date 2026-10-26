@@ -5,17 +5,17 @@
  "marks": [
   {
    "name": "home",
-   "t": 18.459,
+   "t": 17.878,
    "box": null
   },
   {
    "name": "drop",
-   "t": 19.643,
+   "t": 19.07,
    "box": null
   },
   {
    "name": "parts",
-   "t": 33.245,
+   "t": 32.647,
    "box": {
     "x": 112,
     "y": 112.296875,
@@ -25,32 +25,32 @@
   },
   {
    "name": "parts-read",
-   "t": 37.746,
+   "t": 37.148,
    "box": null
   },
   {
    "name": "fix-start",
-   "t": 37.755,
+   "t": 37.157,
    "box": null
   },
   {
    "name": "fix-done",
-   "t": 45.63,
+   "t": 45.057,
    "box": null
   },
   {
    "name": "keys",
-   "t": 47.798,
+   "t": 47.215,
    "box": null
   },
   {
    "name": "confirm",
-   "t": 49.324,
+   "t": 48.735,
    "box": null
   },
   {
    "name": "rebuilt",
-   "t": 61.659,
+   "t": 59.754,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -60,7 +60,7 @@
   },
   {
    "name": "question",
-   "t": 66.071,
+   "t": 64.172,
    "box": {
     "x": 112,
     "y": 92,
@@ -70,12 +70,12 @@
   },
   {
    "name": "question-read",
-   "t": 72.571,
+   "t": 70.678,
    "box": null
   },
   {
    "name": "answered",
-   "t": 76.615,
+   "t": 74.242,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -85,72 +85,72 @@
   },
   {
    "name": "checks",
-   "t": 81.651,
+   "t": 79.277,
    "box": null
   },
   {
    "name": "checks-read",
-   "t": 86.653,
+   "t": 84.281,
    "box": null
   },
   {
    "name": "s-home",
-   "t": 89.086,
+   "t": 86.717,
    "box": null
   },
   {
    "name": "s-open",
-   "t": 89.087,
+   "t": 86.717,
    "box": null
   },
   {
    "name": "s-sketch",
-   "t": 94.033,
+   "t": 91.661,
    "box": null
   },
   {
    "name": "s-page",
-   "t": 96.168,
+   "t": 93.797,
    "box": null
   },
   {
    "name": "s-read",
-   "t": 97.102,
+   "t": 94.729,
    "box": null
   },
   {
    "name": "s-parts",
-   "t": 117.038,
+   "t": 114.31,
    "box": null
   },
   {
    "name": "s-copy",
-   "t": 120.455,
+   "t": 117.73,
    "box": {
     "x": 763.15625,
     "y": 92.234375,
     "width": 404.828125,
-    "height": 908.28125
+    "height": 944.328125
    }
   },
   {
    "name": "s-copy-read",
-   "t": 129.698,
+   "t": 126.965,
    "box": null
   },
   {
    "name": "s-pics",
-   "t": 134.463,
+   "t": 131.745,
    "box": null
   },
   {
    "name": "s-build",
-   "t": 135.984,
+   "t": 133.266,
    "box": null
   },
   {
    "name": "s-done",
-   "t": 149.2,
+   "t": 140.899,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -160,49 +160,49 @@
   },
   {
    "name": "s-check",
-   "t": 154.615,
+   "t": 146.314,
    "box": {
     "x": 112,
-    "y": 337.328125,
+    "y": 336.875,
     "width": 1056,
     "height": 111.765625
    }
   },
   {
    "name": "s-check-read",
-   "t": 160.117,
+   "t": 151.816,
    "box": null
   },
   {
    "name": "s-prov",
-   "t": 162.554,
+   "t": 154.254,
    "box": {
     "x": 112,
-    "y": 192.09375,
+    "y": 191.640625,
     "width": 1056,
     "height": 494.25
    }
   },
   {
    "name": "s-prov-read",
-   "t": 169.554,
+   "t": 161.256,
    "box": null
   },
   {
    "name": "limits",
-   "t": 171.567,
+   "t": 163.246,
    "box": {
     "x": 112,
-    "y": 231.71875,
+    "y": 231.265625,
     "width": 1056,
     "height": 392.6875
    }
   },
   {
    "name": "limits-read",
-   "t": 178.568,
+   "t": 170.248,
    "box": null
   }
  ],
- "frameOffset": 0.019
+ "frameOffset": 0.018
 }
