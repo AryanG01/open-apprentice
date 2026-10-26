@@ -256,7 +256,14 @@ What would help:
    every role correctly in our probe, but its boxes were loose or tight by 10 to 40% between runs. A documented coordinate
    convention (and a way to ask for pixel boxes) would help. Image tokens are not in the pricing page; we estimate 3,000 per
    image and cap spend per run.
-5. **Billing visibility:** an API view of spend per key or per day would let apps enforce caps against the real balance.
+5. **Tavily Extract (for the Best Use of Tavily prize, and as feedback):** one `POST /extract` per page was all we needed and
+   it worked on the first try with a Bearer key. Things we learned: `usage.credits` reports 0 until an account has made 5
+   successful extractions, so spend is invisible at small volumes; `title` is the HTML title, not the page's H1; the markdown
+   begins with navigation and image lines that we strip before grounding; and a small product page came back as a few hundred
+   characters of clean text, which is exactly what made deterministic grounding practical (a fact is kept only if its quote is
+   in that text). We never fetch a user's address ourselves: Tavily does, so there is no server-side request to an address a
+   visitor typed, and we validate the address (https, a real host name, no IP numbers or internal names) before sending it.
+6. **Billing visibility:** an API view of spend per key or per day would let apps enforce caps against the real balance.
    We keep our own durable ledger, and it ran about 11% below the real spend on the dashboard because of our rate assumptions.
 
 ## Testing instructions (for judges)
@@ -265,6 +272,9 @@ Open the demo URL; no login is needed.
 0. **The main flow:** the landing page is **Adapt a banner**. Pick a banner under **Or try a sample banner** (or drop a 1280 x 720 or 16:9
    banner image), check the parts it found, press **Looks right: make the story card**, answer the overflow question if it asks, then read
    the checks and download the PNG. Remove price, button or small print with the buttons in the editor if your banner has none.
+0b. **The sketch door:** press **Start from a sketch**, then **Use the sample sketch**, **Use the sample page** and **Read my
+   sketch**. Read the facts (each with its quote) and pick a headline, press **Use the sample pictures**, then **Looks right: make
+   the story card**. The result shows the 14 independent checks and a **Page check** row.
 1. Optional, diagrams: press **Try a sample: Online order journey** and **Hiring process**, then **Confirm mapping** on each.
 2. Under *Show it once*, drag each note under its box, lined up with its left edge.
 3. Tick **Use the live model** and press **This whole document is right**.
