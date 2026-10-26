@@ -1,32 +1,31 @@
 # Open Apprentice
 
-**Drop any banner. Nemotron sees its parts, you fix what it got wrong, and the apprentice turns it into a 9:16 story card, asks before it guesses, and checks every result independently.**
+**Bring a banner, or a rough sketch and your product page. Nemotron reads the parts, you check them, and the apprentice turns them into a 9:16 story card, asks before it guesses, and checks every result independently.**
 
-Nemotron-3.5-Super-VL (live, on Nebius Token Factory) looks at a 16:9 banner image and proposes its parts: logo, product image,
-headline, and the price, button and small print when the banner has them. You check them in an editor (drag a box, or move it with the
-arrow keys; boxes snap to the content they surround). The app rebuilds the banner as editable layers, adapts it to a story card with a
-layout rule it learned from one worked example, and, when the copy does not fit (a long German headline), stops and shows two fully
-rendered outcomes instead of squeezing. Every result is checked by an independent verifier (copy preserved, link kept, logo kept, image
-proportions, safe areas, minimum sizes, text fits, no overlaps) before you see it. The same show, ask and check loop also fixes
-`.drawio` diagrams (below).
+Two doors, one pipeline:
+- **Bring a banner.** Nemotron-3.5-Super-VL (live, on Nebius Token Factory) looks at a 16:9 banner image and proposes its parts: logo, product image, headline, and the price, button and small print when it has them. You check them in an editor (drag a box, or move it with the arrow keys; boxes snap to the content they surround). The app rebuilds the banner as editable layers, adapts it to a story card with a layout rule it learned from one worked example, and when the copy does not fit (a long German headline) stops and shows two fully rendered outcomes instead of squeezing.
+- **Start from a sketch.** Upload a photo of a rough wireframe and, optionally, the address of your product page. Nemotron VL reads the sketch into layers. **Tavily** reads the page. Nemotron-3-Super lifts facts from the page text (each with the quote it came from) and drafts headline options from those facts only. Deterministic checks keep a fact only if its quote is on the page, and a headline only if every number, currency and name in it is on the page and none of a list of unsupported claim words is used unless the page uses it. You add your own logo and product pictures and pick a colour, and the same pipeline builds the banner and the story card.
+
+Every result passes an independent verifier (copy preserved, link kept, logo kept, image proportions, safe areas, minimum sizes, text fits, no overlaps) before you see it, and a **page check** compares the banner's price with the prices on your page (advisory, never a block). The same show, ask and check loop also fixes `.drawio` diagrams (below).
 
 Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents; submission text in `docs/submission.md`).
-Who does what: **Nemotron-3.5-Super-VL** reads the banner; **you** confirm the parts; **deterministic checks and the independent verifier** decide;
-**Nemotron-3-Super** words the overflow question. Everything else runs offline.
+Who does what: **Nemotron-3.5-Super-VL** reads the banner or sketch; **Tavily** reads your page; **Nemotron-3-Super** lifts facts, drafts headlines and words the overflow question; **you** confirm; **deterministic checks and the independent verifier** decide. Everything else runs offline.
 
-**What it cannot do yet:** flat or simple backgrounds only; fonts replaced by Liberation Sans; 16:9 input; Latin scripts; logo and product must be
-separate pictures; image content is judged only by Nemotron and then you. Reading quality: roles 6/6 and 83% of words exact on 6 development
-banners, but boxes only partly accurate (median overlap 0.55), which is why you confirm them
-([`docs/evaluation/campaign_vision_dev_run3.md`](docs/evaluation/campaign_vision_dev_run3.md)). Of 274 real 16:9 designs we scanned, none had all six
-original parts, so price, button and small print are now optional: 252 of 274 meet the current rule by element count (an upper bound, because vector art counts as pictures; 23 if it does not), and we have not run the flow on them
-([`docs/evaluation/real_world_coverage.md`](docs/evaluation/real_world_coverage.md)); that scan is our own measurement, not user research.
+**Honest status.**
+- Banner reading: roles 6/6 and 83% of words exact on 6 development banners, but boxes only partly accurate (median overlap 0.55), which is why you confirm them ([`docs/evaluation/campaign_vision_dev_run3.md`](docs/evaluation/campaign_vision_dev_run3.md)).
+- Sketch reading: pre-registered probe on 6 synthetic wireframes: partial (all six roles named on 6 of 6, median overlap 0.61, every layer found on 2 of 6; headline and small-print boxes come back loose) ([`docs/evaluation/campaign_sketch_dev_run1.md`](docs/evaluation/campaign_sketch_dev_run1.md)). Real hand-drawn sketches are tested separately and reported as such.
+- Page facts and copy: the grounding and claim rules are deterministic and tested; Nemotron's drafts are not scored for quality, only for being grounded. One live end-to-end smoke on the sample page (sketch, Tavily, facts, headline, build, 14/14 checks, page check match).
+- 252 of 274 real 16:9 designs we scanned meet the current required-parts rule by element count (an upper bound; 23 if vector art does not count as pictures; the flow was not run on them) ([`docs/evaluation/real_world_coverage.md`](docs/evaluation/real_world_coverage.md)). That scan is our own measurement, not user research.
+- **What it cannot do yet:** flat or simple backgrounds only; fonts replaced by Liberation Sans; 16:9; Latin scripts; logo and product must be separate pictures you supply for sketches; no picture generation (Token Factory offers no image model); image content is judged only by Nemotron and then you.
 
 ## Live demo
 
 **https://open-apprentice-md76de375q-uc.a.run.app** (Google Cloud Run, state in Cloud Storage, long steps through Cloud Tasks).
 Video: <YouTube link>. To try it: on the landing page, pick a sample banner (or drop a 16:9 image), check the parts, press
-**Looks right: make the story card**, answer the question if it asks, and download the PNG. Your image is sent to Nebius Token Factory to be read
-and kept in memory for 30 minutes; at most 10 vision reads per address per hour, under a durable spending cap.
+**Looks right: make the story card**, answer the question if it asks, and download the PNG. Or press **Start from a sketch**: use the sample sketch and
+the sample page, read the facts (each with its quote) and the headline options, add the sample pictures, build, and read the page check. Your image is sent to
+Nebius Token Factory to be read and kept in memory for 30 minutes; a page address is sent to Tavily; at most 10 vision reads and 6 page reads per address per
+hour, under a durable spending cap.
 
 The other lane, **diagrams** (Diagrams tab): press **Try a sample: Online order journey** and **Hiring process**, confirm which box each note describes,
 drag the notes on one diagram under their boxes, tick *Use the live model* and press *This whole

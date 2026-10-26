@@ -12,15 +12,16 @@ comes from a file in this repository. The file is named next to the claim so it 
 
 ## Tagline (one line)
 
-Drop any banner. Nemotron sees its parts, you fix what it got wrong, and the apprentice turns it into a story card, asks
-before it guesses, and proves every result.
+Bring a banner, or a rough sketch and your product page. Nemotron reads the parts, you fix what it got wrong, and the
+apprentice builds a story card, asks before it guesses, and proves every result.
 
 ## Inspiration
 
 Every campaign ships the same ad in a dozen shapes and languages, and someone rebuilds each one by hand. A tool that
 "just adapts it" guesses, and a guess applied to every banner is a lot of chances to be quietly wrong: a headline cut off,
-a price too small to read, a logo squeezed. We wanted an apprentice instead of an autopilot. It looks at the banner,
-shows you what it understood, asks the one question your banner leaves open, and never shows a result it has not checked.
+a price too small to read, a logo squeezed, a price that no longer matches the page it links to. We wanted an apprentice
+instead of an autopilot. It looks at the banner (or your sketch), shows you what it understood, asks the one question your
+banner leaves open, and never shows a result it has not checked.
 
 ## What it does
 
@@ -40,6 +41,30 @@ shows you what it understood, asks the one question your banner leaves open, and
 5. **Every result is checked by an independent verifier** (copy exactly preserved, link kept, logo kept, image proportions,
    safe areas, minimum sizes, text fits, no overlaps) before you see it, then downloaded as a PNG. For your own banners
    there is no authored expected answer, and the app says so instead of counting one.
+
+**The second door: start from a sketch and your product page.**
+1. **Upload a rough sketch** (a photo of boxes drawn on paper works) and, optionally, the address of your product page.
+2. **Nemotron-3.5-Super-VL reads the sketch** into the same layers the banner door uses (logo, picture, headline, and the
+   price, button and small print when you drew them).
+3. **Tavily Extract reads your page.** **Nemotron-3-Super lifts facts from the page text**, each with the quote it came from,
+   and drafts three headline options from those facts only. A fact survives only if its quote is on the page. A headline
+   survives only if every number, currency and name in it is on the page, none of a list of unsupported claim words
+   (best, number one, guaranteed, free, and their German, French and Spanish equivalents) appears unless the page uses it,
+   and the font can draw every character. The price line is the page's own text, never generated. If no draft survives,
+   the product name is the headline.
+4. **You add your own logo and product pictures** (the app generates no pictures: Token Factory offers no image model),
+   pick a colour, and confirm. The same pipeline builds the banner as editable layers, adapts it to a story card, asks on
+   overflow, and runs the independent verifier.
+5. **A page check** compares the price on the banner with the prices on your page (match, mismatch, unknown). It is
+   advisory and never blocks a result; it is the same problem ad platforms enforce when a price does not match the page.
+6. While Nemotron reads (10 to 30 seconds) a small 3D headphones turntable turns. It was built from the sample picture with
+   the img2threejs skill (only its first, blockout pass was completed; the module is hand-written) and loads only when needed.
+
+**How well does the sketch reading work?** Pre-registered probe on 6 synthetic wireframes (not hand drawn), $0.027: all six
+roles named on 6 of 6, median box overlap 0.61, every layer found on 2 of 6, decision **partial**
+(`docs/evaluation/campaign_sketch_dev_run1.md`). Headline and small-print boxes come back loose, which is why you drag boxes.
+Real hand-drawn sketches are tested separately and reported separately. One live end-to-end run on the sample page passed:
+sketch read, page read, grounded facts, a headline, a built banner, 14 of 14 independent checks, page check match.
 
 **Who does what** (shown on the page): Nemotron-3.5-Super-VL reads the banner; you confirm the parts; deterministic
 checks and the independent verifier decide; Nemotron-3-Super words the question.
@@ -199,7 +224,7 @@ and Ultra does the heavy evaluation.
 
 ## Built with
 
-nvidia-nemotron, nemotron-vl, nebius-token-factory, python, fastapi, react, typescript, playwright, draw.io, konva, fabric.js, google-cloud-run,
+nvidia-nemotron, nemotron-vl, nebius-token-factory, tavily, three.js, figma, python, fastapi, react, typescript, playwright, draw.io, konva, fabric.js, google-cloud-run,
 cloud-tasks, cloud-storage, z3, remotion
 
 ## Feedback on Nebius Token Factory and NVIDIA models (required field)
