@@ -98,6 +98,7 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     assert.match(await text(), /15 of 15 checks passed/);
 
     await run("de_long_a");
+    await page.getByText(/Which tradeoff should this rule make/).first().waitFor({ timeout: 20_000 }); // a slow runner renders after the response
     assert.match(await text(), /Which tradeoff should this rule make/);
     assert.equal(await page.locator(".preview img").count(), 2);
     await pick("Shrink the product image");
