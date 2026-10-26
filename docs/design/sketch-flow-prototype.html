@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Open Apprentice: sketch to banner (prototype)</title>
+<style>
+:root{--bg:#fdfdfc;--surface:#f4f4f2;--surface-2:#ebebe8;--raised:#fff;--ink:#111110;--ink-2:#64625f;--ink-3:#8f8d89;--line:#e7e7e5;--line-strong:#cfcfcd;--accent:#76b900;--ok:#2f5d00;--ok-soft:#e6f3d1;--bad:#b3261e;--bad-soft:#fbe7e4;--warn:#8a5a00;--warn-soft:#fcefd2}
+*{box-sizing:border-box}
+body{margin:0;background:#e9e9e6;font:450 15px/1.5 Geist,Inter,Arial,sans-serif;color:var(--ink);letter-spacing:-.005em}
+.frame{width:1440px;background:var(--bg);margin:0 0 80px;position:relative;overflow:hidden}
+.m{width:390px}
+.shell{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:10px;align-items:center;font-weight:600;font-size:15.5px;letter-spacing:-.02em}
+.mark{width:26px;height:26px;position:relative}.mark i{position:absolute;border:1.8px solid var(--ink);border-radius:3px}.mark i+i{border-color:var(--accent);background:#76b90028}
+.tabs{display:flex;gap:2px}.tab{padding:7px 14px;border-radius:999px;font-weight:520;font-size:14px;color:var(--ink-2)}.tab.on{background:var(--surface-2);color:var(--ink)}
+.page{padding:64px 32px 72px;max-width:1120px;margin:0 auto}
+h1{font:560 56px/1.03 Geist,Inter,sans-serif;letter-spacing:-.045em;margin:0 0 20px}
+h2{font:560 28px/1.15 Geist,Inter,sans-serif;letter-spacing:-.03em;margin:0 0 8px}
+h3{font:600 15px/1.3 Geist,Inter,sans-serif;letter-spacing:-.01em;margin:0}
+p{margin:0}
+.lede{font-size:18px;line-height:1.5;color:var(--ink-2);max-width:46ch;letter-spacing:-.01em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;border:1px solid var(--line-strong);background:var(--raised);font:560 14.5px/1 Geist,Inter,sans-serif;letter-spacing:-.01em}
+.btn.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}.btn.q{background:transparent;border-color:transparent}.btn.sm{height:32px;padding:0 12px;font-size:13px}
+.small{font-size:13px;color:var(--ink-2)}.label{font:520 12.5px/1.3 Geist,Inter,sans-serif;color:var(--ink-2)}
+.hero{display:grid;grid-template-columns:1.02fr .98fr;gap:64px;align-items:center}
+.row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.samples{display:flex;gap:10px;margin-top:8px}.samplebtn{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:16px;padding:8px 16px 8px 8px;font:520 13.5px/1.2 Geist,Inter,sans-serif}.samplebtn img{width:96px;border-radius:8px;display:block}
+.vis{display:grid;grid-template-columns:1fr 31%}.vis .b{grid-column:1/-1;width:100%;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}.vis .c{grid-column:2;margin-top:-44px;width:100%;border-radius:12px;overflow:hidden;box-shadow:0 18px 40px -16px #1e1c1447}
+.who{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);margin-top:72px}.who div{padding:20px 20px 0 0;color:var(--ink-2);font-size:14px;line-height:1.45}.who b{display:block;color:var(--ink);font-weight:560;margin-bottom:4px;line-height:20px;min-height:40px}.who .mono{font:520 12.5px Geist Mono,Menlo,monospace}
+.card{background:var(--surface);border-radius:16px;padding:20px}
+.drop{border-radius:16px;background:var(--surface);padding:28px;display:grid;gap:14px}
+.in{height:36px;border:1px solid var(--line-strong);border-radius:10px;background:var(--raised);padding:0 10px;display:flex;align-items:center;font-size:14px}
+.in.mono{font:450 13px Geist Mono,Menlo,monospace}
+.cols{display:grid;grid-template-columns:1.25fr .9fr;gap:32px;align-items:start}
+.sk{border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line);background:#fff;position:relative;height:392px}
+.box{position:absolute;border:2px solid #ffd23f;background:#ffd23f1a;box-shadow:0 0 0 1px #00000073}.box.on{border-color:var(--accent);background:#76b92829}.tag{position:absolute;left:-2px;top:-22px;background:#111;color:#fff;font:520 11px Geist Mono,Menlo,monospace;padding:4px 7px;border-radius:6px}
+.fact{display:grid;grid-template-columns:110px 1fr;gap:2px 12px;padding:10px 0;border-bottom:1px solid var(--line)}.fact:last-child{border-bottom:0}.fact .k{font:520 12.5px Geist,Inter,sans-serif;color:var(--ink-2)}.fact .v{font-weight:560}.fact .q{grid-column:2;color:var(--ink-3);font-size:12.5px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:12px;background:var(--raised);box-shadow:inset 0 0 0 1px var(--line)}.opt.on{box-shadow:inset 0 0 0 1.5px var(--ink)}.opt i{flex:none;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--ink-2);margin-top:3px}.opt.on i{border:5px solid var(--ink)}
+.pill{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:999px;font:560 11.5px Geist,Inter,sans-serif;background:var(--surface-2);color:var(--ink-2)}.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.slot{display:grid;grid-template-columns:96px 1fr auto;gap:14px;align-items:center;background:var(--raised);border-radius:12px;padding:10px;box-shadow:inset 0 0 0 1px var(--line)}.slot .th{height:64px;border-radius:8px;background:#1d1240;display:grid;place-items:center;color:#fff;font-weight:700;letter-spacing:.04em;font-size:13px}.slot img{height:64px;border-radius:8px;display:block;background:#1d1240}
+.sw{display:flex;gap:10px}.sw i{width:36px;height:36px;border-radius:10px;box-shadow:inset 0 0 0 1px #0000001f}.sw i.on{box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px var(--ink)}
+.bar{display:flex;gap:10px;align-items:center;padding:16px 32px;border-top:1px solid var(--line);background:var(--bg)}
+.part{display:grid;grid-template-columns:1fr auto;gap:8px;padding:12px 14px;background:var(--surface);border-radius:12px;font-weight:560}.part span{font:450 12.5px Geist Mono,Menlo,monospace;color:var(--ink-2)}
+.callout{display:flex;gap:12px;background:var(--ok-soft);border-radius:16px;padding:14px 18px;font-size:14px}.callout.warn{background:var(--warn-soft)}.callout.bad{background:var(--bad-soft)}.callout.n{background:var(--surface)}
+.trio{display:grid;grid-template-columns:1fr 24px .5fr;gap:12px;align-items:center}.trio figure{margin:0;background:var(--surface);border-radius:16px;padding:12px}.trio img{width:100%;display:block;border-radius:8px}.trio figcaption{font:520 12.5px Geist,Inter,sans-serif;color:var(--ink-2);margin-top:10px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.wait{display:flex;gap:24px;align-items:center;background:var(--surface);border-radius:20px;padding:20px 28px}.wait img{width:168px;height:168px;object-fit:cover;border-radius:16px;background:#1d1240}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--line-strong);border-top-color:var(--ink);display:inline-block}
+.dim{padding:8px 32px;color:var(--ink-3);font:520 12px Geist Mono,Menlo,monospace;background:#e9e9e6}
+.m .page{padding:28px 16px 40px}.m h1{font-size:40px}.m .shell{padding:10px 16px}
+
+.bn{position:relative;aspect-ratio:16/9;background:#1d1240;border-radius:8px;overflow:hidden;color:#fff;width:100%}
+.bn b{position:absolute;left:6%;top:8%;font-size:.75em;letter-spacing:.06em}
+.bn .hpd{position:absolute;left:12%;top:22%;width:30%;height:62%;border:10px solid #fdfbff;border-bottom:0;border-radius:120px 120px 0 0}
+.bn .hl{position:absolute;left:55%;top:20%;width:40%;font-weight:700;font-size:1.15em;line-height:1.1}
+.bn .pr{position:absolute;left:55%;top:52%;font-weight:700;font-size:.8em}
+.bn .cta{position:absolute;left:55%;top:66%;background:#ffd23f;color:#1d1240;border-radius:999px;padding:.35em 1em;font-weight:700;font-size:.75em}
+.cd{position:relative;aspect-ratio:9/16;background:#1d1240;border-radius:8px;overflow:hidden;color:#fff;width:100%}
+.cd b{position:absolute;left:10%;top:6%;font-size:.7em;letter-spacing:.06em}
+.cd .hpd{position:absolute;left:25%;top:18%;width:50%;height:22%;border:8px solid #fdfbff;border-bottom:0;border-radius:80px 80px 0 0}
+.cd .hl{position:absolute;left:10%;top:48%;width:80%;font-weight:700;font-size:1em;line-height:1.1}
+.cd .cta{position:absolute;left:10%;top:72%;background:#ffd23f;color:#1d1240;border-radius:999px;padding:.35em 1em;font-weight:700;font-size:.7em}
+.ph3{width:168px;height:168px;border-radius:16px;background:#1d1240;display:grid;place-items:center;position:relative}
+.ph3 i{position:absolute;left:30px;top:34px;width:108px;height:80px;border:12px solid #fdfbff;border-bottom:0;border-radius:60px 60px 0 0}
+.ph3 u{position:absolute;bottom:26px;width:34px;height:56px;background:#f5b72b;border-radius:14px}
+</style></head><body>
+
+<div class="dim">A. Landing, 1440 x 900</div>
+<section class="frame" style="min-height:900px">
+ <div class="shell"><div class="brand"><span class="mark"><i style="left:3px;top:5px;width:15px;height:10px"></i><i style="left:12px;top:15px;width:13px;height:9px"></i></span>Open Apprentice</div><div class="tabs"><span class="tab on">Adapt a banner</span><span class="tab">Diagrams</span><span class="tab">UI components · Earlier prototype</span></div></div>
+ <div class="page"><div class="hero">
+  <div>
+   <h1>Bring a banner.<br>Get story cards you can trust.</h1>
+   <p class="lede">Nemotron reads its parts, you check them, and every result is independently verified before you see it.</p>
+   <div class="row" style="margin-top:28px"><span class="btn p">Bring a banner</span><span class="btn">Start from a sketch</span></div>
+   <p class="small" style="margin-top:10px">PNG or JPEG, 16:9. A photo of a rough sketch works too. Or drop a file anywhere here.</p>
+   <div style="margin-top:36px"><p class="label" style="margin-bottom:8px">Or start from a sample</p>
+    <div class="samples"><span class="samplebtn"><span style="width:96px;display:block"><div class="bn" style="font-size:6px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="pr">Now $159 (was $229)</div><div class="cta">Shop now</div></div></span>Headphones, English</span><span class="samplebtn"><span style="width:96px;height:54px;background:#fff;border-radius:8px;box-shadow:inset 0 0 0 1px #cfcfcd;display:block"></span>Use the sample sketch</span></div></div>
+  </div>
+  <div class="vis"><div class="b"><div class="bn" style="font-size:13px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="pr">Now $159 (was $229)</div><div class="cta">Shop now</div></div></div><div class="c"><div class="cd" style="font-size:12px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="cta">Shop now</div></div></div></div>
+ </div>
+ <div class="who"><div><b class="mono">Nemotron-3.5-Super-VL</b>reads your banner or your sketch</div><div><b>Tavily</b>reads your product page</div><div><b class="mono">Nemotron-3-Super</b>lifts facts and drafts copy from that page only</div><div><b>You</b>confirm parts, words, pictures</div><div><b>Checks and an independent verifier</b>decide, and compare the price with the page</div></div>
+ </div>
+</section>
+
+<div class="dim">B. Sketch, step 1, 1440 x 900</div>
+<section class="frame" style="min-height:900px">
+ <div class="shell"><div class="brand"><span class="mark"><i style="left:3px;top:5px;width:15px;height:10px"></i><i style="left:12px;top:15px;width:13px;height:9px"></i></span>Open Apprentice</div><div class="tabs"><span class="tab on">Adapt a banner</span><span class="tab">Diagrams</span><span class="tab">UI components · Earlier prototype</span></div></div>
+ <div class="page" style="max-width:760px">
+  <h2>Start from a sketch</h2><p class="lede" style="margin-bottom:28px">Draw boxes for the logo, the picture, the words and the button. Add your product page and the words come from it.</p>
+  <div class="drop"><h3>1. Your sketch</h3><p class="small">A photo or screenshot of a rough wireframe. It is letterboxed onto 16:9.</p><div class="row"><span class="btn p">Choose a sketch</span><span class="btn">Use the sample sketch</span></div></div>
+  <div class="card" style="margin-top:16px;display:grid;gap:12px"><h3>2. Your product page (optional)</h3><div class="in mono">https://halden.example/h7</div><p class="small">Tavily reads the page. Every number and name in the copy has to be on it. The address is sent to Tavily; the sketch image is sent to Nebius Token Factory.</p><div class="row"><span class="btn sm">Use the sample page</span></div></div>
+  <div style="margin-top:20px" class="row"><span class="btn p">Read my sketch</span><span class="small">Takes about 10 to 30 seconds.</span></div>
+ </div>
+</section>
+
+<div class="dim">C. Workbench, 1440 x 900 (scrolls)</div>
+<section class="frame">
+ <div class="shell"><div class="brand"><span class="mark"><i style="left:3px;top:5px;width:15px;height:10px"></i><i style="left:12px;top:15px;width:13px;height:9px"></i></span>Open Apprentice</div><div class="tabs"><span class="tab on">Adapt a banner</span><span class="tab">Diagrams</span><span class="tab">UI components · Earlier prototype</span></div></div>
+ <div class="page" style="padding-top:40px">
+  <h2>Check what Nemotron found</h2>
+  <div class="callout" style="margin:12px 0 20px"><b>Nemotron read this sketch</b> (Nemotron-3.5-Super-VL). Boxes are loose by design; drag them where you want each part, then continue.</div>
+  <div class="cols">
+   <div>
+    <div class="sk">
+     <svg viewBox="0 0 640 360" width="100%" height="100%" style="position:absolute;inset:0"><g fill="none" stroke="#555" stroke-width="2.2" stroke-linecap="round"><path d="M40 40 q60 -6 128 2 q4 22 0 42 q-60 6 -128 -1 q-4 -22 0 -43"/><path d="M46 140 q110 -8 226 4 q8 100 -2 190 q-110 10 -224 0 q-8 -92 0 -194"/><path d="M52 150 L262 322 M262 150 L52 322" stroke="#999"/><path d="M360 60 q120 -8 230 0 M362 92 q90 -6 160 2 M360 124 q100 -4 190 0"/><path d="M362 190 q60 -6 120 0"/><path d="M360 232 q50 -10 110 -2 q6 28 -2 50 q-56 8 -108 0 q-6 -26 0 -48"/><path d="M362 318 q120 -4 228 2"/></g><text x="370" y="214" font-family="Segoe Print, Comic Sans MS, cursive" font-size="22" fill="#444">$159</text><text x="372" y="262" font-family="Segoe Print, Comic Sans MS, cursive" font-size="18" fill="#444">shop</text></svg>
+     <div class="box" style="left:6%;top:11%;width:30%;height:16%"><span class="tag">Logo</span></div>
+     <div class="box" style="left:6%;top:36%;width:36%;height:52%"><span class="tag">Product image</span></div>
+     <div class="box on" style="left:55%;top:13%;width:38%;height:30%"><span class="tag">Headline</span></div>
+     <div class="box" style="left:55%;top:49%;width:20%;height:12%"><span class="tag">Price</span></div>
+     <div class="box" style="left:55%;top:62%;width:19%;height:17%"><span class="tag">Button</span></div>
+     <div class="box" style="left:55%;top:84%;width:38%;height:9%"><span class="tag">Small print</span></div>
+    </div>
+    <p class="small" style="margin-top:12px">Drag a box to move it, drag its corner to resize it. With the keyboard: arrow keys move the focused box, Shift plus arrows resize it.</p>
+   </div>
+   <div style="display:grid;gap:12px">
+    <div class="card"><div class="row" style="justify-content:space-between"><h3>Copy from your page</h3><span class="pill ok">Read by Tavily</span></div>
+     <p class="small" style="margin:4px 0 8px">halden.example/h7 · 4,210 characters. Only facts found on the page are kept; the quote shows where.</p>
+     <div class="fact"><span class="k">Product</span><span class="v">Halden H7 Headphones</span><span class="q">“Halden H7 Headphones”</span></div>
+     <div class="fact"><span class="k">Price</span><span class="v">$159</span><span class="q">“Now $159 (was $229)”</span></div>
+     <div class="fact"><span class="k">Feature</span><span class="v">40 hour battery</span><span class="q">“Up to 40 hours of battery”</span></div>
+     <div class="fact"><span class="k">Small print</span><span class="v">Offer ends 31 Oct 2026</span><span class="q">“Offer ends 31 Oct 2026. While stocks last.”</span></div>
+     <p class="label" style="margin:14px 0 8px">Headline, drafted by Nemotron-3-Super from those facts</p>
+     <div style="display:grid;gap:8px"><div class="opt on"><i></i><div>Hear only what matters.<br><span class="pill ok" style="margin-top:6px">names and numbers on your page</span></div></div><div class="opt"><i></i><div>Quiet for 40 hours at a time.</div></div><div class="opt"><i></i><div>Halden H7. Noise cancelling, 40 hours.</div></div></div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px"><div><p class="label" style="margin-bottom:5px">Price line</p><div class="in">$159</div></div><div><p class="label" style="margin-bottom:5px">Button label</p><div class="in">Shop now</div></div></div>
+    </div>
+    <div class="card"><h3 style="margin-bottom:10px">Your pictures</h3><div style="display:grid;gap:8px"><div class="slot"><div class="th">HALDEN</div><div><b>Logo</b><br><span class="small">halden-wordmark.png · box refits to 4:1</span></div><span class="btn sm">Replace</span></div><div class="slot"><div class="ph3" style="width:96px;height:64px;border-radius:8px"><i style="left:22px;top:10px;width:52px;height:38px;border-width:6px"></i></div><div><b>Product image</b><br><span class="small">h7-headphones.png · box refits to 1:1</span></div><span class="btn sm">Replace</span></div></div></div>
+    <div class="card"><h3 style="margin-bottom:10px">Colours</h3><div class="sw"><i style="background:#1d1240" class="on"></i><i style="background:#0f2440"></i><i style="background:#14342b"></i><i style="background:#f2efe8"></i><i style="background:#111110"></i><i style="background:linear-gradient(135deg,#fff,#ddd)"></i></div><p class="small" style="margin-top:8px">Text colours are chosen for contrast.</p></div>
+    <div style="display:grid;gap:8px"><div class="part">Logo<span>66 · 54 · 189 × 36</span></div><div class="part">Product image<span>150 · 210 · 356 × 209</span></div><div class="part">Headline<span>639 · 163 · 558 × 155</span></div></div>
+   </div>
+  </div>
+ </div>
+ <div class="bar"><span class="btn p">Build my banner</span><span class="btn q">Start over</span><span class="small" style="margin-left:12px">Next: the banner is rebuilt as editable layers, then adapted to a story card and checked.</span></div>
+</section>
+
+<div class="dim">D. Result with the page check, three states</div>
+<section class="frame">
+ <div class="shell"><div class="brand"><span class="mark"><i style="left:3px;top:5px;width:15px;height:10px"></i><i style="left:12px;top:15px;width:13px;height:9px"></i></span>Open Apprentice</div><div class="tabs"><span class="tab on">Adapt a banner</span><span class="tab">Diagrams</span><span class="tab">UI components · Earlier prototype</span></div></div>
+ <div class="page" style="padding-top:40px">
+  <h2>Your story card</h2>
+  <div class="trio" style="margin:16px 0"><figure><div class="bn" style="font-size:13px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="pr">Now $159 (was $229)</div><div class="cta">Shop now</div></div><figcaption>Banner built from your sketch and page</figcaption></figure><span style="text-align:center;color:var(--ink-3)">→</span><figure><div class="cd" style="font-size:12px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="cta">Shop now</div></div><figcaption>Story card, 1080 × 1920</figcaption></figure></div>
+  <div class="callout"><b>14 of 14 checks passed</b><span class="small">independent verifier: exact copy, link, logo, image proportions, safe areas, minimum sizes, text fit.</span></div>
+  <h3 style="margin:24px 0 10px">Page check <span class="small" style="font-weight:450">(advisory: it never blocks a result)</span></h3>
+  <div class="three">
+   <div class="callout"><div><span class="pill ok">Match</span><p style="margin-top:8px"><b>$159</b> on the banner is listed on your page.</p><p class="small" style="margin-top:4px">Page prices: $159, $229. Currency: USD on both.</p></div></div>
+   <div class="callout bad"><div><span class="pill bad">Mismatch</span><p style="margin-top:8px"><b>$149</b> on the banner is not on your page.</p><p class="small" style="margin-top:4px">Your page lists $159 and $229. Fix the price line or the page before this runs.</p></div></div>
+   <div class="callout n"><div><span class="pill">Unknown</span><p style="margin-top:8px">Your page lists no price, so there is nothing to compare.</p><p class="small" style="margin-top:4px">Add a page address, or one that shows the price.</p></div></div>
+  </div>
+  <div class="row" style="margin-top:24px"><span class="btn p">Download the story card (PNG)</span><span class="btn">Download the banner (PNG)</span><span class="btn q">Adapt another</span></div>
+ </div>
+</section>
+
+<div class="dim">E. Waiting state while Nemotron reads</div>
+<section class="frame">
+ <div class="shell"><div class="brand"><span class="mark"><i style="left:3px;top:5px;width:15px;height:10px"></i><i style="left:12px;top:15px;width:13px;height:9px"></i></span>Open Apprentice</div><div class="tabs"><span class="tab on">Adapt a banner</span><span class="tab">Diagrams</span></div></div>
+ <div class="page" style="max-width:760px">
+  <h2>Reading your sketch</h2><p class="lede" style="margin-bottom:24px">This takes about 10 to 30 seconds.</p>
+  <div class="wait"><div class="ph3"><i></i><u style="left:26px"></u><u style="right:26px"></u></div><div><span class="pill" style="gap:8px"><span class="spin"></span> Nemotron-3.5-Super-VL is reading your sketch</span><p class="small" style="margin-top:12px;max-width:40ch">Then Tavily reads your page, and Nemotron-3-Super drafts headlines from the facts it finds.</p></div></div>
+ </div>
+</section>
+
+<div class="dim">F. Mobile landing and sketch step 1, 390 wide</div>
+<div style="display:flex;gap:40px">
+<section class="frame m" style="margin:0">
+ <div class="shell"><div class="brand">Open Apprentice</div></div>
+ <div class="page"><h1>Bring a banner. Get story cards you can trust.</h1><p class="lede" style="font-size:16px">Nemotron reads its parts, you check them, and every result is independently verified.</p>
+ <div style="display:grid;gap:10px;margin-top:20px"><span class="btn p">Bring a banner</span><span class="btn">Start from a sketch</span></div>
+ <div class="vis" style="margin-top:28px"><div class="b"><div class="bn" style="font-size:13px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="pr">Now $159 (was $229)</div><div class="cta">Shop now</div></div></div><div class="c"><div class="cd" style="font-size:12px"><b>HALDEN</b><div class="hpd"></div><div class="hl">Hear only what matters.</div><div class="cta">Shop now</div></div></div></div></div>
+</section>
+<section class="frame m" style="margin:0">
+ <div class="shell"><div class="brand">Open Apprentice</div></div>
+ <div class="page"><h2>Start from a sketch</h2><p class="lede" style="font-size:16px;margin-bottom:18px">Draw boxes, add your product page, and the words come from it.</p>
+ <div class="drop"><h3>1. Your sketch</h3><span class="btn p">Choose a sketch</span><span class="btn">Use the sample sketch</span></div>
+ <div class="card" style="margin-top:12px;display:grid;gap:10px"><h3>2. Your product page</h3><div class="in mono">https://halden.example/h7</div></div>
+ <div style="margin-top:16px"><span class="btn p" style="width:100%">Read my sketch</span></div></div>
+</section>
+</div>
+</body></html>
