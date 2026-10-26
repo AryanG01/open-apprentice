@@ -26,6 +26,10 @@ class Settings:
     nebius_vision_model: str = (
         ""  # a Nemotron VL model for reading banner images; empty = no vision (manual editor only)
     )
+    page_mode: str = (
+        "mock"  # "mock" (offline fixtures) or "tavily" (Tavily Extract fetches the owner's product page)
+    )
+    tavily_api_key: str = field(default="", repr=False)
     live_run_max_usd: Optional[str] = None
     max_provider_concurrency: int = 2
     nebius_completion_cap: int = (
@@ -91,6 +95,8 @@ def load_settings(dotenv_path: str = ".env", env: Optional[dict] = None) -> Sett
         nebius_model=env.get("NEBIUS_MODEL", "nvidia/nemotron-3-super-120b-a12b"),
         provider_mode=env.get("PROVIDER_MODE", "mock"),
         nebius_vision_model=env.get("NEBIUS_VISION_MODEL", ""),
+        page_mode=env.get("PAGE_MODE", "mock"),
+        tavily_api_key=env.get("TAVILY_API_KEY", ""),
         live_run_max_usd=env.get("LIVE_RUN_MAX_USD") or None,
         max_provider_concurrency=int(env.get("MAX_PROVIDER_CONCURRENCY", "2")),
         nebius_reasoning_effort=env.get("NEBIUS_REASONING_EFFORT") or None,

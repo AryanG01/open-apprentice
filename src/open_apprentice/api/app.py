@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 import os
 import pathlib
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -15,9 +16,12 @@ from fastapi.staticfiles import StaticFiles
 from open_apprentice import __version__
 from open_apprentice.api.svg import router as svg_router
 from open_apprentice.api.campaign import router as campaign_router
+from open_apprentice.api.pages import router as pages_router
+from open_apprentice.api.sketches import router as sketches_router
 from open_apprentice.api.teach import replay_router, router as teach_router
 from open_apprentice.api.v2 import routes as v2_routes
 from open_apprentice.api.v2.context import make_v2
+from open_apprentice.campaign.pages import MockPageFetcher, TavilyFetcher
 from open_apprentice.config import load_settings
 from open_apprentice.providers.factory import MissingCredential, make_provider, make_vision_provider
 from open_apprentice.providers.replay import RecordingProvider, load_tape
@@ -48,6 +52,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         None  # Nemotron VL for the banner flow; never recorded to tapes (uploads are private)
     )
     app.state.model_error = None
+    app.state.page_fetcher = None
     async with AsyncExitStack() as stack:
         # Model mode costs real money, so it is OFF unless the operator opts in with DEMO_MODEL_ENABLED=1 (and has credentials).
         if os.environ.get("DEMO_MODEL_ENABLED") == "1":
@@ -72,6 +77,16 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                     pathlib.Path(record),
                     {"model": p.requested_model, "recorded_at": datetime.date.today().isoformat()},
                 )
+        settings = load_settings()
+        if settings.page_mode == "tavily" and settings.tavily_api_key:
+            app.state.page_fetcher = TavilyFetcher(settings.tavily_api_key)
+            stack.push_async_callback(app.state.page_fetcher.aclose)
+        else:
+            if settings.page_mode == "tavily":
+                logging.getLogger(__name__).warning(
+                    "PAGE_MODE=tavily but TAVILY_API_KEY is empty: using the sample-page fetcher"
+                )
+            app.state.page_fetcher = MockPageFetcher()
         app.state.tape = None
         if TAPE_PATH.is_file():
             app.state.tape = load_tape(TAPE_PATH)
@@ -115,6 +130,8 @@ app.include_router(teach_router)
 app.include_router(replay_router)
 app.include_router(svg_router)
 app.include_router(campaign_router)
+app.include_router(pages_router)
+app.include_router(sketches_router)
 v2_routes.install(app)
 
 

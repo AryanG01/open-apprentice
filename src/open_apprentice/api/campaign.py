@@ -95,6 +95,9 @@ class Workspace:
     banners: dict[str, dict] = field(
         default_factory=dict
     )  # "u-<id>" -> {scene, locale, png}: confirmed uploaded banners
+    pages: dict[str, dict] = field(
+        default_factory=dict
+    )  # page id -> {url, text, facts, copy}: the owner's product page as Tavily read it (api/pages.py)
 
 
 def _workspaces(request: Request) -> dict[str, Workspace]:
