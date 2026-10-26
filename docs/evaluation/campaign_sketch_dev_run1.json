@@ -1,0 +1,1628 @@
+[
+ {
+  "sketch": "teach_before",
+  "gold": {
+   "brand_mark": [
+    64.0,
+    48.0,
+    192.0,
+    48.0
+   ],
+   "product_image": [
+    80.0,
+    152.0,
+    496.0,
+    496.0
+   ],
+   "headline": [
+    640.0,
+    160.0,
+    576.0,
+    176.0
+   ],
+   "price": [
+    640.0,
+    352.0,
+    576.0,
+    51.2
+   ],
+   "cta": [
+    640.0,
+    432.0,
+    256.0,
+    76.80000000000001
+   ],
+   "legal": [
+    640.0,
+    560.0,
+    576.0,
+    112.0
+   ]
+  },
+  "drawn_extent": {
+   "brand_mark": [
+    62.0,
+    46.2,
+    257.6,
+    100.1
+   ],
+   "product_image": [
+    75.2,
+    147.3,
+    578.8,
+    651.0
+   ],
+   "headline": [
+    642.0,
+    187.7,
+    1075.3,
+    209.4
+   ],
+   "price": [
+    645.6,
+    358.9,
+    1038.7,
+    401.9
+   ],
+   "cta": [
+    639.2,
+    431.1,
+    895.8,
+    508.6
+   ],
+   "legal": [
+    642.0,
+    568.5,
+    1080.5,
+    575.5
+   ]
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     51.2,
+     50.4,
+     204.8,
+     57.6
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     57.6,
+     144.0,
+     518.4,
+     504.0
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     172.8,
+     422.4,
+     57.6
+    ],
+    "text": "",
+    "font_px": 40.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     345.6,
+     422.4,
+     64.8
+    ],
+    "text": "",
+    "font_px": 28.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     424.8,
+     268.8,
+     93.6
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     547.2,
+     422.4,
+     43.2
+    ],
+    "text": "",
+    "font_px": 14.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      40.0,
+      70.0,
+      200.0,
+      150.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      45.0,
+      200.0,
+      450.0,
+      900.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      240.0,
+      830.0,
+      320.0
+     ],
+     "text": "",
+     "font_px": 40.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      480.0,
+      830.0,
+      570.0
+     ],
+     "text": "",
+     "font_px": 28.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      590.0,
+      710.0,
+      720.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      760.0,
+      830.0,
+      820.0
+     ],
+     "text": "",
+     "font_px": 14.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 6002,
+  "score": {
+   "roles_present": true,
+   "all_found": false,
+   "iou": {
+    "brand_mark": 0.714,
+    "product_image": 0.942,
+    "headline": 0.24,
+    "price": 0.614,
+    "cta": 0.781,
+    "legal": 0.184
+   },
+   "invented_words": 0,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "sketch": "short_a",
+  "gold": {
+   "brand_mark": [
+    64.0,
+    48.0,
+    192.0,
+    48.0
+   ],
+   "product_image": [
+    80.0,
+    152.0,
+    496.0,
+    496.0
+   ],
+   "headline": [
+    640.0,
+    160.0,
+    576.0,
+    176.0
+   ],
+   "price": [
+    640.0,
+    352.0,
+    576.0,
+    51.2
+   ],
+   "cta": [
+    640.0,
+    432.0,
+    256.0,
+    76.8
+   ],
+   "legal": [
+    640.0,
+    560.0,
+    576.0,
+    112.0
+   ]
+  },
+  "drawn_extent": {
+   "brand_mark": [
+    60.8,
+    46.0,
+    259.5,
+    100.2
+   ],
+   "product_image": [
+    75.0,
+    148.1,
+    578.8,
+    652.0
+   ],
+   "headline": [
+    642.0,
+    187.3,
+    1167.7,
+    286.4
+   ],
+   "price": [
+    645.6,
+    363.4,
+    1038.1,
+    396.9
+   ],
+   "cta": [
+    639.7,
+    431.8,
+    896.2,
+    508.2
+   ],
+   "legal": [
+    642.0,
+    568.5,
+    1075.4,
+    575.5
+   ]
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     51.2,
+     43.2,
+     204.8,
+     57.6
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     64.0,
+     144.0,
+     512.0,
+     504.0
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     172.8,
+     537.6,
+     108.0
+    ],
+    "text": "",
+    "font_px": 40.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     352.8,
+     409.6,
+     57.6
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     439.2,
+     256.0,
+     79.2
+    ],
+    "text": "",
+    "font_px": 32.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     561.6,
+     448.0,
+     28.8
+    ],
+    "text": "",
+    "font_px": 20.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      40.0,
+      60.0,
+      200.0,
+      140.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      50.0,
+      200.0,
+      450.0,
+      900.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      240.0,
+      920.0,
+      390.0
+     ],
+     "text": "",
+     "font_px": 40.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      490.0,
+      820.0,
+      570.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      610.0,
+      700.0,
+      720.0
+     ],
+     "text": "",
+     "font_px": 32.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      780.0,
+      850.0,
+      820.0
+     ],
+     "text": "",
+     "font_px": 20.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 6618,
+  "score": {
+   "roles_present": true,
+   "all_found": false,
+   "iou": {
+    "brand_mark": 0.781,
+    "product_image": 0.953,
+    "headline": 0.573,
+    "price": 0.636,
+    "cta": 0.806,
+    "legal": 0.2
+   },
+   "invented_words": 0,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "sketch": "short_b",
+  "gold": {
+   "brand_mark": [
+    64.0,
+    48.0,
+    192.0,
+    48.0
+   ],
+   "product_image": [
+    80.0,
+    152.0,
+    496.0,
+    496.0
+   ],
+   "headline": [
+    640.0,
+    160.0,
+    576.0,
+    176.0
+   ],
+   "price": [
+    640.0,
+    352.0,
+    576.0,
+    51.199999999999996
+   ],
+   "cta": [
+    640.0,
+    432.0,
+    256.0,
+    76.8
+   ],
+   "legal": [
+    640.0,
+    560.0,
+    576.0,
+    112.0
+   ]
+  },
+  "drawn_extent": {
+   "brand_mark": [
+    59.2,
+    44.4,
+    257.7,
+    99.2
+   ],
+   "product_image": [
+    77.1,
+    149.3,
+    578.8,
+    649.7
+   ],
+   "headline": [
+    642.0,
+    188.3,
+    1143.0,
+    209.6
+   ],
+   "price": [
+    645.6,
+    363.0,
+    1038.9,
+    397.5
+   ],
+   "cta": [
+    639.9,
+    430.9,
+    895.7,
+    509.2
+   ],
+   "legal": [
+    642.0,
+    568.5,
+    1082.0,
+    575.5
+   ]
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     51.2,
+     36.0,
+     217.6,
+     50.4
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     76.8,
+     108.0,
+     499.2,
+     540.0
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     627.2,
+     129.6,
+     524.8,
+     72.0
+    ],
+    "text": "",
+    "font_px": 40.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     627.2,
+     252.0,
+     422.4,
+     50.4
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     627.2,
+     309.6,
+     268.8,
+     64.8
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     627.2,
+     561.6,
+     460.8,
+     28.8
+    ],
+    "text": "",
+    "font_px": 15.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      40.0,
+      50.0,
+      210.0,
+      120.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      60.0,
+      150.0,
+      450.0,
+      900.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      490.0,
+      180.0,
+      900.0,
+      280.0
+     ],
+     "text": "",
+     "font_px": 40.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      490.0,
+      350.0,
+      820.0,
+      420.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      490.0,
+      430.0,
+      700.0,
+      520.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "legal",
+     "box": [
+      490.0,
+      780.0,
+      850.0,
+      820.0
+     ],
+     "text": "",
+     "font_px": 15.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 6049,
+  "score": {
+   "roles_present": true,
+   "all_found": false,
+   "iou": {
+    "brand_mark": 0.576,
+    "product_image": 0.913,
+    "headline": 0.181,
+    "price": 0.0,
+    "cta": 0.0,
+    "legal": 0.199
+   },
+   "invented_words": 0,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "sketch": "de_long_a",
+  "gold": {
+   "brand_mark": [
+    64.0,
+    48.0,
+    192.0,
+    48.0
+   ],
+   "product_image": [
+    80.0,
+    152.0,
+    496.0,
+    496.0
+   ],
+   "headline": [
+    640.0,
+    160.0,
+    576.0,
+    176.0
+   ],
+   "price": [
+    640.0,
+    352.0,
+    576.0,
+    51.2
+   ],
+   "cta": [
+    640.0,
+    432.0,
+    256.0,
+    76.80000000000001
+   ],
+   "legal": [
+    640.0,
+    560.0,
+    576.0,
+    112.0
+   ]
+  },
+  "drawn_extent": {
+   "brand_mark": [
+    59.8,
+    43.6,
+    257.7,
+    97.4
+   ],
+   "product_image": [
+    75.9,
+    150.3,
+    578.9,
+    652.1
+   ],
+   "headline": [
+    642.0,
+    187.4,
+    1168.9,
+    286.1
+   ],
+   "price": [
+    645.6,
+    365.5,
+    1152.0,
+    399.6
+   ],
+   "cta": [
+    638.9,
+    430.8,
+    897.1,
+    509.8
+   ],
+   "legal": [
+    642.0,
+    568.5,
+    1196.7,
+    599.5
+   ]
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     49.9,
+     49.7,
+     220.2,
+     60.5
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     70.4,
+     149.8,
+     499.2,
+     500.4
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     180.0,
+     519.7,
+     100.1
+    ],
+    "text": "",
+    "font_px": 48,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     349.9,
+     519.7,
+     50.4
+    ],
+    "text": "",
+    "font_px": 36,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     419.8,
+     259.8,
+     100.1
+    ],
+    "text": "",
+    "font_px": 28,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     550.1,
+     519.7,
+     69.8
+    ],
+    "text": "",
+    "font_px": 16,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      39.0,
+      69.0,
+      211.0,
+      153.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      55.0,
+      208.0,
+      445.0,
+      903.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      250.0,
+      906.0,
+      389.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      486.0,
+      906.0,
+      556.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      583.0,
+      703.0,
+      722.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      764.0,
+      906.0,
+      861.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 5158,
+  "score": {
+   "roles_present": true,
+   "all_found": true,
+   "iou": {
+    "brand_mark": 0.651,
+    "product_image": 0.96,
+    "headline": 0.513,
+    "price": 0.821,
+    "cta": 0.756,
+    "legal": 0.447
+   },
+   "invented_words": 0,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "sketch": "de_long_b",
+  "gold": {
+   "brand_mark": [
+    64.0,
+    48.0,
+    192.0,
+    48.0
+   ],
+   "product_image": [
+    80.0,
+    152.0,
+    496.0,
+    496.0
+   ],
+   "headline": [
+    640.0,
+    160.0,
+    576.0,
+    176.0
+   ],
+   "price": [
+    640.0,
+    352.0,
+    576.0,
+    51.2
+   ],
+   "cta": [
+    640.0,
+    432.0,
+    256.0,
+    76.80000000000001
+   ],
+   "legal": [
+    640.0,
+    560.0,
+    576.0,
+    112.0
+   ]
+  },
+  "drawn_extent": {
+   "brand_mark": [
+    62.6,
+    45.9,
+    257.5,
+    97.9
+   ],
+   "product_image": [
+    76.3,
+    148.7,
+    579.7,
+    652.5
+   ],
+   "headline": [
+    642.0,
+    187.3,
+    1194.8,
+    286.3
+   ],
+   "price": [
+    645.6,
+    365.7,
+    1150.7,
+    397.0
+   ],
+   "cta": [
+    639.4,
+    431.7,
+    897.0,
+    509.1
+   ],
+   "legal": [
+    642.0,
+    568.5,
+    1200.2,
+    647.4
+   ]
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     51.2,
+     43.2,
+     204.8,
+     43.2
+    ],
+    "text": "WWW WW",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     76.8,
+     108.0,
+     499.2,
+     360.0
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     129.6,
+     537.6,
+     72.0
+    ],
+    "text": "",
+    "font_px": 40.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     252.0,
+     512.0,
+     36.0
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     324.0,
+     256.0,
+     72.0
+    ],
+    "text": "WWW N",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     417.6,
+     576.0,
+     72.0
+    ],
+    "text": "",
+    "font_px": 20.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      40.0,
+      60.0,
+      200.0,
+      120.0
+     ],
+     "text": "WWW WW",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      60.0,
+      150.0,
+      450.0,
+      650.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      180.0,
+      920.0,
+      280.0
+     ],
+     "text": "",
+     "font_px": 40.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      350.0,
+      900.0,
+      400.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      450.0,
+      700.0,
+      550.0
+     ],
+     "text": "WWW N",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      580.0,
+      950.0,
+      680.0
+     ],
+     "text": "",
+     "font_px": 20.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 6188,
+  "score": {
+   "roles_present": true,
+   "all_found": false,
+   "iou": {
+    "brand_mark": 0.69,
+    "product_image": 0.583,
+    "headline": 0.19,
+    "price": 0.0,
+    "cta": 0.0,
+    "legal": 0.0
+   },
+   "invented_words": 1,
+   "origin": "model",
+   "problems": []
+  }
+ },
+ {
+  "sketch": "fr_long",
+  "gold": {
+   "brand_mark": [
+    64.0,
+    48.0,
+    192.0,
+    48.0
+   ],
+   "product_image": [
+    80.0,
+    152.0,
+    496.0,
+    496.0
+   ],
+   "headline": [
+    640.0,
+    160.0,
+    576.0,
+    176.0
+   ],
+   "price": [
+    640.0,
+    352.0,
+    576.0,
+    51.2
+   ],
+   "cta": [
+    640.0,
+    432.0,
+    256.0,
+    76.80000000000001
+   ],
+   "legal": [
+    640.0,
+    560.0,
+    576.0,
+    112.0
+   ]
+  },
+  "drawn_extent": {
+   "brand_mark": [
+    62.5,
+    46.3,
+    260.0,
+    96.8
+   ],
+   "product_image": [
+    77.4,
+    149.0,
+    580.7,
+    651.8
+   ],
+   "headline": [
+    642.0,
+    187.3,
+    1189.8,
+    286.3
+   ],
+   "price": [
+    645.6,
+    364.1,
+    1068.9,
+    395.9
+   ],
+   "cta": [
+    638.9,
+    431.9,
+    896.2,
+    508.8
+   ],
+   "legal": [
+    642.0,
+    568.5,
+    1198.3,
+    599.4
+   ]
+  },
+  "proposed": [
+   {
+    "role": "brand_mark",
+    "box": [
+     51.2,
+     36.0,
+     217.6,
+     50.4
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     76.8,
+     108.0,
+     499.2,
+     540.0
+    ],
+    "text": "",
+    "font_px": 0.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640.0,
+     144.0,
+     576.0,
+     180.0
+    ],
+    "text": "",
+    "font_px": 40.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640.0,
+     345.6,
+     448.0,
+     50.4
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640.0,
+     432.0,
+     256.0,
+     86.4
+    ],
+    "text": "",
+    "font_px": 30.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     640.0,
+     561.6,
+     576.0,
+     72.0
+    ],
+    "text": "",
+    "font_px": 20.0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "raw": {
+   "language": "en",
+   "layers": [
+    {
+     "role": "brand_mark",
+     "box": [
+      40.0,
+      50.0,
+      210.0,
+      120.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "product_image",
+     "box": [
+      60.0,
+      150.0,
+      450.0,
+      900.0
+     ],
+     "text": "",
+     "font_px": 0.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "headline",
+     "box": [
+      500.0,
+      200.0,
+      950.0,
+      450.0
+     ],
+     "text": "",
+     "font_px": 40.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "price",
+     "box": [
+      500.0,
+      480.0,
+      850.0,
+      550.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "cta",
+     "box": [
+      500.0,
+      600.0,
+      700.0,
+      720.0
+     ],
+     "text": "",
+     "font_px": 30.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    },
+    {
+     "role": "legal",
+     "box": [
+      500.0,
+      780.0,
+      950.0,
+      880.0
+     ],
+     "text": "",
+     "font_px": 20.0,
+     "bold": false,
+     "color": "",
+     "fill": ""
+    }
+   ]
+  },
+  "note": "",
+  "tokens": 5269,
+  "score": {
+   "roles_present": true,
+   "all_found": true,
+   "iou": {
+    "brand_mark": 0.576,
+    "product_image": 0.913,
+    "headline": 0.854,
+    "price": 0.609,
+    "cta": 0.889,
+    "legal": 0.643
+   },
+   "invented_words": 0,
+   "origin": "model",
+   "problems": []
+  }
+ }
+]
