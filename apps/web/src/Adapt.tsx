@@ -6,7 +6,7 @@ import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
 import type { Rgb } from "./snap";
-import { ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
+import { CARD_FITS, ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
 import type { Picture } from "./SketchPanels";
 import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace, PageCheck, PageInfo } from "./types";
 
@@ -398,6 +398,7 @@ export function Adapt() {
       }
       const [up, pg, pgNote] = got;
       const copy = pg?.copy;
+      if (copy?.options.length) copy.options = [...copy.options.filter((o) => o.headline.length <= CARD_FITS), ...copy.options.filter((o) => o.headline.length > CARD_FITS)]; // options that fit the card first
       const textFor = (role: string, hint: string): string => {
         const fromPage = role === "headline" ? copy?.options[0]?.headline : role === "price" ? copy?.price : role === "cta" ? copy?.cta : role === "legal" ? copy?.legal : "";
         return fromPage || hint;

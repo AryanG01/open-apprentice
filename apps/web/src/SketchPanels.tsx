@@ -2,6 +2,8 @@ import { CheckCircle, UploadSimple, WarningCircle } from "@phosphor-icons/react"
 import type { AdaptLayer, PageCheck, PageInfo } from "./types";
 import { LABEL, hexOr } from "./LayerEditor";
 
+/** The story card's headline frame fits about this many characters; longer copy makes the app ask how to fit it. */
+export const CARD_FITS = 44;
 export const PALETTE = ["#1d1240", "#0f2440", "#14342b", "#f2efe8", "#111110", "#ffffff"] as const;
 
 export type Picture = { url: string; img: HTMLImageElement; name: string };
@@ -110,7 +112,10 @@ export function CopyPanel({ page, choice, onChoice, price, onPrice, cta, onCta, 
               <input type="radio" name="headline-option" value={o.id} checked={choice === o.id} onChange={() => onChoice(o.id, o.headline)} />
               <span>
                 {o.headline}
-                {choice === o.id ? <span className="pill ok">names and numbers on your page</span> : null}
+                <span className="opt-tags">
+                  {choice === o.id ? <span className="pill ok">names and numbers on your page</span> : null}
+                  <span className={o.headline.length <= CARD_FITS ? "pill" : "pill recorded"}>{o.headline.length <= CARD_FITS ? "fits the story card" : "long: the story card will ask"}</span>
+                </span>
               </span>
             </label>
           ))}

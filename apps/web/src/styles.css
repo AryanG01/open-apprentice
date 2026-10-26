@@ -788,6 +788,7 @@ fieldset.lrow > :not(legend) { clear: both; }
 .opt.on { box-shadow: inset 0 0 0 1.5px var(--ink); }
 .opt input { margin-top: 3px; }
 .opt > span { display: grid; gap: 6px; justify-items: start; }
+.opt-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pair label { display: grid; gap: 5px; font: 520 0.78rem/1.2 var(--font); color: var(--ink-2); }
 .slots { display: grid; gap: 8px; }
