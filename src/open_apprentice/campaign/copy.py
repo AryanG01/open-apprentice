@@ -76,6 +76,24 @@ def _has_word(word: str, text: str) -> bool:
     return re.search(rf"(?<!\w){re.escape(word)}(?!\w)", text) is not None
 
 
+_TYPOGRAPHY = str.maketrans(
+    {
+        "\u2010": "-",  # hyphen, non-breaking hyphen, figure dash and the minus sign: the font draws none of them
+        "\u2011": "-",
+        "\u2012": "-",
+        "\u2212": "-",
+        "\u00a0": " ",  # no-break, figure and narrow no-break spaces
+        "\u2007": " ",
+        "\u202f": " ",
+    }
+)
+
+
+def tidy(headline: str) -> str:
+    """Plain typography for a model's headline. Changes how a character is drawn, never what the headline says."""
+    return headline.translate(_TYPOGRAPHY).strip()
+
+
 def check_headline(headline: str, page_text: str) -> list[str]:
     """Why this headline may not go on the banner (empty list: it may)."""
     problems: list[str] = []
@@ -146,7 +164,7 @@ async def draft_copy(
         template.problems.append(f"{res.error or 'no reply'}; the product name is the headline")
         return template
     problems, kept = [], []
-    for h in dict.fromkeys(x.strip() for x in res.parsed.headlines):
+    for h in dict.fromkeys(tidy(x) for x in res.parsed.headlines):
         why = check_headline(h, page)
         if why:
             problems.append(f"Rejected \"{h[:60]}\": {'; '.join(why)}.")

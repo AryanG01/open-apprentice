@@ -107,6 +107,13 @@ def test_model_headlines_are_kept_deduplicated_and_capped_at_three():
     assert [o["id"] for o in c.options] == ["c1", "c2", "c3"]
 
 
+def test_typographic_hyphens_and_non_breaking_spaces_are_normalised_not_rejected():
+    heads = ["Halden H7 \u2011 40\u2011hour battery\u00a0life", "Quiet\u2010clear"]
+    c = draft(MockProvider({"campaign_copy": [{"headlines": heads}]}))
+    assert c.origin == "model"
+    assert [o["headline"] for o in c.options] == ["Halden H7 - 40-hour battery life", "Quiet-clear"]
+
+
 def test_an_invented_number_and_a_claim_word_are_rejected_and_the_template_is_used():
     c = draft(
         MockProvider(
