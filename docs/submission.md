@@ -83,6 +83,12 @@ draws boxes tight around the words, which is what the snapping grows back to the
 rule (a picture box may not contain words), crop previews and a limit on how far snapping may grow an image box, and wrote
 it up (`docs/evaluation/campaign_vision_protocol.md`, Addendum 2).
 
+**Accessibility (tested, not claimed).** An axe-core scan (WCAG 2.0 A and AA, 2.1 AA, best-practice) of the landing, the sketch
+door, the workbench and the result, in light and dark, finds no violations; it runs in the browser tests. It found, and we fixed,
+invalid tab markup, a missing page heading and low-contrast quote text. Also tested: keyboard-operable layer editor (arrow keys),
+labelled controls, a live-region status, a skip link. Not tested: a hand run with a screen reader, and the older Diagrams and
+Prototype lanes beyond the shared shell.
+
 **Real-world check (our own, not user research).** We scanned 274 real 16:9 designs from the Crello dataset: none had all
 six of our original parts, which is why price, button and small print are now optional. Under the current rule 252 of the 274 qualify by
 element count, an upper bound (vector art counts as pictures; 23 if it does not); we have not run the flow on them

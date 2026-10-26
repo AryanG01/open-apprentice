@@ -9,6 +9,8 @@ import assert from "node:assert/strict";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
+const AXE = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), "../../node_modules/axe-core/axe.min.js"), "utf8");
+
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const PORT = Number(process.env.OA_E2E_ADAPT_PORT ?? 8770);
 const API = `http://127.0.0.1:${PORT}`;
@@ -171,6 +173,38 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     assert.ok((await page.locator("a[download]").count()) >= 2, "story card and banner downloads");
     assert.match((await page.locator("a[download]").nth(1).getAttribute("href")) ?? "", /^data:image\/png;base64,/);
     assert.deepEqual(problems, []);
+  });
+
+  test("axe-core finds no WCAG 2.x A or AA and no best-practice violations on the landing, the sketch door, the workbench and the result, in light and dark", async () => {
+    const found = {};
+    for (const scheme of ["light", "dark"]) {
+      const page = await (await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: scheme, bypassCSP: true })).newPage(); // CSP bypassed only so the scanner can be injected
+      const scan = async (name) => {
+        await page.waitForTimeout(900); // the entrance animation must finish: axe reads blended colours mid-fade
+        await page.addScriptTag({ content: AXE });
+        const r = await page.evaluate(async () => await window.axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21aa", "best-practice"] } }));
+        found[`${scheme}: ${name}`] = r.violations.map((v) => `${v.impact} ${v.id} (${v.nodes.length}) ${v.nodes[0].target.join(" ")}`);
+      };
+      await page.goto(`${API}/`, { waitUntil: "networkidle" });
+      await page.waitForFunction(() => !document.querySelector("input[type=file]").disabled);
+      await scan("landing");
+      await page.getByRole("button", { name: "Start from a sketch" }).click();
+      await page.getByRole("button", { name: "Use the sample sketch" }).click();
+      await page.locator("img[alt='Your sketch']").waitFor();
+      await page.getByRole("button", { name: "Use the sample page" }).click();
+      await scan("sketch door");
+      await page.getByRole("button", { name: "Read my sketch" }).click();
+      await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 60_000 });
+      await page.getByRole("button", { name: "Use the sample pictures" }).click();
+      await page.locator("img[alt='Logo you chose']").waitFor();
+      await scan("workbench");
+      const legal = page.locator("fieldset.lrow", { has: page.locator("legend", { hasText: "Small print" }) }).locator("textarea");
+      if ((await legal.count()) && (await legal.inputValue()) === "") await page.getByRole("button", { name: /has no small print: remove it/ }).click();
+      await page.getByRole("button", { name: "Looks right: make the story card" }).click();
+      await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
+      await scan("result");
+    }
+    assert.deepEqual(Object.fromEntries(Object.entries(found).filter(([, v]) => v.length)), {});
   });
 
   test("a banner that is not 16:9 is refused in plain words, and a non-image is refused too", async () => {

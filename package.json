@@ -17,5 +17,8 @@
     "test:snap": "node --experimental-strip-types --test tests/web/snap.test.ts",
     "test:e2e": "OA_E2E=1 node --test --test-concurrency=1 tests/e2e/ui.test.mjs tests/e2e/journey.test.mjs tests/e2e/campaign.test.mjs tests/e2e/adapt.test.mjs",
     "lint": "npm run lint -w apps/web"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.2"
   }
 }

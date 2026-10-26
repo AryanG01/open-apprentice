@@ -382,22 +382,22 @@ export function App() {
             <path d="M6 18h8M17 31h9" />
           </svg>
           <div>
-            <p className="name">Open Apprentice</p>
+            <h1 className="name">Open Apprentice</h1>
           </div>
         </div>
         <nav aria-label="Areas" className="areas">
           <ul className="tabs" role="tablist">
-            <li>
+            <li role="presentation">
               <button role="tab" aria-selected={area === "adapt"} className={area === "adapt" ? "tab on" : "tab"} onClick={() => pick("adapt")}>
                 Adapt a banner
               </button>
             </li>
-            <li>
+            <li role="presentation">
               <button role="tab" aria-selected={area === "apprentice"} className={area === "apprentice" ? "tab on" : "tab"} onClick={() => pick("apprentice")}>
                 Diagrams
               </button>
             </li>
-            <li>
+            <li role="presentation">
               <button role="tab" aria-selected={area === "prototype"} className={area === "prototype" ? "tab on" : "tab"} onClick={() => pick("prototype")}>
                 UI components · Earlier prototype
               </button>
