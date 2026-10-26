@@ -185,9 +185,12 @@ def _overlap(a: list[float], b: list[float]) -> float:
     return w * h if w > 0 and h > 0 else 0.0
 
 
-def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[str]:
+def check_layers(
+    layers: list[Layer], background: Optional[str] = None, allow_empty_text: bool = False
+) -> list[str]:
     """Every reason these layers cannot become a banner, in plain words. Empty means usable. Contrast is judged only once
-    the background colour (measured in the browser) is known."""
+    the background colour (measured in the browser) is known. `allow_empty_text` (a rough sketch has no legible words yet)
+    skips only the "text is empty" and "text size is missing" problems."""
     problems: list[str] = []
     by_role: dict[str, list[Layer]] = {}
     for l in layers:
@@ -230,7 +233,8 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
             continue
         l = one[r]
         if not l.text.strip():
-            problems.append(f"{label[r]} text is empty: type the words that are in the image")
+            if not allow_empty_text:
+                problems.append(f"{label[r]} text is empty: type the words that are in the image")
         elif len(l.text) > MAX_TEXT[r]:
             problems.append(f"{label[r]} text is too long ({MAX_TEXT[r]} characters at most)")
         else:
@@ -239,7 +243,7 @@ def check_layers(layers: list[Layer], background: Optional[str] = None) -> list[
                 problems.append(
                     f"{label[r]} uses characters Liberation Sans cannot draw: {''.join(missing[:5])}"
                 )
-        if l.font_px <= 0:
+        if l.font_px <= 0 and not allow_empty_text:
             problems.append(f"{label[r]} text size is missing")
     if (
         "price" in one

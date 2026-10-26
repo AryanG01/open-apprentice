@@ -1375,6 +1375,65 @@ def eval_campaign_vision(
     )
 
 
+@eval_app.command("campaign-sketch")
+def eval_campaign_sketch(
+    live: bool = typer.Option(
+        False, "--live", help="spend real credit on Nebius Token Factory (required)"
+    ),
+    cap_usd: float = typer.Option(
+        0.15, "--cap-usd", help="hard cap for this run, checked before every call"
+    ),
+    out: Path = typer.Option(
+        Path("docs/evaluation/campaign_sketch_dev.md"), "--out", help="where to write the table"
+    ),
+) -> None:
+    """Development probe: can Nemotron VL read a rough wireframe? Needs PROVIDER_MODE=nebius and NEBIUS_VISION_MODEL."""
+    import asyncio
+    import datetime
+
+    from open_apprentice.config import load_settings
+    from open_apprentice.evaluation.campaign_sketch_eval import render_markdown, run_dev
+    from open_apprentice.providers.factory import make_vision_provider
+    from open_apprentice.providers.spend import SpendGuard
+
+    if not live:
+        typer.echo("this command spends money: pass --live", err=True)
+        raise typer.Exit(2)
+    settings = load_settings()
+    inner = make_vision_provider(settings)
+    if inner is None:
+        typer.echo("set PROVIDER_MODE=nebius and NEBIUS_VISION_MODEL for a live run", err=True)
+        raise typer.Exit(2)
+    guard = SpendGuard(
+        inner,
+        run_id=f"campaign-sketch-dev-{datetime.date.today().isoformat()}",
+        run_cap_usd=cap_usd,
+        merge_system=True,
+    )
+
+    async def go():
+        try:
+            return await run_dev(guard)  # the wireframes are drawn in-process: no engine needed
+        finally:
+            try:
+                await guard.aclose()
+            except Exception:  # noqa: BLE001 - a failed close must not lose the measurement
+                pass
+
+    rows = asyncio.run(go())
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        render_markdown(
+            rows, model=settings.nebius_vision_model, spent_usd=guard.run_usd, calls=guard.calls
+        )
+    )
+    out.with_suffix(".json").write_text(json.dumps(rows, indent=1, ensure_ascii=False) + "\n")
+    stopped = f"; stopped: {guard.stopped_reason}" if guard.stopped_reason else ""
+    typer.echo(
+        f"{guard.calls} calls, ${guard.run_usd:.3f} (ledger) of ${cap_usd:.2f}{stopped}; table in {out}"
+    )
+
+
 @eval_app.command("campaign-nemotron")
 def eval_campaign_nemotron(
     live: bool = typer.Option(
