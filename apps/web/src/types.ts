@@ -513,3 +513,30 @@ export interface AdaptBanner {
   locale: string;
   png: string;
 }
+
+/** The owner's product page as Tavily read it, with facts that were each found on the page (api/pages.py). */
+export interface PageFact {
+  text: string;
+  quote: string;
+}
+export interface PagePrice extends PageFact {
+  amount: string;
+  currency: string;
+}
+export interface PageInfo {
+  page_id: string;
+  url: string;
+  title: string;
+  chars: number;
+  origin: "tavily" | "mock";
+  language: string;
+  facts: { product_name: PageFact | null; prices: PagePrice[]; features: PageFact[]; legal: PageFact[] };
+  copy: { origin: "model" | "template"; options: { id: string; headline: string }[]; price: string | null; cta: string; legal: string; problems: string[] };
+  problems: string[];
+  note: string;
+}
+export interface PageCheck {
+  status: "match" | "mismatch" | "unknown";
+  rows: { field: string; banner: string[]; page: string[]; ok: boolean; detail: string }[];
+  notes: string[];
+}

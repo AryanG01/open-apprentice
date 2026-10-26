@@ -137,6 +137,42 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
   });
 
+  test("the sketch door: sample sketch and sample page, the owner's pictures, a built banner, a verified story card and a page check", async () => {
+    const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 } })).newPage();
+    const problems = [];
+    page.on("pageerror", (e) => problems.push(`pageerror: ${e.message.slice(0, 160)}`));
+    page.on("response", (r) => r.status() >= 400 && problems.push(`HTTP ${r.status()} ${r.url()}`));
+    const text = async () => (await page.locator("body").innerText()).replace(/\s+/g, " ");
+    await page.goto(`${API}/`, { waitUntil: "networkidle" });
+    await page.waitForFunction(() => !document.querySelector("input[type=file]").disabled);
+    await page.getByRole("button", { name: "Start from a sketch" }).click();
+    await page.getByRole("heading", { name: "Start from a sketch" }).waitFor();
+    await page.getByRole("button", { name: "Use the sample sketch" }).click();
+    await page.locator("img[alt='Your sketch']").waitFor();
+    await page.getByRole("button", { name: "Use the sample page" }).click();
+    assert.match(await page.locator("input[type=url]").inputValue(), /^https:\/\/.+\/samples\/halden-h7\.html$/);
+    await page.getByRole("button", { name: "Read my sketch" }).click();
+    await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 60_000 });
+    assert.match(await text(), /Place the parts yourself/); // no vision model on this server: the manual template
+    assert.match(await text(), /Copy from your page/);
+    assert.match(await text(), /Offline sample page/);
+    assert.match(await text(), /Only facts found on the page are kept/);
+    await page.getByRole("button", { name: "Use the sample pictures" }).click();
+    await page.locator("img[alt='Logo you chose']").waitFor();
+    await page.locator("img[alt='Product image you chose']").waitFor();
+    const removeLegal = page.getByRole("button", { name: /has no small print: remove it/ });
+    if (await page.locator("fieldset.lrow", { has: page.locator("legend", { hasText: "Small print" }) }).locator("textarea").inputValue() === "") await removeLegal.click();
+    await page.getByRole("radio", { name: "#1d1240" }).click();
+    await page.getByRole("button", { name: "Looks right: make the story card" }).click();
+    await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
+    assert.match(await text(), /\d+ of \d+ checks passed/);
+    assert.match(await text(), /Page check/);
+    assert.match(await text(), /Match/);
+    assert.ok((await page.locator("a[download]").count()) >= 2, "story card and banner downloads");
+    assert.match((await page.locator("a[download]").nth(1).getAttribute("href")) ?? "", /^data:image\/png;base64,/);
+    assert.deepEqual(problems, []);
+  });
+
   test("a banner that is not 16:9 is refused in plain words, and a non-image is refused too", async () => {
     const page = await (await browser.newContext()).newPage();
     await page.goto(`${API}/`, { waitUntil: "networkidle" });

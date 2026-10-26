@@ -665,10 +665,10 @@ input[type="file"]::file-selector-button { font: 560 0.85rem/1 var(--font); colo
 .hv-card { grid-column: 2; grid-row: 2; position: relative; width: 100%; margin-top: -44px; border-radius: 12px; box-shadow: 0 1px 2px rgb(30 28 20 / 0.05), 0 18px 40px -16px rgb(30 28 20 / 0.28); }
 
 /* who does what: four plain facts on a hairline, no chips */
-.adapt .who { list-style: none; margin: 88px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.adapt .who { list-style: none; margin: 88px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .adapt .who li { padding: 20px 24px 0 0; color: var(--ink-2); font-size: 0.9rem; line-height: 1.45; }
 .adapt .who strong { display: block; color: var(--ink); font-weight: 560; margin-bottom: 4px; }
-.adapt .who li:first-child strong, .adapt .who li:nth-child(4) strong { font-family: var(--mono); font-size: 0.8rem; font-weight: 520; letter-spacing: 0; }
+.adapt .who li:first-child strong, .adapt .who li:nth-child(5) strong { font-family: var(--mono); font-size: 0.8rem; font-weight: 520; letter-spacing: 0; }
 
 /* the editor: the picture on the left (it stays in view), the parts on the right */
 .editor { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.85fr); gap: 32px; align-items: start; margin: 20px 0; }
@@ -699,7 +699,7 @@ fieldset.lrow > :not(legend) { clear: both; }
 .adapt input[type="number"] { font-family: var(--mono); font-size: 0.84rem; font-variant-numeric: tabular-nums; }
 .adapt input::placeholder, .adapt textarea::placeholder { color: var(--ink-3); }
 .adapt input:focus, .adapt textarea:focus, .adapt select:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ink) 12%, transparent); }
-.adapt input:disabled, .adapt textarea:disabled { opacity: 0.55; }
+.adapt input:disabled:not([type="file"]), .adapt textarea:disabled { opacity: 0.55; }
 .adapt input[type="color"] { width: 100%; height: 36px; padding: 3px; border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--raised); cursor: pointer; }
 .adapt input[type="checkbox"], .adapt input[type="radio"] { accent-color: var(--ink); width: 16px; height: 16px; margin: 0; }
 .lnums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 10px; }
@@ -764,6 +764,50 @@ fieldset.lrow > :not(legend) { clear: both; }
   .lnums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lnums > label:nth-child(n + 5):not(.inline) { grid-column: span 1; }
 }
+
+/* sketch door and the workbench panels (design: docs/design/sketch-flow-prototype.html, Figma LhsRAlpHtI4Jg93Uh9V2It) */
+.sketchdoor { max-width: 760px; }
+.sketchdoor .panel, .editor-right .panel { background: var(--surface); border-radius: var(--radius-card); padding: 20px; display: grid; gap: 12px; margin: 0 0 12px; }
+.sketchdoor .panel { margin-bottom: 16px; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.panel h3 { margin: 0; }
+.panel .muted { margin: 0; }
+.sketch-preview { display: block; width: 100%; max-height: 260px; object-fit: contain; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1px var(--line); }
+.field { display: block; }
+.editor-right { display: grid; gap: 12px; min-width: 0; }
+.facts { margin: 0; display: grid; }
+.fact { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.fact:last-child { border-bottom: 0; }
+.fact dt { font: 520 0.78rem/1.4 var(--font); color: var(--ink-2); }
+.fact dd { margin: 0; display: grid; gap: 2px; min-width: 0; }
+.fact-v { font-weight: 560; overflow-wrap: anywhere; }
+.fact-q { color: var(--ink-3); font-size: 0.82rem; overflow-wrap: anywhere; }
+.opts { border: 0; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; min-width: 0; }
+.opts legend { padding: 0; margin: 0 0 8px; }
+.opt { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border-radius: 12px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); cursor: pointer; transition: box-shadow 160ms ease; }
+.opt.on { box-shadow: inset 0 0 0 1.5px var(--ink); }
+.opt input { margin-top: 3px; }
+.opt > span { display: grid; gap: 6px; justify-items: start; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.pair label { display: grid; gap: 5px; font: 520 0.78rem/1.2 var(--font); color: var(--ink-2); }
+.slots { display: grid; gap: 8px; }
+.slot { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 14px; align-items: center; background: var(--raised); border-radius: 12px; padding: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+.slot-th { height: 64px; border-radius: 8px; background: repeating-conic-gradient(#8885 0% 25%, transparent 0% 50%) 50% / 12px 12px; display: grid; place-items: center; overflow: hidden; }
+.slot-th img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.slot p { margin: 2px 0 0; }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.swatch { width: 36px; height: 36px; padding: 0; border: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.14); cursor: pointer; transition: transform 140ms var(--ease-out); }
+.swatch:active { transform: scale(0.94); }
+.swatch.on { box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--ink); }
+.swatches input[type="color"] { width: 44px; height: 36px; }
+.pagecheck { margin: 24px 0 0; }
+.pagecheck h3 { margin-bottom: 8px; }
+.pagecheck .callout > div { display: grid; gap: 6px; justify-items: start; }
+.pagecheck .callout p { margin: 0; }
+.reading-panel { display: flex; gap: 24px; align-items: center; background: var(--surface); border-radius: 20px; padding: 16px 28px 16px 16px; margin: 0 0 16px; max-width: 560px; }
+.reading-canvas { width: 168px; height: 168px; flex: none; border-radius: 14px; background: #1d1240; }
+.reading-panel .status { margin: 0; }
+@media (max-width: 760px) { .reading-panel { flex-direction: column; align-items: flex-start; padding: 16px; } .slot { grid-template-columns: 72px minmax(0, 1fr); } .slot .btn { grid-column: 1 / -1; } .pair { grid-template-columns: 1fr; } }
 
 /* one authored moment per screen change: panels rise and fade, children staggered; movement is removed for reduced motion */
 @media (prefers-reduced-motion: no-preference) {

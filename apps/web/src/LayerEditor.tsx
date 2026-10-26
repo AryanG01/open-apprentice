@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { KeyboardEvent, PointerEvent } from "react";
+import type { KeyboardEvent, PointerEvent, ReactNode } from "react";
 import type { AdaptLayer } from "./types";
 
 export const BANNER_W = 1280;
@@ -37,11 +37,13 @@ interface Props {
   layers: AdaptLayer[];
   onChange: (layers: AdaptLayer[]) => void;
   disabled?: boolean;
+  /** Panels shown above the part list (the sketch door puts the page copy, pictures and colours here). */
+  lead?: ReactNode;
 }
 
 /** The banner with one draggable box per part, and a plain form for each. Everything is keyboard-operable: arrow keys move
  *  the focused box by 4 px, Shift+arrows resize it, Alt makes the step 1 px. */
-export function LayerEditor({ image, layers, onChange, disabled }: Props) {
+export function LayerEditor({ image, layers, onChange, disabled, lead }: Props) {
   const stage = useRef<HTMLDivElement>(null);
   const drag = useRef<Drag | null>(null);
   const [sel, setSel] = useState<string>("headline");
@@ -130,6 +132,8 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
       </p>
       </div>
 
+      <div className="editor-right">
+      {lead}
       <div className="lfields">
         {ORDER.map((role) => {
           const l = byRole(role);
@@ -208,6 +212,7 @@ export function LayerEditor({ image, layers, onChange, disabled }: Props) {
             </fieldset>
           );
         })}
+      </div>
       </div>
     </div>
   );

@@ -1,13 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { DragEvent } from "react";
-import { ArrowRight, CheckCircle, DownloadSimple, UploadSimple } from "@phosphor-icons/react";
+import { lazy, Suspense } from "react";
+import { ArrowRight, CheckCircle, DownloadSimple, UploadSimple, WarningCircle } from "@phosphor-icons/react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
 import type { Rgb } from "./snap";
-import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace } from "./types";
+import { ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
+import type { Picture } from "./SketchPanels";
+import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace, PageCheck, PageInfo } from "./types";
 
+const ReadingLoader = lazy(() => import("./ReadingLoader").then((m) => ({ default: m.ReadingLoader })));
 const SAMPLES = ["short_a", "short_b"];
+/** A server note as a sentence: first letter capital, one full stop. */
+const sentence = (t: string): string => {
+  const x = t.trim().replace(/[.\s]+$/, "");
+  return x ? `${x[0].toUpperCase()}${x.slice(1)}.` : "";
+};
+const PUBLIC_DEMO = "https://open-apprentice-md76de375q-uc.a.run.app";
+/** The sample product page Tavily reads. On an https deployment it is this server's own copy (so a candidate revision tests itself);
+ *  locally the public demo's address stands in (the offline page reader answers for it without any network). */
+const samplePageUrl = (): string => `${window.location.protocol === "https:" ? window.location.origin : PUBLIC_DEMO}/samples/halden-h7.html`;
 const LANGUAGES = ["en", "de", "fr", "es", "it", "nl", "pt", "pl", "sv", "cs", "tr", "ro"];
 const MAX_PNG_CHARS = 1_900_000; // above this a 1280 x 720 banner is sent as a JPEG instead (the server accepts both)
 
@@ -44,6 +57,25 @@ async function normalize(src: string): Promise<string> {
   if (!ctx) throw new Error("This browser cannot draw images.");
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(img, 0, 0, BANNER_W, BANNER_H);
+  const png = c.toDataURL("image/png");
+  return png.length <= MAX_PNG_CHARS ? png : c.toDataURL("image/jpeg", 0.9);
+}
+
+/** A sketch (often a photo of paper) letterboxed onto a white 1280 x 720 canvas, so the boxes keep their relative places. */
+async function normalizeSketch(src: string): Promise<string> {
+  const img = await loadImage(src);
+  const c = document.createElement("canvas");
+  c.width = BANNER_W;
+  c.height = BANNER_H;
+  const ctx = c.getContext("2d");
+  if (!ctx) throw new Error("This browser cannot draw images.");
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, BANNER_W, BANNER_H);
+  const k = Math.min(BANNER_W / img.naturalWidth, BANNER_H / img.naturalHeight);
+  const w = img.naturalWidth * k;
+  const h = img.naturalHeight * k;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, (BANNER_W - w) / 2, (BANNER_H - h) / 2, w, h);
   const png = c.toDataURL("image/png");
   return png.length <= MAX_PNG_CHARS ? png : c.toDataURL("image/jpeg", 0.9);
 }
@@ -148,9 +180,22 @@ export function Adapt() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [reading, setReading] = useState(false); // Nemotron is reading an image: show the turntable
   const [over, setOver] = useState(false);
   const [snapNote, setSnapNote] = useState("");
   const [flat, setFlat] = useState(false);
+  const [door, setDoor] = useState<"choose" | "sketch">("choose");
+  const [kind, setKind] = useState<"banner" | "sketch">("banner");
+  const [sketchSrc, setSketchSrc] = useState<string | null>(null);
+  const [pageUrl, setPageUrl] = useState("");
+  const [page, setPage] = useState<PageInfo | null>(null);
+  const [pageNote, setPageNote] = useState("");
+  const [choice, setChoice] = useState("");
+  const [priceLine, setPriceLine] = useState("");
+  const [ctaLabel, setCtaLabel] = useState("");
+  const [pics, setPics] = useState<Record<string, Picture>>({});
+  const [pageCheck, setPageCheck] = useState<PageCheck | null>(null);
+  const [checkNote, setCheckNote] = useState("");
   const imgEl = useRef<HTMLImageElement | null>(null);
   const pix = useRef<{ d: ImageData; rgb: Rgb } | null>(null);
   const started = useRef(false);
@@ -187,6 +232,7 @@ export function Adapt() {
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      setReading(false);
       setStatus("");
     }
   };
@@ -199,10 +245,78 @@ export function Adapt() {
     setRun(null);
     setLink("");
     setError(null);
+    setDoor("choose");
+    setKind("banner");
+    setSketchSrc(null);
+    setPageUrl("");
+    setPage(null);
+    setPageNote("");
+    setChoice("");
+    setPriceLine("");
+    setCtaLabel("");
+    setPics({});
+    setPageCheck(null);
+    setCheckNote("");
   };
+
+  const patchRole = (role: string, text: string) => setLayers((ls) => ls.map((l) => (l.role === role ? { ...l, text } : l)));
+  const onChoice = (id: string, headline: string) => {
+    setChoice(id);
+    patchRole("headline", headline);
+  };
+  const onPrice = (v: string) => {
+    setPriceLine(v);
+    patchRole("price", v);
+  };
+  const onCta = (v: string) => {
+    setCtaLabel(v);
+    patchRole("cta", v);
+  };
+  const setPicture = async (role: string, url: string, name: string) => {
+    const pic = await loadPicture(url, name);
+    setPics((p) => ({ ...p, [role]: pic }));
+    setLayers((ls) => ls.map((l) => (l.role === role ? { ...l, box: fitBoxTo(l.box, pic.img) } : l)));
+  };
+  const pickPicture = async (role: string, file: File | undefined) => {
+    if (!file) return;
+    try {
+      await setPicture(role, await readFileAsDataUrl(file), file.name);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+  const samplePictures = () =>
+    go("Loading the sample pictures…", async () => {
+      for (const [role, path, name] of [
+        ["brand_mark", "/samples/pictures/halden-wordmark.png", "halden-wordmark.png"],
+        ["product_image", "/samples/pictures/h7-headphones.png", "h7-headphones.png"],
+      ] as const) {
+        const blob = await (await fetch(path)).blob();
+        await setPicture(role, await readFileAsDataUrl(new File([blob], name, { type: blob.type || "image/png" })), name);
+      }
+    });
+  const onSketch = async (file: File | undefined) => {
+    if (!file) return;
+    if (!/^image\/(png|jpeg)$/.test(file.type)) {
+      setError("Use a PNG or JPEG image.");
+      return;
+    }
+    try {
+      setSketchSrc(await readFileAsDataUrl(file));
+      setError(null);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  };
+  const sampleSketch = () =>
+    go("Loading the sample sketch…", async () => {
+      const blob = await (await fetch("/samples/sketches/sketch-1.png")).blob();
+      setSketchSrc(await readFileAsDataUrl(new File([blob], "sketch-1.png", { type: blob.type || "image/png" })));
+    });
 
   const readBanner = (src: string) =>
     go("Nemotron is reading your banner. This takes about 10 to 30 seconds.", async () => {
+      setReading(true);
       const url = await normalize(src);
       const img = await loadImage(url);
       imgEl.current = img;
@@ -234,6 +348,56 @@ export function Adapt() {
       setLayers(filled);
       setBackground(bg);
       setLanguage(up.language || "en");
+    });
+
+  const readSketch = () =>
+    go("Nemotron is reading your sketch. This takes about 10 to 30 seconds.", async () => {
+      if (!sketchSrc) throw new Error("Choose a sketch first.");
+      setReading(true);
+      const url = await normalizeSketch(sketchSrc);
+      imgEl.current = await loadImage(url);
+      let id = wid ?? (await newWorkspace());
+      const attempt = async (ws: string): Promise<[AdaptUpload, PageInfo | null, string]> => {
+        const address = pageUrl.trim();
+        const [up, pg] = await Promise.all([
+          call<AdaptUpload>(`/api/campaign/workspaces/${ws}/sketches`, { image: url }),
+          address
+            ? call<PageInfo>(`/api/campaign/workspaces/${ws}/pages`, { url: address }).then(
+                (p): [PageInfo | null, string] => [p, ""],
+                (e: Error): [PageInfo | null, string] => [null, e.message],
+              )
+            : Promise.resolve<[PageInfo | null, string]>([null, ""]),
+        ]);
+        return [up, pg[0], pg[1]];
+      };
+      let got: [AdaptUpload, PageInfo | null, string];
+      try {
+        got = await attempt(id);
+      } catch (e) {
+        if (!/holds \d+ banners at most/.test((e as Error).message)) throw e;
+        id = await newWorkspace(); // a workspace holds a few banners; carry on in a fresh one
+        got = await attempt(id);
+      }
+      const [up, pg, pgNote] = got;
+      const copy = pg?.copy;
+      const textFor = (role: string, hint: string): string => {
+        const fromPage = role === "headline" ? copy?.options[0]?.headline : role === "price" ? copy?.price : role === "cta" ? copy?.cta : role === "legal" ? copy?.legal : "";
+        return fromPage || hint;
+      };
+      setKind("sketch");
+      setImage(url);
+      setUpload(up);
+      setLayers(up.layers.map((l) => ({ ...l, color: "", fill: "", text: isImageRole(l.role) ? "" : textFor(l.role, l.text) })));
+      setBackground(PALETTE[0]);
+      setLanguage(pg?.language || up.language || "en");
+      setPage(pg);
+      setPageNote(pgNote);
+      setChoice(copy?.options[0]?.id ?? "");
+      setPriceLine(copy?.price ?? "");
+      setCtaLabel(copy?.cta ?? "");
+      setFlat(false);
+      setSnapNote("");
+      setPics({});
     });
 
   const snapAll = () => {
@@ -274,7 +438,23 @@ export function Adapt() {
       const missing = REQUIRED.filter((r) => !layers.some((l) => l.role === r));
       if (missing.length) throw new Error(`Add the missing part${missing.length > 1 ? "s" : ""}: ${missing.map((r) => LABEL[r].toLowerCase()).join(", ")}.`);
       const crops: Record<string, string> = {};
-      for (const l of layers) if (isImageRole(l.role)) crops[l.role] = cropPng(img, l.box);
+      for (const l of layers) {
+        if (!isImageRole(l.role)) continue;
+        if (kind === "sketch") {
+          const pic = pics[l.role];
+          if (!pic) throw new Error(`Add your ${LABEL[l.role].toLowerCase()} picture first.`);
+          crops[l.role] = renderPicture(pic.img, l.box[2], l.box[3]);
+        } else {
+          crops[l.role] = cropPng(img, l.box);
+        }
+      }
+      if (kind === "banner" && pageUrl.trim() && !page) {
+        try {
+          setPage(await call<PageInfo>(`/api/campaign/workspaces/${wid}/pages`, { url: pageUrl.trim(), copy: false }));
+        } catch (e) {
+          setCheckNote((e as Error).message);
+        }
+      }
       const b = await call<AdaptBanner>(`/api/campaign/workspaces/${wid}/uploads/${upload.upload_id}/confirm`, {
         layers,
         background,
@@ -295,6 +475,17 @@ export function Adapt() {
   const verification = run?.result?.verification ?? null;
   const passed = verification ? verification.checks.filter((c) => c.passed).length : 0;
   const finished = run && (run.status === "ready" || run.status === "applied");
+  useEffect(() => {
+    if (!finished || !page || !banner || !wid || pageCheck) return;
+    let live = true;
+    call<PageCheck>(`/api/campaign/workspaces/${wid}/page-check`, { banner_id: banner.banner_id, page_id: page.page_id }).then(
+      (c) => live && setPageCheck(c),
+      (e: Error) => live && setCheckNote(e.message),
+    );
+    return () => {
+      live = false;
+    };
+  }, [finished, page, banner, wid, pageCheck]);
 
   const title = step === 1 ? "Bring a banner. Get story cards you can trust." : step === 2 ? "Check what Nemotron found" : finished ? "Your story card" : run?.status === "question" ? "It needs one decision from you" : "Your banner";
   const notices = (
@@ -304,15 +495,70 @@ export function Adapt() {
           {error}
         </p>
       ) : null}
-      <p className={busy ? "status busy" : "status"} role="status" aria-live="polite">
-        {busy ? status : ""}
-      </p>
+      {busy && reading ? (
+        <div className="reading-panel">
+          <Suspense fallback={null}>
+            <ReadingLoader />
+          </Suspense>
+          <p className="status busy" role="status" aria-live="polite">
+            {status}
+          </p>
+        </div>
+      ) : (
+        <p className={busy ? "status busy" : "status"} role="status" aria-live="polite">
+          {busy ? status : ""}
+        </p>
+      )}
     </>
   );
 
   return (
     <main className="page adapt" id="stage">
-      {step === 1 ? (
+      {step === 1 && door === "sketch" ? (
+        <section aria-labelledby="s-title" className="sketchdoor">
+          <h2 id="s-title" tabIndex={-1} ref={heading}>
+            Start from a sketch
+          </h2>
+          <p className="lede">Draw boxes for the logo, the picture, the words and the button. Add your product page and the words come from it.</p>
+          {notices}
+          <div className="panel">
+            <h3>1. Your sketch</h3>
+            <p className="muted small">A photo or screenshot of a rough wireframe. It is letterboxed onto 16:9.</p>
+            <div className="cta-row">
+              <label className="btn primary filebtn">
+                <UploadSimple size={18} weight="bold" aria-hidden="true" />
+                Choose a sketch
+                <input type="file" accept="image/png,image/jpeg" aria-label="Sketch image" disabled={busy || !wid} onChange={(e) => void onSketch(e.target.files?.[0])} />
+              </label>
+              <button type="button" className="btn" onClick={() => void sampleSketch()} disabled={busy || !wid}>
+                Use the sample sketch
+              </button>
+            </div>
+            {sketchSrc ? <img className="sketch-preview" src={sketchSrc} alt="Your sketch" /> : null}
+          </div>
+          <div className="panel">
+            <h3>2. Your product page (optional)</h3>
+            <label className="field">
+              <span className="visually-hidden">Product page address</span>
+              <input type="url" placeholder="https://" value={pageUrl} onChange={(e) => setPageUrl(e.target.value)} disabled={busy} />
+            </label>
+            <p className="muted small">Tavily reads the page. Every number and name in the copy has to be on it. The address is sent to Tavily; the sketch image is sent to Nebius Token Factory.</p>
+            <div className="cta-row">
+              <button type="button" className="btn small" onClick={() => setPageUrl(samplePageUrl())} disabled={busy}>
+                Use the sample page
+              </button>
+            </div>
+          </div>
+          <div className="cta-row">
+            <button type="button" className="btn primary" onClick={() => void readSketch()} disabled={busy || !wid || !sketchSrc}>
+              Read my sketch
+            </button>
+            <button type="button" className="btn quiet" onClick={() => setDoor("choose")} disabled={busy}>
+              Back
+            </button>
+          </div>
+        </section>
+      ) : step === 1 ? (
         <section aria-labelledby="a-choose" className={over ? "hero-grid drop over" : "hero-grid drop"} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={onDrop}>
           <div className="hero-copy">
             <h2 tabIndex={-1} ref={heading} className="display">
@@ -329,7 +575,10 @@ export function Adapt() {
                 Choose a banner
                 <input type="file" accept="image/png,image/jpeg" disabled={busy || !wid} onChange={(e) => void onFile(e.target.files?.[0])} />
               </label>
-              <span className="muted small">PNG or JPEG, 16:9. Or drop one anywhere here.</span>
+              <button type="button" className="btn" onClick={() => setDoor("sketch")} disabled={busy || !wid}>
+                Start from a sketch
+              </button>
+              <span className="muted small">PNG or JPEG, 16:9. A photo of a rough sketch works too. Or drop a banner anywhere here.</span>
             </div>
             {samples.length ? (
               <div className="samples-row">
@@ -363,7 +612,10 @@ export function Adapt() {
       {step === 1 ? (
         <ol className="who" aria-label="Who does what">
           <li>
-            <strong>Nemotron-3.5-Super-VL</strong> reads your banner
+            <strong>Nemotron-3.5-Super-VL</strong> reads your banner or sketch
+          </li>
+          <li>
+            <strong>Tavily</strong> reads your product page, when you give one
           </li>
           <li>
             <strong>You</strong> check the parts
@@ -372,7 +624,7 @@ export function Adapt() {
             <strong>Deterministic checks and an independent verifier</strong> decide
           </li>
           <li>
-            <strong>Nemotron-3-Super</strong> words the question when the copy does not fit
+            <strong>Nemotron-3-Super</strong> words the question, and drafts copy from your page
           </li>
         </ol>
       ) : null}
@@ -387,11 +639,11 @@ export function Adapt() {
             <div>
             {upload.origin === "model" ? (
               <>
-                <strong>Nemotron read this banner</strong> ({upload.model.replace(/^nvidia\//, "")}). Boxes can be tight around the words; fix anything that is off, then continue.
+                <strong>Nemotron read this {kind === "sketch" ? "sketch" : "banner"}</strong> ({upload.model.replace(/^nvidia\//, "")}). {kind === "sketch" ? "Boxes are loose by design; drag them where you want each part, then continue." : "Boxes can be tight around the words; fix anything that is off, then continue."}
               </>
             ) : (
               <>
-                <strong>Place the parts yourself.</strong> {upload.note || "No vision model answered."} Drag each box onto its part and type the words.
+                <strong>Place the parts yourself.</strong> {sentence(upload.note || "No vision model answered")} Drag each box onto its part and type the words.
               </>
             )}
             {upload.problems.length ? (
@@ -414,16 +666,57 @@ export function Adapt() {
               </ul>
             </div>
           ) : null}
-          <LayerEditor image={image} layers={layers} onChange={setLayers} disabled={busy} />
-          <CropPreview img={imgEl.current} layers={layers} />
+          {pageNote ? (
+            <p className="callout" role="status">
+              <WarningCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" />
+              <span>The page could not be read: {pageNote} Type the words yourself.</span>
+            </p>
+          ) : null}
+          <LayerEditor
+            image={image}
+            layers={layers}
+            onChange={setLayers}
+            disabled={busy}
+            lead={
+              kind === "sketch" ? (
+                <>
+                  {page ? (
+                    <CopyPanel
+                      page={page}
+                      choice={choice}
+                      onChoice={onChoice}
+                      price={priceLine}
+                      onPrice={onPrice}
+                      cta={ctaLabel}
+                      onCta={onCta}
+                      hasPrice={layers.some((l) => l.role === "price")}
+                      hasCta={layers.some((l) => l.role === "cta")}
+                      disabled={busy}
+                    />
+                  ) : null}
+                  <PicturesPanel layers={layers} pics={pics} onPick={(r, f) => void pickPicture(r, f)} onSample={samplePictures} disabled={busy} />
+                  <ColourPanel value={background} onChange={setBackground} disabled={busy} />
+                </>
+              ) : null
+            }
+          />
+          {kind === "banner" ? <CropPreview img={imgEl.current} layers={layers} /> : null}
           <div className="lextras">
-            <button type="button" className="btn" onClick={snapAll} disabled={busy || !flat} title={flat ? undefined : "Only works on a flat background"}>
-              Snap boxes to the content
-            </button>
-            <label>
-              Background colour
-              <input type="color" value={hexOr(background, "#000000")} onChange={(e) => setBackground(e.target.value)} />
-            </label>
+            {kind === "banner" ? (
+              <>
+                <button type="button" className="btn" onClick={snapAll} disabled={busy || !flat} title={flat ? undefined : "Only works on a flat background"}>
+                  Snap boxes to the content
+                </button>
+                <label>
+                  Background colour
+                  <input type="color" value={hexOr(background, "#000000")} onChange={(e) => setBackground(e.target.value)} />
+                </label>
+                <label>
+                  Check the price against your page (optional)
+                  <input type="url" placeholder="https://" value={pageUrl} onChange={(e) => setPageUrl(e.target.value)} />
+                </label>
+              </>
+            ) : null}
             <label>
               Language (2 letters)
               <input type="text" list="a-langs" maxLength={2} pattern="[a-z]{2}" value={language} onChange={(e) => setLanguage(e.target.value.toLowerCase())} />
@@ -467,15 +760,15 @@ export function Adapt() {
           </h3>
           <div className="trio">
             <figure>
-              <img src={banner.original} alt="Your banner" />
-              <figcaption>Your banner</figcaption>
+              <img src={banner.original} alt={kind === "sketch" ? "Your sketch" : "Your banner"} />
+              <figcaption>{kind === "sketch" ? "Your sketch" : "Your banner"}</figcaption>
             </figure>
             <span aria-hidden="true" className="arrow">
               <ArrowRight size={18} />
             </span>
             <figure>
               <img src={banner.rebuilt} alt="Your banner rebuilt as editable layers" />
-              <figcaption>Rebuilt as editable layers</figcaption>
+              <figcaption>{kind === "sketch" ? "Your banner, built from the sketch" : "Rebuilt as editable layers"}</figcaption>
             </figure>
             <span aria-hidden="true" className="arrow">
               <ArrowRight size={18} />
@@ -552,11 +845,18 @@ export function Adapt() {
                   </table>
                 </div>
               </details>
+              {page || checkNote ? <PageCheckBox check={pageCheck} error={pageCheck ? "" : checkNote} /> : null}
               <div className="controls">
                 <a className="btn primary" href={run.result?.png} download="story-card.png">
                   <DownloadSimple size={18} weight="bold" aria-hidden="true" />
                   Download the story card (PNG)
                 </a>
+                {kind === "sketch" ? (
+                  <a className="btn" href={banner.rebuilt} download="banner.png">
+                    <DownloadSimple size={18} weight="bold" aria-hidden="true" />
+                    Download the banner (PNG)
+                  </a>
+                ) : null}
                 <button className="btn" onClick={reset}>
                   Adapt another banner
                 </button>
