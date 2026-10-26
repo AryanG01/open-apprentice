@@ -118,7 +118,9 @@ try {
   const readSketch = page.waitForResponse((r) => /\/sketches$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
   await click(page.getByRole("button", { name: "Read my sketch" }));
   await mark("s-read");
-  const sk = await (await readSketch).json();
+  const skRes = await readSketch;
+  if (!skRes.ok()) throw new Error(`reading the sketch failed: HTTP ${skRes.status()} ${(await skRes.text()).slice(0, 200)}`);
+  const sk = await skRes.json();
   console.log(`  sketch: origin ${sk.origin}, model ${sk.model}, layers ${sk.layers.map((l) => l.role).join(",")}`);
   await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 120_000 });
   await sleep(1500);
@@ -130,7 +132,8 @@ try {
   await mark("s-copy", "section[aria-labelledby=p-copy]");
   await sleep(6500);
   const opts = page.locator("label.opt");
-  if ((await opts.count()) > 1) await click(opts.nth(1));
+  const lens = await opts.evaluateAll((els) => els.map((e) => e.textContent.length));
+  if (lens.length > 1) await click(opts.nth(lens.indexOf(Math.min(...lens)))); // the shortest option fits the story card without a question
   await sleep(1800);
   await mark("s-copy-read");
   await click(page.getByRole("button", { name: "Use the sample pictures" }));
@@ -147,8 +150,19 @@ try {
   await buildBtn.scrollIntoViewIfNeeded();
   await mark("s-build");
   await click(buildBtn);
+  const alertText = page.getByRole("alert").first().waitFor({ timeout: 25_000 }).then(async () => (await page.getByRole("alert").first().innerText()).replace(/\s+/g, " "), () => "");
+  const first = await Promise.race([built.then(() => "ok", () => "timeout"), alertText.then((t) => (t ? `alert: ${t}` : new Promise(() => undefined)))]);
+  if (first !== "ok") {
+    await page.screenshot({ path: "/tmp/claude-501/design/capture-error.png", fullPage: true });
+    throw new Error(`building the banner did not start: ${first}`);
+  }
   const sr = await (await built).json();
   console.log(`  sketch run: ${sr.status}`);
+  if (sr.status === "question") {
+    const answered0 = page.waitForResponse((r) => /\/answer$/.test(r.url()) && r.request().method() === "POST", { timeout: 300_000 });
+    await click(page.getByRole("button", { name: "Shrink the product image" }).first());
+    await answered0;
+  }
   await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 120_000 });
   await sleep(1200);
   await scrollTo(".trio", 60);

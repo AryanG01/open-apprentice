@@ -27,7 +27,7 @@ Owner = the person who must do it (some steps need the owner's accounts or are o
 - [x] One pass of every number in README and submission against its source file.
 
 ## 4. Video (owner records or approves; under 3:00, public on YouTube)
-- [x] **Current video: banner-led cut, 1:42** (25 Oct, recorded live on production 00048-wuq, `video/out/open_apprentice_demo.mp4`; upload this one). Earlier: cut rebuilt around the Campaign lane (23 Oct, 2:55, `video/out/open_apprentice_demo.mp4`; captured on the public
+- [x] **Current video: two-door cut, 1:46 (26 Oct, recorded live on candidate 00051-wib; sketch and page first, then the banner flow; `video/out/open_apprentice_demo.mp4`; upload this one).** Earlier: banner-led cut, 1:42 (25 Oct, recorded live on production 00048-wuq, `video/out/open_apprentice_demo.mp4`; upload this one). Earlier: cut rebuilt around the Campaign lane (23 Oct, 2:55, `video/out/open_apprentice_demo.mp4`; captured on the public
       demo, live Nemotron role proposal; draw.io appears as one beat). Re-render: `node video/capture/campaign.mjs`,
       `video/.venv/bin/python video/tools/encode.py`, `video/.venv/bin/python video/tools/tts.py`, `npm run render` in `video/`.
 - [ ] Upload as public; put the link in `docs/submission.md` and the Devpost form.

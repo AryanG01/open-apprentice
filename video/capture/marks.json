@@ -1,66 +1,66 @@
 {
- "url": "http://127.0.0.1:8771",
+ "url": "https://cand---open-apprentice-md76de375q-uc.a.run.app",
  "live": true,
  "scale": 1.5,
  "marks": [
   {
    "name": "home",
-   "t": 5.235,
+   "t": 7.734,
    "box": null
   },
   {
    "name": "s-open",
-   "t": 5.235,
+   "t": 7.735,
    "box": null
   },
   {
    "name": "s-sketch",
-   "t": 9.458,
+   "t": 12.725,
    "box": null
   },
   {
    "name": "s-page",
-   "t": 11.6,
+   "t": 14.857,
    "box": null
   },
   {
    "name": "s-read",
-   "t": 12.53,
+   "t": 15.792,
    "box": null
   },
   {
    "name": "s-parts",
-   "t": 14.085,
+   "t": 34.979,
    "box": null
   },
   {
    "name": "s-copy",
-   "t": 17.504,
+   "t": 38.392,
    "box": {
     "x": 763.15625,
     "y": 92.234375,
     "width": 404.828125,
-    "height": 551.5
+    "height": 829.78125
    }
   },
   {
    "name": "s-copy-read",
-   "t": 25.812,
+   "t": 47.64,
    "box": null
   },
   {
    "name": "s-pics",
-   "t": 28.911,
+   "t": 51.503,
    "box": null
   },
   {
    "name": "s-build",
-   "t": 30.431,
+   "t": 53.022,
    "box": null
   },
   {
    "name": "s-done",
-   "t": 34.095,
+   "t": 60.597,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -70,7 +70,7 @@
   },
   {
    "name": "s-check",
-   "t": 39.509,
+   "t": 66.011,
    "box": {
     "x": 112,
     "y": 383.875,
@@ -80,22 +80,22 @@
   },
   {
    "name": "s-check-read",
-   "t": 45.012,
+   "t": 71.512,
    "box": null
   },
   {
    "name": "b-home",
-   "t": 47.149,
+   "t": 73.64,
    "box": null
   },
   {
    "name": "drop",
-   "t": 48.3,
+   "t": 74.789,
    "box": null
   },
   {
    "name": "parts",
-   "t": 50.869,
+   "t": 88.29,
    "box": {
     "x": 112,
     "y": 112.296875,
@@ -105,32 +105,32 @@
   },
   {
    "name": "parts-read",
-   "t": 55.369,
+   "t": 92.791,
    "box": null
   },
   {
    "name": "fix-start",
-   "t": 55.378,
+   "t": 92.798,
    "box": null
   },
   {
    "name": "fix-done",
-   "t": 63.254,
+   "t": 100.659,
    "box": null
   },
   {
    "name": "keys",
-   "t": 65.416,
+   "t": 102.817,
    "box": null
   },
   {
    "name": "confirm",
-   "t": 66.93,
+   "t": 104.336,
    "box": null
   },
   {
    "name": "rebuilt",
-   "t": 71,
+   "t": 115.56,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -140,22 +140,22 @@
   },
   {
    "name": "question",
-   "t": 75.415,
+   "t": 119.968,
    "box": {
     "x": 112,
     "y": 92,
     "width": 1056,
-    "height": 642.140625
+    "height": 690.765625
    }
   },
   {
    "name": "question-read",
-   "t": 81.915,
+   "t": 126.469,
    "box": null
   },
   {
    "name": "answered",
-   "t": 84.572,
+   "t": 130.742,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -165,17 +165,17 @@
   },
   {
    "name": "checks",
-   "t": 89.611,
+   "t": 135.782,
    "box": null
   },
   {
    "name": "checks-read",
-   "t": 94.612,
+   "t": 140.783,
    "box": null
   },
   {
    "name": "limits",
-   "t": 96.564,
+   "t": 142.737,
    "box": {
     "x": 112,
     "y": 231.703125,
@@ -185,9 +185,9 @@
   },
   {
    "name": "limits-read",
-   "t": 103.565,
+   "t": 149.739,
    "box": null
   }
  ],
- "frameOffset": 0.007
+ "frameOffset": 0.021
 }
