@@ -157,6 +157,29 @@ def baseline_facts(page_text: str) -> FactsResult:
     return FactsResult(guess_language(page_text), name, prices, [], [], "baseline", problems)
 
 
+_BULLET = re.compile(r"^\s*(?:[-*+\u2022])\s+(.+?)\s*$")
+_NOT_A_FEATURE = re.compile(r"\b(terms|offer ends|while stocks|valid until|all rights)\b", re.I)
+
+
+def page_bullets(page_text: str) -> list[dict]:
+    """The page's own list items as features: grounded by construction (the quote is the line), used only when the model
+    found no feature. Price lines and legal-sounding lines are left out."""
+    out: list[dict] = []
+    for ln in page_text.split("\n"):
+        m = _BULLET.match(ln)
+        if not m:
+            continue
+        t = re.sub(r"[*_`]+", "", m.group(1)).strip()
+        if (
+            3 <= len(t) <= 80
+            and not PRICE.search(t)
+            and not _NOT_A_FEATURE.search(t)
+            and len(out) < MAX_FEATURES
+        ):
+            out.append({"text": t, "quote": ln.strip()})
+    return out
+
+
 def _keep(
     items: list[Fact], page: str, cap: int, label: str, problems: list[str], price: bool = False
 ) -> list[dict]:
@@ -209,7 +232,8 @@ async def extract_facts(
         lang if re.fullmatch(r"[a-z]{2}", lang) else base.language,
         name_list[0] if name_list else base.product_name,
         prices,
-        _keep(out.features, page_text, MAX_FEATURES, "feature", problems),
+        _keep(out.features, page_text, MAX_FEATURES, "feature", problems)
+        or page_bullets(page_text),
         _keep(out.legal, page_text, MAX_LEGAL, "legal line", problems),
         "model",
         problems,

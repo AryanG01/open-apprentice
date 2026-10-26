@@ -105,6 +105,15 @@ def test_model_facts_are_kept_when_grounded_and_amounts_come_from_the_text():
     )
 
 
+def test_a_model_that_finds_no_features_falls_back_to_the_pages_own_bullets():
+    r = run(MockProvider({"campaign_facts": [dict(GOOD, features=[])]}))
+    assert [f["text"] for f in r.features] == [
+        "40-hour battery life",
+        "30 dB adaptive noise cancelling",
+    ]
+    assert all(f["quote"] in PAGE for f in r.features)
+
+
 def test_an_invented_quote_or_text_outside_the_quote_is_dropped_with_a_reason():
     reply = dict(
         GOOD,
