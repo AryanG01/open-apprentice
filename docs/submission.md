@@ -72,7 +72,7 @@ checks and the independent verifier decide; Nemotron-3-Super words the question.
 
 **What it cannot do yet** (also on the page): flat or simple backgrounds only (the logo and product are cropped as
 rectangles); fonts are replaced by Liberation Sans; 16:9 input only; Latin scripts only; the logo and the product must be
-separate pictures and the product larger than the logo; their rectangles must not overlap; a tall, narrow product (a bottle) cannot reach the minimum width and nothing is built; the checks do not look inside the pictures; image content is judged only by Nemotron and then you; the
+separate pictures and the product larger than the logo; their crops have neighbouring ink painted out on a flat background; a photo or busy background is refused before any model call, with a labelled simplified-version option; the structure checks do not look inside the pictures; image content is judged only by Nemotron and then you; the
 sealed-set and role results below were measured on our own fixtures, not on real customer banners. Your image is sent to
 Nebius Token Factory to be read and kept in memory for 30 minutes.
 

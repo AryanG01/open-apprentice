@@ -1034,7 +1034,7 @@ export function Adapt() {
           <li>Text is rebuilt in Liberation Sans; scripts that font cannot draw (Chinese, Japanese, Korean, Arabic, Hindi) are refused.</li>
           <li>The logo, the product image and the headline are required, and the product image must be larger than the logo. The price, the button and the small print are optional: remove any the banner does not have.</li>
           <li>Banners must be 16:9; one story-card layout (1080 × 1920) is learned from a single example.</li>
-          <li>The logo and the product are cut out as rectangles, so their boxes must not overlap (a product whose rectangle reaches into the logo would carry a piece of it). A tall, narrow product, such as a bottle, cannot reach the minimum product width on a story card: the app says so and builds nothing.</li>
+          <li>The logo and the product are cut out of the banner as rectangles; on a flat background the app paints any neighbouring ink out of each crop and warns when a crop would cut the picture off. A tall, narrow product is accepted when it is at least 480 px tall on the card. A photo or busy background is refused before any model call; you can accept a simplified flat-colour version, which is labelled as simplified.</li>
           <li>Nemotron can misplace or merge boxes, so you confirm every layer. The checks are structural: they do not look inside the pictures and cannot judge whether the result is beautiful.</li>
           <li>Measured so far: roles and words are read well; boxes are often loose or misplaced, most of all when the headline wraps onto many lines (see the evaluation in the repository). No people have been studied.</li>
         </ul>

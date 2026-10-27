@@ -61,3 +61,14 @@ authored gold and the sealed 22/22), the snapping behaviour that grew banner_02'
 `stage_a/` raw responses, app-resized PNGs, editor states, overlays, screenshots; `calls_stage_a.jsonl` raw replies and usage;
 `stage_b/` first Stage B pass (exports, question and result screenshots, per-case JSON); `stage_b_pass2/` banner_02 after the
 headline box correction; `product_box_measurement.json`; `stage_a_scoring.md`.
+
+## Development rerun after the fixes (27 Oct, later; NOT an untouched evaluation)
+The four banners were run again after code changed because of them: `stage_c_dev_rerun/` (vision replies replayed from Stage A, text model live).
+The changes: text boxes put back onto their measured blocks (button plates split from prices), product box fitted to the whole picture, neighbours' ink painted out of crops,
+tall narrow products accepted by height (width OR height), a photo background refused before the model call, a plain reason on every stop.
+| | banner_01 | banner_02 | banner_03 | banner_04 |
+|---|---|---|---|---|
+| Boxes | all on target, no corrections | all on target, no corrections | all on target, no corrections | not cleaned (non-flat); now refused before the model call unless the owner accepts a simplified version |
+| Outcome | story card, 15/15 structure checks | story card, 15/15 | story card (two cards, because the long headline asks) 15/15 | (simplified path only) a card on a flat olive background, bottle crop keeps forest pixels: lossy, labelled |
+| Visual (internal) | clean: no fragment, lamp whole | clean: bottle whole | card 1 clean, speaker whole; card 2 sparse (known, frozen layout) | not faithful |
+Because these four inputs shaped the fixes, this proves the fixes work on them, not that they generalise. The held-out set (`docs/plan/holdout_spec.md`) is the test of that and is run once.
