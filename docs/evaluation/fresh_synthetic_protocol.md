@@ -22,8 +22,9 @@ validation, not user research. Four rows cannot support a population claim or a 
   support label or brief reaches the model. Annotations in `evaluator_only/` are not read until the raw extraction of an image is
   saved and committed (`stage_a/`).
 - **Budget manifest:** at most 4 vision reads (one per image; the existing code resends once only after a truncated reply, and any
-  such second call is logged), at most 4 question-wording calls, no page reads, no fact/copy calls. Server-side hard cap for this
-  run `DEMO_MODEL_MAX_USD=0.25` (incremental), far inside the owner's $5 total. Stop on cap, on a systematic failure, or after the
+  such second call is logged), at most 4 question-wording calls, no page reads, no fact/copy calls. The incremental realised-spend stop is **$0.25**, checked from `calls.jsonl` by the operator after every image. The server's own cap is
+  set to `DEMO_MODEL_MAX_USD=1.00` only because the app reserves about $0.48 per model session before a call (a first attempt with a
+  $0.25 server cap made no model call: `run0_setup_failure_no_model/`); that reserve is not spend. All of it is far inside the owner's $5 total. Stop on cap, on a systematic failure, or after the
   four images; never to improve a score. Every call is logged in `calls.jsonl` (role, raw reply text, usage; no images).
 
 ## Procedure and scoring (fixed now)
