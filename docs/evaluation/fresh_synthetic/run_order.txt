@@ -1,0 +1,4 @@
+inputs/banner_01.png
+inputs/banner_02.png
+inputs/banner_03.png
+inputs/banner_04.png

@@ -1,0 +1,5 @@
+case_id,input_sha256,predeclared_intent,preflight_classification,preflight_reason,code_commit,model_id,prompt_hash,attempt_number,raw_extraction_saved_path,raw_text_correct,roles_correct,human_text_corrections,human_box_corrections,clarifications,preference_used,outcome,exact_content_preserved,required_parts_preserved,mechanical_checks,visual_review,active_human_seconds,elapsed_seconds,model_calls,cost_usd,export_paths,notes
+banner_01,cd22e42c5371ea570059d0cbedb6dee62a602e580c9884c3f6cc7ac1ca36d295,intended_supported,,,,,,,,,,,,,,,,,,,,,,,,
+banner_02,765fccc27e4e63a29c1911c485e80548bdbe5bb8597c0a809a8a99d8ca1d907d,intended_supported,,,,,,,,,,,,,,,,,,,,,,,,
+banner_03,a6fe8c0082553c3c1c83949edf9c1ccf158d557fd00d6fe8cef4af2ab333bab2,intended_supported_long_copy,,,,,,,,,,,,,,,,,,,,,,,,
+banner_04,1673d335628cad1c30eea753bba9fe84d5bfe11a6cb12a9d35d6dc9b4a061e0a,intended_unsupported_photographic_background,,,,,,,,,,,,,,,,,,,,,,,,
