@@ -959,10 +959,10 @@ export function Adapt() {
                 <CheckCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" />
                 <div>
                   <strong>
-                    {passed} of {verification.checks.length} checks passed
+                    {passed} of {verification.checks.length} structure checks passed
                   </strong>{" "}
                   <span className="small">
-                    independent verifier: exact copy, link, logo, image proportions, safe areas, minimum sizes, text fit. It has no authored expected output for your banner, so that comparison is not part of these checks.
+                    independent verifier: your words kept exactly, link, logo, picture proportions, safe areas, minimum sizes, text fit, nothing missing or doubled. It does not look inside the pictures (they were cleaned in your browser before the build), and it has no authored expected output for your banner, so that comparison is not part of these checks.
                   </span>
                   {run.preference ? (
                     <>

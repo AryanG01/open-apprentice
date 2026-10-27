@@ -1,5 +1,16 @@
 # Open Apprentice
 
+**Turn a flat-background ad banner into a vertical story card without changing a word of the approved copy, and get a receipt you can check.**
+
+- **Bring a banner** (or a rough sketch and your product page): Nemotron-3.5-Super-VL reads its parts, you check them, the card is built and checked independently.
+- **It asks before it guesses** when your words do not fit, shows both layouts it built, and remembers your answer for that language in this workspace.
+- **It shows its work:** a downloadable change receipt (your approved words next to what ended up on the card, hashes, the checks, your choice) that anyone can verify with `scripts/verify_receipt.py`, and a live "try to break it" button that damages a copy of the result so you can watch the checker catch it.
+- **It says what it cannot do:** flat or simple backgrounds only (a photo is refused before any model call), 16:9 in, 9:16 out, one font, no generated pictures. Measured results, including failures, are below; how it sits next to Canva and Adobe is in `docs/positioning.md`.
+
+Live demo and submission text: see below and `docs/submission.md`. Everything under "Earlier work" is separate research from before the banner product and is not needed to try it.
+
+---
+
 **Bring a banner, or a rough sketch and your product page. Nemotron reads the parts, you check them, and the apprentice turns them into a 9:16 story card, asks before it guesses, and checks every result independently.**
 
 Two doors, one pipeline:
@@ -114,7 +125,7 @@ What is and is not shown:
   on both engines**, and the question was asked exactly when it should be (16 of 16 cases): 8 banners in 4 new locales
   ([`docs/evaluation/campaign_sealed.md`](docs/evaluation/campaign_sealed.md), with its limits).
 
-## Earlier work in this repository
+## Earlier work in this repository (separate from the banner product)
 
 The sections below describe the earlier badge/Konva-Fabric prototype, the NeMo Gym environment and the label-program research line. They are still true of the code
 they describe but are not the current product.

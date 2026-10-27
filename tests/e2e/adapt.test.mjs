@@ -106,7 +106,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     }
     await page.getByRole("button", { name: "Looks right: make the story card" }).click();
     await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
-    assert.match(await text(), /15 of 15 checks passed/);
+    assert.match(await text(), /15 of 15 structure checks passed/);
     assert.match(await text(), /no authored expected output for your banner/);
     // proof you can check: try to break the result, and the receipt
     for (const [label, expect] of [["Delete the product picture", /Delete the product picture: caught: a part from your banner is missing/], ["Change a digit of the price", /Change a digit of the price: caught: the words are no longer your approved words/], ["Push the headline off the card", /Push the headline off the card: caught: a part is outside the safe area/]]) {
@@ -150,7 +150,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     await row.locator("textarea").fill("Hear only what matters.");
     await page.getByRole("button", { name: "Looks right: make the story card" }).click();
     await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
-    assert.match(await text(), /\d+ of \d+ checks passed/);
+    assert.match(await text(), /\d+ of \d+ structure checks passed/);
     assert.doesNotMatch(await text(), /Add the missing part/);
     assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
   });
@@ -204,7 +204,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     await page.getByRole("radio", { name: "#1d1240" }).click();
     await page.getByRole("button", { name: "Looks right: make the story card" }).click();
     await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
-    assert.match(await text(), /\d+ of \d+ checks passed/);
+    assert.match(await text(), /\d+ of \d+ structure checks passed/);
     assert.match(await text(), /Page check/);
     assert.match(await text(), /Amount found on page/);
     assert.ok((await page.locator("a[download]").count()) >= 2, "story card and banner downloads");
