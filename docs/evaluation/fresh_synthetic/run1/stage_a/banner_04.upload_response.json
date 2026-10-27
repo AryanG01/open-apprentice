@@ -1,0 +1,97 @@
+{
+ "http_status": 200,
+ "response": {
+  "upload_id": "35407e995451",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     64,
+     50.4,
+     230.4,
+     50.4
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     806.4,
+     64.8,
+     192,
+     532.8
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     64,
+     144,
+     499.2,
+     115.2
+    ],
+    "text": "Take the long way home.",
+    "font_px": 65,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     64,
+     388.8,
+     179.2,
+     57.6
+    ],
+    "text": "SGD 39",
+    "font_px": 45,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     76.8,
+     475.2,
+     332.8,
+     64.8
+    ],
+    "text": "SHOP THE BOTTLE",
+    "font_px": 28,
+    "bold": true,
+    "color": "#000000",
+    "fill": "#ff9900"
+   },
+   {
+    "role": "legal",
+    "box": [
+     64,
+     648,
+     230.4,
+     28.8
+    ],
+    "text": "Demo offer. Bottle only.",
+    "font_px": 18,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

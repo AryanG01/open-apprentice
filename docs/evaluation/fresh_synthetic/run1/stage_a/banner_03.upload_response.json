@@ -1,0 +1,97 @@
+{
+ "http_status": 200,
+ "response": {
+  "upload_id": "6cf1ec1038bc",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     51.2,
+     46.8,
+     243.2,
+     32.4
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     108.8,
+     86.4,
+     441.6,
+     345.6
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     614.4,
+     93.6,
+     640,
+     208.8
+    ],
+    "text": "Make room for your\nfavourite music, from\nthe first morning coffee\nto the last quiet moment\nof the day.",
+    "font_px": 48,
+    "bold": true,
+    "color": "#0a1f44",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     614.4,
+     338.4,
+     281.6,
+     64.8
+    ],
+    "text": "SGD 129",
+    "font_px": 52,
+    "bold": true,
+    "color": "#0a1f44",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     614.4,
+     417.6,
+     320,
+     43.2
+    ],
+    "text": "SHOP THE SPEAKER",
+    "font_px": 20,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#0a1f44"
+   },
+   {
+    "role": "legal",
+    "box": [
+     1024,
+     460.8,
+     230.4,
+     21.6
+    ],
+    "text": "Demo offer. Speaker only.",
+    "font_px": 14,
+    "bold": false,
+    "color": "#0a1f44",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

@@ -1,0 +1,97 @@
+{
+ "http_status": 200,
+ "response": {
+  "upload_id": "f1d9f6710776",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     32,
+     39.6,
+     204.8,
+     32.4
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     115.2,
+     43.2,
+     448,
+     626.4
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     627.2,
+     144,
+     588.8,
+     244.8
+    ],
+    "text": "Light for your\nquiet hours.",
+    "font_px": 85,
+    "bold": true,
+    "color": "#0e4a4a",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     627.2,
+     417.6,
+     268.8,
+     79.2
+    ],
+    "text": "SGD 89",
+    "font_px": 50,
+    "bold": true,
+    "color": "#0e4a4a",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     627.2,
+     518.4,
+     384,
+     100.8
+    ],
+    "text": "SHOP THE LAMP",
+    "font_px": 28,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#0e4a4a"
+   },
+   {
+    "role": "legal",
+    "box": [
+     1049.6,
+     662.4,
+     204.8,
+     36
+    ],
+    "text": "Demo offer. Lamp only.",
+    "font_px": 14,
+    "bold": false,
+    "color": "#0e4a4a",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

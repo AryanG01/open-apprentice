@@ -1,0 +1,199 @@
+{
+ "fields": [
+  {
+   "legend": "Logo",
+   "values": [
+    {
+     "label": "Left",
+     "value": "40"
+    },
+    {
+     "label": "Top",
+     "value": "41"
+    },
+    {
+     "label": "Width",
+     "value": "185"
+    },
+    {
+     "label": "Height",
+     "value": "39"
+    }
+   ]
+  },
+  {
+   "legend": "Product image",
+   "values": [
+    {
+     "label": "Left",
+     "value": "99"
+    },
+    {
+     "label": "Top",
+     "value": "45"
+    },
+    {
+     "label": "Width",
+     "value": "465"
+    },
+    {
+     "label": "Height",
+     "value": "627"
+    }
+   ]
+  },
+  {
+   "legend": "Headline",
+   "values": [
+    {
+     "label": "Words in the image",
+     "value": "Light for your\nquiet hours."
+    },
+    {
+     "label": "Left",
+     "value": "637"
+    },
+    {
+     "label": "Top",
+     "value": "199"
+    },
+    {
+     "label": "Width",
+     "value": "580"
+    },
+    {
+     "label": "Height",
+     "value": "195"
+    },
+    {
+     "label": "Size (px)",
+     "value": "85"
+    },
+    {
+     "label": "Bold",
+     "value": true
+    },
+    {
+     "label": "Text colour",
+     "value": "#0e4a4a"
+    }
+   ]
+  },
+  {
+   "legend": "Price",
+   "values": [
+    {
+     "label": "Words in the image",
+     "value": "SGD 89"
+    },
+    {
+     "label": "Left",
+     "value": "637"
+    },
+    {
+     "label": "Top",
+     "value": "425"
+    },
+    {
+     "label": "Width",
+     "value": "384"
+    },
+    {
+     "label": "Height",
+     "value": "190"
+    },
+    {
+     "label": "Size (px)",
+     "value": "50"
+    },
+    {
+     "label": "Bold",
+     "value": true
+    },
+    {
+     "label": "Text colour",
+     "value": "#0e4a4a"
+    }
+   ]
+  },
+  {
+   "legend": "Button",
+   "values": [
+    {
+     "label": "Button label",
+     "value": "SHOP THE LAMP"
+    },
+    {
+     "label": "Left",
+     "value": "637"
+    },
+    {
+     "label": "Top",
+     "value": "515"
+    },
+    {
+     "label": "Width",
+     "value": "384"
+    },
+    {
+     "label": "Height",
+     "value": "100"
+    },
+    {
+     "label": "Size (px)",
+     "value": "28"
+    },
+    {
+     "label": "Bold",
+     "value": true
+    },
+    {
+     "label": "Label colour",
+     "value": "#ffffff"
+    },
+    {
+     "label": "Button colour",
+     "value": "#0e4a4a"
+    }
+   ]
+  },
+  {
+   "legend": "Small print",
+   "values": [
+    {
+     "label": "Words in the image",
+     "value": "Demo offer. Lamp only."
+    },
+    {
+     "label": "Left",
+     "value": "1052"
+    },
+    {
+     "label": "Top",
+     "value": "664"
+    },
+    {
+     "label": "Width",
+     "value": "193"
+    },
+    {
+     "label": "Height",
+     "value": "22"
+    },
+    {
+     "label": "Size (px)",
+     "value": "14"
+    },
+    {
+     "label": "Bold",
+     "value": false
+    },
+    {
+     "label": "Text colour",
+     "value": "#0e4a4a"
+    }
+   ]
+  }
+ ],
+ "page_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype Check what Nemotron found Check the parts Nemotron read this banner (Nemotron-3.5-Super-VL). Boxes can be tight around the words; fix anything that is off, then continue. The boxes were snapped to what is in the image. Logo Product image Headline Price Button Small print Drag a box to move it, drag its corner to resize it. With the keyboard: arrow keys move the focused box, Shift plus arrows resize it. Logo Left Top Width Height Product image Left Top Width Height Headline Words in the image Left Top Width Height Size (px) Bold Text colour Price This banner has no price: remove it Words in the image Left Top Width Height Size (px) Bold Text colour Button This banner has no button: remove it Button label Left Top Width Height Size (px) Bold Label colour Button colour Small print This banner has no small print: remove it Words in the image Left Top Width Height Size (px) Bold Text colour These two parts are cut out as pictures. Everything else is rebuilt as editable text and shapes, so a picture should not contain any words. Logo Product image Snap boxes to the content Background colour Check the price against your page (optional) Language (2 letters) Button link (optional, https) More options Looks right: make the story card Start over What it cannot do yet"
+}

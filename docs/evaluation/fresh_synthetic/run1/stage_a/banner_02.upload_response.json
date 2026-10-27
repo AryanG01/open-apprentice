@@ -1,0 +1,97 @@
+{
+ "http_status": 200,
+ "response": {
+  "upload_id": "648587acc715",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     89.6,
+     72,
+     243.2,
+     50.4
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     844.8,
+     43.2,
+     204.8,
+     633.6
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     76.8,
+     136.8,
+     601.6,
+     230.4
+    ],
+    "text": "A better bottle\nfor busy days.",
+    "font_px": 60,
+    "bold": true,
+    "color": "#0b3d2e",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     76.8,
+     403.2,
+     256,
+     86.4
+    ],
+    "text": "SGD 39",
+    "font_px": 45,
+    "bold": true,
+    "color": "#0b3d2e",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     76.8,
+     511.2,
+     371.2,
+     79.2
+    ],
+    "text": "SHOP THE BOTTLE",
+    "font_px": 22,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#0b3d2e"
+   },
+   {
+    "role": "legal",
+    "box": [
+     76.8,
+     612,
+     294.4,
+     43.2
+    ],
+    "text": "Demo offer. Bottle only.",
+    "font_px": 16,
+    "bold": false,
+    "color": "#0b3d2e",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}
