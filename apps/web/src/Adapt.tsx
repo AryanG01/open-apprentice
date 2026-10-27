@@ -794,7 +794,9 @@ export function Adapt() {
             </span>
             <figure>
               <img src={banner.rebuilt} alt="Your banner rebuilt as editable layers" />
-              <figcaption>{kind === "sketch" ? "Your banner, built from the sketch" : "Rebuilt as editable layers"}</figcaption>
+              <figcaption>
+                {kind === "sketch" ? "Your banner, built from the sketch" : flat ? "Rebuilt as editable layers" : "Rebuilt as editable layers. Your background is not a flat colour, so it is replaced by one flat colour: a simplified version, not a faithful one."}
+              </figcaption>
             </figure>
             <span aria-hidden="true" className="arrow">
               <ArrowRight size={18} />
@@ -907,8 +909,9 @@ export function Adapt() {
           <li>Text is rebuilt in Liberation Sans; scripts that font cannot draw (Chinese, Japanese, Korean, Arabic, Hindi) are refused.</li>
           <li>The logo, the product image and the headline are required, and the product image must be larger than the logo. The price, the button and the small print are optional: remove any the banner does not have.</li>
           <li>Banners must be 16:9; one story-card layout (1080 × 1920) is learned from a single example.</li>
-          <li>Nemotron can misplace or merge boxes, so you confirm every layer. The checks are structural: they cannot judge whether the result is beautiful.</li>
-          <li>Measured so far: roles and words are read well, boxes come back tight around the text (see the evaluation in the repository). No people have been studied.</li>
+          <li>The logo and the product are cut out as rectangles, so their boxes must not overlap (a product whose rectangle reaches into the logo would carry a piece of it). A tall, narrow product, such as a bottle, cannot reach the minimum product width on a story card: the app says so and builds nothing.</li>
+          <li>Nemotron can misplace or merge boxes, so you confirm every layer. The checks are structural: they do not look inside the pictures and cannot judge whether the result is beautiful.</li>
+          <li>Measured so far: roles and words are read well; boxes are often loose or misplaced, most of all when the headline wraps onto many lines (see the evaluation in the repository). No people have been studied.</li>
         </ul>
       </details>
     </main>

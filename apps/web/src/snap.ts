@@ -99,5 +99,12 @@ export function imageTextOverlaps(layers: { role: string; box: number[] }[]): st
       }
     }
   }
+  const logo = layers.find((l) => l.role === "brand_mark");
+  const product = layers.find((l) => l.role === "product_image");
+  if (logo && product) {
+    const w = Math.min(logo.box[0] + logo.box[2], product.box[0] + product.box[2]) - Math.max(logo.box[0], product.box[0]);
+    const h = Math.min(logo.box[1] + logo.box[3], product.box[1] + product.box[3]) - Math.max(logo.box[1], product.box[1]);
+    if (w > 0 && h > 0 && (w * h) / area(logo.box) > MAX_TEXT_SHARE) out.push("Product image box overlaps the logo: its crop would contain part of the logo");
+  }
   return out;
 }

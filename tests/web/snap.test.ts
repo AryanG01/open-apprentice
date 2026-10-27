@@ -83,3 +83,14 @@ test("overlap problems name an image box that holds a text box, by either share"
   const touch = clean.map((l) => (l.role === "product_image" ? L("product_image", [80, 150, 570, 480]) : l)); // 10 px: tolerated
   assert.deepEqual(imageTextOverlaps(touch), []);
 });
+
+test("a product box that holds part of the logo is a problem (its crop would show a stray fragment)", async () => {
+  const { imageTextOverlaps } = await import("../../apps/web/src/snap.ts");
+  const L = (role: string, box: number[]) => ({ role, box });
+  const apart = [L("brand_mark", [32, 40, 205, 32]), L("product_image", [115, 90, 448, 580])];
+  assert.deepEqual(imageTextOverlaps(apart), []);
+  const into = [L("brand_mark", [32, 40, 205, 32]), L("product_image", [115, 43, 448, 626])]; // the fresh-set lamp: its box reaches into the wordmark
+  assert.ok(imageTextOverlaps(into).some((m: string) => /Product image box overlaps the logo/.test(m)), String(imageTextOverlaps(into)));
+  const touch = [L("brand_mark", [32, 40, 205, 32]), L("product_image", [115, 70, 448, 600])]; // 2 px: tolerated
+  assert.deepEqual(imageTextOverlaps(touch), []);
+});

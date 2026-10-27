@@ -17,3 +17,12 @@ Reading: the words and roles were read correctly on all four images, including t
 background. The model's weakness is box placement when the headline wraps onto many lines: three of the six banner_03 boxes
 were moved off their elements. This is the same failure the earlier probes reported (roles right, boxes loose), now seen on
 a case the product was not tuned on. **No annotated expected text reached the model.**
+
+## Amendment after Stage B (same day): product boxes re-scored by measurement, not by eye
+The by-eye table above judged every product box on target. Stage B showed two story cards with a cut or contaminated product, so
+the product boxes were measured: on the three flat-background images the product's true extent is the largest non-background
+component of the app's resized image (`product_box_measurement.json`). Result: banner_01 IoU 0.98 (covers 100%), banner_02 IoU 0.76
+(covers 79%: the bottle's sides are clipped), banner_03 IoU 0.57 (covers 61%: the speaker's lower part is cut off). With the 70%
+coverage rule, **banner_02 and banner_03 product boxes are off target**, so boxes on target are **18/24 (0.75)**, not 20/24.
+The raw model output is unchanged; only my judgement was corrected, and the corrected figure is the one to quote. The Stage B
+operator had followed the first table, so it did not correct the banner_02/03 product boxes (see the results file).

@@ -1,0 +1,50 @@
+{
+ "banner_01": {
+  "measured_product_bbox": [
+   116,
+   55,
+   446,
+   615
+  ],
+  "returned": [
+   115,
+   43,
+   448,
+   626
+  ],
+  "iou": 0.98,
+  "covered_fraction_of_measured": 1.0
+ },
+ "banner_02": {
+  "measured_product_bbox": [
+   850,
+   53,
+   254,
+   624
+  ],
+  "returned": [
+   845,
+   43,
+   205,
+   634
+  ],
+  "iou": 0.76,
+  "covered_fraction_of_measured": 0.79
+ },
+ "banner_03": {
+  "measured_product_bbox": [
+   95,
+   117,
+   462,
+   495
+  ],
+  "returned": [
+   109,
+   86,
+   442,
+   346
+  ],
+  "iou": 0.57,
+  "covered_fraction_of_measured": 0.61
+ }
+}
