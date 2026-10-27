@@ -12,7 +12,9 @@ import sys
 
 
 def canonical(obj) -> bytes:
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
 
 
 def main(argv: list[str]) -> int:
@@ -40,7 +42,9 @@ def main(argv: list[str]) -> int:
     for p in problems:
         print("MISMATCH:", p)
     if not problems:
-        print("OK: the receipt matches", "the files." if len(argv) > 1 else "itself (no PNG given).")
+        print(
+            "OK: the receipt matches", "the files." if len(argv) > 1 else "itself (no PNG given)."
+        )
     return 1 if problems else 0
 
 

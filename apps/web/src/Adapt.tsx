@@ -7,7 +7,7 @@ import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } 
 import { noFitReasons } from "./reasons";
 import { ProofPanel } from "./Proof";
 import { Feedback } from "./Feedback";
-import { backgroundOf as backgroundInfo, clippedSides, foreignRuns, imageTextOverlaps, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "./snap";
+import { backgroundOf as backgroundInfo, clippedSides, foreignComponents, foreignRuns, imageTextOverlaps, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "./snap";
 import type { Components, Rgb } from "./snap";
 import { CARD_FITS, ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
 import type { Picture } from "./SketchPanels";
@@ -173,10 +173,11 @@ function cleanCrop(img: HTMLImageElement, pix: Pix | null, flat: boolean, l: Ada
   ctx?.drawImage(img, l.box[0], l.box[1], l.box[2], l.box[3], 0, 0, c.width, c.height);
   if (ctx && pix && flat) {
     const comps = compsOf(pix);
-    const ids = pictureComponents(comps, l.box, layers.filter((o) => o !== l).map((o) => o.box));
+    const others = layers.filter((o) => o !== l).map((o) => o.box);
+    const ids = pictureComponents(comps, l.box, others);
     if (ids.length) {
       ctx.fillStyle = `rgb(${pix.rgb[0]},${pix.rgb[1]},${pix.rgb[2]})`;
-      for (const [x, y, w, h] of foreignRuns(pix.d, comps, [Math.round(l.box[0]), Math.round(l.box[1]), c.width, c.height], ids)) ctx.fillRect(x, y, w, h);
+      for (const [x, y, w, h] of foreignRuns(pix.d, comps, [Math.round(l.box[0]), Math.round(l.box[1]), c.width, c.height], foreignComponents(comps, others, ids))) ctx.fillRect(x, y, w, h);
     }
   }
   return c.toDataURL("image/png");

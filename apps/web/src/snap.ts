@@ -222,23 +222,41 @@ export function unionBox(comps: Components, ids: number[], pad = 2): number[] | 
   return [Math.max(0, x0 - pad), Math.max(0, y0 - pad), x1 - x0 + 2 * pad, y1 - y0 + 2 * pad];
 }
 
-/** Pixels (in the picture's crop) that belong to some other object: to be painted with the background colour. Returns crop-local
- *  rows as [x, y, w, h] runs. `keep` are this picture's own component ids. */
-export function foreignRuns(p: Pixels, comps: Components, crop: number[], keep: number[]): number[][] {
-  const own = new Set(keep);
+/** Components that are some other layer's ink: not this picture's own, and mostly inside another layer's box (the logo's tail, a text line). A small
+ *  part of the picture that floats apart from the rest (the dot between a headphone's cups) sits in no other box and is NOT foreign. */
+export function foreignComponents(comps: Components, others: number[][], own: number[]): number[] {
+  const mine = new Set(own);
+  const out: number[] = [];
+  comps.boxes.forEach((b, i) => {
+    if (mine.has(i + 1) || comps.inkCount[i] < 12) return;
+    if (others.some((o) => overlapArea(b, o) / area(b) > 0.5)) out.push(i + 1);
+  });
+  return out;
+}
+
+/** Pixels (in the picture's crop) to paint with the background colour: the cells of the `paint` components and one cell around them (their
+ *  anti-aliased fringe). Returns crop-local runs as [x, y, w, h]. */
+export function foreignRuns(p: Pixels, comps: Components, crop: number[], paint: number[]): number[][] {
+  const bad = new Set(paint);
   const [cx, cy, cw, ch] = crop.map(Math.round);
   const runs: number[][] = [];
+  const at = (gx: number, gy: number): boolean => {
+    const c0 = Math.floor(gx / CELL), r0 = Math.floor(gy / CELL);
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        const c = c0 + dc, r = r0 + dr;
+        if (c >= 0 && r >= 0 && c < comps.cw && r < comps.ch && bad.has(comps.label[r * comps.cw + c])) return true;
+      }
+    }
+    return false;
+  };
   for (let y = 0; y < ch; y++) {
     const gy = cy + y;
     if (gy < 0 || gy >= p.height) continue;
     let start = -1;
     for (let x = 0; x <= cw; x++) {
       const gx = cx + x;
-      let foreign = false;
-      if (x < cw && gx >= 0 && gx < p.width) {
-        const id = comps.label[Math.floor(gy / CELL) * comps.cw + Math.floor(gx / CELL)];
-        foreign = id > 0 && !own.has(id);
-      }
+      const foreign = x < cw && gx >= 0 && gx < p.width && at(gx, gy);
       if (foreign && start < 0) start = x;
       if (!foreign && start >= 0) {
         runs.push([start, y, x - start, 1]);

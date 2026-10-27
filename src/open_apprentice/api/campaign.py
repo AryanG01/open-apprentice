@@ -815,7 +815,7 @@ async def selftest_mutations() -> dict:
 
 @router.post("/workspaces/{wid}/runs/{rid}/selftest")
 async def run_selftest(request: Request, wid: str, rid: str, body: SelfTestIn) -> dict:
-    """"Try to break it": inject one defect into a COPY of the finished result and run the independent verifier on it. Nothing stored changes."""
+    """ "Try to break it": inject one defect into a COPY of the finished result and run the independent verifier on it. Nothing stored changes."""
     ws = _ws(request, wid)
     rec = _finished(ws, rid)
     run = rec.run

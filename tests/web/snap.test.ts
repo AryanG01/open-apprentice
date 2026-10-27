@@ -99,7 +99,7 @@ test("a product box that holds part of the logo is a problem (its crop would sho
   assert.deepEqual(imageTextOverlaps(touch), []);
 });
 
-import { clippedSides, foreignRuns, inkComponents, pictureComponents, unionBox } from "../../apps/web/src/snap.ts";
+import { clippedSides, foreignComponents, foreignRuns, inkComponents, pictureComponents, unionBox } from "../../apps/web/src/snap.ts";
 
 test("a picture is cut out of its box together with its own parts, without the logo that overlaps the rectangle", () => {
   const p = canvas();
@@ -114,9 +114,11 @@ test("a picture is cut out of its box together with its own parts, without the l
   const box = unionBox(comps, ids, 0) as number[];
   assert.deepEqual(box, [100, 60, 90, 200]);
   // the crop of the SEED rectangle holds the wordmark's tail: it is returned as foreign pixels to paint over
-  const runs = foreignRuns(p, comps, seed, ids);
-  assert.ok(runs.length > 0 && runs.every(([x, y, w]) => w > 0 && y < 12), JSON.stringify(runs.slice(0, 3)));
-  assert.deepEqual(foreignRuns(p, comps, box, ids), []); // the tight crop is clean
+  const paint = foreignComponents(comps, [logoBox], ids);
+  assert.equal(paint.length, 1);
+  const runs = foreignRuns(p, comps, seed, paint);
+  assert.ok(runs.length > 0 && runs.every(([x, y, w]) => w > 0 && y < 14), JSON.stringify(runs.slice(0, 3)));
+  assert.deepEqual(foreignRuns(p, comps, box, paint), []); // the tight crop is clean
 });
 
 test("a box that cuts the picture off is reported, a tight box is not", () => {
@@ -183,4 +185,20 @@ test("when no layout fits, the reasons are plain words about the parts, with a n
   assert.deepEqual(reasons, ["the product picture is smaller than the smallest size allowed on a story card", "the small print does not fit in its frame"]);
   assert.ok(steps.some((s) => /product is larger/.test(s)) && steps.some((s) => /will not shorten them/.test(s)));
   assert.deepEqual(noFitReasons([{ fits: true, violations: [] }]), { reasons: [], steps: [] });
+});
+
+test("a small part of the picture that floats apart from it (a dot between two cups) is kept, a neighbour's ink is painted out", () => {
+  const p = canvas();
+  rect(p, 100, 60, 40, 120); rect(p, 220, 60, 40, 120); // two cups, 80 px apart (not bridged)
+  rect(p, 175, 100, 12, 12, [250, 120, 90]); // the dot between them
+  rect(p, 40, 20, 140, 14); // the wordmark above
+  const comps = inkComponents(p, BG);
+  const logoBox = [40, 20, 140, 14];
+  const seed = [90, 40, 180, 160];
+  const own = pictureComponents(comps, seed, [logoBox]);
+  const paint = foreignComponents(comps, [logoBox], own);
+  const runs = foreignRuns(p, comps, [90, 15, 180, 190], paint);
+  // painted: only rows of the wordmark (y 20..33 -> crop rows about 5..18 plus the fringe), never the dot's rows (crop rows 85..97)
+  assert.ok(runs.length > 0 && runs.every(([, y]) => y < 25), JSON.stringify(runs.slice(0, 3)));
+  assert.ok(own.length >= 3, "both cups and the dot are the picture's own");
 });

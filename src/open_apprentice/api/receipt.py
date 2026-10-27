@@ -19,6 +19,7 @@ LIMITS_NOTE = [
     "They do not look inside the pictures; the picture clean-up is done in the browser before the build and is not part of this record.",
     "A price found on a page is an amount that occurs there, not proof of today's offer.",
     "The record matches the files by hash; it does not prove the card looks good.",
+    "'Approved' words are the words as confirmed in the editor. If the model misread the banner and the owner did not correct it, the receipt records the misread: it does not compare against the original image.",
 ]
 COPY_ROLES = ("headline", "price", "legal")
 
@@ -28,7 +29,9 @@ def sha256_text(s: str) -> str:
 
 
 def canonical(obj: Any) -> bytes:
-    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
 
 
 def _png_bytes(data_url: str) -> bytes:
@@ -73,7 +76,10 @@ def build_receipt(
     pictures = {}
     for aid, url in sorted((source.get("assets") or {}).items()):
         data = _png_bytes(url) if isinstance(url, str) else b""
-        pictures[aid] = {"sha256": hashlib.sha256(data).hexdigest() if data else None, "bytes": len(data)}
+        pictures[aid] = {
+            "sha256": hashlib.sha256(data).hexdigest() if data else None,
+            "bytes": len(data),
+        }
     body = {
         "schema": SCHEMA,
         "created_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -87,7 +93,11 @@ def build_receipt(
             k: {"text": v, "sha256": sha256_text(v), "identical_to_approved": want.get(k) == v}
             for k, v in sorted(got.items())
         },
-        "link": {"approved": _link(source), "result": _link(native), "identical": _link(source) == _link(native)},
+        "link": {
+            "approved": _link(source),
+            "result": _link(native),
+            "identical": _link(source) == _link(native),
+        },
         "pictures": pictures,
         "result": {
             "cards": sum(1 for n in native["nodes"] if n.get("type") == "artboard"),

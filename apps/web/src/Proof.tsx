@@ -67,7 +67,7 @@ export function ProofPanel({ wid, runId, pageCheck }: { wid: string; runId: stri
       </h3>
       <p className="muted small">
         The receipt lists your approved words, link and pictures next to what ended up on the card, the checks that ran and the choice you made, tied to the
-        files by hash. It shows the record matches the files; it does not show the card looks good.
+        files by hash. "Approved" means the words as you confirmed them in the editor, not read back from the image. It shows the record matches the files; it does not show the card looks good.
       </p>
       <div className="row">
         <button type="button" className="btn" onClick={() => void download()} disabled={busy}>

@@ -945,7 +945,8 @@ def test_the_receipt_matches_its_files_and_breaks_when_edited(client, tmp_path):
     import pathlib
 
     spec = importlib.util.spec_from_file_location(
-        "verify_receipt", pathlib.Path(__file__).resolve().parents[2] / "scripts" / "verify_receipt.py"
+        "verify_receipt",
+        pathlib.Path(__file__).resolve().parents[2] / "scripts" / "verify_receipt.py",
     )
     vr = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(vr)
@@ -955,7 +956,10 @@ def test_the_receipt_matches_its_files_and_breaks_when_edited(client, tmp_path):
     r = _receipt(client, wid, run["run_id"])
     assert r["schema"].startswith("open-apprentice-change-receipt/") and r["all_checks_passed"]
     assert r["approved_text"]["headline"]["text"] == r["result_text"]["headline"]["text"]
-    assert all(v["identical_to_approved"] for v in r["result_text"].values()) and r["link"]["identical"]
+    assert (
+        all(v["identical_to_approved"] for v in r["result_text"].values())
+        and r["link"]["identical"]
+    )
     path = tmp_path / "receipt.json"
     path.write_text(json.dumps(r))
     png = tmp_path / "card.png"
@@ -984,12 +988,15 @@ def test_try_to_break_it_catches_each_defect_on_a_copy_and_changes_nothing(clien
         ("push_headline_out", "inside_safe"),
     ):
         r = client.post(
-            f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/selftest", json={"mutation": mutation}
+            f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/selftest",
+            json={"mutation": mutation},
         )
         assert r.status_code == 200, r.text
         out = r.json()
         assert out["caught"] and check in out["failed"], (mutation, out["failed"])
-    assert _receipt(client, wid, run["run_id"])["all_checks_passed"] is True  # the stored result is untouched
+    assert (
+        _receipt(client, wid, run["run_id"])["all_checks_passed"] is True
+    )  # the stored result is untouched
     assert _receipt(client, wid, run["run_id"])["result"]["png_sha256"] == before
     bad = client.post(
         f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/selftest", json={"mutation": "nope"}
@@ -997,20 +1004,44 @@ def test_try_to_break_it_catches_each_defect_on_a_copy_and_changes_nothing(clien
     assert bad.status_code == 422
 
 
-def test_feedback_is_stored_without_an_image_or_an_address_and_bad_answers_are_refused(client, tmp_path):
+def test_feedback_is_stored_without_an_image_or_an_address_and_bad_answers_are_refused(
+    client, tmp_path
+):
     import json
     import pathlib
 
     ok = client.post(
         "/api/campaign/feedback",
-        json={"would_post": 4, "fixes": "1-2", "words_correct": "yes", "note": "nice", "own_banner": True},
+        json={
+            "would_post": 4,
+            "fixes": "1-2",
+            "words_correct": "yes",
+            "note": "nice",
+            "own_banner": True,
+        },
     )
     assert ok.status_code == 200 and ok.json() == {"ok": True}
     files = list(pathlib.Path(tmp_path).rglob("feedback/*.json"))
     assert len(files) == 1
     body = json.loads(files[0].read_text())
     assert body == {
-        "would_post": 4, "fixes": "1-2", "words_correct": "yes", "note": "nice", "own_banner": True, "quote_ok": False,
+        "would_post": 4,
+        "fixes": "1-2",
+        "words_correct": "yes",
+        "note": "nice",
+        "own_banner": True,
+        "quote_ok": False,
     }
-    assert client.post("/api/campaign/feedback", json={"would_post": 9, "fixes": "0", "words_correct": "yes"}).status_code == 422
-    assert client.post("/api/campaign/feedback", json={"would_post": 3, "fixes": "0", "words_correct": "yes", "image": "x"}).status_code == 422
+    assert (
+        client.post(
+            "/api/campaign/feedback", json={"would_post": 9, "fixes": "0", "words_correct": "yes"}
+        ).status_code
+        == 422
+    )
+    assert (
+        client.post(
+            "/api/campaign/feedback",
+            json={"would_post": 3, "fixes": "0", "words_correct": "yes", "image": "x"},
+        ).status_code
+        == 422
+    )

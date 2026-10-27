@@ -37,7 +37,9 @@ def main() -> None:
     os.environ.setdefault("SESSION_SECRET", "local-eval-" + os.urandom(8).hex())  # local only
     os.environ.setdefault("NEBIUS_VISION_MODEL", "nvidia/Nemotron-3.5-Super-VL")
     os.environ.setdefault("NEBIUS_MODEL", "nvidia/nemotron-3-super-120b-a12b")
-    os.environ.setdefault("PAGE_MODE", "tavily")  # the product page is read by Tavily, as on the public demo
+    os.environ.setdefault(
+        "PAGE_MODE", "tavily"
+    )  # the product page is read by Tavily, as on the public demo
     os.environ.setdefault(
         "VISION_INPUT_USD_PER_MILLION", "0.30"
     )  # Token Factory list price of the VL model

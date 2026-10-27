@@ -4,7 +4,7 @@
 import { chromium } from "playwright";
 import fs from "node:fs";
 import path from "node:path";
-import { backgroundOf, foreignRuns, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "../apps/web/src/snap.ts";
+import { backgroundOf, foreignComponents, foreignRuns, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "../apps/web/src/snap.ts";
 
 const [setDir, outDir] = process.argv.slice(2);
 fs.mkdirSync(outDir, { recursive: true });
@@ -41,7 +41,7 @@ for (const b of ["banner_01", "banner_02", "banner_03", "banner_04"]) {
     const [x, y, w, h] = l.box;
     const buf = Buffer.alloc(w * h * 4);
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { const s = ((y + j) * 1280 + x + i) * 4, d = (j * w + i) * 4; for (let k = 0; k < 4; k++) buf[d + k] = p.data[s + k]; }
-    if (own.length) for (const [rx, ry, rw] of foreignRuns(p, comps, l.box, own)) for (let i = 0; i < rw; i++) { const d = (ry * w + rx + i) * 4; buf[d] = bg.rgb[0]; buf[d + 1] = bg.rgb[1]; buf[d + 2] = bg.rgb[2]; }
+    if (own.length) for (const [rx, ry, rw] of foreignRuns(p, comps, l.box, foreignComponents(comps, snapped.filter((o) => o !== l).map((o) => o.box), own))) for (let i = 0; i < rw; i++) { const d = (ry * w + rx + i) * 4; buf[d] = bg.rgb[0]; buf[d + 1] = bg.rgb[1]; buf[d + 2] = bg.rgb[2]; }
     fs.writeFileSync(path.join(outDir, `${b}.${l.role}.${w}x${h}.rgba`), buf);
   }
 }
