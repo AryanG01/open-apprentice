@@ -4,6 +4,7 @@ import { lazy, Suspense } from "react";
 import { ArrowRight, CheckCircle, DownloadSimple, UploadSimple, WarningCircle } from "@phosphor-icons/react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
+import { noFitReasons } from "./reasons";
 import { backgroundOf as backgroundInfo, clippedSides, foreignRuns, imageTextOverlaps, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "./snap";
 import type { Components, Rgb } from "./snap";
 import { CARD_FITS, ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
@@ -903,7 +904,7 @@ export function Adapt() {
           {run.status === "question" ? (
             <div className="question" aria-label="Question">
               <p>
-                <strong>The copy does not fit, so it is asking instead of guessing.</strong>{" "}
+                <strong>{run.previews.length > 0 && run.previews.every((p) => !p.fits) ? "No layout fits this banner, so it stopped instead of guessing." : "The copy does not fit, so it is asking instead of guessing."}</strong>{" "}
                 {run.explanation ? (
                   <>
                     {run.explanation.text}{" "}
@@ -918,9 +919,26 @@ export function Adapt() {
                   <PreviewCard key={p.outcome} p={p} busy={busy} onPick={(o) => void answer(o)} />
                 ))}
               </div>
-              <button className="btn" onClick={() => void answer("neither")} disabled={busy}>
-                Neither: leave it unchanged
-              </button>
+              {run.previews.length > 0 && run.previews.every((p) => !p.fits) ? (
+                <div className="callout bad" role="alert">
+                  <WarningCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" />
+                  <div>
+                    <strong>Neither layout fits this banner, so nothing was built.</strong>
+                    <ul>
+                      {noFitReasons(run.previews).reasons.map((r) => (
+                        <li key={r}>{r}.</li>
+                      ))}
+                    </ul>
+                    {noFitReasons(run.previews).steps.map((s) => (
+                      <p key={s}>{s}</p>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <button className="btn" onClick={() => void answer("neither")} disabled={busy}>
+                  Neither: leave it unchanged
+                </button>
+              )}
             </div>
           ) : null}
 
@@ -929,7 +947,7 @@ export function Adapt() {
               <strong>Not applied.</strong> {run.problems.join("; ") || (verification ? `The independent verifier refused this result (failed: ${verification.failed.join(", ")}).` : "Something went wrong.")} Your banner is unchanged.
             </p>
           ) : null}
-          {run.status === "unchanged" ? <p className="callout">You chose neither, so nothing was changed.</p> : null}
+          {run.status === "unchanged" ? <p className="callout">Nothing was built and nothing was saved. Your banner is unchanged.</p> : null}
 
           {finished && verification ? (
             <>

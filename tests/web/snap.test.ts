@@ -171,3 +171,16 @@ test("a button plate right under a price is its own block, not part of the price
   const b = textBlocks(p, BG, [190, 0, 210, 300], []);
   assert.equal(b.length, 2, JSON.stringify(b));
 });
+
+import { noFitReasons } from "../../apps/web/src/reasons.ts";
+
+test("when no layout fits, the reasons are plain words about the parts, with a next step, and never blame the owner", () => {
+  const previews = [
+    { fits: false, violations: [{ kind: "below_minimum", node_id: "u-36a3eff50b80-product" }] },
+    { fits: false, violations: [{ kind: "below_minimum", node_id: "u-36a3eff50b80-product" }, { kind: "text_overflow", node_id: "u-36a3eff50b80-legal" }] },
+  ];
+  const { reasons, steps } = noFitReasons(previews);
+  assert.deepEqual(reasons, ["the product picture is smaller than the smallest size allowed on a story card", "the small print does not fit in its frame"]);
+  assert.ok(steps.some((s) => /product is larger/.test(s)) && steps.some((s) => /will not shorten them/.test(s)));
+  assert.deepEqual(noFitReasons([{ fits: true, violations: [] }]), { reasons: [], steps: [] });
+});
