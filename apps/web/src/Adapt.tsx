@@ -4,8 +4,8 @@ import { lazy, Suspense } from "react";
 import { ArrowRight, CheckCircle, DownloadSimple, UploadSimple, WarningCircle } from "@phosphor-icons/react";
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
-import { backgroundOf as backgroundInfo, imageTextOverlaps, snapBox } from "./snap";
-import type { Rgb } from "./snap";
+import { backgroundOf as backgroundInfo, clippedSides, foreignRuns, imageTextOverlaps, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "./snap";
+import type { Components, Rgb } from "./snap";
 import { CARD_FITS, ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
 import type { Picture } from "./SketchPanels";
 import type { AdaptBanner, AdaptLayer, AdaptUpload, CampaignEngine, CampaignFixture, CampaignRun, CampaignWorkspace, PageCheck, PageInfo } from "./types";
@@ -152,6 +152,33 @@ function cropPng(img: HTMLImageElement, [x, y, w, h]: number[]): string {
   return c.toDataURL("image/png");
 }
 
+/** The banner's pixels, with its ink labelled once (only a flat background is cleaned). */
+interface Pix {
+  d: ImageData;
+  rgb: Rgb;
+  comps?: Components;
+}
+const compsOf = (pix: Pix): Components => (pix.comps ??= inkComponents(pix.d, pix.rgb));
+
+/** What a picture layer cuts out of the banner: its box, with every other object's ink painted over in the background colour, so a
+ *  neighbour's fragment (the logo's tail above a lamp) is never in the picture. A picture whose own ink cannot be identified is cropped as is. */
+function cleanCrop(img: HTMLImageElement, pix: Pix | null, flat: boolean, l: AdaptLayer, layers: AdaptLayer[]): string {
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(l.box[2]));
+  c.height = Math.max(1, Math.round(l.box[3]));
+  const ctx = c.getContext("2d");
+  ctx?.drawImage(img, l.box[0], l.box[1], l.box[2], l.box[3], 0, 0, c.width, c.height);
+  if (ctx && pix && flat) {
+    const comps = compsOf(pix);
+    const ids = pictureComponents(comps, l.box, layers.filter((o) => o !== l).map((o) => o.box));
+    if (ids.length) {
+      ctx.fillStyle = `rgb(${pix.rgb[0]},${pix.rgb[1]},${pix.rgb[2]})`;
+      for (const [x, y, w, h] of foreignRuns(pix.d, comps, [Math.round(l.box[0]), Math.round(l.box[1]), c.width, c.height], ids)) ctx.fillRect(x, y, w, h);
+    }
+  }
+  return c.toDataURL("image/png");
+}
+
 /** Text boxes may grow to the words; image boxes only a little (the model is mostly right about them). */
 function snapLayer(d: ImageData, l: AdaptLayer, rgb: Rgb, flat: boolean): AdaptLayer {
   const box = snapBox(d, l.box, rgb, { flat, maxGrow: isImageRole(l.role) ? 14 : undefined }).map(Math.round);
@@ -159,10 +186,10 @@ function snapLayer(d: ImageData, l: AdaptLayer, rgb: Rgb, flat: boolean): AdaptL
 }
 
 /** What each image layer will cut out of the banner, so a crop that holds words is obvious before confirming. */
-function CropPreview({ img, layers }: { img: HTMLImageElement | null; layers: AdaptLayer[] }) {
+function CropPreview({ img, layers, pix, flat }: { img: HTMLImageElement | null; layers: AdaptLayer[]; pix: Pix | null; flat: boolean }) {
   const crops = useMemo(
-    () => (img ? layers.filter((l) => isImageRole(l.role) && l.box.length === 4 && l.box[2] > 0 && l.box[3] > 0).map((l) => ({ role: l.role, url: cropPng(img, l.box) })) : []),
-    [img, layers],
+    () => (img ? layers.filter((l) => isImageRole(l.role) && l.box.length === 4 && l.box[2] > 0 && l.box[3] > 0).map((l) => ({ role: l.role, url: cleanCrop(img, pix, flat, l, layers) })) : []),
+    [img, layers, pix, flat],
   );
   if (!crops.length) return null;
   return (
@@ -215,12 +242,24 @@ export function Adapt() {
   const [pageCheck, setPageCheck] = useState<PageCheck | null>(null);
   const [checkNote, setCheckNote] = useState("");
   const imgEl = useRef<HTMLImageElement | null>(null);
-  const pix = useRef<{ d: ImageData; rgb: Rgb } | null>(null);
+  const pix = useRef<Pix | null>(null);
   const started = useRef(false);
   const heading = useRef<HTMLHeadingElement>(null);
 
   const step = run ? 3 : upload ? 2 : 1;
-  const overlaps = useMemo(() => imageTextOverlaps(layers), [layers]);
+  const overlaps = useMemo(() => {
+    const out = imageTextOverlaps(layers).filter((m) => !(kind === "banner" && flat && /overlaps the logo/.test(m))); // a neighbour's ink is painted out of the crop on a flat background
+    const px = pix.current;
+    if (kind === "banner" && flat && px) {
+      const comps = compsOf(px);
+      for (const l of layers.filter((x) => isImageRole(x.role) && x.box.length === 4)) {
+        const ids = pictureComponents(comps, l.box, layers.filter((o) => o !== l).map((o) => o.box));
+        const sides = ids.length ? clippedSides(px.d, comps, l.box, ids) : [];
+        if (sides.length) out.push(`${LABEL[l.role]} box cuts the picture off at the ${sides.join(" and ")}: drag that edge outwards or press “Snap boxes to the content”`);
+      }
+    }
+    return out;
+  }, [layers, kind, flat]);
   useEffect(() => {
     heading.current?.focus();
   }, [step, run?.status]);
@@ -360,9 +399,36 @@ export function Adapt() {
       pix.current = { d, rgb: info.rgb };
       // Nemotron's boxes are often too narrow or too loose; pixels are measured exactly, so on a flat background they are
       // grown to the content and tightened to it (and the owner is told).
-      const snapped = up.origin === "model" && info.flat ? up.layers.map((l) => snapLayer(d, l, info.rgb, true)) : up.layers;
+      const notes: string[] = [];
+      let snapped = up.layers;
+      if (up.origin === "model" && info.flat) {
+        // 1) text boxes the model put on the wrong lines (a long headline pushes the rest down) go back onto their own blocks
+        const keepOut = up.layers.filter((l) => isImageRole(l.role)).map((l) => l.box);
+        const re = reassignText(d, info.rgb, up.layers, keepOut);
+        let work = up.layers;
+        if (re) {
+          const moved = re.filter((r) => { const was = up.layers.find((l) => l.role === r.role)?.box ?? r.box; return Math.abs(was[1] - r.box[1]) > 12 || Math.abs(was[0] - r.box[0]) > 12; });
+          if (moved.length) notes.push(`${moved.map((m) => LABEL[m.role].toLowerCase()).join(", ")} moved onto ${moved.length > 1 ? "their own lines" : "its own line"}`);
+          work = up.layers.map((l) => (re.find((r) => r.role === l.role) ? { ...l, box: (re.find((r) => r.role === l.role) as { box: number[] }).box } : l));
+        }
+        // 2) every box snapped to the pixels; 3) the product box fitted to the whole picture (components, not a guess)
+        // text boxes that were put on measured blocks are final (snapping would grow them into their neighbours); the rest are snapped
+        snapped = work.map((l) => (re && re.some((r) => r.role === l.role) && !isImageRole(l.role) ? l : snapLayer(d, l, info.rgb, true)));
+        const pix0: Pix = { d, rgb: info.rgb };
+        const comps = compsOf(pix0);
+        const prod = snapped.find((l) => l.role === "product_image");
+        if (prod) {
+          const ids = pictureComponents(comps, prod.box, snapped.filter((l) => l !== prod).map((l) => l.box));
+          const ub = unionBox(comps, ids, 2);
+          if (ub && (Math.abs(ub[2] - prod.box[2]) > 6 || Math.abs(ub[3] - prod.box[3]) > 6 || Math.abs(ub[1] - prod.box[1]) > 6)) {
+            snapped = snapped.map((l) => (l === prod ? { ...l, box: ub.map(Math.round) } : l));
+            notes.push("the product box was fitted to the whole picture");
+          }
+        }
+        pix.current = pix0;
+      }
       setFlat(info.flat);
-      setSnapNote(up.origin === "model" && info.flat ? "The boxes were snapped to what is in the image." : info.flat ? "" : "This banner's background is not a flat colour, so boxes are not snapped: place them yourself.");
+      setSnapNote(up.origin === "model" && info.flat ? `The boxes were snapped to what is in the image${notes.length ? `; ${notes.join("; ")}` : ""}.` : info.flat ? "" : "This banner's background is not a flat colour, so boxes are not snapped: place them yourself.");
       const filled = snapped.map((l) => {
         const plate = l.role === "cta" ? hexOr(l.fill, plateOf(d, l.box)) : "";
         return { ...l, fill: plate, color: hexOr(l.color, readableOn(l.role === "cta" ? plate : bg)) };
@@ -470,7 +536,7 @@ export function Adapt() {
           if (!pic) throw new Error(`Add your ${LABEL[l.role].toLowerCase()} picture first.`);
           crops[l.role] = renderPicture(pic.img, l.box[2], l.box[3]);
         } else {
-          crops[l.role] = cropPng(img, l.box);
+          crops[l.role] = cleanCrop(img, pix.current, flat, l, layers);
         }
       }
       if (kind === "banner" && pageUrl.trim() && !page) {
@@ -726,7 +792,7 @@ export function Adapt() {
               ) : null
             }
           />
-          {kind === "banner" ? <CropPreview img={imgEl.current} layers={layers} /> : null}
+          {kind === "banner" ? <CropPreview img={imgEl.current} layers={layers} pix={pix.current} flat={flat} /> : null}
           <div className="lextras">
             {kind === "banner" ? (
               <>
