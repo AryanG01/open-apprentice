@@ -1,0 +1,199 @@
+{
+ "fields": [
+  {
+   "legend": "Logo",
+   "values": [
+    {
+     "label": "Left",
+     "value": "64"
+    },
+    {
+     "label": "Top",
+     "value": "48"
+    },
+    {
+     "label": "Width",
+     "value": "192"
+    },
+    {
+     "label": "Height",
+     "value": "48"
+    }
+   ]
+  },
+  {
+   "legend": "Product image",
+   "values": [
+    {
+     "label": "Left",
+     "value": "80"
+    },
+    {
+     "label": "Top",
+     "value": "152"
+    },
+    {
+     "label": "Width",
+     "value": "480"
+    },
+    {
+     "label": "Height",
+     "value": "480"
+    }
+   ]
+  },
+  {
+   "legend": "Headline",
+   "values": [
+    {
+     "label": "Words in the image",
+     "value": ""
+    },
+    {
+     "label": "Left",
+     "value": "640"
+    },
+    {
+     "label": "Top",
+     "value": "160"
+    },
+    {
+     "label": "Width",
+     "value": "576"
+    },
+    {
+     "label": "Height",
+     "value": "176"
+    },
+    {
+     "label": "Size (px)",
+     "value": "48"
+    },
+    {
+     "label": "Bold",
+     "value": true
+    },
+    {
+     "label": "Text colour",
+     "value": "#111111"
+    }
+   ]
+  },
+  {
+   "legend": "Price",
+   "values": [
+    {
+     "label": "Words in the image",
+     "value": ""
+    },
+    {
+     "label": "Left",
+     "value": "640"
+    },
+    {
+     "label": "Top",
+     "value": "352"
+    },
+    {
+     "label": "Width",
+     "value": "576"
+    },
+    {
+     "label": "Height",
+     "value": "52"
+    },
+    {
+     "label": "Size (px)",
+     "value": "36"
+    },
+    {
+     "label": "Bold",
+     "value": true
+    },
+    {
+     "label": "Text colour",
+     "value": "#111111"
+    }
+   ]
+  },
+  {
+   "legend": "Button",
+   "values": [
+    {
+     "label": "Button label",
+     "value": ""
+    },
+    {
+     "label": "Left",
+     "value": "640"
+    },
+    {
+     "label": "Top",
+     "value": "432"
+    },
+    {
+     "label": "Width",
+     "value": "256"
+    },
+    {
+     "label": "Height",
+     "value": "76"
+    },
+    {
+     "label": "Size (px)",
+     "value": "28"
+    },
+    {
+     "label": "Bold",
+     "value": true
+    },
+    {
+     "label": "Label colour",
+     "value": "#111111"
+    },
+    {
+     "label": "Button colour",
+     "value": "#e6f0fa"
+    }
+   ]
+  },
+  {
+   "legend": "Small print",
+   "values": [
+    {
+     "label": "Words in the image",
+     "value": ""
+    },
+    {
+     "label": "Left",
+     "value": "640"
+    },
+    {
+     "label": "Top",
+     "value": "560"
+    },
+    {
+     "label": "Width",
+     "value": "576"
+    },
+    {
+     "label": "Height",
+     "value": "80"
+    },
+    {
+     "label": "Size (px)",
+     "value": "16"
+    },
+    {
+     "label": "Bold",
+     "value": false
+    },
+    {
+     "label": "Text colour",
+     "value": "#111111"
+    }
+   ]
+  }
+ ],
+ "page_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype Check what Nemotron found Check the parts Place the parts yourself. The model budget for this server is used up ($0.00 of $0.25); use the reference learner instead; place the boxes yourself. Drag each box onto its part and type the words. Logo Product image Headline Price Button Small print Drag a box to move it, drag its corner to resize it. With the keyboard: arrow keys move the focused box, Shift plus arrows resize it. Logo Left Top Width Height Product image Left Top Width Height Headline Words in the image Left Top Width Height Size (px) Bold Text colour Price This banner has no price: remove it Words in the image Left Top Width Height Size (px) Bold Text colour Button This banner has no button: remove it Button label Left Top Width Height Size (px) Bold Label colour Button colour Small print This banner has no small print: remove it Words in the image Left Top Width Height Size (px) Bold Text colour These two parts are cut out as pictures. Everything else is rebuilt as editable text and shapes, so a picture should not contain any words. Logo Product image Snap boxes to the content Background colour Check the price against your page (optional) Language (2 letters) Button link (optional, https) More options Looks right: make the story card Start over What it cannot do yet"
+}

@@ -1,0 +1,97 @@
+{
+ "http_status": 200,
+ "response": {
+  "upload_id": "e5d38223b3af",
+  "origin": "manual",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     64,
+     48,
+     192,
+     48
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     80,
+     152,
+     480,
+     480
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640,
+     160,
+     576,
+     176
+    ],
+    "text": "",
+    "font_px": 48,
+    "bold": true,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640,
+     352,
+     576,
+     52
+    ],
+    "text": "",
+    "font_px": 36,
+    "bold": true,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640,
+     432,
+     256,
+     76
+    ],
+    "text": "",
+    "font_px": 28,
+    "bold": true,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "legal",
+    "box": [
+     640,
+     560,
+     576,
+     80
+    ],
+    "text": "",
+    "font_px": 16,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "the model budget for this server is used up ($0.00 of $0.25); use the reference learner instead; place the boxes yourself",
+  "model": ""
+ }
+}

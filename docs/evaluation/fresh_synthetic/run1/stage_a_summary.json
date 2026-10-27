@@ -1,0 +1,54 @@
+[
+ {
+  "image": "inputs/banner_01.png",
+  "original_sha256": "cd22e42c5371ea570059d0cbedb6dee62a602e580c9884c3f6cc7ac1ca36d295",
+  "app_resized_sha256": "059b71b43abe62e4421594e44c5a06d5d71affe0b4f1aef9269592402f59a29b",
+  "outcome": "editor",
+  "elapsed_s": 0.25,
+  "http_status": 200,
+  "origin": "manual",
+  "model": "",
+  "layers_returned": 6,
+  "problems": [],
+  "note": "the model budget for this server is used up ($0.00 of $0.25); use the reference learner instead; place the boxes yourself"
+ },
+ {
+  "image": "inputs/banner_02.png",
+  "original_sha256": "765fccc27e4e63a29c1911c485e80548bdbe5bb8597c0a809a8a99d8ca1d907d",
+  "app_resized_sha256": "29bdb8e270b7d437f92edcfa86e7bc5260f0b78f564fdd855ec775cdd850609c",
+  "outcome": "editor",
+  "elapsed_s": 0.251,
+  "http_status": 200,
+  "origin": "manual",
+  "model": "",
+  "layers_returned": 6,
+  "problems": [],
+  "note": "the model budget for this server is used up ($0.00 of $0.25); use the reference learner instead; place the boxes yourself"
+ },
+ {
+  "image": "inputs/banner_03.png",
+  "original_sha256": "a6fe8c0082553c3c1c83949edf9c1ccf158d557fd00d6fe8cef4af2ab333bab2",
+  "app_resized_sha256": "c175f691d2d1e788d8f491b5f62905846d24d8beab6499ca22bdcb72a4d47b20",
+  "outcome": "editor",
+  "elapsed_s": 0.272,
+  "http_status": 200,
+  "origin": "manual",
+  "model": "",
+  "layers_returned": 6,
+  "problems": [],
+  "note": "the model budget for this server is used up ($0.00 of $0.25); use the reference learner instead; place the boxes yourself"
+ },
+ {
+  "image": "inputs/banner_04.png",
+  "original_sha256": "1673d335628cad1c30eea753bba9fe84d5bfe11a6cb12a9d35d6dc9b4a061e0a",
+  "app_resized_sha256": "6e55952f8728a3ea32d7cc1270e726fed7a3737b8c6a1a7dc6e77396eab9527b",
+  "outcome": "editor",
+  "elapsed_s": 0.363,
+  "http_status": 200,
+  "origin": "manual",
+  "model": "",
+  "layers_returned": 6,
+  "problems": [],
+  "note": "the model budget for this server is used up ($0.00 of $0.25); use the reference learner instead; place the boxes yourself"
+ }
+]
