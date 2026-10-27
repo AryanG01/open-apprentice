@@ -39,6 +39,16 @@
    "text": "I pick split, and a checker re-measures the result: copy kept, link, logo, sizes, overlaps. For my own banner there is no authored answer, and the app says so. It does not look inside the pictures."
   },
   {
+   "id": "e-proof",
+   "clip": [
+    "proof",
+    "proof-read"
+   ],
+   "live": true,
+   "onScreen": "Try to break it",
+   "text": "Now I try to break it. I delete the product, change a digit of the price, push the headline off the card, and the checker catches each one. This receipt ties my approved words to the file by hash, so anyone can check it without trusting the app."
+  },
+  {
    "id": "e-sketch",
    "clip": [
     "s-open",

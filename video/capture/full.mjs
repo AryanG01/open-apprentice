@@ -191,6 +191,19 @@ try {
   await mark("checks");
   await sleep(5000);
   await mark("checks-read");
+
+  // proof you can check: damage a copy of the result and watch the independent checker notice
+  await scrollTo("section.proof", 80);
+  await mark("proof", "section.proof");
+  await sleep(1500);
+  for (const name of ["Delete the product picture", "Change a digit of the price", "Push the headline off the card"]) {
+    const done = page.waitForResponse((r) => /\/selftest$/.test(r.url()) && r.request().method() === "POST", { timeout: 60_000 });
+    await click(page.getByRole("button", { name }));
+    await done;
+    await sleep(1800);
+  }
+  await mark("proof-read");
+  await sleep(2500);
   await click(page.getByRole("button", { name: "Adapt another banner" }));
   await sleep(1500);
   await mark("s-home");
