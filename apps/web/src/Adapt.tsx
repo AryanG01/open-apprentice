@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle, DownloadSimple, UploadSimple, WarningCircle } 
 import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { noFitReasons } from "./reasons";
+import { ProofPanel } from "./Proof";
 import { backgroundOf as backgroundInfo, clippedSides, foreignRuns, imageTextOverlaps, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "./snap";
 import type { Components, Rgb } from "./snap";
 import { CARD_FITS, ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
@@ -985,6 +986,7 @@ export function Adapt() {
                   </table>
                 </div>
               </details>
+              {finished && wid && run ? <ProofPanel wid={wid} runId={run.run_id} pageCheck={pageCheck} /> : null}
               {page || checkNote ? <PageCheckBox check={pageCheck} error={pageCheck ? "" : checkNote} /> : null}
               {kind === "sketch" && upload ? <Provenance model={upload.origin === "model" ? upload.model : ""} layers={layers} page={page} choice={choice} pics={pics} background={background} /> : null}
               <div className="controls">

@@ -823,3 +823,14 @@ fieldset.lrow > :not(legend) { clear: both; }
 @media (prefers-reduced-motion: reduce) {
   .adapt .status.busy::before { animation-duration: 2.4s; }
 }
+
+/* proof you can check: receipt and "try to break it" */
+.proof { margin-top: 20px; padding: 16px 18px; border: 1px solid var(--line, #e4e1da); border-radius: 16px; background: var(--surface-2, #f6f5f1); }
+.proof h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font-size: 18px; }
+.proof h4 { margin: 14px 0 4px; font-size: 15px; }
+.proof .row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.proof code { font-family: var(--mono, "Geist Mono Variable", monospace); font-size: 12.5px; word-break: break-all; }
+.breaks { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.breaks li { display: flex; gap: 6px; align-items: flex-start; font-size: 14px; }
+.breaks li.ok svg { color: var(--accent, #2f8f2f); }
+.breaks li.bad { color: var(--bad, #b3261e); }

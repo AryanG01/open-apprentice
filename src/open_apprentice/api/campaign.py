@@ -16,6 +16,7 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
+from open_apprentice.api.receipt import MUTATIONS, build_receipt, mutate
 from open_apprentice.api.teach import _account, _engine, _rate_limit, _require_model_budget
 from open_apprentice.api.v2.routes import client_key
 from open_apprentice.budget import Ledger, Limits
@@ -626,7 +627,15 @@ async def upload_banner(request: Request, wid: str, body: UploadIn) -> dict:
         ):  # say why this server (or this address, right now) did not read the image
             proposal.note = note
         uid = uuid.uuid4().hex[:12]
-        ws.uploads[uid] = {"image": body.image}
+        ws.uploads[uid] = {
+            "image": body.image,
+            "origin": proposal.origin,
+            "model": (
+                getattr(provider, "requested_model", "")
+                if provider and proposal.origin == "model"
+                else ""
+            ),
+        }
     return {
         "upload_id": uid,
         "origin": proposal.origin,
@@ -677,8 +686,14 @@ async def confirm_banner(request: Request, wid: str, uid: str, body: ConfirmIn) 
         raise HTTPException(422, str(e)) from e
     png = await asyncio.to_thread(_render, harness, scene)
     async with ws.lock:
-        ws.uploads.pop(uid, None)
-        ws.banners[f"u-{uid}"] = {"scene": scene, "locale": body.locale, "png": png}
+        read = ws.uploads.pop(uid, None) or {}
+        ws.banners[f"u-{uid}"] = {
+            "scene": scene,
+            "locale": body.locale,
+            "png": png,
+            "origin": read.get("origin", ""),
+            "model": read.get("model", ""),
+        }
     return {"banner_id": f"u-{uid}", "locale": body.locale, "png": png}
 
 
@@ -723,6 +738,78 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
 
     async with ws.lock:
         return await asyncio.to_thread(work)
+
+
+class ReceiptIn(BaseModel):
+    page_check: dict | None = None  # the advisory price check the owner saw, if any
+
+
+class SelfTestIn(BaseModel):
+    mutation: str = Field(min_length=1, max_length=40)
+
+
+def _finished(ws: Workspace, rid: str) -> RunRecord:
+    rec = ws.runs.get(rid)
+    if rec is None:
+        raise HTTPException(404, "unknown or expired run")
+    if rec.run.status not in ("ready", "applied") or not rec.run.result_session:
+        raise HTTPException(409, "this run has no finished result yet")
+    return rec
+
+
+@router.post("/workspaces/{wid}/runs/{rid}/receipt")
+async def run_receipt(request: Request, wid: str, rid: str, body: ReceiptIn) -> dict:
+    """The change receipt of a finished result (see api/receipt.py and scripts/verify_receipt.py)."""
+    ws = _ws(request, wid)
+    rec = _finished(ws, rid)
+    run = rec.run
+    outcome = "layout" if run.status == "ready" else run.preference.outcome
+    snap = rec.snapshots[run.result_session]
+    verification = _verify(rec.fixture_id, outcome, snap["native"], rec.source, rec.reading)
+    banner = ws.banners.get(rec.fixture_id, {})
+    choice = {
+        "outcome": outcome,
+        "asked": run.status == "applied" and not run.provenance.get("preference_version"),
+        "saved_preference_version": run.preference.version if run.preference else None,
+        "language": run.locale,
+        "remembered": "for this workspace only",
+    }
+    return build_receipt(
+        source=rec.source,
+        native=snap["native"],
+        png_data_url=snap["png"],
+        verification=verification,
+        choice=choice,
+        page_check=body.page_check,
+        reading_origin=(banner.get("model") or banner.get("origin") or ""),
+    )
+
+
+@router.get("/selftest-mutations")
+async def selftest_mutations() -> dict:
+    return {"mutations": [{"id": k, "label": v} for k, v in MUTATIONS.items()]}
+
+
+@router.post("/workspaces/{wid}/runs/{rid}/selftest")
+async def run_selftest(request: Request, wid: str, rid: str, body: SelfTestIn) -> dict:
+    """"Try to break it": inject one defect into a COPY of the finished result and run the independent verifier on it. Nothing stored changes."""
+    ws = _ws(request, wid)
+    rec = _finished(ws, rid)
+    run = rec.run
+    outcome = "layout" if run.status == "ready" else run.preference.outcome
+    snap = rec.snapshots[run.result_session]
+    try:
+        broken = mutate(snap["native"], body.mutation)
+    except KeyError as e:
+        raise HTTPException(422, f"cannot apply {body.mutation}: {e}") from e
+    after = _verify(rec.fixture_id, outcome, broken, rec.source, rec.reading)
+    return {
+        "mutation": body.mutation,
+        "label": MUTATIONS[body.mutation],
+        "caught": not after["passed"],
+        "failed": after["failed"],
+        "checks": after["checks"],
+    }
 
 
 @router.post("/workspaces/{wid}/preferences/rollback")

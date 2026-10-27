@@ -929,3 +929,69 @@ def test_an_answer_without_a_version_still_uses_the_questions_snapshot(client):
         client, wid, q["run_id"], SPLIT
     )  # no expected_version: used to fail with "active version is 1, not None"
     assert a["preference"] == {"outcome": SPLIT, "version": 2}
+
+
+def _receipt(client, wid, rid, page_check=None):
+    r = client.post(
+        f"/api/campaign/workspaces/{wid}/runs/{rid}/receipt", json={"page_check": page_check}
+    )
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def test_the_receipt_matches_its_files_and_breaks_when_edited(client, tmp_path):
+    import importlib.util
+    import json
+    import pathlib
+
+    spec = importlib.util.spec_from_file_location(
+        "verify_receipt", pathlib.Path(__file__).resolve().parents[2] / "scripts" / "verify_receipt.py"
+    )
+    vr = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(vr)
+    wid = _workspace(client)["workspace_id"]
+    run = _run(client, wid, "short_a")
+    assert run["status"] == "ready"
+    r = _receipt(client, wid, run["run_id"])
+    assert r["schema"].startswith("open-apprentice-change-receipt/") and r["all_checks_passed"]
+    assert r["approved_text"]["headline"]["text"] == r["result_text"]["headline"]["text"]
+    assert all(v["identical_to_approved"] for v in r["result_text"].values()) and r["link"]["identical"]
+    path = tmp_path / "receipt.json"
+    path.write_text(json.dumps(r))
+    png = tmp_path / "card.png"
+    import base64
+
+    png.write_bytes(base64.b64decode(run["result"]["png"].split(",", 1)[1]))
+    assert vr.main([str(path), str(png)]) == 0
+    # the receipt edited by one character no longer verifies; a different PNG does not match
+    r2 = json.loads(path.read_text())
+    r2["approved_text"]["headline"]["text"] += "!"
+    path.write_text(json.dumps(r2))
+    assert vr.main([str(path), str(png)]) == 1
+    path.write_text(json.dumps(r))
+    other = tmp_path / "other.png"
+    other.write_bytes(png.read_bytes() + b"x")
+    assert vr.main([str(path), str(other)]) == 1
+
+
+def test_try_to_break_it_catches_each_defect_on_a_copy_and_changes_nothing(client):
+    wid = _workspace(client)["workspace_id"]
+    run = _run(client, wid, "short_a")
+    before = _receipt(client, wid, run["run_id"])["result"]["png_sha256"]
+    for mutation, check in (
+        ("delete_product", "source_complete"),
+        ("change_price", "exact_copy"),
+        ("push_headline_out", "inside_safe"),
+    ):
+        r = client.post(
+            f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/selftest", json={"mutation": mutation}
+        )
+        assert r.status_code == 200, r.text
+        out = r.json()
+        assert out["caught"] and check in out["failed"], (mutation, out["failed"])
+    assert _receipt(client, wid, run["run_id"])["all_checks_passed"] is True  # the stored result is untouched
+    assert _receipt(client, wid, run["run_id"])["result"]["png_sha256"] == before
+    bad = client.post(
+        f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/selftest", json={"mutation": "nope"}
+    )
+    assert bad.status_code == 422

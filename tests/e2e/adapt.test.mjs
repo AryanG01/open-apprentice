@@ -108,6 +108,16 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
     assert.match(await text(), /15 of 15 checks passed/);
     assert.match(await text(), /no authored expected output for your banner/);
+    // proof you can check: try to break the result, and the receipt
+    for (const [label, expect] of [["Delete the product picture", /Delete the product picture: caught: a part from your banner is missing/], ["Change a digit of the price", /Change a digit of the price: caught: the words are no longer your approved words/], ["Push the headline off the card", /Push the headline off the card: caught: a part is outside the safe area/]]) {
+      await page.getByRole("button", { name: label }).click();
+      await page.waitForFunction((re) => new RegExp(re).test(document.body.innerText.replace(/\s+/g, " ")), expect.source, { timeout: 30_000 });
+    }
+    const [dl] = await Promise.all([page.waitForEvent("download"), page.getByRole("button", { name: /Download the change receipt/ }).click()]);
+    const receipt = JSON.parse(fs.readFileSync(await dl.path(), "utf8"));
+    assert.match(receipt.schema, /^open-apprentice-change-receipt\//);
+    assert.equal(receipt.all_checks_passed, true);
+    assert.match(receipt.receipt_sha256, /^[0-9a-f]{64}$/);
     assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
     assert.match((await page.locator("a[download]").getAttribute("href")) ?? "", /^data:image\/png;base64,/);
     assert.equal(await page.locator("img[alt='Your banner rebuilt as editable layers']").count(), 1);
