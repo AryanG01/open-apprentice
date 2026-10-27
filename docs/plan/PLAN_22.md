@@ -6,20 +6,30 @@ hours for me and an unknown number for you.
 ## 0. What I can and cannot promise (read this first)
 I will not tell you I have "full confidence" in 22+/25 on all three. That would be a lie, and you asked me not to lie.
 - **Design/Completeness: 22 is reachable by engineering**, because it depends on things I can build and measure (a held-out set,
-  a checklist, a blind reviewer). My honest odds of earning a defensible 22 on the frozen rubric: about 35%; of 20 or more: about 70%.
+  a checklist, a blind reviewer). The independent baseline is 13, not 15, and a held-out mix that includes gradients and photos cannot reach 6 of 8 clean inside the flat-background envelope. My honest odds of a defensible 22: about 10%; of 18 or more: about 65%; of 20 or more: about 35%.
 - **Idea/Originality: 22 is not reachable in 3 days by building.** The concept (a banner to story-card adapter) sits next to
   shipping features of Canva and Adobe. I can move it from 16 to about 19-20 by sharpening the wedge and adding proof moments that
   do not exist elsewhere. Odds of a defensible 22: under 10%; of 19 or more: about 60%.
 - **Potential Impact: 22 requires real adoption**, which no code can create in 3 days. With 10+ outside users, practitioner
   quotes and measured time saved I can defend 17-18 (odds about 55%, and it depends entirely on you recruiting). Without outside
   users it stays at 11-12. Odds of a defensible 22: under 5%.
-- Expected total on these three if every gate below passes: **about 57 to 60 of 75, not 66.** That is a strong, honest result; it
+- Expected total on these three if every gate below passes: **about 52 to 58 of 75, not 66** (from a baseline of 35 by the independent judge). That is a strong, honest result; it
   is not the number you asked for. The point of the plan is to take every point that can be earned honestly and to stop claiming
   the ones that cannot.
 
 Why the last estimate dropped (65 to 63): the evidence got worse (the first honest test on new banners failed to produce a clean
 card), not because the plan changed. This plan is built on the failures, and its gates are fixed **now**, before any work, in
 `docs/plan/strict_rubric.md`. A gate that fails will be reported as failed; I will not re-score the rubric afterwards.
+
+## 0b. Independent baseline (fresh-context judge, artifacts only, frozen rubric, 27 Oct)
+**Design 13, Impact 9, Idea 13** (my own estimate was 15, 11, 16; the lower numbers are the ones to quote). Its decisive points:
+0 of 4 new inputs gave a clean card; "You chose neither, so nothing was changed" blames the user instead of giving the real reason;
+the photo background was never refused; no outside user; the submission never answers "why not Canva or Adobe resize"; the README
+sprawls across several projects so there is no single repeatable sentence; and the green "15 of 15 checks passed" panel is
+presented as trust although the video later admits both built cards had visible flaws. Its verdict on reaching 22: Design only
+partly achievable (a held-out mix with tall products, gradients and a photo cannot reach 6 of 8 clean, because gradients and photos
+are outside the flat-background envelope and can at best be refused correctly); Impact 22 not achievable; Idea 22 not achievable.
+I agree with all of that and have changed the plan below accordingly.
 
 ## 1. Root causes found on 27 Oct (evidence, not opinion)
 1. Clean output fails on new inputs: logo fragment inside the product crop (lamp), product clipped by a loose box (speaker, bottle),
@@ -39,7 +49,9 @@ All work is on flat backgrounds first (the documented envelope), plus honest han
 | D3 | **Early honest refusal**: preflight the background before spending a model call; for a photo or busy background show one screen (why, and two buttons: "Use a flat-colour version (lossy, labelled on the card and in the report)" or "Start over") | Removes the silent-flattening failure; no dead end | Forest banner: stopped before the model call with the screen; the lossy path produces a card labelled "simplified" | 3 h |
 | D4 | **Result screen**: finished card first, phone-frame preview, zoom, before/after, report download; plain empty, error, quota and expired-workspace states | "Completeness" is mostly absence of dead ends | Walkthrough checklist of 12 states, each with a screenshot; axe scan of the new states | 5 h |
 | D5 | **Split card 2** (versioned, not silent): improve composition behind a new outcome id, keep v1 for the frozen fixtures, document that fixtures still run v1 | The sparse card is the first thing a judge sees on the German demo | Before/after at phone scale; if it cannot be done without touching frozen gold, the demo uses shrink and the limit stays documented | 3 h, drop first if time is short |
-| D6 | **Held-out check**: 8 new banners (you generate them from my spec: 2 tall products, 2 gradients or soft shadows, 2 long headlines, 1 photographic, 1 reversed layout) | The only honest test of D1-D5, because the four banners are now spent | At least 6 of 8 clean by the checklist; the other 2 refused before a bad output. Blind reviewer scores the exports | run once; never tuned on |
+| D6 | **Held-out check**: 8 new banners (you generate them from my spec: 2 tall products, 1 soft gradient, 1 photographic, 2 long headlines, 2 reversed or different layouts) | The only honest test of D1-D5, because the four banners are now spent | Reported as two numbers: clean cards among the **in-envelope** inputs (target at least 5 of 5: the tall, long and reversed ones) and correct early refusals among the **out-of-envelope** inputs (gradient, photo: target 3 of 3). It is **not** 6 of 8 clean: gradients and photos are outside the envelope and the rubric's 22 band is therefore not claimed. A non-author scores the exports | run once; never tuned on |
+| D7 | **Say the real reason** on every stop: replace "You chose neither, so nothing was changed" with the cause ("the product picture would have to be narrower than the minimum") and one next step; same for blocked editor states | Removes a message that blames the user | Every refusal path has a reason string asserted in a test | 2 h |
+| D8 | **Reframe the checks**: call them "structural checks (copy, link, logo, sizes, overlaps)" and show beside them the new "picture check" from D1 (no foreign fragment, product not clipped); stop presenting a green panel as trust | The first-minute contradiction the judge found | The result panel and video wording never imply the checks judge the pictures | 1 h |
 
 ## 3. Workstream I: Idea/Originality (target gate: defensible 19-20)
 The wedge, in one sentence a stranger can repeat: **"Resize your ad for vertical formats without changing a word of the approved
@@ -52,6 +64,8 @@ verifiable record that the approved words, price, link and picture survived. I w
 | I3 | **Honest positioning table** in README and submission: Canva Magic Resize/Layers, Adobe Express resize versus this, using only what their public pages say, with the links and the date read | Each row cites a page; no superlatives | 2 h (I need web access for it) |
 | I4 | The ask-before-guess and per-language memory stay, shown once, briefly | Already proven in the browser test | 0 |
 | I5 | Plain statement of what is not novel (resizing, layer extraction) | In the submission | 0 |
+| I6 | **Side-by-side with an incumbent**: the owner runs the same German banner through Canva (or Adobe Express) resize and we show their real output beside ours; I report whatever it does, including if it does the job well | A screenshot pair, dated, with the tool and plan named | 1 h of yours, 1 h of mine |
+| I7 | **One-sentence README**: the first screen of README says the wedge and nothing else; the diagram, badge and Gym material move below a divider labelled "earlier work" | A stranger can repeat the sentence after 10 seconds | 1 h |
 
 ## 4. Workstream U: Potential Impact (target gate: defensible 17-18; needs you)
 | # | Work | Acceptance gate | Owner needed |
@@ -87,7 +101,9 @@ them honestly). Accounts or durable memory. A new learner. Real-sketch evaluatio
 | D3 early refusal | 95% | none |
 | D4 result screen, no dead ends | 85% | |
 | D5 split polish | 50% | demo uses shrink |
-| D6 at least 6 of 8 clean | 45% | report the real number; Design 18-20 |
+| D6 in-envelope 5 of 5 clean and out-of-envelope 3 of 3 refused | 40% | report the real numbers; Design 17-19 |
+| D7, D8 honest messages and wording | 95% | |
+| I6 incumbent comparison (needs you) | 70% | skip it and say it was not run |
 | I1 receipt and verifier script | 90% | |
 | I2 break-it | 90% | |
 | U2 pilot n >= 10 | 55% (your recruiting) | Impact stays at 12 |
