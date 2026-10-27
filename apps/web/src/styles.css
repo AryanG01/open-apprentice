@@ -834,3 +834,18 @@ fieldset.lrow > :not(legend) { clear: both; }
 .breaks li { display: flex; gap: 6px; align-items: flex-start; font-size: 14px; }
 .breaks li.ok svg { color: var(--accent, #2f8f2f); }
 .breaks li.bad { color: var(--bad, #b3261e); }
+
+/* the finished card leads: large, phone-like, with the banner and its rebuild beside it */
+.trio.done { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-areas: "card orig" "card rebuilt"; grid-template-rows: auto 1fr; align-items: start; }
+.trio.done .arrow { display: none; }
+.trio.done figure:nth-of-type(1) { grid-area: orig; }
+.trio.done figure:nth-of-type(2) { grid-area: rebuilt; }
+.trio.done figure:nth-of-type(3) { grid-area: card; padding: 16px; box-shadow: 0 0 0 1px var(--line), 0 18px 40px rgba(20, 30, 10, 0.12); }
+.trio.done figure:nth-of-type(3) img { max-height: min(78vh, 900px); border-radius: 22px; margin: 0 auto; width: auto; max-width: 100%; background: transparent; }
+.trio.done.actual figure:nth-of-type(3) { overflow: auto; max-height: 90vh; }
+.trio.done.actual figure:nth-of-type(3) img { max-height: none; width: auto; max-width: none; }
+.trio.done figure:nth-of-type(1) img, .trio.done figure:nth-of-type(2) img { max-height: 220px; }
+.trio figcaption .btn.small { margin-left: 10px; padding: 2px 12px; font-size: 0.78rem; }
+@media (max-width: 980px) {
+  .trio.done { grid-template-columns: minmax(0, 1fr); grid-template-areas: "card" "orig" "rebuilt"; }
+}

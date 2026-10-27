@@ -227,6 +227,7 @@ export function Adapt() {
   const [samples, setSamples] = useState<CampaignFixture[]>([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [actualSize, setActualSize] = useState(false); // result card at its real pixel size (scrolls) instead of fitted
   const [fromSample, setFromSample] = useState(false); // the banner is one of the built-in samples (feedback says so)
   const [busyBackground, setBusyBackground] = useState<string | null>(null); // the banner whose background is not a flat colour, awaiting the owner's choice
   const [busy, setBusy] = useState(false);
@@ -882,7 +883,7 @@ export function Adapt() {
           <h3 id="a-result" className="visually-hidden">
             Your story cards
           </h3>
-          <div className="trio">
+          <div className={finished ? (actualSize ? "trio done actual" : "trio done") : "trio"}>
             <figure>
               <img src={banner.original} alt={kind === "sketch" ? "Your sketch" : "Your banner"} />
               <figcaption>{kind === "sketch" ? "Your sketch" : "Your banner"}</figcaption>
@@ -901,7 +902,14 @@ export function Adapt() {
             </span>
             <figure className={finished ? "" : "pending"}>
               {run.result ? <img src={run.result.png} alt="The story card" /> : <div className="placeholder">{run.status === "question" ? "Waiting for your decision" : "No result yet"}</div>}
-              <figcaption>{finished ? "Story card, 1080 × 1920" : "Story card"}</figcaption>
+              <figcaption>
+                {finished ? "Story card, 1080 × 1920" : "Story card"}
+                {finished ? (
+                  <button type="button" className="btn small" onClick={() => setActualSize((v) => !v)} aria-pressed={actualSize}>
+                    {actualSize ? "Fit to screen" : "Actual size"}
+                  </button>
+                ) : null}
+              </figcaption>
             </figure>
           </div>
 
