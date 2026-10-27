@@ -240,3 +240,16 @@ test("export_scene shows every story card, even beyond the source canvas", async
   const left = Math.min(...boards.map((b) => b.x)), top = Math.min(...boards.map((b) => b.y));
   assert.ok(Math.abs(w / h - (right - left) / (bottom - top)) < 0.01, `exported ${w}x${h}, cards span ${right - left}x${bottom - top}`);
 });
+
+test("a tall, narrow product is large enough when it is tall enough (width OR height), a small one is not", async () => {
+  const L = { ...LIMITS, min_hero_tall_height: 480 };
+  const run = async (w, h) => {
+    const s = await mk(variant((n) => { n.hero.width = w; n.hero.height = h; }));
+    const r = await act(s, "observe_fit", { artboard_id: "story-1", limits: L });
+    assert.equal(r.ok, true, JSON.stringify(r.error));
+    return kinds(r);
+  };
+  assert.ok(!(await run(300, 600)).includes("below_minimum:hero"), "300 x 600 is tall enough");
+  assert.ok((await run(300, 300)).includes("below_minimum:hero"), "300 x 300 is neither wide nor tall enough");
+  assert.ok(!(await run(440, 300)).includes("below_minimum:hero"), "the old width rule still passes");
+});

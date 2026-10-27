@@ -7,6 +7,7 @@ MIN_FONT = 40
 MIN_LEGAL_FONT = 24
 MIN_CTA_H = 96
 MIN_HERO_W = 432
+MIN_HERO_TALL_H = 480  # a tall, narrow product (a bottle) is large enough when it is at least this tall: width OR height, so every earlier result still passes
 ROLES: tuple[str, ...] = (
     "background",
     "brand_mark",
@@ -29,4 +30,5 @@ def fit_limits() -> dict:
         "min_legal_font": MIN_LEGAL_FONT,
         "min_cta_height": MIN_CTA_H,
         "min_hero_width": MIN_HERO_W,
+        "min_hero_tall_height": MIN_HERO_TALL_H,
     }

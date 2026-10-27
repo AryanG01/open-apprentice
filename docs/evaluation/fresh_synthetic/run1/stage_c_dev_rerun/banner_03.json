@@ -1,0 +1,26 @@
+{
+ "image": "inputs/banner_03.png",
+ "corrections": [],
+ "events": [
+  {
+   "url": "runs",
+   "status": 200
+  },
+  {
+   "url": "answer",
+   "status": 200
+  }
+ ],
+ "replay_equals_stage_a": false,
+ "editor_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype Check what Nemotron found Check the parts Nemotron read this banner (mock-model). Boxes can be tight around the words; fix anything that is off, then continue. The boxes were snapped to what is in the image; headline, price, button, small print moved onto their own lines; the product box was fitted to the whole picture. Logo Product image Headline Price Button Small print Drag a box to move it, drag its corner to resize it. With the keyboard: arrow keys move the focused box, Shift plus arrows resize it. Logo Left Top Width Height Product image Left Top Width Height Headline Words in the image Left Top Width Height Size (px) Bold Text colour Price This banner has no price: remove it Words in the image Left Top Width Height Size (px) Bold Text colour Button This banner has no button: remove it Button label Left Top Width Height Size (px) Bold Label colour Button colour Small print This banner has no small print: remove it Words in the image Left Top Width Height Size (px) Bold Text colour These two parts are cut out as pictures. Everything else is rebuilt as editable text and shapes, so a picture should not contain any words. Logo Product image Snap boxes to the content Background colour Check the price against your page (optional) Language (2 letters) Button link (optional, https) More options Looks right: make the story card Start over What it cannot do yet",
+ "blocked_in_editor": null,
+ "build_enabled": true,
+ "question": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype It needs one decision from you Your story cards Your banner Rebuilt as editable layers Waiting for your decision Story card The copy does not fit, so it is asking instead of guessing. Headline needs 396 px but frame allows 160 px. Shrinking the product image does not fit; splitting across two cards fits. (wording by Nemotron-3-Super, every number checked against the measured facts) built-in does not fit below minimum: u-5784c5857387-product Shrink the product image built-in fits Split across two cards Neither: leave it unchanged Start over What it cannot do yet",
+ "answer": "split",
+ "final_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype Your story card Your story cards Your banner Rebuilt as editable layers Story card, 1080 × 1920 15 of 15 checks passed independent verifier: exact copy, link, logo, image proportions, safe areas, minimum sizes, text fit. It has no authored expected output for your banner, so that comparison is not part of these checks. remembered for this workspace: Split across two cards for en (version 1) Kept for about 30 minutes while the server runs; a reload or restart starts fresh. See every check Download the story card (PNG) Adapt another banner What it cannot do yet",
+ "checks": [
+  15,
+  15
+ ],
+ "elapsed_s": 5.965
+}

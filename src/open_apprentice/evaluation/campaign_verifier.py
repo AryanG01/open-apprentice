@@ -15,6 +15,7 @@ from typing import Any
 from open_apprentice.campaign.limits import (
     MIN_CTA_H,
     MIN_FONT,
+    MIN_HERO_TALL_H,
     MIN_HERO_W,
     MIN_LEGAL_FONT,
     SAFE,
@@ -277,7 +278,11 @@ def verify_story(
         for r in ("headline", "price"):
             small += [n["id"] for n in roles.get(r, []) if _font_px(fin, n) < MIN_FONT]
         small += [n["id"] for n in roles.get("legal", []) if _font_px(fin, n) < MIN_LEGAL_FONT]
-        small += [n["id"] for n in roles.get("product_image", []) if _box(fin, n)[2] < MIN_HERO_W]
+        small += [
+            n["id"]
+            for n in roles.get("product_image", [])
+            if _box(fin, n)[2] < MIN_HERO_W and _box(fin, n)[3] < MIN_HERO_TALL_H
+        ]
         for cta in roles.get("cta", []):
             label = _cta_label(fin, cta)
             if _box(fin, cta)[3] < MIN_CTA_H or label is None or _font_px(fin, label) < MIN_FONT:

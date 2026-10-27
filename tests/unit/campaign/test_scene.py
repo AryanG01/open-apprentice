@@ -29,4 +29,5 @@ def test_fit_limits_match_the_frozen_values():
         "min_legal_font": 24,
         "min_cta_height": 96,
         "min_hero_width": 432,
+        "min_hero_tall_height": 480,  # 27 Oct amendment: width OR height; every earlier result passes both versions
     }

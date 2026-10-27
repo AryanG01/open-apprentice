@@ -321,6 +321,7 @@
       if (kindOf(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "artboard_id must name an artboard");
       if (typeof limits !== "object" || limits === null || typeof limits.safe !== "object" || limits.safe === null) throw new ToolError("INVALID_ARGUMENT", "limits");
       for (const k of ["min_font", "min_legal_font", "min_cta_height", "min_hero_width"]) num(limits[k], `limits.${k}`);
+      if (limits.min_hero_tall_height !== undefined) num(limits.min_hero_tall_height, "limits.min_hero_tall_height");
       for (const k of ["top", "right", "bottom", "left"]) num(limits.safe[k], `limits.safe.${k}`);
       const nodes = [];
       const walk = (g) => { for (const o of g.getObjects()) { nodes.push(o); if (o instanceof fabric.Group) walk(o); } };
@@ -365,7 +366,7 @@
         if (role === "legal" && fontPx(o) < limits.min_legal_font) flag("below_minimum", o, "legal font");
         if ((role === "headline" || role === "price") && fontPx(o) < limits.min_font) flag("below_minimum", o, "font");
         if (role === "cta" && r.height < limits.min_cta_height) flag("below_minimum", o, "cta height");
-        if (role === "product_image" && r.width < limits.min_hero_width) flag("below_minimum", o, "hero width");
+        if (role === "product_image" && r.width < limits.min_hero_width && !(limits.min_hero_tall_height && r.height >= limits.min_hero_tall_height)) flag("below_minimum", o, "hero width"); // a tall, narrow product is large enough when it is tall enough
       }
       for (const o of nodes) {
         if (kindOf(o) === "text" && o.group?.oaMeta?.role === "cta" && fontPx(o) < limits.min_font) flag("below_minimum", o, "cta label font");

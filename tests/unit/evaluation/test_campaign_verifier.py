@@ -350,3 +350,18 @@ def test_valid_results_incl_split_clones_pass_completeness_without_gold(fid, out
     source, final, _ = _case(fid, outcome)
     report = verify_story(source, final, None, gold_applies=False)
     assert "source_complete" not in report.failed(), report.failed()
+
+
+def test_a_tall_narrow_product_passes_the_minimum_size_check_a_small_one_does_not():
+    """Width OR height: a bottle 300 x 600 is large enough, 300 x 300 is not, and the old wide rule still passes."""
+
+    def sized(w, h):
+        def m(s):
+            hero = _node(s, "product_image")
+            hero["width"], hero["height"] = w, h
+
+        return _no_gold("short_a", "layout", m)
+
+    assert "minimum_sizes" not in sized(300, 600)
+    assert "minimum_sizes" in sized(300, 300)
+    assert "minimum_sizes" not in sized(440, 300)

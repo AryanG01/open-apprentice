@@ -206,6 +206,7 @@
       if (kind(ab) !== "artboard") throw new ToolError("INVALID_ARGUMENT", "artboard_id must name an artboard");
       if (typeof limits !== "object" || limits === null || typeof limits.safe !== "object" || limits.safe === null) throw new ToolError("INVALID_ARGUMENT", "limits");
       for (const k of ["min_font", "min_legal_font", "min_cta_height", "min_hero_width"]) num(limits[k], `limits.${k}`);
+      if (limits.min_hero_tall_height !== undefined) num(limits.min_hero_tall_height, "limits.min_hero_tall_height");
       for (const k of ["top", "right", "bottom", "left"]) num(limits.safe[k], `limits.safe.${k}`);
       const nodes = ab.find((n) => Boolean(n.id()));
       const violations = [];
@@ -236,7 +237,7 @@
         if (role === "legal" && fontPx(n) < limits.min_legal_font) flag("below_minimum", n, "legal font");
         if ((role === "headline" || role === "price") && fontPx(n) < limits.min_font) flag("below_minimum", n, "font");
         if (role === "cta" && r.height < limits.min_cta_height) flag("below_minimum", n, "cta height");
-        if (role === "product_image" && r.width < limits.min_hero_width) flag("below_minimum", n, "hero width");
+        if (role === "product_image" && r.width < limits.min_hero_width && !(limits.min_hero_tall_height && r.height >= limits.min_hero_tall_height)) flag("below_minimum", n, "hero width"); // a tall, narrow product is large enough when it is tall enough
       }
       for (const n of nodes) {
         const owner = n.getParent();
