@@ -251,6 +251,8 @@ export function Adapt() {
       if (/unknown or expired/.test(m)) {
         setWid(null); // the server dropped this workspace (30 minutes, or a restart): the next action starts a fresh one
         setError("This workspace has expired, so the choices saved in it are gone. Start over to begin a new one.");
+      } else if (/saved preference changed/.test(m)) {
+        setError("Your saved choice for this language changed after this question was shown, so nothing was saved. Adapt the banner again to see the current question.");
       } else setError(m);
     } finally {
       setBusy(false);
@@ -848,7 +850,7 @@ export function Adapt() {
                   {run.preference ? (
                     <>
                       {" "}
-                      <span className="pill ok">remembered for this workspace: {outcomeLabel(run.preference.outcome)} for {run.locale}</span>{" "}
+                      <span className="pill ok">remembered for this workspace: {outcomeLabel(run.preference.outcome)} for {run.locale} (version {run.preference.version})</span>{" "}
                       <span className="small muted">Kept for about 30 minutes while the server runs; a reload or restart starts fresh.</span>
                     </>
                   ) : null}
