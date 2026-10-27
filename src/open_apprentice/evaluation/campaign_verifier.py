@@ -335,7 +335,9 @@ def verify_story(
     dup += [
         i
         for i in fin_ids
-        if i.endswith("-2") and i[:-2] in role_of and role_of[i[:-2]] not in ("brand_mark", "background")
+        if i.endswith("-2")
+        and i[:-2] in role_of
+        and role_of[i[:-2]] not in ("brand_mark", "background")
     ]
     orphan = [n["id"] for n in fin if n.get("parent") and n["parent"] not in seen]
     rep.add(

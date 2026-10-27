@@ -73,16 +73,22 @@ def test_the_checker_is_independent_of_agent_visible_code(bad):
 
 
 def named(price, headline):
-    return {"nodes": [
-        {"id": "h", "type": "text", "role": "headline", "text": headline},
-        {"id": "p", "type": "text", "role": "price", "text": price},
-    ]}
+    return {
+        "nodes": [
+            {"id": "h", "type": "text", "role": "headline", "text": headline},
+            {"id": "p", "type": "text", "role": "price", "text": price},
+        ]
+    }
 
 
 def test_a_price_listed_for_another_product_is_not_a_match():
     page = "Product A: $229. Product B: $159."
     r = check_page(named("$159", "Product A"), page)
-    assert r["status"] == "mismatch" and "$229" not in r["rows"][0]["detail"] and "229" in r["rows"][0]["detail"]
+    assert (
+        r["status"] == "mismatch"
+        and "$229" not in r["rows"][0]["detail"]
+        and "229" in r["rows"][0]["detail"]
+    )
     assert check_page(named("$159", "Product B"), page)["status"] == "match"
 
 

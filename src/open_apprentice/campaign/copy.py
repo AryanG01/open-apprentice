@@ -123,9 +123,13 @@ def check_headline(headline: str, page_text: str) -> list[str]:
     return problems
 
 
-_QUALIFIER = re.compile(r"(up to|about|around|over|from|starting at|as low as|at least|bis zu|jusqu'à|hasta)\s*$", re.I)
+_QUALIFIER = re.compile(
+    r"(up to|about|around|over|from|starting at|as low as|at least|bis zu|jusqu'à|hasta)\s*$", re.I
+)
 _NEGATION = re.compile(r"\b(not|no|never|without|nicht|kein|keine|ne\b|pas|sin)\b", re.I)
-_SAVING = re.compile(r"\b(save|saving|savings|off|discount|sparen|spare|économis\w*|ahorra\w*)\b", re.I)
+_SAVING = re.compile(
+    r"\b(save|saving|savings|off|discount|sparen|spare|économis\w*|ahorra\w*)\b", re.I
+)
 _WORD = re.compile(r"[^\W\d_]{3,}", re.U)
 
 
@@ -139,17 +143,29 @@ def review_notes(headline: str, page_text: str) -> list[str]:
     unseen = [
         w
         for m in _WORD.finditer(headline)
-        if m is not first and m.group(0)[0].isupper() and (w := m.group(0)) and _fold(w) not in page_words
+        if m is not first
+        and m.group(0)[0].isupper()
+        and (w := m.group(0))
+        and _fold(w) not in page_words
     ]
-    if first and first.group(0)[0].isupper() and _fold(first.group(0)) not in page_words and len(headline.split()) > 1:
+    if (
+        first
+        and first.group(0)[0].isupper()
+        and _fold(first.group(0)) not in page_words
+        and len(headline.split()) > 1
+    ):
         unseen.insert(0, first.group(0))
     if unseen:
-        notes.append(f"{', '.join(dict.fromkeys(unseen))}: not a word on the page. Is it the product's name?")
+        notes.append(
+            f"{', '.join(dict.fromkeys(unseen))}: not a word on the page. Is it the product's name?"
+        )
     for m in re.finditer(r"\d+", low):
         for pm in re.finditer(rf"(?<!\d){m.group(0)}(?!\d)", page):
             qual = _QUALIFIER.search(page[max(0, pm.start() - 14) : pm.start()])
             if qual and not _QUALIFIER.search(low[max(0, m.start() - 14) : m.start()]):
-                notes.append(f'The page says "{qual.group(1)} {m.group(0)}"; the headline drops "{qual.group(1)}".')
+                notes.append(
+                    f'The page says "{qual.group(1)} {m.group(0)}"; the headline drops "{qual.group(1)}".'
+                )
                 break
     for sentence in re.split(r"(?<=[.!?\n])\s+", page):
         if _NEGATION.search(sentence) and any(
@@ -157,10 +173,14 @@ def review_notes(headline: str, page_text: str) -> list[str]:
             for d in re.findall(r"\d+", low)
             for w in ([d] + [x for x in CLAIMS if _has_word(x, low)])
         ):
-            notes.append(f'The page qualifies this with a "not/no" ("{sentence.strip()[:70]}"). Check the headline does not say the opposite.')
+            notes.append(
+                f'The page qualifies this with a "not/no" ("{sentence.strip()[:70]}"). Check the headline does not say the opposite.'
+            )
             break
     if _SAVING.search(low) and re.search(r"\d", low):
-        notes.append("A saving is stated. The page may list prices, not a saving; check the amount.")
+        notes.append(
+            "A saving is stated. The page may list prices, not a saving; check the amount."
+        )
     return list(dict.fromkeys(notes))
 
 
@@ -217,6 +237,7 @@ async def draft_copy(
         template.problems += problems
         return template
     opts = [
-        {"id": f"c{i}", "headline": h, "notes": review_notes(h, page)} for i, h in enumerate(kept, 1)
+        {"id": f"c{i}", "headline": h, "notes": review_notes(h, page)}
+        for i, h in enumerate(kept, 1)
     ]
     return CopyResult("model", opts, problems=problems, tokens=res.tokens, **fixed)

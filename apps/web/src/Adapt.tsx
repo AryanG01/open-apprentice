@@ -247,7 +247,11 @@ export function Adapt() {
     try {
       await fn();
     } catch (e) {
-      setError((e as Error).message);
+      const m = (e as Error).message;
+      if (/unknown or expired/.test(m)) {
+        setWid(null); // the server dropped this workspace (30 minutes, or a restart): the next action starts a fresh one
+        setError("This workspace has expired, so the choices saved in it are gone. Start over to begin a new one.");
+      } else setError(m);
     } finally {
       setBusy(false);
       setReading(false);
@@ -345,7 +349,7 @@ export function Adapt() {
         up = await post();
       } catch (e) {
         if (!/holds \d+ banners at most/.test((e as Error).message)) throw e;
-        id = await newWorkspace(); // a workspace holds a few banners; carry on in a fresh one
+        id = await newWorkspace(); // a workspace holds a few banners; carry on in a fresh one (its saved choices stay behind)
         up = await post();
       }
       const d = pixelsOf(img);
@@ -393,7 +397,7 @@ export function Adapt() {
         got = await attempt(id);
       } catch (e) {
         if (!/holds \d+ banners at most/.test((e as Error).message)) throw e;
-        id = await newWorkspace(); // a workspace holds a few banners; carry on in a fresh one
+        id = await newWorkspace(); // a workspace holds a few banners; carry on in a fresh one (its saved choices stay behind)
         got = await attempt(id);
       }
       const [up, pg, pgNote] = got;
@@ -506,7 +510,7 @@ export function Adapt() {
     };
   }, [finished, page, banner, wid, pageCheck]);
 
-  const title = step === 1 ? "Bring a banner. Get story cards you can trust." : step === 2 ? "Check what Nemotron found" : finished ? "Your story card" : run?.status === "question" ? "It needs one decision from you" : "Your banner";
+  const title = step === 1 ? "Bring a banner. Get story cards, checked." : step === 2 ? "Check what Nemotron found" : finished ? "Your story card" : run?.status === "question" ? "It needs one decision from you" : "Your banner";
   const notices = (
     <>
       {error ? (
@@ -844,7 +848,8 @@ export function Adapt() {
                   {run.preference ? (
                     <>
                       {" "}
-                      <span className="pill ok">saved: {outcomeLabel(run.preference.outcome)} for {run.locale}</span>
+                      <span className="pill ok">remembered for this workspace: {outcomeLabel(run.preference.outcome)} for {run.locale}</span>{" "}
+                      <span className="small muted">Kept for about 30 minutes while the server runs; a reload or restart starts fresh.</span>
                     </>
                   ) : null}
                 </div>

@@ -913,7 +913,10 @@ def test_the_question_carries_the_preference_version_it_was_asked_under(client):
     a = _answer(client, wid, q1["run_id"], SPLIT, expected_version=q1["preference_seen"])
     assert a["preference"] == {"outcome": SPLIT, "version": 2}
     _answer(client, wid, q2["run_id"], SPLIT, expected_version=q2["preference_seen"], status=409)
-    scope = {s["locale"]: s for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]}["de"]
+    scope = {
+        s["locale"]: s
+        for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]
+    }["de"]
     assert scope["active"]["version"] == 2  # the stale answer saved nothing
 
 
@@ -922,5 +925,7 @@ def test_an_answer_without_a_version_still_uses_the_questions_snapshot(client):
     first = _run(client, wid, "de_long_a")
     _answer(client, wid, first["run_id"], SHRINK)
     q = _run(client, wid, "de_long_b")
-    a = _answer(client, wid, q["run_id"], SPLIT)  # no expected_version: used to fail with "active version is 1, not None"
+    a = _answer(
+        client, wid, q["run_id"], SPLIT
+    )  # no expected_version: used to fail with "active version is 1, not None"
     assert a["preference"] == {"outcome": SPLIT, "version": 2}

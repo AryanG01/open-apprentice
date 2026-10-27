@@ -58,7 +58,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
 
     await page.goto(`${API}/`, { waitUntil: "networkidle" });
     assert.equal(await page.getByRole("tab", { name: "Adapt a banner" }).getAttribute("aria-selected"), "true");
-    assert.match(await text(), /Bring a banner\. Get story cards you can trust\./);
+    assert.match(await text(), /Bring a banner\. Get story cards, checked\./);
     const who = await page.getByLabel("Who does what").innerText();
     assert.match(who, /Nemotron-3\.5-Super-VL/);
     assert.match(who, /independent verifier/);
@@ -113,7 +113,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     assert.equal(await page.locator("img[alt='Your banner rebuilt as editable layers']").count(), 1);
 
     await page.getByRole("button", { name: "Adapt another banner" }).click();
-    await page.getByRole("heading", { name: "Bring a banner. Get story cards you can trust." }).waitFor();
+    await page.getByRole("heading", { name: "Bring a banner. Get story cards, checked." }).waitFor();
     await page.getByRole("tab", { name: "Diagrams" }).click();
     assert.equal(new URL(page.url()).hash, "#apprentice");
     assert.deepEqual(problems, []);
@@ -169,7 +169,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
     assert.match(await text(), /\d+ of \d+ checks passed/);
     assert.match(await text(), /Page check/);
-    assert.match(await text(), /Match/);
+    assert.match(await text(), /Amount found on page/);
     assert.ok((await page.locator("a[download]").count()) >= 2, "story card and banner downloads");
     assert.match((await page.locator("a[download]").nth(1).getAttribute("href")) ?? "", /^data:image\/png;base64,/);
     assert.deepEqual(problems, []);

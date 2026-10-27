@@ -52,7 +52,9 @@ class CampaignRun:
     result_session: Optional[str] = None
     previews: dict[str, Preview] = field(default_factory=dict)
     preference: Optional[Preference] = None
-    pref_version: Optional[int] = None  # the saved preference's version when the question was asked (compare-and-set token)
+    pref_version: Optional[int] = (
+        None  # the saved preference's version when the question was asked (compare-and-set token)
+    )
     problems: list[str] = field(default_factory=list)
     provenance: dict = field(default_factory=dict)
     sessions: dict[str, EngineSession] = field(default_factory=dict, repr=False)

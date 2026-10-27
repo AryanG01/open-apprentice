@@ -306,7 +306,9 @@ def _no_gold(fid: str, outcome: str, mutate) -> list[str]:
     return verify_story(source, final, None, gold_applies=False).failed()
 
 
-@pytest.mark.parametrize("role", ["product_image", "background", "brand_mark", "headline", "price", "cta", "legal"])
+@pytest.mark.parametrize(
+    "role", ["product_image", "background", "brand_mark", "headline", "price", "cta", "legal"]
+)
 def test_deleting_a_source_element_fails_without_gold(role):
     """A missing product used to pass 14/14 for uploads (no gold to compare the node set with)."""
 

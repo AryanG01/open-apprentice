@@ -95,7 +95,7 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     assert.match(work, /same frame every time/);
 
     await run("short_a");
-    assert.match(await text(), /15 of 15 checks passed/);
+    assert.match(await text(), /16 of 16 checks passed/);
 
     await run("de_long_a");
     await page.getByText(/Which tradeoff should this rule make/).first().waitFor({ timeout: 20_000 }); // a slow runner renders after the response
@@ -103,14 +103,14 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     assert.equal(await page.locator(".preview img").count(), 2);
     await pick("Shrink the product image");
     assert.match(await text(), /Applied result/);
-    assert.match(await text(), /15 of 15 checks passed/);
+    assert.match(await text(), /16 of 16 checks passed/);
     assert.match(await prefRow("de").innerText(), /Shrink the product image \(v1\)/);
 
     await run("de_long_b");
     assert.ok(await page.getByRole("button", { name: "Shrink the product image" }).isDisabled());
     assert.match(await text(), /does not fit/i);
     await pick("Split across two cards");
-    assert.match(await text(), /15 of 15 checks passed/);
+    assert.match(await text(), /16 of 16 checks passed/);
     assert.match(await prefRow("de").innerText(), /Split across two cards \(v2\)/);
 
     await run("de_long_a");
@@ -120,7 +120,7 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     await page.getByRole("radio", { name: "Fabric" }).check();
     await run("short_a");
     assert.match(await text(), /engine: fabric/i);
-    assert.match(await text(), /15 of 15 checks passed/);
+    assert.match(await text(), /16 of 16 checks passed/);
     await page.getByRole("radio", { name: "Konva" }).check();
 
     await banner("untagged_short_b").click();
@@ -130,7 +130,7 @@ describe("Campaign tab in a real browser", { skip: !enabled && "set OA_E2E=1 to 
     await page.getByRole("button", { name: "Confirm roles and run" }).click();
     await confirmed;
     await page.waitForLoadState("networkidle");
-    assert.match(await text(), /15 of 15 checks passed/);
+    assert.match(await text(), /16 of 16 checks passed/);
 
     await run("missing_role");
     assert.match(await page.getByRole("alert").innerText(), /role headline is missing/);

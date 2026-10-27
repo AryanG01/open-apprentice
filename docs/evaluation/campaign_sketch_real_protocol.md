@@ -40,3 +40,14 @@ Under $0.05 at the production vision price (about $0.005 per sketch). Spend is w
 ## Reporting
 All sketches, overlays, per-box judgements and the decision are published in `campaign_sketch_real_run1.md`, including any that
 fail. If the result is partial or no-go, the in-app limits panel and the README keep saying so.
+
+## Amendment, 27 Oct 2026 (before any real sketch has been read)
+Infrastructure only; thresholds, procedure and decision rule above are unchanged.
+- The runner now opens a **separate workspace per sketch** (the old single-workspace runner would have received HTTP 409 on the
+  fifth upload, `MAX_UPLOADS=4`, before any model call).
+- The runner **never retries** a paid POST (the old curl `--retry 2` could repeat a request after an ambiguous failure).
+- Images run in the order of `manifest.txt` in the image folder (the order received), not filename order. The manifest and the
+  committed pre-call annotations are fixed before the first call.
+- Raw (unrounded) boxes, HTTP status and workspace id are saved per sketch in `results.json` next to the overlays.
+- An HTTP or network failure is reported as an **infrastructure failure** (row kept, not counted as a model miss). A reply whose
+  `origin` is not the model (template boxes) counts as a **miss**, never as model success. Both are listed in the report.

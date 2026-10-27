@@ -74,7 +74,7 @@ def test_happy_path_returns_grounded_facts_and_copy(client):
         "waterproof" in p for p in out["problems"]
     ), "an invented fact is dropped and reported"
     assert out["copy"]["origin"] == "model" and out["copy"]["options"] == [
-        {"id": "c1", "headline": "Hear only what matters."}
+        {"id": "c1", "headline": "Hear only what matters.", "notes": []}
     ]
     assert out["copy"]["price"] == "$159" and out["copy"]["cta"] == "Shop now"
     assert out["copy"]["legal"] == "Offer ends 31 Oct 2026"
@@ -186,7 +186,7 @@ def test_page_check_match_mismatch_and_unknown(client):
     p = post_page(client, w).json()["page_id"]
     r = check(client, w, _banner(client, w, "Now $159 (was $229)"), p)
     assert r.status_code == 200 and r.json()["status"] == "match"
-    assert r.json()["rows"][0]["detail"] == "The banner prices $159, $229 are on the page."
+    assert r.json()["rows"][0]["detail"] == "The banner prices $159, $229 are listed on the page."
     assert check(client, w, _banner(client, w, "Now $149"), p).json()["status"] == "mismatch"
     assert check(client, w, _banner(client, w, "Ask in store"), p).json()["status"] == "unknown"
 

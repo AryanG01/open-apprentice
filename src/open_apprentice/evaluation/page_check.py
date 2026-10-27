@@ -91,9 +91,13 @@ def _flagged(text: str, allow_bare: bool = False) -> list[tuple[Decimal, str | N
     return out
 
 
-def _same_kind(banner: tuple[Decimal, str | None, bool], page: list[tuple[Decimal, str | None, bool]]) -> bool:
+def _same_kind(
+    banner: tuple[Decimal, str | None, bool], page: list[tuple[Decimal, str | None, bool]]
+) -> bool:
     a, c, prev = banner
-    return any(a == pa and (c is None or pc is None or c == pc) and prev == pp for pa, pc, pp in page)
+    return any(
+        a == pa and (c is None or pc is None or c == pc) and prev == pp for pa, pc, pp in page
+    )
 
 
 def _beside_name(name: str, page_text: str) -> list[Decimal]:
@@ -124,14 +128,18 @@ def check_page(scene: dict, page_text: str) -> dict:
     missing = [t for t, a, c in banner if not _on_page(a, c, page)]
     # An amount that is on the page only as an old price, or only the other way round, is not the banner's price.
     mismatched_kind = [
-        t for (t, *_), f in zip(banner, banner_flags) if t not in missing and not _same_kind(f, page_flags)
+        t
+        for (t, *_), f in zip(banner, banner_flags)
+        if t not in missing and not _same_kind(f, page_flags)
     ]
     name = _texts(scene, "headline").strip()
     beside = _beside_name(name, page_text) if len(name) >= 3 else []
     current = [f for f in banner_flags if not f[2]]
     if beside and current and not any(f[0] in beside for f in current):
         shown = ", ".join(sorted({str(b) for b in beside}))
-        detail = f"The page lists {shown} next to \"{name}\", not the banner price {', '.join(b_txt)}."
+        detail = (
+            f"The page lists {shown} next to \"{name}\", not the banner price {', '.join(b_txt)}."
+        )
         return _out("mismatch", b_txt, p_txt, False, detail, notes)
     if mismatched_kind:
         detail = (
