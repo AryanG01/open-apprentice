@@ -488,7 +488,7 @@ export function Adapt() {
   const answer = (choice: string) =>
     go("Applying your choice and checking it…", async () => {
       if (!wid || !run) return;
-      setRun(await call<CampaignRun>(`/api/campaign/workspaces/${wid}/runs/${run.run_id}/answer`, { choice }));
+      setRun(await call<CampaignRun>(`/api/campaign/workspaces/${wid}/runs/${run.run_id}/answer`, { choice, expected_version: run.preference_seen ?? null }));
     });
 
   const verification = run?.result?.verification ?? null;

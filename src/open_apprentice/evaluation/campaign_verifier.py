@@ -320,6 +320,30 @@ def verify_story(
                 changed.append(f"{n['id']}.{k}")
     rep.add("non_writable_unchanged", not changed, str(changed[:10]))
 
+    # Completeness is derived from the confirmed source alone (no gold): every source node must survive, once, under its own
+    # id or as the "-2" copy a split makes of a repeated brand mark / background; nothing may be duplicated otherwise,
+    # and every node must hang from a node that exists.
+    fin_ids = [n["id"] for n in fin]
+    role_of = {n["id"]: n.get("role") for n in src}
+    seen = set(fin_ids)
+    absent = [
+        n["id"]
+        for n in src
+        if n["type"] != "artboard" and n["id"] not in seen and f"{n['id']}-2" not in seen
+    ]
+    dup = sorted({i for i in fin_ids if fin_ids.count(i) > 1})
+    dup += [
+        i
+        for i in fin_ids
+        if i.endswith("-2") and i[:-2] in role_of and role_of[i[:-2]] not in ("brand_mark", "background")
+    ]
+    orphan = [n["id"] for n in fin if n.get("parent") and n["parent"] not in seen]
+    rep.add(
+        "source_complete",
+        not (absent or dup or orphan),
+        f"missing {absent}, duplicated {dup}, orphaned {orphan}"[:300],
+    )
+
     if not gold_applies:
         pass
     elif gold is None:

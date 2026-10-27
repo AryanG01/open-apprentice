@@ -96,7 +96,7 @@ def _answer(c, wid, rid, choice, expected_version=None, status=200):
 
 def _passed(out):
     v = out["result"]["verification"]
-    assert v["passed"] and len(v["checks"]) == 15, v
+    assert v["passed"] and len(v["checks"]) == 16, v
     assert out["result"]["png"].startswith("data:image/png")
 
 
@@ -897,3 +897,30 @@ def test_the_split_option_is_offered_only_when_there_is_something_for_a_second_c
     _, some = _run_upload(client, ("price",), locale="de", headline=LONG)
     assert some["status"] == "question"
     assert "builtin_split_two_cards" in {p["outcome"] for p in some["previews"]}
+
+
+def test_the_question_carries_the_preference_version_it_was_asked_under(client):
+    """Adapt sends this snapshot back: replacing a saved choice works from the rendered question, and a question that was
+    asked before the preference changed cannot overwrite the newer one."""
+    wid = _workspace(client)["workspace_id"]
+    first = _run(client, wid, "de_long_a")
+    assert first["preference_seen"] is None  # no saved choice yet
+    _answer(client, wid, first["run_id"], SHRINK, expected_version=first["preference_seen"])
+
+    q1 = _run(client, wid, "de_long_b")
+    q2 = _run(client, wid, "de_long_b")
+    assert q1["preference_seen"] == q2["preference_seen"] == 1
+    a = _answer(client, wid, q1["run_id"], SPLIT, expected_version=q1["preference_seen"])
+    assert a["preference"] == {"outcome": SPLIT, "version": 2}
+    _answer(client, wid, q2["run_id"], SPLIT, expected_version=q2["preference_seen"], status=409)
+    scope = {s["locale"]: s for s in client.get(f"/api/campaign/workspaces/{wid}/preferences").json()["scopes"]}["de"]
+    assert scope["active"]["version"] == 2  # the stale answer saved nothing
+
+
+def test_an_answer_without_a_version_still_uses_the_questions_snapshot(client):
+    wid = _workspace(client)["workspace_id"]
+    first = _run(client, wid, "de_long_a")
+    _answer(client, wid, first["run_id"], SHRINK)
+    q = _run(client, wid, "de_long_b")
+    a = _answer(client, wid, q["run_id"], SPLIT)  # no expected_version: used to fail with "active version is 1, not None"
+    assert a["preference"] == {"outcome": SPLIT, "version": 2}

@@ -24,7 +24,7 @@ def test_gold_result_passes_every_check(fid, outcome):
     source, final, gold = _case(fid, outcome)
     report = verify_story(source, final, gold)
     assert report.passed, report.failed()
-    assert len(report.checks) == 15
+    assert len(report.checks) == 16
 
 
 def _fails(check: str, fid: str, outcome: str, mutate) -> None:
@@ -268,7 +268,7 @@ def test_without_applicable_gold_every_other_check_still_runs_and_none_is_waived
     )
     report = verify_story(source, final, None, gold_applies=False)
     assert "matches_gold" not in [c.name for c in report.checks]
-    assert len(report.checks) == 14 and report.passed
+    assert len(report.checks) == 15 and report.passed
     _node(final, "legal")["fontSize"] = 4
     assert "minimum_sizes" in verify_story(source, final, None, gold_applies=False).failed()
 
@@ -298,3 +298,53 @@ def test_uploaded_asset_sizes_come_from_the_png_headers_and_anything_odd_is_left
     }
     assert uploaded_sizes(odd) == {}
     assert uploaded_sizes(None) == {}
+
+
+def _no_gold(fid: str, outcome: str, mutate) -> list[str]:
+    source, final, _ = _case(fid, outcome)
+    mutate(final)
+    return verify_story(source, final, None, gold_applies=False).failed()
+
+
+@pytest.mark.parametrize("role", ["product_image", "background", "brand_mark", "headline", "price", "cta", "legal"])
+def test_deleting_a_source_element_fails_without_gold(role):
+    """A missing product used to pass 14/14 for uploads (no gold to compare the node set with)."""
+
+    def m(s):
+        s["nodes"] = [n for n in s["nodes"] if n.get("role") != role]
+
+    assert "source_complete" in _no_gold("short_a", "layout", m)
+
+
+def test_deleting_the_cta_label_child_fails_without_gold():
+    def m(s):
+        s["nodes"] = [n for n in s["nodes"] if n["id"] != "sa-cta-label"]
+
+    assert "source_complete" in _no_gold("short_a", "layout", m)
+
+
+def test_duplicating_a_node_or_cloning_a_non_repeatable_role_fails_without_gold():
+    def dup(s):
+        s["nodes"].append(copy.deepcopy(_node(s, "product_image")))
+
+    def clone(s):
+        c = copy.deepcopy(_node(s, "product_image"))
+        c["id"] += "-2"
+        s["nodes"].append(c)
+
+    assert "source_complete" in _no_gold("short_a", "layout", dup)
+    assert "source_complete" in _no_gold("short_a", "layout", clone)
+
+
+def test_a_node_with_a_missing_parent_fails_without_gold():
+    def m(s):
+        _node(s, "headline")["parent"] = "no-such-board"
+
+    assert "source_complete" in _no_gold("short_a", "layout", m)
+
+
+@pytest.mark.parametrize("fid,outcome", APPLICABLE)
+def test_valid_results_incl_split_clones_pass_completeness_without_gold(fid, outcome):
+    source, final, _ = _case(fid, outcome)
+    report = verify_story(source, final, None, gold_applies=False)
+    assert "source_complete" not in report.failed(), report.failed()

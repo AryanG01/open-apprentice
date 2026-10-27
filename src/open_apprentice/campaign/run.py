@@ -52,6 +52,7 @@ class CampaignRun:
     result_session: Optional[str] = None
     previews: dict[str, Preview] = field(default_factory=dict)
     preference: Optional[Preference] = None
+    pref_version: Optional[int] = None  # the saved preference's version when the question was asked (compare-and-set token)
     problems: list[str] = field(default_factory=list)
     provenance: dict = field(default_factory=dict)
     sessions: dict[str, EngineSession] = field(default_factory=dict, repr=False)
@@ -137,6 +138,7 @@ def start_run(
         ).ask
         asked = [o for o in asked if o != BUILTINS[1] or split_applicable(base)]
         pref = prefs.get(scope_key(locale))
+        run.pref_version = pref.version if pref else None
         for outcome in ([pref.outcome] if pref else []) + [
             o for o in asked if not pref or o != pref.outcome
         ]:

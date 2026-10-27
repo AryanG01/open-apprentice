@@ -106,7 +106,7 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     }
     await page.getByRole("button", { name: "Looks right: make the story card" }).click();
     await page.getByRole("heading", { level: 2, name: /Your story card|It needs one decision/ }).waitFor({ timeout: 90_000 });
-    assert.match(await text(), /14 of 14 checks passed/);
+    assert.match(await text(), /15 of 15 checks passed/);
     assert.match(await text(), /no authored expected output for your banner/);
     assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
     assert.match((await page.locator("a[download]").getAttribute("href")) ?? "", /^data:image\/png;base64,/);

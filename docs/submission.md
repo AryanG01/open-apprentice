@@ -64,7 +64,7 @@ banner leaves open, and never shows a result it has not checked.
 roles named on 6 of 6, median box overlap 0.61, every layer found on 2 of 6, decision **partial**
 (`docs/evaluation/campaign_sketch_dev_run1.md`). Headline and small-print boxes come back loose, which is why you drag boxes.
 Real hand-drawn sketches are tested separately and reported separately. One live end-to-end run on the sample page passed:
-sketch read, page read, grounded facts, a headline, a built banner, 14 of 14 independent checks, page check match.
+sketch read, page read, grounded facts, a headline, a built banner, 15 of 15 independent checks, page check match.
 
 **Who does what** (shown on the page): Nemotron-3.5-Super-VL reads the banner; you confirm the parts; deterministic
 checks and the independent verifier decide; Nemotron-3-Super words the question.
@@ -280,7 +280,7 @@ Open the demo URL; no login is needed.
    the checks and download the PNG. Remove price, button or small print with the buttons in the editor if your banner has none.
 0b. **The sketch door:** press **Start from a sketch**, then **Use the sample sketch**, **Use the sample page** and **Read my
    sketch**. Read the facts (each with its quote) and pick a headline, press **Use the sample pictures**, then **Looks right: make
-   the story card**. The result shows the 14 independent checks and a **Page check** row.
+   the story card**. The result shows the 15 independent checks and a **Page check** row.
 1. Optional, diagrams: press **Try a sample: Online order journey** and **Hiring process**, then **Confirm mapping** on each.
 2. Under *Show it once*, drag each note under its box, lined up with its left edge.
 3. Tick **Use the live model** and press **This whole document is right**.

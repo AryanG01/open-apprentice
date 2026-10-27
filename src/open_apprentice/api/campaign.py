@@ -438,6 +438,7 @@ def _run_out(rec: RunRecord, status: str | None = None, verification: dict | Non
             }
             for p in (run.previews.values() if run.status == "question" else [])
         ],
+        "preference_seen": run.pref_version,
         "preference": (
             None
             if run.preference is None
@@ -707,7 +708,13 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
         # A guard for when banners can change: today the fixture is fixed, so this always matches.
         current = _hash(rec.source)
         try:
-            answer(run, body.choice, ws.prefs, body.expected_version, current_source_hash=current)
+            answer(
+                run,
+                body.choice,
+                ws.prefs,
+                body.expected_version if body.expected_version is not None else run.pref_version,
+                current_source_hash=current,
+            )
         except ValueError as e:
             raise HTTPException(409, str(e)) from e
         except PreferenceConflict as e:

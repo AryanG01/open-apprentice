@@ -448,6 +448,7 @@ export interface CampaignRun {
   result: { png: string; verification: CampaignVerification | null } | null;
   previews: CampaignPreview[];
   preference: { outcome: string; version: number } | null;
+  preference_seen: number | null; // saved-preference version when the question was asked; sent back with the answer
   explanation?: { text: string; origin: string; problems: string[] };
 }
 
