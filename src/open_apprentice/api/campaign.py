@@ -5,6 +5,8 @@ before the response, and every result offered as applied has passed the independ
 from __future__ import annotations
 
 import asyncio
+import json
+import datetime
 import os
 import re
 import time
@@ -14,7 +16,7 @@ from typing import Any, Literal
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 from open_apprentice.api.receipt import MUTATIONS, build_receipt, mutate
 from open_apprentice.api.teach import _account, _engine, _rate_limit, _require_model_budget
@@ -738,6 +740,27 @@ async def answer_run(request: Request, wid: str, rid: str, body: AnswerIn) -> di
 
     async with ws.lock:
         return await asyncio.to_thread(work)
+
+
+class FeedbackIn(BaseModel):
+    """Five small answers from someone who just used the app. No image and no address is stored."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    would_post: int = Field(ge=1, le=5)  # "would you post this card as it is?"
+    fixes: Literal["0", "1-2", "3-5", "more"]
+    words_correct: Literal["yes", "no"]
+    note: str = Field(default="", max_length=400)
+    own_banner: bool = False
+    quote_ok: bool = False  # may the team quote the note
+
+
+@router.post("/feedback")
+async def feedback(request: Request, body: FeedbackIn) -> dict:
+    _rate_limit(request, "campaign")
+    key = f"feedback/{datetime.datetime.now(datetime.timezone.utc):%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:8]}.json"
+    _store(request).create(key, json.dumps(body.model_dump(), sort_keys=True).encode("utf-8"))
+    return {"ok": True}
 
 
 class ReceiptIn(BaseModel):

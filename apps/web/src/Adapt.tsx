@@ -6,6 +6,7 @@ import { PreviewCard, call, outcomeLabel } from "./CampaignLane";
 import { BANNER_H, BANNER_W, LABEL, LayerEditor, REQUIRED, hexOr, isImageRole } from "./LayerEditor";
 import { noFitReasons } from "./reasons";
 import { ProofPanel } from "./Proof";
+import { Feedback } from "./Feedback";
 import { backgroundOf as backgroundInfo, clippedSides, foreignRuns, imageTextOverlaps, inkComponents, pictureComponents, reassignText, snapBox, unionBox } from "./snap";
 import type { Components, Rgb } from "./snap";
 import { CARD_FITS, ColourPanel, CopyPanel, PALETTE, PageCheckBox, PicturesPanel, Provenance, fitBoxTo, loadPicture, readFileAsDataUrl, renderPicture } from "./SketchPanels";
@@ -226,6 +227,7 @@ export function Adapt() {
   const [samples, setSamples] = useState<CampaignFixture[]>([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [fromSample, setFromSample] = useState(false); // the banner is one of the built-in samples (feedback says so)
   const [busyBackground, setBusyBackground] = useState<string | null>(null); // the banner whose background is not a flat colour, awaiting the owner's choice
   const [busy, setBusy] = useState(false);
   const [reading, setReading] = useState(false); // Nemotron is reading an image: show the turntable
@@ -509,6 +511,7 @@ export function Adapt() {
   };
 
   const onFile = async (file: File | undefined) => {
+    setFromSample(false);
     if (!file) return;
     if (!/^image\/(png|jpeg)$/.test(file.type)) {
       setError("Use a PNG or JPEG image.");
@@ -706,7 +709,7 @@ export function Adapt() {
                 <p className="label">Or start from a sample</p>
                 <div className="samples">
                   {samples.map((f) => (
-                    <button key={f.id} className="samplebtn" disabled={busy || !wid} onClick={() => void readBanner(f.png)}>
+                    <button key={f.id} className="samplebtn" disabled={busy || !wid} onClick={() => { setFromSample(true); void readBanner(f.png); }}>
                       <img src={f.png} alt="" className="thumb" />
                       <strong>{f.id === "short_a" ? "Headphones, English" : "Headphones, new copy"}</strong>
                     </button>
@@ -987,6 +990,7 @@ export function Adapt() {
                 </div>
               </details>
               {finished && wid && run ? <ProofPanel wid={wid} runId={run.run_id} pageCheck={pageCheck} /> : null}
+              {finished ? <Feedback ownBanner={kind === "banner" && !fromSample} /> : null}
               {page || checkNote ? <PageCheckBox check={pageCheck} error={pageCheck ? "" : checkNote} /> : null}
               {kind === "sketch" && upload ? <Provenance model={upload.origin === "model" ? upload.model : ""} layers={layers} page={page} choice={choice} pics={pics} background={background} /> : null}
               <div className="controls">

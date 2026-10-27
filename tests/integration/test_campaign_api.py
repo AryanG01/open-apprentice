@@ -995,3 +995,22 @@ def test_try_to_break_it_catches_each_defect_on_a_copy_and_changes_nothing(clien
         f"/api/campaign/workspaces/{wid}/runs/{run['run_id']}/selftest", json={"mutation": "nope"}
     )
     assert bad.status_code == 422
+
+
+def test_feedback_is_stored_without_an_image_or_an_address_and_bad_answers_are_refused(client, tmp_path):
+    import json
+    import pathlib
+
+    ok = client.post(
+        "/api/campaign/feedback",
+        json={"would_post": 4, "fixes": "1-2", "words_correct": "yes", "note": "nice", "own_banner": True},
+    )
+    assert ok.status_code == 200 and ok.json() == {"ok": True}
+    files = list(pathlib.Path(tmp_path).rglob("feedback/*.json"))
+    assert len(files) == 1
+    body = json.loads(files[0].read_text())
+    assert body == {
+        "would_post": 4, "fixes": "1-2", "words_correct": "yes", "note": "nice", "own_banner": True, "quote_ok": False,
+    }
+    assert client.post("/api/campaign/feedback", json={"would_post": 9, "fixes": "0", "words_correct": "yes"}).status_code == 422
+    assert client.post("/api/campaign/feedback", json={"would_post": 3, "fixes": "0", "words_correct": "yes", "image": "x"}).status_code == 422

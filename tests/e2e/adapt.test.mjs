@@ -118,6 +118,12 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     assert.match(receipt.schema, /^open-apprentice-change-receipt\//);
     assert.equal(receipt.all_checks_passed, true);
     assert.match(receipt.receipt_sha256, /^[0-9a-f]{64}$/);
+    // feedback: five small answers, no image
+    await page.getByRole("radio", { name: "4" }).check();
+    await page.getByLabel("How many things did you have to fix?").selectOption("1-2");
+    await page.getByLabel(/Are all your words/).selectOption("yes");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await page.getByText(/Your answers were saved/).waitFor({ timeout: 30_000 });
     assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
     assert.match((await page.locator("a[download]").getAttribute("href")) ?? "", /^data:image\/png;base64,/);
     assert.equal(await page.locator("img[alt='Your banner rebuilt as editable layers']").count(), 1);
