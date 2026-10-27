@@ -139,6 +139,27 @@ describe("Adapt a banner in a real browser", { skip: !enabled && "set OA_E2E=1 t
     assert.ok((await page.locator("img[alt='The story card']").count()) === 1);
   });
 
+  test("a photo background is refused before any model call, with a choice: a labelled simplified version or another banner", async () => {
+    const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 } })).newPage();
+    const text = async () => (await page.locator("body").innerText()).replace(/\s+/g, " ");
+    let uploads = 0;
+    page.on("request", (r) => { if (/\/uploads$/.test(r.url()) && r.method() === "POST") uploads++; });
+    await page.goto(`${API}/`, { waitUntil: "networkidle" });
+    await page.waitForFunction(() => !document.querySelector("input[type=file]").disabled);
+    const photo = path.join(ROOT, "docs/evaluation/fresh_synthetic/inputs/banner_04.png");
+    await page.locator("input[type=file]").setInputFiles(photo);
+    await page.getByRole("alert").filter({ hasText: /photo or busy background/ }).waitFor({ timeout: 30_000 });
+    assert.match(await text(), /Nothing has been sent to the model yet/);
+    assert.equal(uploads, 0, "refused before the upload");
+    await page.getByRole("button", { name: "Choose another banner" }).click();
+    assert.equal(await page.getByRole("alert").filter({ hasText: /photo or busy background/ }).count(), 0);
+    await page.locator("input[type=file]").setInputFiles(photo);
+    await page.getByRole("button", { name: "Use a simplified flat-colour version" }).click();
+    await page.getByRole("heading", { name: "Check what Nemotron found" }).waitFor({ timeout: 60_000 });
+    assert.equal(uploads, 1, "only after the owner accepted the simplified version");
+    assert.match(await text(), /not a flat colour/);
+  });
+
   test("the sketch door: sample sketch and sample page, the owner's pictures, a built banner, a verified story card and a page check", async () => {
     const page = await (await browser.newContext({ viewport: { width: 1280, height: 1000 } })).newPage();
     const problems = [];

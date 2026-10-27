@@ -224,6 +224,7 @@ export function Adapt() {
   const [samples, setSamples] = useState<CampaignFixture[]>([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [busyBackground, setBusyBackground] = useState<string | null>(null); // the banner whose background is not a flat colour, awaiting the owner's choice
   const [busy, setBusy] = useState(false);
   const [reading, setReading] = useState(false); // Nemotron is reading an image: show the turntable
   const [over, setOver] = useState(false);
@@ -377,11 +378,18 @@ export function Adapt() {
       setSketchSrc(await readFileAsDataUrl(new File([blob], "sketch-4.png", { type: blob.type || "image/png" })));
     });
 
-  const readBanner = (src: string) =>
+  const readBanner = (src: string, accepted = false) =>
     go("Nemotron is reading your banner. This takes about 10 to 30 seconds.", async () => {
       setReading(true);
+      setBusyBackground(null);
       const url = await normalize(src);
       const img = await loadImage(url);
+      // a photo or busy background cannot be kept: say so BEFORE spending a model call, and let the owner choose a lossy version
+      if (!accepted && !backgroundInfo(pixelsOf(img)).flat) {
+        setBusyBackground(src);
+        setReading(false);
+        return;
+      }
       imgEl.current = img;
       let id = wid ?? (await newWorkspace());
       const post = () => call<AdaptUpload>(`/api/campaign/workspaces/${id}/uploads`, { image: url });
@@ -586,6 +594,25 @@ export function Adapt() {
           {error}
         </p>
       ) : null}
+      {busyBackground ? (
+        <div className="callout" role="alert">
+          <WarningCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" />
+          <div>
+            <strong>This banner has a photo or busy background, which the app cannot keep.</strong>
+            <p>
+              The story card is rebuilt on one flat colour, so your background would be replaced and the logo and product would be cut out with some of it. Nothing has been sent to the model yet. You can start from a banner with a flat or simple background, or go on with a simplified version that is labelled as simplified.
+            </p>
+            <div className="row">
+              <button type="button" className="btn" onClick={() => void readBanner(busyBackground, true)} disabled={busy}>
+                Use a simplified flat-colour version
+              </button>
+              <button type="button" className="btn" onClick={() => setBusyBackground(null)} disabled={busy}>
+                Choose another banner
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {busy && reading ? (
         <div className="reading-panel">
           <Suspense fallback={null}>
@@ -665,7 +692,7 @@ export function Adapt() {
               <label className="btn primary filebtn">
                 <UploadSimple size={18} weight="bold" aria-hidden="true" />
                 Choose a banner
-                <input type="file" accept="image/png,image/jpeg" disabled={busy || !wid} onChange={(e) => void onFile(e.target.files?.[0])} />
+                <input type="file" accept="image/png,image/jpeg" disabled={busy || !wid} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void onFile(f); }} />
               </label>
               <button type="button" className="btn" onClick={() => setDoor("sketch")} disabled={busy || !wid}>
                 Start from a sketch
