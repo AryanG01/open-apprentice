@@ -48,14 +48,15 @@ banner leaves open, and never shows a result it has not checked.
    price, button and small print when you drew them).
 3. **Tavily Extract reads your page.** **Nemotron-3-Super lifts facts from the page text**, each with the quote it came from,
    and drafts three headline options from those facts only. A fact survives only if its quote is on the page. A headline
-   survives only if every number, currency and name in it is on the page, none of a list of unsupported claim words
+   draft survives only if every number and currency in it is on the page, none of a list of unsupported claim words
    (best, number one, guaranteed, free, and their German, French and Spanish equivalents) appears unless the page uses it,
-   and the font can draw every character. The price line is the page's own text, never generated. If no draft survives,
+   and the font can draw every character. This is permission to draft, not proof of truth: a new product name, a dropped
+   "up to" or a negation can pass the checks, so each draft carries review notes and you approve the wording. The price line is the page's own text, never generated. If no draft survives,
    the product name is the headline.
 4. **You add your own logo and product pictures** (the app generates no pictures: Token Factory offers no image model),
    pick a colour, and confirm. The same pipeline builds the banner as editable layers, adapts it to a story card, asks on
    overflow, and runs the independent verifier.
-5. **A page check** compares the price on the banner with the prices on your page (match, mismatch, unknown). It is
+5. **A page check** compares the price on the banner with the prices on your page (amount found, does not match, unknown: it shows an amount is on the page, as a current or an old price, and that no other current price sits right after the product's name; it does not prove the offer is current). It is
    advisory and never blocks a result; it is the same problem ad platforms enforce when a price does not match the page.
 6. While Nemotron reads (10 to 30 seconds) a small 3D headphones turntable turns. It was built from the sample picture with
    the img2threejs skill (only its first, blockout pass was completed; the module is hand-written) and loads only when needed.
@@ -64,7 +65,7 @@ banner leaves open, and never shows a result it has not checked.
 roles named on 6 of 6, median box overlap 0.61, every layer found on 2 of 6, decision **partial**
 (`docs/evaluation/campaign_sketch_dev_run1.md`). Headline and small-print boxes come back loose, which is why you drag boxes.
 Real hand-drawn sketches are tested separately and reported separately. One live end-to-end run on the sample page passed:
-sketch read, page read, grounded facts, a headline, a built banner, 15 of 15 independent checks, page check match.
+sketch read, page read, grounded facts, a headline, a built banner, 15 of 15 independent checks, price amount found on the page.
 
 **Who does what** (shown on the page): Nemotron-3.5-Super-VL reads the banner; you confirm the parts; deterministic
 checks and the independent verifier decide; Nemotron-3-Super words the question.

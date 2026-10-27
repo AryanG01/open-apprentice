@@ -160,3 +160,24 @@ def test_no_product_name_and_no_price_leave_empty_fields_with_a_problem():
     page = "just some words"
     c = draft(None, page=page)
     assert c.options == [{"id": "c1", "headline": ""}] and c.price == "" and c.problems
+
+
+def test_review_notes_flag_what_the_checks_cannot_settle():
+    """The four drafts the hard checks let through (a reviewer's counterexamples): each now carries a note for the owner."""
+    from open_apprentice.campaign.copy import review_notes
+
+    assert check_headline("Acme headphones", "Halden headphones. Up to 40 hours battery life.") == []
+    assert any("Acme" in n for n in review_notes("Acme headphones", "Halden headphones. Up to 40 hours battery life."))
+    neg = "Halden headphones: up to 40 hours. This is not guaranteed."
+    assert check_headline("40 hours guaranteed", neg) == []
+    assert any("not/no" in n for n in review_notes("40 hours guaranteed", neg))
+    assert any("saving" in n for n in review_notes("Save $159", "Model A costs $159; Model B costs $229."))
+    assert any("up to" in n for n in review_notes("Battery lasts 40 hours", "Battery lasts up to 40 hours."))
+
+
+def test_a_faithful_headline_has_no_notes():
+    from open_apprentice.campaign.copy import review_notes
+
+    assert review_notes("Hear only what matters.", PAGE) == []
+    assert review_notes("40-hour battery for $159", PAGE) == []
+    assert review_notes("Battery lasts up to 40 hours", "Battery lasts up to 40 hours.") == []

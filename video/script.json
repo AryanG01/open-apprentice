@@ -56,8 +56,8 @@
    ],
    "live": true,
    "onScreen": "Facts from your page, with their quotes",
-   "text": "Nemotron 3 Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number or a name that is not on the page is thrown away.",
-   "say": "Nemotron three Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number or a name that is not on the page is thrown away."
+   "text": "Nemotron 3 Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number that is not on the page is thrown away, and every draft is for you to read and approve.",
+   "say": "Nemotron three Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number that is not on the page is thrown away, and every draft is for you to read and approve."
   },
   {
    "id": "e-build",
@@ -76,8 +76,8 @@
     "s-prov-read"
    ],
    "live": true,
-   "onScreen": "Checked against your page. Nothing is conjured.",
-   "text": "A page check compares the price with the page. And this panel says where every part came from: the layout from the sketch, the words from the page, the pictures from me."
+   "onScreen": "Checked against your page. You approve the words.",
+   "text": "A page check looks for the price on the page. And this panel says where every part came from: the layout from the sketch, the words from the page, the pictures from me."
   },
   {
    "id": "e-limits",

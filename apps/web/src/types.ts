@@ -532,7 +532,7 @@ export interface PageInfo {
   origin: "tavily" | "mock";
   language: string;
   facts: { product_name: PageFact | null; prices: PagePrice[]; features: PageFact[]; legal: PageFact[] };
-  copy: { origin: "model" | "template"; options: { id: string; headline: string }[]; price: string | null; cta: string; legal: string; problems: string[] };
+  copy: { origin: "model" | "template"; options: { id: string; headline: string; notes?: string[] }[]; price: string | null; cta: string; legal: string; problems: string[] };
   problems: string[];
   note: string;
 }

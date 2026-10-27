@@ -22,10 +22,10 @@ def test_match_when_every_banner_amount_is_on_the_page():
     row = r["rows"][0]
     assert row["field"] == "price" and row["ok"] is True
     assert row["banner"] == ["$159", "$229"] and row["page"] == ["$159", "$229"]
-    assert row["detail"] == "The banner prices $159, $229 are on the page."
+    assert row["detail"] == "The banner prices $159, $229 are listed on the page."
     assert (
         check_page(scene("$159"), PAGE)["rows"][0]["detail"]
-        == "The banner price $159 is on the page."
+        == "The banner price $159 is listed on the page."
     )
 
 
@@ -70,3 +70,27 @@ def test_the_checker_is_independent_of_agent_visible_code(bad):
         a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names
     ]
     assert not any(f"open_apprentice.{bad}" in m for m in mods)
+
+
+def named(price, headline):
+    return {"nodes": [
+        {"id": "h", "type": "text", "role": "headline", "text": headline},
+        {"id": "p", "type": "text", "role": "price", "text": price},
+    ]}
+
+
+def test_a_price_listed_for_another_product_is_not_a_match():
+    page = "Product A: $229. Product B: $159."
+    r = check_page(named("$159", "Product A"), page)
+    assert r["status"] == "mismatch" and "$229" not in r["rows"][0]["detail"] and "229" in r["rows"][0]["detail"]
+    assert check_page(named("$159", "Product B"), page)["status"] == "match"
+
+
+def test_a_price_the_page_gives_as_an_old_price_is_not_the_current_one():
+    page = "Product A: Was $159. Now $129."
+    assert check_page(named("$159", "Product A"), page)["status"] == "mismatch"
+    assert check_page(named("$129", "Product A"), page)["status"] == "match"
+
+
+def test_the_row_says_what_was_checked():
+    assert check_page(scene("$159"), PAGE)["rows"][0]["scope"] == "amount_on_page"

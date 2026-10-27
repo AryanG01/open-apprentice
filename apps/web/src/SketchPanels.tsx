@@ -106,16 +106,23 @@ export function CopyPanel({ page, choice, onChoice, price, onPrice, cta, onCta, 
       ) : null}
       {page.copy.options.length ? (
         <fieldset className="opts" disabled={disabled}>
-          <legend className="label">Headline, {page.copy.origin === "model" ? "drafted by Nemotron-3-Super from those facts" : "the product name from your page"}</legend>
+          <legend className="label">Headline, {page.copy.origin === "model" ? "drafts by Nemotron-3-Super from those facts. Read it and approve it" : "the product name from your page"}</legend>
           {page.copy.options.map((o) => (
             <label key={o.id} className={choice === o.id ? "opt on" : "opt"}>
               <input type="radio" name="headline-option" value={o.id} checked={choice === o.id} onChange={() => onChoice(o.id, o.headline)} />
               <span>
                 {o.headline}
                 <span className="opt-tags">
-                  {choice === o.id ? <span className="pill ok">names and numbers on your page</span> : null}
+                  <span className="pill">numbers and currency are on your page</span>
                   <span className={o.headline.length <= CARD_FITS ? "pill" : "pill recorded"}>{o.headline.length <= CARD_FITS ? "fits the story card" : "long: the story card will ask"}</span>
                 </span>
+                {o.notes?.length ? (
+                  <ul className="muted small review-notes">
+                    {o.notes.map((n) => (
+                      <li key={n}>Check: {n}</li>
+                    ))}
+                  </ul>
+                ) : null}
               </span>
             </label>
           ))}
@@ -211,8 +218,9 @@ export function PageCheckBox({ check, error }: { check: PageCheck | null; error:
       <div className={tone}>
         {status === "match" ? <CheckCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" /> : <WarningCircle size={22} weight="fill" aria-hidden="true" className="callout-icon" />}
         <div>
-          <span className={status === "match" ? "pill ok" : status === "mismatch" ? "pill bad" : "pill"}>{status === "match" ? "Match" : status === "mismatch" ? "Mismatch" : "Unknown"}</span>
+          <span className={status === "match" ? "pill ok" : status === "mismatch" ? "pill bad" : "pill"}>{status === "match" ? "Amount found on page" : status === "mismatch" ? "Does not match the page" : "Unknown"}</span>
           {error ? <p>{error}</p> : null}
+          {status === "match" ? <p className="muted small">It shows the amount is on your page, not that it is today's price for this product.</p> : null}
           {check?.rows.map((r) => (
             <p key={r.field}>
               {r.detail}
@@ -247,7 +255,7 @@ export function Provenance({ model, layers, page, choice, pics, background }: Pr
   const option = page?.copy.options.find((o) => o.id === choice);
   const nameQuote = page?.facts.product_name?.quote;
   if (text("headline")) {
-    rows.push(["Headline", option && option.headline === text("headline") ? "Drafted by Nemotron-3-Super from your page's facts" : "Typed by you", option && nameQuote ? `Every number and name is on your page, for example “${nameQuote}”` : ""]);
+    rows.push(["Headline", option && option.headline === text("headline") ? "A Nemotron-3-Super draft from your page's facts, approved by you" : "Typed by you", option && nameQuote ? `Numbers and currency were found on your page (for example “${nameQuote}”). Wording is a draft you approved` : ""]);
   }
   const price = page?.facts.prices.find((p) => text("price").includes(p.text));
   if (text("price")) rows.push(["Price", price ? "Your page, word for word" : "Typed by you", price ? `“${price.quote}”` : ""]);
