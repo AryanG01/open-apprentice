@@ -37,7 +37,7 @@ export const Demo = () => {
 function Scene({ b }: { b: Beat }) {
   return (
     <AbsoluteFill>
-      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.card === "finale" ? <Finale b={b} /> : b.card === "cmontage" ? <CampaignMontage /> : b.card === "cresults" ? <CampaignResults /> : b.clip ? <Clip b={b} /> : null}
+      {b.card === "title" ? <TitleCard /> : b.card === "results" ? <ResultsCard /> : b.card === "montage" ? <Montage /> : b.card === "arch" ? <Architecture dur={b.dur} /> : b.card === "breadth" ? <Breadth dur={b.dur} /> : b.card === "finale" ? <Finale b={b} /> : b.card === "cmontage" ? <CampaignMontage /> : b.card === "cresults" ? <CampaignResults /> : b.card === "fresh" ? <FreshResults /> : b.clip ? <Clip b={b} /> : null}
       {b.onScreen ? <Headline text={b.onScreen} /> : null}
       {b.live ? <Tags b={b} /> : null}
       {b.explain ? <Explainer steps={b.explain} dur={b.dur} /> : null}
@@ -389,13 +389,41 @@ function CampaignMontage() {
 }
 
 /** Close: the Campaign lane's measured results, with their limits on screen. */
+/** The first attempt on four new banners: what went in, what came out, including the cards that were flawed and the ones never built. */
+function FreshResults() {
+  const cols: { n: string; src: string; out: string | null; label: string; note: string; tone: string }[] = [
+    { n: "1 lamp", src: "in1.jpg", out: "out1.jpg", label: "built, 15 / 15 checks", note: "stray bit of the logo above the lamp", tone: C.amber },
+    { n: "2 bottle", src: "in2.jpg", out: null, label: "nothing built", note: "a tall narrow product cannot reach the minimum width", tone: C.pink },
+    { n: "3 speaker, long copy", src: "in3.jpg", out: "out3.jpg", label: "built as two cards, 15 / 15", note: "speaker cut off; all 101 characters kept", tone: C.amber },
+    { n: "4 forest photo", src: "in4.jpg", out: null, label: "nothing built", note: "not refused for the photo background; stopped by the same width limit", tone: C.pink },
+  ];
+  return (
+    <AbsoluteFill style={{ ...grid, padding: "70px 80px", color: C.ink }}>
+      <div style={{ fontSize: 56, fontWeight: 600, color: "#fff" }}>First attempt on four new banners</div>
+      <div style={{ display: "flex", gap: 28, marginTop: 34 }}>
+        {cols.map((c) => (
+          <div key={c.n} style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 28, color: C.ink2, marginBottom: 8 }}>{c.n}</div>
+            <Img src={staticFile(`fresh/${c.src}`)} style={{ width: "100%", borderRadius: 8, border: "1px solid #2a4670" }} />
+            <div style={{ height: 300, marginTop: 14, display: "flex", alignItems: "center", justifyContent: "center", background: "#0a1a30", borderRadius: 8, border: "1px solid #2a4670" }}>
+              {c.out ? <Img src={staticFile(`fresh/${c.out}`)} style={{ maxWidth: "100%", maxHeight: 290, objectFit: "contain" }} /> : <span style={{ fontSize: 30, color: C.ink2 }}>no story card</span>}
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 600, color: c.tone, marginTop: 12 }}>{c.label}</div>
+            <div style={{ fontSize: 24, color: C.ink2, marginTop: 4, lineHeight: 1.25 }}>{c.note}</div>
+          </div>
+        ))}
+      </div>
+    </AbsoluteFill>
+  );
+}
+
 function CampaignResults() {
   const rows: [string, string, string][] = [
-    ["Nemotron-3.5-Super-VL names every part (6 banners)", "6 / 6", "words 83% exact; boxes only partly right, so you confirm them"],
-    ["Sketch reading (6 synthetic wireframes)", "6 / 6", "roles named; every layer found on 2 of 6: partial, boxes come back loose"],
-    ["Real 16:9 designs that fit the current rule", "252 / 274", "upper bound, by element count; the old six-part rule: 0 / 274"],
-    ["Independent checks on a story card", "14 / 14", "for the banner in this video; no authored answer exists"],
-    ["Sealed set: 8 new banners, 4 new languages", "22 / 22", "pass on Konva and Fabric"],
+    ["Four new banners: every part and word read", "24 / 24 · 16 / 16", "roles and exact text, first attempt, nothing tuned"],
+    ["Boxes on target", "18 / 24", "loose when a headline wraps onto many lines, so you drag them"],
+    ["Story cards built / visibly clean", "2 / 0", "both passed 15 / 15 checks and both had a flaw; two built nothing"],
+    ["Sketch reading (6 synthetic wireframes)", "6 / 6 roles", "all layers found on 2 of 6: partial"],
+    ["Sealed set: 8 banners, 4 languages", "22 / 22", "our rules applied on Konva and Fabric; not new learning"],
   ];
   return (
     <AbsoluteFill style={{ ...grid, padding: "90px 140px", color: C.ink }}>
@@ -405,16 +433,17 @@ function CampaignResults() {
           {rows.map(([q, v, note]) => (
             <tr key={q} style={{ borderTop: "1px solid #2a4670" }}>
               <td style={{ padding: "16px 10px" }}>{q}</td>
-              <td style={{ color: v.startsWith("0") ? C.amber : C.green, fontWeight: 600, whiteSpace: "nowrap", paddingRight: 30 }}>{v}</td>
+              <td style={{ color: /^(0|18|2 \/ 0|6 \/ 6 roles)/.test(v) ? C.amber : C.green, fontWeight: 600, whiteSpace: "nowrap", paddingRight: 30 }}>{v}</td>
               <td style={{ color: C.ink2, fontSize: 28 }}>{note}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <div style={{ fontSize: 24, color: C.ink2, marginTop: 30, lineHeight: 1.4 }}>
-        The reading probe is one pre-registered run on 6 development banners (partly right). The 274 designs are a public dataset we scanned ourselves: our own
-        measurement, not user research. The sealed set was written by a separate AI agent from the written rules only. Every screen in this video is a real
-        session on the public demo (Nemotron-3.5-Super-VL, Nemotron-3-Super and Tavily live); waiting time is shortened in the edit.
+        The four banners are AI-generated fictional images we made ourselves: a small convenience set, not a benchmark and not user research; "visibly clean" is our own
+        visual review. The sketch probe is one pre-registered run on 6 synthetic wireframes. The sealed set was written by a separate AI agent from the written rules only.
+        The screens are one real session on a local build of the final code with live Nemotron-3.5-Super-VL, Nemotron-3-Super and Tavily; the sample sketch and
+        page are generated by us; waiting time is shortened in the edit.
         Full results, including what did not work: github.com/AryanG01/open-apprentice
       </div>
     </AbsoluteFill>

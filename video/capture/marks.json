@@ -1,21 +1,21 @@
 {
- "url": "https://cand---open-apprentice-md76de375q-uc.a.run.app",
+ "url": "http://127.0.0.1:8780",
  "live": true,
  "scale": 1.5,
  "marks": [
   {
    "name": "home",
-   "t": 17.878,
+   "t": 5.219,
    "box": null
   },
   {
    "name": "drop",
-   "t": 19.07,
+   "t": 6.4,
    "box": null
   },
   {
    "name": "parts",
-   "t": 32.647,
+   "t": 17.129,
    "box": {
     "x": 112,
     "y": 112.296875,
@@ -25,32 +25,32 @@
   },
   {
    "name": "parts-read",
-   "t": 37.148,
+   "t": 21.63,
    "box": null
   },
   {
    "name": "fix-start",
-   "t": 37.157,
+   "t": 21.639,
    "box": null
   },
   {
    "name": "fix-done",
-   "t": 45.057,
+   "t": 29.505,
    "box": null
   },
   {
    "name": "keys",
-   "t": 47.215,
+   "t": 31.666,
    "box": null
   },
   {
    "name": "confirm",
-   "t": 48.735,
+   "t": 33.182,
    "box": null
   },
   {
    "name": "rebuilt",
-   "t": 59.754,
+   "t": 39.313,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -60,7 +60,7 @@
   },
   {
    "name": "question",
-   "t": 64.172,
+   "t": 43.727,
    "box": {
     "x": 112,
     "y": 92,
@@ -70,12 +70,12 @@
   },
   {
    "name": "question-read",
-   "t": 70.678,
+   "t": 50.228,
    "box": null
   },
   {
    "name": "answered",
-   "t": 74.242,
+   "t": 52.898,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -85,72 +85,72 @@
   },
   {
    "name": "checks",
-   "t": 79.277,
+   "t": 57.928,
    "box": null
   },
   {
    "name": "checks-read",
-   "t": 84.281,
+   "t": 62.929,
    "box": null
   },
   {
    "name": "s-home",
-   "t": 86.717,
+   "t": 65.366,
    "box": null
   },
   {
    "name": "s-open",
-   "t": 86.717,
+   "t": 65.367,
    "box": null
   },
   {
    "name": "s-sketch",
-   "t": 91.661,
+   "t": 69.557,
    "box": null
   },
   {
    "name": "s-page",
-   "t": 93.797,
+   "t": 71.695,
    "box": null
   },
   {
    "name": "s-read",
-   "t": 94.729,
+   "t": 72.628,
    "box": null
   },
   {
    "name": "s-parts",
-   "t": 114.31,
+   "t": 99.794,
    "box": null
   },
   {
    "name": "s-copy",
-   "t": 117.73,
+   "t": 103.21,
    "box": {
     "x": 763.15625,
     "y": 92.234375,
     "width": 404.828125,
-    "height": 944.328125
+    "height": 1015.578125
    }
   },
   {
    "name": "s-copy-read",
-   "t": 126.965,
+   "t": 112.444,
    "box": null
   },
   {
    "name": "s-pics",
-   "t": 131.745,
+   "t": 117.192,
    "box": null
   },
   {
    "name": "s-build",
-   "t": 133.266,
+   "t": 118.712,
    "box": null
   },
   {
    "name": "s-done",
-   "t": 140.899,
+   "t": 122.362,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -160,49 +160,49 @@
   },
   {
    "name": "s-check",
-   "t": 146.314,
+   "t": 127.778,
    "box": {
     "x": 112,
-    "y": 336.875,
+    "y": 309.875,
     "width": 1056,
-    "height": 111.765625
+    "height": 138.828125
    }
   },
   {
    "name": "s-check-read",
-   "t": 151.816,
+   "t": 133.279,
    "box": null
   },
   {
    "name": "s-prov",
-   "t": 154.254,
+   "t": 135.722,
    "box": {
     "x": 112,
-    "y": 191.640625,
+    "y": 191.703125,
     "width": 1056,
-    "height": 494.25
+    "height": 515.3125
    }
   },
   {
    "name": "s-prov-read",
-   "t": 161.256,
+   "t": 142.723,
    "box": null
   },
   {
    "name": "limits",
-   "t": 163.246,
+   "t": 144.718,
    "box": {
     "x": 112,
-    "y": 231.265625,
+    "y": 112.203125,
     "width": 1056,
-    "height": 392.6875
+    "height": 537.5625
    }
   },
   {
    "name": "limits-read",
-   "t": 170.248,
+   "t": 151.72,
    "box": null
   }
  ],
- "frameOffset": 0.018
+ "frameOffset": 0.014
 }

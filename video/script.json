@@ -1,5 +1,5 @@
 {
- "note": "Honest two-door cut (26 Oct, v2): the proven banner flow first, the sketch and page flow as the extension, provenance on screen. One live capture: capture/full.mjs.",
+ "note": "Honest cut (27 Oct, v3): banner flow first, sketch as extension, then the first-attempt result on four new banners including what failed. One live capture on a local build of the final code with the same live models: capture/full.mjs --url http://127.0.0.1:8780.",
  "beats": [
   {
    "id": "e-hook",
@@ -36,7 +36,7 @@
    ],
    "live": true,
    "onScreen": "Every result is checked independently",
-   "text": "I pick split, and an independent verifier re-measures the result. For my own banner there is no authored answer, and the app says so instead of counting one."
+   "text": "I pick split, and a checker re-measures the result: copy kept, link, logo, sizes, overlaps. For my own banner there is no authored answer, and the app says so. It does not look inside the pictures."
   },
   {
    "id": "e-sketch",
@@ -80,13 +80,19 @@
    "text": "A page check looks for the price on the page. And this panel says where every part came from: the layout from the sketch, the words from the page, the pictures from me."
   },
   {
+   "id": "e-fresh",
+   "card": "fresh",
+   "onScreen": "Four new banners. First attempt, nothing tuned.",
+   "text": "Then we tried four banners we had never run. Every word and part was read exactly. Three of every four boxes were right. Two banners built a card, and both had a visible flaw that the checks passed. Two built nothing, and said why."
+  },
+  {
    "id": "e-limits",
    "clip": [
     "limits",
     "limits-read"
    ],
    "onScreen": "What it cannot do yet",
-   "text": "It also says what it cannot do: flat backgrounds, one font, sixteen by nine, and no generated pictures. On our test, sketch reading named every part but its boxes were loose, which is why you drag them."
+   "text": "So it says what it cannot do: flat backgrounds, one font, sixteen by nine, no tall narrow products, and no generated pictures."
   },
   {
    "id": "e-close",
