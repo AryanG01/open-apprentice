@@ -21,7 +21,13 @@ def main() -> None:
     ap.add_argument("--port", type=int, default=8780)
     ap.add_argument("--mode", choices=["record", "replay-vision"], default="record")
     ap.add_argument("--calls", required=True)
-    ap.add_argument("--max-usd", default="0.25")
+    ap.add_argument("--max-usd", default="1.00")
+    ap.add_argument(
+        "--replay-skip",
+        type=int,
+        default=0,
+        help="drop this many logged vision replies first (to replay one later image)",
+    )
     args = ap.parse_args()
 
     os.environ["DEMO_MODEL_ENABLED"] = "1"
@@ -69,7 +75,7 @@ def main() -> None:
 
     if args.mode == "replay-vision":
         saved = [json.loads(line) for line in open(args.calls) if line.strip()]
-        replies = [c["text"] for c in saved if c["role"] == "campaign_vision"]
+        replies = [c["text"] for c in saved if c["role"] == "campaign_vision"][args.replay_skip :]
         orig_lifespan = app.router.lifespan_context
 
         @asynccontextmanager
