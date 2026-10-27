@@ -27,3 +27,8 @@ Evidence levels: *reproduced offline*, *regression test*, *source-confirmed, int
 ## Gates run on this branch (27 Oct)
 Python (3.12, engine on): 1793 tests, all pass after fixing 2 stale assertions this branch caused; browser e2e (real Chromium + engine, axe scans): 18 passed, 0 failed, 1 skipped; ruff clean; black clean on `src tests scripts`; tsc clean; web lint 0 errors, 1 pre-existing warning (`App.tsx:169`).
 `lint-imports` still not run here (no PyPI access in the sandbox): run `uv run lint-imports` before release.
+
+## Gates run at the end of the 27 Oct sprint (commit after `8072c89`)
+Python 3.12, engine on: 1,794 passed. Browser e2e (real Chromium + engine, axe, and the new `adapt_preferences` test, now part of `npm run test:e2e`): 19 passed, 0 failed, 1 skipped. Engine 92/92, snap 9/9, ruff and black clean, tsc clean, web lint 0 errors / 1 pre-existing warning. **`lint-imports`: 2 contracts kept, 0 broken** (run in a rebuilt env, `uv sync --frozen --all-groups`).
+Added this sprint: browser saved-choice sequence (v1 shrink, reuse, v2 split with the version sent, other language and workspace unaffected, stale question refused), real-engine verifier mutation table (12 defects x 8 cases caught, 8 controls clean), fresh four-banner evaluation (`docs/evaluation/fresh_synthetic/run1/RESULTS.md`), release and spend plan (`docs/release_plan_2026-10-27.md`).
+Open: re-recorded video, manual comparator, owner listening pass, spend decision, owner push and deploy, the sparse split card (frozen gold), and the page-check message printing the amount without its currency symbol.

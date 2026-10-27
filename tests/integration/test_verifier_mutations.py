@@ -8,7 +8,6 @@ import json
 import os
 import pathlib
 
-import pytest
 
 from open_apprentice.evaluation.campaign_verifier import verify_story
 from tests.integration.test_campaign_api import client  # noqa: F401  (fixture)
@@ -125,7 +124,16 @@ def test_every_injected_defect_is_caught_and_valid_results_have_no_false_positiv
             rep = verify_story(source, bad, None, gold_applies=False)
             failed = set(rep.failed())
             assert not rep.passed and expected <= failed, (label, engine, name, sorted(failed))
-            rows.append((label, engine, name, ", ".join(sorted(expected)), ", ".join(sorted(failed)), "caught"))
+            rows.append(
+                (
+                    label,
+                    engine,
+                    name,
+                    ", ".join(sorted(expected)),
+                    ", ".join(sorted(failed)),
+                    "caught",
+                )
+            )
     if os.environ.get("OA_WRITE_MUTATION_TABLE") == "1":
         lines = [
             "# Verifier mutation table (real engine states, no gold)",
@@ -141,8 +149,17 @@ def test_every_injected_defect_is_caught_and_valid_results_have_no_false_positiv
             "| Source case | Engine | Failed checks | Checks run | False positive |",
             "|---|---|---|---|---|",
         ]
-        lines += [f"| {l} | {e} | {', '.join(f) or 'none'} | {n} | {'yes' if f else 'no'} |" for l, e, f, n in controls]
-        lines += ["", "## Injected defects", "", "| Source case | Engine | Mutation | Expected failed check | Actual failed checks | Result |", "|---|---|---|---|---|---|"]
+        lines += [
+            f"| {l} | {e} | {', '.join(f) or 'none'} | {n} | {'yes' if f else 'no'} |"
+            for l, e, f, n in controls
+        ]
+        lines += [
+            "",
+            "## Injected defects",
+            "",
+            "| Source case | Engine | Mutation | Expected failed check | Actual failed checks | Result |",
+            "|---|---|---|---|---|---|",
+        ]
         lines += [f"| {' | '.join(r)} |" for r in rows]
         (OUT / "verifier_mutations.md").write_text("\n".join(lines) + "\n")
     caught = [r for r in rows if r[-1] == "caught"]

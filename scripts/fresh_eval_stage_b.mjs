@@ -14,9 +14,9 @@ const SET = "docs/evaluation/fresh_synthetic";
 const only = arg("--only", null);
 const order = fs.readFileSync(path.join(SET, "run_order.txt"), "utf8").split("\n").map((s) => s.trim()).filter(Boolean);
 const expected = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(SET, "evaluator_only/expected_content.json"), "utf8")).records.map((r) => [r.id, r]));
+const seedFile = arg("--seeds", "stage_b_box_corrections.json");
 const seeds = JSON.parse(fs.readFileSync(path.join(OUT, seedFile), "utf8")); // hand-measured boxes for the off-target ones
 const dir = path.join(OUT, arg("--stage-dir", "stage_b"));
-const seedFile = arg("--seeds", "stage_b_box_corrections.json");
 fs.mkdirSync(dir, { recursive: true });
 const norm = (s) => s.normalize("NFC").replace(/\s+/g, " ").trim();
 const LEG = { brand_mark: "Logo", product_image: "Product image", headline: "Headline", price: "Price", cta: "Button", legal: "Small print" };
