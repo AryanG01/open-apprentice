@@ -1,0 +1,97 @@
+{
+ "status": 200,
+ "body": {
+  "upload_id": "6fac1540b977",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     640,
+     130.3,
+     160,
+     29.5
+    ],
+    "text": "",
+    "font_px": 24,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     230.4,
+     20.2,
+     189.4,
+     659.5
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     640,
+     190.1,
+     579.8,
+     180
+    ],
+    "text": "Fill the room,\nnot the shelf.",
+    "font_px": 96,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     640,
+     409.7,
+     249.6,
+     70.6
+    ],
+    "text": "SGD 199",
+    "font_px": 48,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     640,
+     519.8,
+     349.4,
+     69.8
+    ],
+    "text": "SHOP THE TOWER",
+    "font_px": 24,
+    "bold": true,
+    "color": "#1a2e4a",
+    "fill": "#ffffff"
+   },
+   {
+    "role": "legal",
+    "box": [
+     640,
+     619.9,
+     240.6,
+     30.2
+    ],
+    "text": "Demo offer. Speaker only.",
+    "font_px": 16,
+    "bold": false,
+    "color": "#ffffff",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

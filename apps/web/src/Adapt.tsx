@@ -172,6 +172,19 @@ function cleanCrop(img: HTMLImageElement, pix: Pix | null, flat: boolean, l: Ada
   const ctx = c.getContext("2d");
   ctx?.drawImage(img, l.box[0], l.box[1], l.box[2], l.box[3], 0, 0, c.width, c.height);
   if (ctx && pix && flat) {
+    // a generated or compressed banner's "flat" colour drifts by a few levels, so a cut-out would show as a faintly different box on the card:
+    // pixels within a hair of the background become exactly the background (soft shadows and edges, further away, stay)
+    const im = ctx.getImageData(0, 0, c.width, c.height);
+    const [br, bg, bb] = pix.rgb;
+    for (let i = 0; i < im.data.length; i += 4) {
+      const dr = im.data[i] - br, dg = im.data[i + 1] - bg, db = im.data[i + 2] - bb;
+      if (dr * dr + dg * dg + db * db <= 22 * 22) {
+        im.data[i] = br;
+        im.data[i + 1] = bg;
+        im.data[i + 2] = bb;
+      }
+    }
+    ctx.putImageData(im, 0, 0);
     const comps = compsOf(pix);
     const others = layers.filter((o) => o !== l).map((o) => o.box);
     const ids = pictureComponents(comps, l.box, others);
@@ -450,7 +463,7 @@ export function Adapt() {
             return [x, y, w, h].map(Math.round);
           };
           lb = grow(lb, 24);
-          if (lb.some((v, i) => Math.abs(v - logo.box[i]) > 4)) {
+          if (logo.box[2] < 24 || logo.box[3] < 24 || lb.some((v, i) => Math.abs(v - logo.box[i]) > 4)) {
             snapped = snapped.map((l) => (l === logo ? { ...l, box: lb } : l));
             notes.push("the logo box was fitted to the whole wordmark");
           }

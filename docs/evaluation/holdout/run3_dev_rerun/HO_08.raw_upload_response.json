@@ -1,0 +1,97 @@
+{
+ "status": 200,
+ "body": {
+  "upload_id": "3bc51cd55b06",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     769.3,
+     164.9,
+     185.6,
+     25.2
+    ],
+    "text": "",
+    "font_px": 24,
+    "bold": true,
+    "color": "#000000",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     25.6,
+     205.2,
+     709.1,
+     314.6
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     769.3,
+     214.6,
+     474.9,
+     125.3
+    ],
+    "text": "Built for the long walk home,\nthe rainy Monday commute\nand every quiet step in between.",
+    "font_px": 36,
+    "bold": false,
+    "color": "#000000",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     769.3,
+     374.4,
+     335.4,
+     70.6
+    ],
+    "text": "SGD 119",
+    "font_px": 72,
+    "bold": true,
+    "color": "#000000",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     769.3,
+     474.5,
+     380.2,
+     65.5
+    ],
+    "text": "SHOP THE SNEAKER",
+    "font_px": 24,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#000000"
+   },
+   {
+    "role": "legal",
+    "box": [
+     769.3,
+     564.5,
+     185.6,
+     20.2
+    ],
+    "text": "Demo offer. Pair only.",
+    "font_px": 16,
+    "bold": false,
+    "color": "#000000",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

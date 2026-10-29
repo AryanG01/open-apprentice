@@ -1,0 +1,37 @@
+{
+ "file": "HO_09.jpeg",
+ "events": [
+  {
+   "url": "runs",
+   "status": 200
+  }
+ ],
+ "corrections": [],
+ "stage": "editor",
+ "raw": {
+  "origin": "model",
+  "model": "nvidia/Nemotron-3.5-Super-VL",
+  "roles": [
+   "brand_mark",
+   "product_image",
+   "headline",
+   "price",
+   "cta",
+   "legal"
+  ],
+  "has_all_roles": true,
+  "raw_text_exact": {
+   "headline": true,
+   "price": true,
+   "cta": true,
+   "legal": true
+  }
+ },
+ "snap_note": "The boxes were snapped to what is in the image; price, button, small print moved onto their own lines; the product box was fitted to the whole picture; the logo box was fitted to the whole wordmark.",
+ "blocked_in_editor": null,
+ "question": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype It needs one decision from you Your story cards Your banner Rebuilt as editable layers Waiting for your decision Story card No layout fits this banner, so it stopped instead of guessing. The headline needs 317 px but its frame holds 160 px; the logo breaks a layout limit. Shrinking the product image does not fit; Splitting across two cards does not fit. (built-in wording) built-in does not fit outside safe: u-09e0ed3a9d9a-brand Shrink the product image built-in does not fit outside safe: u-09e0ed3a9d9a-brand outside safe: u-09e0ed3a9d9a-brand-2 Split across two cards Neither layout fits this banner, so nothing was built. a part would sit outside the safe area. Move or resize that part in the editor and try again. Start over What it cannot do yet",
+ "answer": "none_fits",
+ "checks": [],
+ "final_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype It needs one decision from you Your story cards Your banner Rebuilt as editable layers Waiting for your decision Story card No layout fits this banner, so it stopped instead of guessing. The headline needs 317 px but its frame holds 160 px; the logo breaks a layout limit. Shrinking the product image does not fit; Splitting across two cards does not fit. (built-in wording) built-in does not fit outside safe: u-09e0ed3a9d9a-brand Shrink the product image built-in does not fit outside safe: u-09e0ed3a9d9a-brand outside safe: u-09e0ed3a9d9a-brand-2 Split across two cards Neither layout fits this banner, so nothing was built. a part would sit outside the safe area. Move or resize that part in the editor and try again. Start over What it cannot do yet",
+ "elapsed_s": 71.398
+}

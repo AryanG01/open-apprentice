@@ -1,0 +1,44 @@
+{
+ "file": "HO_10.jpeg",
+ "events": [
+  {
+   "url": "runs",
+   "status": 200
+  },
+  {
+   "url": "answer",
+   "status": 200
+  }
+ ],
+ "corrections": [],
+ "stage": "editor",
+ "raw": {
+  "origin": "model",
+  "model": "nvidia/Nemotron-3.5-Super-VL",
+  "roles": [
+   "brand_mark",
+   "product_image",
+   "headline",
+   "price",
+   "cta",
+   "legal"
+  ],
+  "has_all_roles": true,
+  "raw_text_exact": {
+   "headline": true,
+   "price": true,
+   "cta": true,
+   "legal": true
+  }
+ },
+ "snap_note": "The boxes were snapped to what is in the image; the logo box was fitted to the whole wordmark.",
+ "blocked_in_editor": null,
+ "question": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype It needs one decision from you Your story cards Your banner Rebuilt as editable layers Waiting for your decision Story card The copy does not fit, so it is asking instead of guessing. The headline needs 317 px but its frame provides only 160 px, causing overflow. Shrinking the product image fits. Splitting across two cards fits. (wording by Nemotron-3-Super, every number checked against the measured facts) built-in fits Shrink the product image built-in fits Split across two cards Neither: leave it unchanged Start over What it cannot do yet",
+ "answer": "split",
+ "checks": [
+  15,
+  15
+ ],
+ "final_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype Your story card Your story cards Your banner Rebuilt as editable layers Story card, 1080 × 1920Actual size 15 of 15 structure checks passed independent verifier: your words kept exactly, link, logo, picture proportions, safe areas, minimum sizes, text fit, nothing missing or doubled. It does not look inside the pictures (they were cleaned in your browser before the build), and it has no authored expected output for your banner, so that comparison is not part of these checks. remembered for this workspace: Split across two cards for en (version 1) Kept for about 30 minutes while the server runs; a reload or restart starts fresh. See every check Proof you can check The receipt lists your approved words, link and pictures next to what ended up on the card, the checks that ran and the choice you made, tied to the files by hash. \"Approved\" means the words as you confirmed them in the editor, not read back from the image. It shows the record matches the files; it does not show the card looks good. Download the change receipt (JSON) Check it without the app: python3 scripts/verify_receipt.py open-apprentice-receipt.json story-card.png (script in the repository, standard library only). Try to break it Each button damages a copy of this result and asks the independent checker whether it notices. Your result is not changed. Delete the product picture Change a digit of the price Push the headline off the card How did it go? Three quick questions and an optional note. They help more than praise: tell us what is wrong. Would you post this card as it is? 1 2 3 4 5 1 = never, 5 = yes, today How many things did you have to fix? Choose None 1 or 2 3 to 5 More than 5 Are all your words, your pri",
+ "elapsed_s": 55.858
+}

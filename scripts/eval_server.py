@@ -23,6 +23,11 @@ def main() -> None:
     ap.add_argument("--calls", required=True)
     ap.add_argument("--max-usd", default="1.00")
     ap.add_argument(
+        "--replay-pick",
+        default="",
+        help="comma-separated zero-based indexes of the logged vision replies to replay, in this order",
+    )
+    ap.add_argument(
         "--replay-skip",
         type=int,
         default=0,

@@ -1,0 +1,97 @@
+{
+ "status": 200,
+ "body": {
+  "upload_id": "318e99ddc3a3",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     588.8,
+     28.8,
+     102.4,
+     28.8
+    ],
+    "text": "",
+    "font_px": 24,
+    "bold": false,
+    "color": "#1b4332",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     440.3,
+     85,
+     380.2,
+     380.2
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     320,
+     489.6,
+     640,
+     50.4
+    ],
+    "text": "Green corners for grey days.",
+    "font_px": 48,
+    "bold": true,
+    "color": "#1b4332",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     560.6,
+     547.2,
+     160,
+     50.4
+    ],
+    "text": "SGD 29",
+    "font_px": 32,
+    "bold": false,
+    "color": "#1b4332",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     480,
+     612,
+     320,
+     57.6
+    ],
+    "text": "SHOP THE PLANTER",
+    "font_px": 20,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#1b4332"
+   },
+   {
+    "role": "legal",
+    "box": [
+     540.2,
+     676.8,
+     199.7,
+     21.6
+    ],
+    "text": "Demo offer. Planter only.",
+    "font_px": 14,
+    "bold": false,
+    "color": "#1b4332",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}
