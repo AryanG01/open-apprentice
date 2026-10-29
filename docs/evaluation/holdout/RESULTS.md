@@ -28,3 +28,8 @@ the build step is unchanged. Fresh model reads were used (the model is not deter
 | `run2_dev_rerun/` (all 12 in-envelope) | 6 / 12: HO_01, 02, 03, 08, 10, 13 | HO_04, 06: logo still under 24 px (padding bug, fixed afterwards); HO_07, 12: product box overlaps text; HO_09, 11: no layout fits (logo outside the safe area) |
 | `run3_dev_rerun/` (HO_04, 06, 08, 09 after the padding fix) | 2 / 4: HO_06, 08 | HO_04, 09: no layout fits (a very wide, thin wordmark lands outside the safe area) |
 Known remaining failure classes, none fixed: very wide thin wordmarks (no layout fits), a product box that swallows text in stacked or centred layouts, a near-empty second split card, bottom-light compositions.
+
+### Independent review of the development-rerun cards (fresh-context reviewer, same checklist; NOT held-out)
+Of 7 built cards (HO_01, 02, 03, 08, 10, 13 in run2; HO_06 in run3): **6 clean** (HO_03 borderline: a small hard-edged shadow patch; HO_10 one doubt: a faint mark on the shoe), **1 not clean**: HO_08, the sneaker's sole is cut along a straight line (the product box stopped short).
+Patterns the reviewer reports on every card: weak composition (the bottom 15 to 20% of a single card is empty; on a two-card result the right card's content sits in the middle of an otherwise empty card),
+one-word last lines in headlines, and soft product shadows that end in a hard edge. Held-out first pass, restated: **4 clean cards among 12 in-envelope images (33%)**; after development fixes on the same images: 6 clean of 12 built or blocked (HO_01, 02, 03, 06, 10, 13 clean-ish), a number that cannot be called held-out.
