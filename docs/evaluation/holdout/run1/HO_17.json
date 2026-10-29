@@ -1,0 +1,8 @@
+{
+ "file": "HO_17.jpeg",
+ "events": [],
+ "corrections": [],
+ "stage": "refused_background",
+ "note": "refused before any model call; operator took 'Choose another banner'",
+ "model_called": false
+}

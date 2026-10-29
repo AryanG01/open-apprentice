@@ -1,0 +1,97 @@
+{
+ "status": 200,
+ "body": {
+  "upload_id": "f45d8f711527",
+  "origin": "model",
+  "language": "en",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     83.2,
+     75.6,
+     192,
+     50.4
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     896,
+     39.6,
+     192,
+     630
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     76.8,
+     129.6,
+     652.8,
+     259.2
+    ],
+    "text": "Cold brew,\nmade slower.",
+    "font_px": 100,
+    "bold": true,
+    "color": "#4a2c1a",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     76.8,
+     432,
+     192,
+     72
+    ],
+    "text": "SGD 9",
+    "font_px": 55,
+    "bold": true,
+    "color": "#4a2c1a",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     89.6,
+     532.8,
+     396.8,
+     100.8
+    ],
+    "text": "SHOP COLD BREW",
+    "font_px": 28,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#c07a52"
+   },
+   {
+    "role": "legal",
+    "box": [
+     76.8,
+     655.2,
+     192,
+     28.8
+    ],
+    "text": "Demo offer. Bottle only.",
+    "font_px": 14,
+    "bold": false,
+    "color": "#4a2c1a",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

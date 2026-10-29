@@ -1,0 +1,97 @@
+{
+ "status": 200,
+ "body": {
+  "upload_id": "1e5d414eaa0f",
+  "origin": "model",
+  "language": "de",
+  "layers": [
+   {
+    "role": "brand_mark",
+    "box": [
+     650.2,
+     144.7,
+     179.2,
+     30.2
+    ],
+    "text": "",
+    "font_px": 20,
+    "bold": false,
+    "color": "#333333",
+    "fill": ""
+   },
+   {
+    "role": "product_image",
+    "box": [
+     139.5,
+     44.6,
+     480,
+     630
+    ],
+    "text": "",
+    "font_px": 0,
+    "bold": false,
+    "color": "",
+    "fill": ""
+   },
+   {
+    "role": "headline",
+    "box": [
+     650.2,
+     195.1,
+     590.1,
+     180
+    ],
+    "text": "Frischer Kaffee, jeden\nMorgen, ganz ohne Eile\nund ohne Kompromisse.",
+    "font_px": 55,
+    "bold": true,
+    "color": "#333333",
+    "fill": ""
+   },
+   {
+    "role": "price",
+    "box": [
+     650.2,
+     409.7,
+     289.3,
+     110.2
+    ],
+    "text": "SGD 79",
+    "font_px": 75,
+    "bold": true,
+    "color": "#333333",
+    "fill": ""
+   },
+   {
+    "role": "cta",
+    "box": [
+     650.2,
+     545,
+     359.7,
+     79.9
+    ],
+    "text": "JETZT KAUFEN",
+    "font_px": 24,
+    "bold": true,
+    "color": "#ffffff",
+    "fill": "#c87d4e"
+   },
+   {
+    "role": "legal",
+    "box": [
+     650.2,
+     635,
+     249.6,
+     25.2
+    ],
+    "text": "Demo-Angebot. Nur Mühle.",
+    "font_px": 16,
+    "bold": false,
+    "color": "#333333",
+    "fill": ""
+   }
+  ],
+  "problems": [],
+  "note": "",
+  "model": "nvidia/Nemotron-3.5-Super-VL"
+ }
+}

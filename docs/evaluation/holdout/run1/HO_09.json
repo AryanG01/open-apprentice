@@ -1,0 +1,32 @@
+{
+ "file": "HO_09.jpeg",
+ "events": [
+  "no result within 150 s"
+ ],
+ "corrections": [],
+ "stage": "editor",
+ "raw": {
+  "origin": "model",
+  "model": "nvidia/Nemotron-3.5-Super-VL",
+  "roles": [
+   "brand_mark",
+   "product_image",
+   "headline",
+   "price",
+   "cta",
+   "legal"
+  ],
+  "has_all_roles": true,
+  "raw_text_exact": {
+   "headline": true,
+   "price": true,
+   "cta": true,
+   "legal": true
+  }
+ },
+ "snap_note": "The boxes were snapped to what is in the image; the product box was fitted to the whole picture.",
+ "blocked_in_editor": null,
+ "checks": [],
+ "final_text": "Skip to the content Open Apprentice Adapt a banner Diagrams UI components · Earlier prototype Check what Nemotron found brand mark box is too small to crop (under 24 px) Check the parts Nemotron read this banner (Nemotron-3.5-Super-VL). Boxes can be tight around the words; fix anything that is off, then continue. brand mark box is too small to crop (under 24 px) The boxes were snapped to what is in the image; the product box was fitted to the whole picture. Logo Product image Headline Price Button Small print Drag a box to move it, drag its corner to resize it. With the keyboard: arrow keys move the focused box, Shift plus arrows resize it. Logo Left Top Width Height Product image Left Top Width Height Headline Words in the image Left Top Width Height Size (px) Bold Text colour Price This banner has no price: remove it Words in the image Left Top Width Height Size (px) Bold Text colour Button This banner has no button: remove it Button label Left Top Width Height Size (px) Bold Label colour Button colour Small print This banner has no small print: remove it Words in the image Left Top Width Height Size (px) Bold Text colour These two parts are cut out as pictures. Everything else is rebuilt as editable text and shapes, so a picture should not contain any words. Logo Product image Snap boxes to the content Background colour Check the price against your page (optional) Language (2 letters) Button link (optional, https) More options Looks right: make the story card Start over What it cannot do yet",
+ "elapsed_s": 195.377
+}
