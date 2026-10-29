@@ -389,39 +389,57 @@ function CampaignMontage() {
 }
 
 /** Close: the Campaign lane's measured results, with their limits on screen. */
-/** The first attempt on four new banners: what went in, what came out, including the cards that were flawed and the ones never built. */
+/** The held-out first pass: what went in, what came out, including the card that was not clean and the twelve that built nothing clean. */
 function FreshResults() {
-  const cols: { n: string; src: string; out: string | null; label: string; note: string; tone: string }[] = [
-    { n: "1 lamp", src: "in1.jpg", out: "out1.jpg", label: "built, 15 / 15 checks", note: "stray bit of the logo above the lamp", tone: C.amber },
-    { n: "2 bottle", src: "in2.jpg", out: null, label: "nothing built", note: "a tall narrow product cannot reach the minimum width", tone: C.pink },
-    { n: "3 speaker, long copy", src: "in3.jpg", out: "out3.jpg", label: "built as two cards, 15 / 15", note: "speaker cut off; all 101 characters kept", tone: C.amber },
-    { n: "4 forest photo", src: "in4.jpg", out: null, label: "nothing built", note: "not refused for the photo background; stopped by the same width limit", tone: C.pink },
+  const stats: [string, string, string, string][] = [
+    ["12 / 12", "flat banners: every part and word read exactly", "incl. German with umlaut, a 90-character headline", C.green],
+    ["5 / 5", "photos and gradients refused before any model call", "no card built from a background it cannot keep", C.green],
+    ["5 / 12", "built a card", "7 stopped: small or cut-off logo boxes", C.amber],
+    ["4 / 12", "built a card that is clean (independent review)", "1 built card showed a faint box around the product", C.amber],
+  ];
+  const cards: { src: string; out: string; label: string; tone: string }[] = [
+    { src: "hi1.jpg", out: "ho1.jpg", label: "clean", tone: C.green },
+    { src: "hi12.jpg", out: "ho12.jpg", label: "clean", tone: C.green },
+    { src: "hi13.jpg", out: "ho13.jpg", label: "clean", tone: C.green },
+    { src: "hi7.jpg", out: "ho7.jpg", label: "built, not clean: faint box around the plant", tone: C.amber },
   ];
   return (
-    <AbsoluteFill style={{ ...grid, padding: "70px 80px", color: C.ink }}>
-      <div style={{ fontSize: 56, fontWeight: 600, color: "#fff" }}>First attempt on four new banners</div>
-      <div style={{ display: "flex", gap: 28, marginTop: 34 }}>
-        {cols.map((c) => (
-          <div key={c.n} style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 28, color: C.ink2, marginBottom: 8 }}>{c.n}</div>
-            <Img src={staticFile(`fresh/${c.src}`)} style={{ width: "100%", borderRadius: 8, border: "1px solid #2a4670" }} />
-            <div style={{ height: 300, marginTop: 14, display: "flex", alignItems: "center", justifyContent: "center", background: "#0a1a30", borderRadius: 8, border: "1px solid #2a4670" }}>
-              {c.out ? <Img src={staticFile(`fresh/${c.out}`)} style={{ maxWidth: "100%", maxHeight: 290, objectFit: "contain" }} /> : <span style={{ fontSize: 30, color: C.ink2 }}>no story card</span>}
-            </div>
-            <div style={{ fontSize: 28, fontWeight: 600, color: c.tone, marginTop: 12 }}>{c.label}</div>
-            <div style={{ fontSize: 24, color: C.ink2, marginTop: 4, lineHeight: 1.25 }}>{c.note}</div>
+    <AbsoluteFill style={{ ...grid, padding: "60px 80px", color: C.ink }}>
+      <div style={{ fontSize: 54, fontWeight: 600, color: "#fff" }}>Held-out: 17 new banners, first pass</div>
+      <div style={{ display: "flex", gap: 26, marginTop: 26 }}>
+        {stats.map(([v, l, n, tone]) => (
+          <div key={v + l} style={{ flex: 1, background: "#0a1a30", border: "1px solid #2a4670", borderRadius: 10, padding: "14px 18px" }}>
+            <div style={{ fontSize: 54, fontWeight: 600, color: tone }}>{v}</div>
+            <div style={{ fontSize: 26, lineHeight: 1.2 }}>{l}</div>
+            <div style={{ fontSize: 21, color: C.ink2, marginTop: 6 }}>{n}</div>
           </div>
         ))}
       </div>
+      <div style={{ display: "flex", gap: 22, marginTop: 26, alignItems: "flex-end" }}>
+        {cards.map((c) => (
+          <div key={c.out} style={{ flex: 1, display: "flex", gap: 12, alignItems: "flex-end" }}>
+            <Img src={staticFile(`fresh/${c.src}`)} style={{ width: "55%", borderRadius: 6, border: "1px solid #2a4670" }} />
+            <div style={{ width: "40%" }}>
+              <Img src={staticFile(`fresh/${c.out}`)} style={{ width: "100%", maxHeight: 360, objectFit: "contain", borderRadius: 6 }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 22, marginTop: 10 }}>
+        {cards.map((c) => (
+          <div key={c.label + c.out} style={{ flex: 1, fontSize: 24, fontWeight: 600, color: c.tone }}>{c.label}</div>
+        ))}
+      </div>
+      <div style={{ fontSize: 22, color: C.ink2, marginTop: 14 }}>AI-generated fictional banners we did not tune on; expected text written by us; cards reviewed by a separate reviewer. Fixes made afterwards are not counted.</div>
     </AbsoluteFill>
   );
 }
 
 function CampaignResults() {
   const rows: [string, string, string][] = [
-    ["Four new banners: every part and word read", "24 / 24 · 16 / 16", "roles and exact text, first attempt, nothing tuned"],
-    ["Boxes on target", "18 / 24", "loose when a headline wraps onto many lines, so you drag them"],
-    ["Story cards built / visibly clean", "2 / 0", "both passed 15 / 15 checks and both had a flaw; two built nothing"],
+    ["Held-out, 12 flat banners: parts and words read", "12 / 12", "all six parts and every word exact; boxes are fitted from the pixels"],
+    ["Held-out, photos and gradients refused", "5 / 5", "before any model call; a simplified version is optional and labelled"],
+    ["Held-out: clean story cards on the 12 flat banners", "4 / 12", "first pass; small logo boxes stopped most of the rest"],
     ["Sketch reading (6 synthetic wireframes)", "6 / 6 roles", "all layers found on 2 of 6: partial"],
     ["Sealed set: 8 banners, 4 languages", "22 / 22", "our rules applied on Konva and Fabric; not new learning"],
   ];
@@ -433,17 +451,16 @@ function CampaignResults() {
           {rows.map(([q, v, note]) => (
             <tr key={q} style={{ borderTop: "1px solid #2a4670" }}>
               <td style={{ padding: "16px 10px" }}>{q}</td>
-              <td style={{ color: /^(0|18|2 \/ 0|6 \/ 6 roles)/.test(v) ? C.amber : C.green, fontWeight: 600, whiteSpace: "nowrap", paddingRight: 30 }}>{v}</td>
+              <td style={{ color: /^(4 \/ 12|6 \/ 6 roles)/.test(v) ? C.amber : C.green, fontWeight: 600, whiteSpace: "nowrap", paddingRight: 30 }}>{v}</td>
               <td style={{ color: C.ink2, fontSize: 28 }}>{note}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <div style={{ fontSize: 24, color: C.ink2, marginTop: 30, lineHeight: 1.4 }}>
-        The four banners are AI-generated fictional images we made ourselves: a small convenience set, not a benchmark and not user research; "visibly clean" is our own
-        visual review. The sketch probe is one pre-registered run on 6 synthetic wireframes. The sealed set was written by a separate AI agent from the written rules only.
-        The screens are one real session on a local build of the final code with live Nemotron-3.5-Super-VL, Nemotron-3-Super and Tavily; the sample sketch and
-        page are generated by us; waiting time is shortened in the edit.
+        The 17 held-out banners are AI-generated fictional images; we wrote the expected text and a separate reviewer judged the cards; some cases arrived as several variants and none was dropped.
+        The sketch probe is one pre-registered run on 6 synthetic wireframes. The sealed set was written by a separate AI agent from the written rules only.
+        The screens are one real session on a local build of the final code with live Nemotron-3.5-Super-VL, Nemotron-3-Super and Tavily; the sample sketch and page are generated by us; waiting time is shortened in the edit.
         Full results, including what did not work: github.com/AryanG01/open-apprentice
       </div>
     </AbsoluteFill>

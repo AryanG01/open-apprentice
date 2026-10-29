@@ -92,8 +92,8 @@
   {
    "id": "e-fresh",
    "card": "fresh",
-   "onScreen": "Four new banners. First attempt, nothing tuned.",
-   "text": "Then we tried four banners we had never run. Every word and part was read exactly. Three of every four boxes were right. Two banners built a card, and both had a visible flaw that the checks passed. Two built nothing, and said why."
+   "onScreen": "Held-out test: 17 new banners, first pass",
+   "text": "Then a held-out test on seventeen new banners nobody tuned on. On the twelve with flat backgrounds, every word and every part was read exactly, and all five photos and gradients were refused before any model call. But only five of the twelve built a card, and four were clean. Most of the others stopped on small logos. We fixed some of that afterwards, and those numbers do not count."
   },
   {
    "id": "e-limits",
@@ -102,7 +102,7 @@
     "limits-read"
    ],
    "onScreen": "What it cannot do yet",
-   "text": "So it says what it cannot do: flat backgrounds, one font, sixteen by nine, no tall narrow products, and no generated pictures."
+   "text": "So it says what it cannot do: flat backgrounds only, one font, sixteen by nine, no generated pictures, and it can stop when a logo is too small or oddly spaced."
   },
   {
    "id": "e-close",

@@ -5,17 +5,17 @@
  "marks": [
   {
    "name": "home",
-   "t": 5.219,
+   "t": 5.183,
    "box": null
   },
   {
    "name": "drop",
-   "t": 6.4,
+   "t": 6.384,
    "box": null
   },
   {
    "name": "parts",
-   "t": 17.129,
+   "t": 27.979,
    "box": {
     "x": 112,
     "y": 112.296875,
@@ -25,32 +25,32 @@
   },
   {
    "name": "parts-read",
-   "t": 21.63,
+   "t": 32.482,
    "box": null
   },
   {
    "name": "fix-start",
-   "t": 21.639,
+   "t": 32.489,
    "box": null
   },
   {
    "name": "fix-done",
-   "t": 29.505,
+   "t": 40.497,
    "box": null
   },
   {
    "name": "keys",
-   "t": 31.666,
+   "t": 42.756,
    "box": null
   },
   {
    "name": "confirm",
-   "t": 33.182,
+   "t": 44.279,
    "box": null
   },
   {
    "name": "rebuilt",
-   "t": 39.313,
+   "t": 49.913,
    "box": {
     "x": 112,
     "y": 132.1875,
@@ -60,7 +60,7 @@
   },
   {
    "name": "question",
-   "t": 43.727,
+   "t": 54.328,
    "box": {
     "x": 112,
     "y": 92,
@@ -70,139 +70,154 @@
   },
   {
    "name": "question-read",
-   "t": 50.228,
+   "t": 60.83,
    "box": null
   },
   {
    "name": "answered",
-   "t": 52.898,
+   "t": 63.5,
    "box": {
     "x": 112,
     "y": 132.1875,
     "width": 1056,
-    "height": 242.8125
+    "height": 578.96875
    }
   },
   {
    "name": "checks",
-   "t": 57.928,
+   "t": 68.546,
    "box": null
   },
   {
    "name": "checks-read",
-   "t": 62.929,
+   "t": 73.547,
+   "box": null
+  },
+  {
+   "name": "proof",
+   "t": 74.461,
+   "box": {
+    "x": 112,
+    "y": 152.171875,
+    "width": 1056,
+    "height": 323.34375
+   }
+  },
+  {
+   "name": "proof-read",
+   "t": 84.165,
    "box": null
   },
   {
    "name": "s-home",
-   "t": 65.366,
+   "t": 89.113,
    "box": null
   },
   {
    "name": "s-open",
-   "t": 65.367,
+   "t": 89.113,
    "box": null
   },
   {
    "name": "s-sketch",
-   "t": 69.557,
+   "t": 93.303,
    "box": null
   },
   {
    "name": "s-page",
-   "t": 71.695,
+   "t": 95.445,
    "box": null
   },
   {
    "name": "s-read",
-   "t": 72.628,
+   "t": 96.378,
    "box": null
   },
   {
    "name": "s-parts",
-   "t": 99.794,
+   "t": 117.808,
    "box": null
   },
   {
    "name": "s-copy",
-   "t": 103.21,
+   "t": 121.227,
    "box": {
     "x": 763.15625,
     "y": 92.234375,
     "width": 404.828125,
-    "height": 1015.578125
+    "height": 1135.078125
    }
   },
   {
    "name": "s-copy-read",
-   "t": 112.444,
+   "t": 130.475,
    "box": null
   },
   {
    "name": "s-pics",
-   "t": 117.192,
+   "t": 135.254,
    "box": null
   },
   {
    "name": "s-build",
-   "t": 118.712,
+   "t": 136.776,
    "box": null
   },
   {
    "name": "s-done",
-   "t": 122.362,
+   "t": 143.528,
    "box": {
     "x": 112,
     "y": 132.1875,
     "width": 1056,
-    "height": 411.4375
+    "height": 635.59375
    }
   },
   {
    "name": "s-check",
-   "t": 127.778,
+   "t": 148.943,
    "box": {
     "x": 112,
-    "y": 309.875,
+    "y": 309.578125,
     "width": 1056,
     "height": 138.828125
    }
   },
   {
    "name": "s-check-read",
-   "t": 133.279,
+   "t": 154.444,
    "box": null
   },
   {
    "name": "s-prov",
-   "t": 135.722,
+   "t": 156.889,
    "box": {
     "x": 112,
-    "y": 191.703125,
+    "y": 192.40625,
     "width": 1056,
     "height": 515.3125
    }
   },
   {
    "name": "s-prov-read",
-   "t": 142.723,
+   "t": 163.891,
    "box": null
   },
   {
    "name": "limits",
-   "t": 144.718,
+   "t": 165.862,
    "box": {
     "x": 112,
-    "y": 112.203125,
+    "y": 111.90625,
     "width": 1056,
-    "height": 537.5625
+    "height": 560.375
    }
   },
   {
    "name": "limits-read",
-   "t": 151.72,
+   "t": 172.864,
    "box": null
   }
  ],
- "frameOffset": 0.014
+ "frameOffset": 0.017
 }
