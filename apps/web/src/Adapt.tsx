@@ -439,6 +439,25 @@ export function Adapt() {
             notes.push("the product box was fitted to the whole picture");
           }
         }
+        // the logo too: a wide-spaced wordmark is often boxed too small (cut off, or under the 24 px the crop needs); fit it to its own ink, then pad to 24 px
+        const logo = snapped.find((l) => l.role === "brand_mark");
+        if (logo) {
+          const lids = pictureComponents(comps, logo.box, snapped.filter((l) => l !== logo).map((l) => l.box));
+          let lb = unionBox(comps, lids, 2) ?? logo.box;
+          const grow = (b: number[], min: number): number[] => {
+            const w = Math.max(b[2], min), h = Math.max(b[3], min);
+            const x = Math.min(Math.max(0, b[0] - (w - b[2]) / 2), BANNER_W - w), y = Math.min(Math.max(0, b[1] - (h - b[3]) / 2), BANNER_H - h);
+            return [x, y, w, h].map(Math.round);
+          };
+          lb = grow(lb, 24);
+          if (lb.some((v, i) => Math.abs(v - logo.box[i]) > 4)) {
+            snapped = snapped.map((l) => (l === logo ? { ...l, box: lb } : l));
+            notes.push("the logo box was fitted to the whole wordmark");
+          }
+        }
+        // a product box under 24 px cannot be cropped either
+        const prod2 = snapped.find((l) => l.role === "product_image");
+        if (prod2 && (prod2.box[2] < 24 || prod2.box[3] < 24)) snapped = snapped.map((l) => (l === prod2 ? { ...l, box: [prod2.box[0], prod2.box[1], Math.max(24, prod2.box[2]), Math.max(24, prod2.box[3])] } : l));
         pix.current = pix0;
       }
       setFlat(info.flat);

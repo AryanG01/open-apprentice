@@ -10,8 +10,9 @@ const arg = (k, d) => (process.argv.includes(k) ? process.argv[process.argv.inde
 const URL_ = arg("--url", "http://127.0.0.1:8780");
 const FROM = Number(arg("--from", "1")), TO = Number(arg("--to", "17"));
 const OUT = arg("--out", "docs/evaluation/holdout/run1");
+const ONLY = arg("--only", "");
 const DIR = "docs/evaluation/holdout";
-const files = JSON.parse(fs.readFileSync(`${DIR}/manifest.json`, "utf8")).map((m) => m.file).slice(FROM - 1, TO);
+const files = JSON.parse(fs.readFileSync(`${DIR}/manifest.json`, "utf8")).map((m) => m.file).slice(FROM - 1, TO).filter((f) => !ONLY || ONLY.split(",").includes(f.replace(".jpeg", "")));
 fs.mkdirSync(OUT, { recursive: true });
 const norm = (s) => s.normalize("NFC").replace(/\s+/g, " ").trim();
 const LEG = { headline: "Headline", price: "Price", cta: "Button", legal: "Small print" };

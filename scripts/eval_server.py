@@ -78,6 +78,8 @@ def main() -> None:
     if args.mode == "replay-vision":
         saved = [json.loads(line) for line in open(args.calls) if line.strip()]
         replies = [c["text"] for c in saved if c["role"] == "campaign_vision"][args.replay_skip :]
+        if args.replay_pick:
+            replies = [replies[int(i)] for i in args.replay_pick.split(",")]
         orig_lifespan = app.router.lifespan_context
 
         @asynccontextmanager
