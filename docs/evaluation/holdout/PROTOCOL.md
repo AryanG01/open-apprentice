@@ -17,3 +17,10 @@ a correct refusal, nothing was sent to the model). Anything the app blocks is re
 for built cards a fresh-context reviewer scores the exported card against the checklist in `docs/plan/strict_rubric.md` at phone size (every approved word present and legible; product whole
 and undistorted; no fragment of another element; logo intact; nothing outside the safe area; no accidental overlap; spacing balanced). Reported as: clean / in-envelope inputs, and correct
 refusals / out-of-envelope inputs. A fix made after seeing these results is a development change, and this set is then spent.
+
+## Amendment, 29 Oct 2026, after viewing the images and before any model call
+- The assistant looked at all 17 images (contact sheets) to write `expected.json` (text read by eye; the brief's wording was used for each case). Mapping: H1 tall bottle x3 (HO_11-13), H2 tall tower x1 (HO_01), H3 soft gradient x1 (HO_14),
+  H4 photograph x4 (HO_05, 15, 16, 17), H5 long English headline x3 (HO_08-10), H6 long German headline x3 (HO_02-04), H8 stacked centred x2 (HO_06-07). **H7 (unusual layout) was not delivered.**
+  Several cases arrived as 2 to 4 variants, so the owner generated more than once: the "first output" rule was not kept, and no variant is dropped here.
+- In-envelope (flat background): 12 images (H1, H2, H5, H6, H8). Out-of-envelope: 5 images (H3, H4); the flat detector decides, and a soft gradient may pass it: that is recorded as it happens.
+- The app's per-address limit is 10 vision reads an hour, so the 17 images run in two batches with the local server restarted between them (local evaluation only; the cost cap is $0.30 for the whole run).

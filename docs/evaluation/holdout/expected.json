@@ -1,0 +1,189 @@
+[
+ {
+  "file": "HO_01.jpeg",
+  "prompt_case": "H2",
+  "case": "tall narrow product",
+  "brand": "KESTRO",
+  "headline": "Fill the room, not the shelf.",
+  "price": "SGD 199",
+  "cta": "SHOP THE TOWER",
+  "legal": "Demo offer. Speaker only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_02.jpeg",
+  "prompt_case": "H6",
+  "case": "long German headline",
+  "brand": "BRENNER",
+  "headline": "Frischer Kaffee, jeden Morgen, ganz ohne Eile und ohne Kompromisse.",
+  "price": "SGD 79",
+  "cta": "JETZT KAUFEN",
+  "legal": "Demo-Angebot. Nur Mühle.",
+  "env": "in"
+ },
+ {
+  "file": "HO_03.jpeg",
+  "prompt_case": "H6",
+  "case": "long German headline",
+  "brand": "BRENNER",
+  "headline": "Frischer Kaffee, jeden Morgen, ganz ohne Eile und ohne Kompromisse.",
+  "price": "SGD 79",
+  "cta": "JETZT KAUFEN",
+  "legal": "Demo-Angebot. Nur Mühle.",
+  "env": "in"
+ },
+ {
+  "file": "HO_04.jpeg",
+  "prompt_case": "H6",
+  "case": "long German headline",
+  "brand": "BRENNER",
+  "headline": "Frischer Kaffee, jeden Morgen, ganz ohne Eile und ohne Kompromisse.",
+  "price": "SGD 79",
+  "cta": "JETZT KAUFEN",
+  "legal": "Demo-Angebot. Nur Mühle.",
+  "env": "in"
+ },
+ {
+  "file": "HO_05.jpeg",
+  "prompt_case": "H4",
+  "case": "photograph",
+  "brand": "TRAILMARK",
+  "headline": "Carry less. Go further.",
+  "price": "SGD 149",
+  "cta": "SHOP THE PACK",
+  "legal": "Demo offer. Pack only.",
+  "env": "out"
+ },
+ {
+  "file": "HO_06.jpeg",
+  "prompt_case": "H8",
+  "case": "stacked centred layout",
+  "brand": "FERNLY",
+  "headline": "Green corners for grey days.",
+  "price": "SGD 29",
+  "cta": "SHOP THE PLANTER",
+  "legal": "Demo offer. Planter only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_07.jpeg",
+  "prompt_case": "H8",
+  "case": "stacked centred layout",
+  "brand": "FERNLY",
+  "headline": "Green corners for grey days.",
+  "price": "SGD 29",
+  "cta": "SHOP THE PLANTER",
+  "legal": "Demo offer. Planter only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_08.jpeg",
+  "prompt_case": "H5",
+  "case": "long English headline",
+  "brand": "STRIDEWELL",
+  "headline": "Built for the long walk home, the rainy Monday commute and every quiet step in between.",
+  "price": "SGD 119",
+  "cta": "SHOP THE SNEAKER",
+  "legal": "Demo offer. Pair only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_09.jpeg",
+  "prompt_case": "H5",
+  "case": "long English headline",
+  "brand": "STRIDEWELL",
+  "headline": "Built for the long walk home, the rainy Monday commute and every quiet step in between.",
+  "price": "SGD 119",
+  "cta": "SHOP THE SNEAKER",
+  "legal": "Demo offer. Pair only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_10.jpeg",
+  "prompt_case": "H5",
+  "case": "long English headline",
+  "brand": "STRIDEWELL",
+  "headline": "Built for the long walk home, the rainy Monday commute and every quiet step in between.",
+  "price": "SGD 119",
+  "cta": "SHOP THE SNEAKER",
+  "legal": "Demo offer. Pair only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_11.jpeg",
+  "prompt_case": "H1",
+  "case": "tall narrow product",
+  "brand": "ALDERA",
+  "headline": "Cold brew, made slower.",
+  "price": "SGD 9",
+  "cta": "SHOP COLD BREW",
+  "legal": "Demo offer. Bottle only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_12.jpeg",
+  "prompt_case": "H1",
+  "case": "tall narrow product",
+  "brand": "ALDERA",
+  "headline": "Cold brew, made slower.",
+  "price": "SGD 9",
+  "cta": "SHOP COLD BREW",
+  "legal": "Demo offer. Bottle only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_13.jpeg",
+  "prompt_case": "H1",
+  "case": "tall narrow product",
+  "brand": "ALDERA",
+  "headline": "Cold brew, made slower.",
+  "price": "SGD 9",
+  "cta": "SHOP COLD BREW",
+  "legal": "Demo offer. Bottle only.",
+  "env": "in"
+ },
+ {
+  "file": "HO_14.jpeg",
+  "prompt_case": "H3",
+  "case": "soft gradient",
+  "brand": "PEBBLO",
+  "headline": "Slow mornings start here.",
+  "price": "SGD 24",
+  "cta": "SHOP THE MUG",
+  "legal": "Demo offer. Mug only.",
+  "env": "out"
+ },
+ {
+  "file": "HO_15.jpeg",
+  "prompt_case": "H4",
+  "case": "photograph",
+  "brand": "TRAILMARK",
+  "headline": "Carry less. Go further.",
+  "price": "SGD 149",
+  "cta": "SHOP THE PACK",
+  "legal": "Demo offer. Pack only.",
+  "env": "out"
+ },
+ {
+  "file": "HO_16.jpeg",
+  "prompt_case": "H4",
+  "case": "photograph",
+  "brand": "TRAILMARK",
+  "headline": "Carry less. Go further.",
+  "price": "SGD 149",
+  "cta": "SHOP THE PACK",
+  "legal": "Demo offer. Pack only.",
+  "env": "out"
+ },
+ {
+  "file": "HO_17.jpeg",
+  "prompt_case": "H4",
+  "case": "photograph",
+  "brand": "TRAILMARK",
+  "headline": "Carry less. Go further.",
+  "price": "SGD 149",
+  "cta": "SHOP THE PACK",
+  "legal": "Demo offer. Pack only.",
+  "env": "out"
+ }
+]
