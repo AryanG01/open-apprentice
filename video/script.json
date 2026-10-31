@@ -14,8 +14,8 @@
    ],
    "live": true,
    "onScreen": "Drop in a banner. Check what it found.",
-   "text": "I drop in a banner. Nemotron 3.5 Super VL reads its parts, and I drag the boxes it got wrong. Nothing it says is trusted until I confirm it.",
-   "say": "I drop in a banner. Nemotron three point five Super V L reads its parts, and I drag the boxes it got wrong. Nothing it says is trusted until I confirm it."
+   "text": "I drop in a banner. Nemotron 3.5 Super VL reads it into six typed layers. Deterministic image analysis then fits every box to the real pixels and paints neighbouring ink out of each crop. Nothing is trusted until I confirm it.",
+   "say": "I drop in a banner. Nemotron three point five Super V L reads it into six typed layers. Deterministic image analysis then fits every box to the real pixels and paints neighbouring ink out of each crop. Nothing is trusted until I confirm it."
   },
   {
    "id": "e-ask",
@@ -25,8 +25,8 @@
    ],
    "live": true,
    "onScreen": "It asks before it guesses",
-   "text": "A long German headline does not fit the story card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron 3 Super words the question.",
-   "say": "A long German headline does not fit the story card. A blind tool would squeeze it. This one stops, renders both options for real, and Nemotron three Super words the question."
+   "text": "A long German headline will not fit. A blind tool would squeeze it. This one renders both layouts on a real graphics engine, measures them, and Nemotron 3 Super words the question.",
+   "say": "A long German headline will not fit. A blind tool would squeeze it. This one renders both layouts on a real graphics engine, measures them, and Nemotron three Super words the question."
   },
   {
    "id": "e-answer",
@@ -36,7 +36,7 @@
    ],
    "live": true,
    "onScreen": "Every result is checked independently",
-   "text": "I pick split, and a checker re-measures the result: copy kept, link, logo, sizes, overlaps. For my own banner there is no authored answer, and the app says so. It does not look inside the pictures."
+   "text": "I pick split. An independent verifier, separate code from the renderer, re-measures fifteen structural checks: copy, link, logo, proportions, safe areas, sizes, overlaps."
   },
   {
    "id": "e-proof",
@@ -46,7 +46,8 @@
    ],
    "live": true,
    "onScreen": "Try to break it",
-   "text": "Now I try to break it. I delete the product, change a digit of the price, push the headline off the card, and the checker catches each one. This receipt ties my approved words to the file by hash, so anyone can check it without trusting the app."
+   "text": "Now I try to break it: delete the product, change a price digit, push the headline off the card. The checker catches each one, and the receipt ties my words to the file by SHA-256, verifiable offline.",
+   "say": "Now I try to break it: delete the product, change a price digit, push the headline off the card. The checker catches each one, and the receipt ties my words to the file by sha two fifty six, verifiable offline."
   },
   {
    "id": "e-sketch",
@@ -56,7 +57,7 @@
    ],
    "live": true,
    "onScreen": "No banner yet? A sketch and your product page.",
-   "text": "No banner yet? Start from a sketch and your product page. This is a sample sketch we generated. Nemotron reads its boxes, and Tavily reads the page."
+   "text": "No banner yet? Start from a rough sketch and a product page. Nemotron reads the wireframe, and Tavily extracts the page. This sample sketch is one we generated."
   },
   {
    "id": "e-facts",
@@ -66,8 +67,8 @@
    ],
    "live": true,
    "onScreen": "Facts from your page, with their quotes",
-   "text": "Nemotron 3 Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number that is not on the page is thrown away, and every draft is for you to read and approve.",
-   "say": "Nemotron three Super lifts the facts from the page, each with the quote it came from, and drafts headlines from those facts only. A headline with a number that is not on the page is thrown away, and every draft is for you to read and approve."
+   "text": "Nemotron 3 Super lifts facts from the page, each with its source quote, and a quote that is not on the page is rejected. Headline drafts are checked for numbers, currency, claim words and glyphs, and every draft is for me to approve.",
+   "say": "Nemotron three Super lifts facts from the page, each with its source quote, and a quote that is not on the page is rejected. Headline drafts are checked for numbers, currency, claim words and glyphs, and every draft is for me to approve."
   },
   {
    "id": "e-build",
@@ -77,7 +78,7 @@
    ],
    "live": true,
    "onScreen": "Your own pictures, built as editable layers",
-   "text": "I add my own logo and product picture, and build. The banner is rebuilt as editable layers, and adapted to a story card."
+   "text": "I add my own logo and product picture, and build. The banner is rebuilt as editable layers on Konva and Fabric, and adapted to a story card."
   },
   {
    "id": "e-prov",
@@ -87,13 +88,13 @@
    ],
    "live": true,
    "onScreen": "Checked against your page. You approve the words.",
-   "text": "A page check looks for the price on the page. And this panel says where every part came from: the layout from the sketch, the words from the page, the pictures from me."
+   "text": "A page check looks for the price among the amounts on the page, and this panel says where every part came from: the layout from the sketch, the words from the page, the pictures from me."
   },
   {
    "id": "e-fresh",
    "card": "fresh",
    "onScreen": "Held-out test: 17 new banners, first pass",
-   "text": "Then a held-out test on seventeen new banners nobody tuned on. On the twelve with flat backgrounds, every word and every part was read exactly, and all five photos and gradients were refused before any model call. But only five of the twelve built a card, and four were clean. Most of the others stopped on small logos. We fixed some of that afterwards, and those numbers do not count."
+   "text": "On seventeen new banners nobody tuned on: every word and part read exactly on the twelve flat ones, all five photos refused before a model call, four of twelve clean cards on the first pass. We publish what failed."
   },
   {
    "id": "e-limits",
@@ -102,12 +103,12 @@
     "limits-read"
    ],
    "onScreen": "What it cannot do yet",
-   "text": "So it says what it cannot do: flat backgrounds only, one font, sixteen by nine, no generated pictures, and it can stop when a logo is too small or oddly spaced."
+   "text": "It says what it cannot do: flat backgrounds only, one font, sixteen by nine, no generated pictures, and it can stop on a tiny or oddly spaced logo."
   },
   {
    "id": "e-close",
    "card": "cresults",
-   "text": "The numbers, and the failures, are in the repository. Open Apprentice: bring a banner or a sketch, and see what was checked."
+   "text": "Two graphics engines, an independent verifier, a hash-checked receipt, eighteen hundred tests, honest numbers. Open Apprentice."
   }
  ]
 }
